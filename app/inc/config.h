@@ -1,1 +1,1 @@
-./config-modduo.h
+./config-modduos.h
