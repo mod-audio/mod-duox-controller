@@ -1,0 +1,790 @@
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"lpc17xx_gpio.c"
+  12              		.text
+  13              		.align	1
+  14              		.syntax unified
+  15              		.thumb
+  16              		.thumb_func
+  17              		.fpu softvfp
+  19              	GPIO_GetPointer:
+  20              		@ args = 0, pretend = 0, frame = 0
+  21              		@ frame_needed = 0, uses_anonymous_args = 0
+  22              		@ link register save eliminated.
+  23 0000 0428     		cmp	r0, #4
+  24 0002 0ED8     		bhi	.L9
+  25 0004 DFE800F0 		tbb	[pc, r0]
+  26              	.L4:
+  27 0008 03       		.byte	(.L3-.L4)/2
+  28 0009 05       		.byte	(.L5-.L4)/2
+  29 000a 07       		.byte	(.L6-.L4)/2
+  30 000b 09       		.byte	(.L7-.L4)/2
+  31 000c 0B       		.byte	(.L8-.L4)/2
+  32 000d 00       		.p2align 1
+  33              	.L3:
+  34 000e 0648     		ldr	r0, .L10
+  35 0010 7047     		bx	lr
+  36              	.L5:
+  37 0012 0648     		ldr	r0, .L10+4
+  38 0014 7047     		bx	lr
+  39              	.L6:
+  40 0016 0648     		ldr	r0, .L10+8
+  41 0018 7047     		bx	lr
+  42              	.L7:
+  43 001a 0648     		ldr	r0, .L10+12
+  44 001c 7047     		bx	lr
+  45              	.L8:
+  46 001e 0648     		ldr	r0, .L10+16
+  47 0020 7047     		bx	lr
+  48              	.L9:
+  49 0022 0020     		movs	r0, #0
+  50 0024 7047     		bx	lr
+  51              	.L11:
+  52 0026 00BF     		.align	2
+  53              	.L10:
+  54 0028 00C00920 		.word	537509888
+  55 002c 20C00920 		.word	537509920
+  56 0030 40C00920 		.word	537509952
+  57 0034 60C00920 		.word	537509984
+  58 0038 80C00920 		.word	537510016
+  60              		.align	1
+  61              		.syntax unified
+  62              		.thumb
+  63              		.thumb_func
+  64              		.fpu softvfp
+  66              	FIO_HalfWordGetPointer:
+  67              		@ args = 0, pretend = 0, frame = 0
+  68              		@ frame_needed = 0, uses_anonymous_args = 0
+  69              		@ link register save eliminated.
+  70 003c 0428     		cmp	r0, #4
+  71 003e 0ED8     		bhi	.L20
+  72 0040 DFE800F0 		tbb	[pc, r0]
+  73              	.L15:
+  74 0044 03       		.byte	(.L14-.L15)/2
+  75 0045 05       		.byte	(.L16-.L15)/2
+  76 0046 07       		.byte	(.L17-.L15)/2
+  77 0047 09       		.byte	(.L18-.L15)/2
+  78 0048 0B       		.byte	(.L19-.L15)/2
+  79 0049 00       		.p2align 1
+  80              	.L14:
+  81 004a 0648     		ldr	r0, .L21
+  82 004c 7047     		bx	lr
+  83              	.L16:
+  84 004e 0648     		ldr	r0, .L21+4
+  85 0050 7047     		bx	lr
+  86              	.L17:
+  87 0052 0648     		ldr	r0, .L21+8
+  88 0054 7047     		bx	lr
+  89              	.L18:
+  90 0056 0648     		ldr	r0, .L21+12
+  91 0058 7047     		bx	lr
+  92              	.L19:
+  93 005a 0648     		ldr	r0, .L21+16
+  94 005c 7047     		bx	lr
+  95              	.L20:
+  96 005e 0020     		movs	r0, #0
+  97 0060 7047     		bx	lr
+  98              	.L22:
+  99 0062 00BF     		.align	2
+ 100              	.L21:
+ 101 0064 00C00920 		.word	537509888
+ 102 0068 20C00920 		.word	537509920
+ 103 006c 40C00920 		.word	537509952
+ 104 0070 60C00920 		.word	537509984
+ 105 0074 80C00920 		.word	537510016
+ 107              		.align	1
+ 108              		.syntax unified
+ 109              		.thumb
+ 110              		.thumb_func
+ 111              		.fpu softvfp
+ 113              	FIO_ByteGetPointer:
+ 114              		@ args = 0, pretend = 0, frame = 0
+ 115              		@ frame_needed = 0, uses_anonymous_args = 0
+ 116              		@ link register save eliminated.
+ 117 0078 0428     		cmp	r0, #4
+ 118 007a 0ED8     		bhi	.L31
+ 119 007c DFE800F0 		tbb	[pc, r0]
+ 120              	.L26:
+ 121 0080 03       		.byte	(.L25-.L26)/2
+ 122 0081 05       		.byte	(.L27-.L26)/2
+ 123 0082 07       		.byte	(.L28-.L26)/2
+ 124 0083 09       		.byte	(.L29-.L26)/2
+ 125 0084 0B       		.byte	(.L30-.L26)/2
+ 126 0085 00       		.p2align 1
+ 127              	.L25:
+ 128 0086 0648     		ldr	r0, .L32
+ 129 0088 7047     		bx	lr
+ 130              	.L27:
+ 131 008a 0648     		ldr	r0, .L32+4
+ 132 008c 7047     		bx	lr
+ 133              	.L28:
+ 134 008e 0648     		ldr	r0, .L32+8
+ 135 0090 7047     		bx	lr
+ 136              	.L29:
+ 137 0092 0648     		ldr	r0, .L32+12
+ 138 0094 7047     		bx	lr
+ 139              	.L30:
+ 140 0096 0648     		ldr	r0, .L32+16
+ 141 0098 7047     		bx	lr
+ 142              	.L31:
+ 143 009a 0020     		movs	r0, #0
+ 144 009c 7047     		bx	lr
+ 145              	.L33:
+ 146 009e 00BF     		.align	2
+ 147              	.L32:
+ 148 00a0 00C00920 		.word	537509888
+ 149 00a4 20C00920 		.word	537509920
+ 150 00a8 40C00920 		.word	537509952
+ 151 00ac 60C00920 		.word	537509984
+ 152 00b0 80C00920 		.word	537510016
+ 154              		.align	1
+ 155              		.global	GPIO_SetDir
+ 156              		.syntax unified
+ 157              		.thumb
+ 158              		.thumb_func
+ 159              		.fpu softvfp
+ 161              	GPIO_SetDir:
+ 162              		@ args = 0, pretend = 0, frame = 0
+ 163              		@ frame_needed = 0, uses_anonymous_args = 0
+ 164 00b4 38B5     		push	{r3, r4, r5, lr}
+ 165 00b6 0C46     		mov	r4, r1
+ 166 00b8 1546     		mov	r5, r2
+ 167 00ba FFF7A1FF 		bl	GPIO_GetPointer
+ 168 00be 20B1     		cbz	r0, .L34
+ 169 00c0 25B9     		cbnz	r5, .L38
+ 170 00c2 0268     		ldr	r2, [r0]
+ 171 00c4 22EA0404 		bic	r4, r2, r4
+ 172 00c8 0460     		str	r4, [r0]
+ 173              	.L34:
+ 174 00ca 38BD     		pop	{r3, r4, r5, pc}
+ 175              	.L38:
+ 176 00cc 0268     		ldr	r2, [r0]
+ 177 00ce 1443     		orrs	r4, r4, r2
+ 178 00d0 0460     		str	r4, [r0]
+ 179 00d2 FAE7     		b	.L34
+ 181              		.align	1
+ 182              		.global	GPIO_SetValue
+ 183              		.syntax unified
+ 184              		.thumb
+ 185              		.thumb_func
+ 186              		.fpu softvfp
+ 188              	GPIO_SetValue:
+ 189              		@ args = 0, pretend = 0, frame = 0
+ 190              		@ frame_needed = 0, uses_anonymous_args = 0
+ 191 00d4 10B5     		push	{r4, lr}
+ 192 00d6 0C46     		mov	r4, r1
+ 193 00d8 FFF792FF 		bl	GPIO_GetPointer
+ 194 00dc 00B1     		cbz	r0, .L39
+ 195 00de 8461     		str	r4, [r0, #24]
+ 196              	.L39:
+ 197 00e0 10BD     		pop	{r4, pc}
+ 199              		.align	1
+ 200              		.global	GPIO_ClearValue
+ 201              		.syntax unified
+ 202              		.thumb
+ 203              		.thumb_func
+ 204              		.fpu softvfp
+ 206              	GPIO_ClearValue:
+ 207              		@ args = 0, pretend = 0, frame = 0
+ 208              		@ frame_needed = 0, uses_anonymous_args = 0
+ 209 00e2 10B5     		push	{r4, lr}
+ 210 00e4 0C46     		mov	r4, r1
+ 211 00e6 FFF78BFF 		bl	GPIO_GetPointer
+ 212 00ea 00B1     		cbz	r0, .L42
+ 213 00ec C461     		str	r4, [r0, #28]
+ 214              	.L42:
+ 215 00ee 10BD     		pop	{r4, pc}
+ 217              		.align	1
+ 218              		.global	GPIO_ReadValue
+ 219              		.syntax unified
+ 220              		.thumb
+ 221              		.thumb_func
+ 222              		.fpu softvfp
+ 224              	GPIO_ReadValue:
+ 225              		@ args = 0, pretend = 0, frame = 0
+ 226              		@ frame_needed = 0, uses_anonymous_args = 0
+ 227 00f0 08B5     		push	{r3, lr}
+ 228 00f2 FFF785FF 		bl	GPIO_GetPointer
+ 229 00f6 08B1     		cbz	r0, .L47
+ 230 00f8 4069     		ldr	r0, [r0, #20]
+ 231              	.L45:
+ 232 00fa 08BD     		pop	{r3, pc}
+ 233              	.L47:
+ 234 00fc 0020     		movs	r0, #0
+ 235 00fe FCE7     		b	.L45
+ 237              		.align	1
+ 238              		.global	GPIO_IntCmd
+ 239              		.syntax unified
+ 240              		.thumb
+ 241              		.thumb_func
+ 242              		.fpu softvfp
+ 244              	GPIO_IntCmd:
+ 245              		@ args = 0, pretend = 0, frame = 0
+ 246              		@ frame_needed = 0, uses_anonymous_args = 0
+ 247              		@ link register save eliminated.
+ 248 0100 0346     		mov	r3, r0
+ 249 0102 40B9     		cbnz	r0, .L50
+ 250 0104 22B1     		cbz	r2, .L57
+ 251 0106 012A     		cmp	r2, #1
+ 252 0108 07D1     		bne	.L53
+ 253 010a 0A4B     		ldr	r3, .L60
+ 254 010c 5961     		str	r1, [r3, #20]
+ 255 010e 7047     		bx	lr
+ 256              	.L57:
+ 257 0110 084B     		ldr	r3, .L60
+ 258 0112 1961     		str	r1, [r3, #16]
+ 259 0114 7047     		bx	lr
+ 260              	.L50:
+ 261 0116 0228     		cmp	r0, #2
+ 262 0118 02D0     		beq	.L58
+ 263              	.L53:
+ 264 011a 022B     		cmp	r3, #2
+ 265 011c 01D0     		beq	.L54
+ 266              	.L55:
+ 267              	.L56:
+ 268 011e FEE7     		b	.L56
+ 269              	.L58:
+ 270 0120 22B1     		cbz	r2, .L59
+ 271              	.L54:
+ 272 0122 012A     		cmp	r2, #1
+ 273 0124 FBD1     		bne	.L55
+ 274 0126 034B     		ldr	r3, .L60
+ 275 0128 5963     		str	r1, [r3, #52]
+ 276 012a 7047     		bx	lr
+ 277              	.L59:
+ 278 012c 014B     		ldr	r3, .L60
+ 279 012e 1963     		str	r1, [r3, #48]
+ 280 0130 7047     		bx	lr
+ 281              	.L61:
+ 282 0132 00BF     		.align	2
+ 283              	.L60:
+ 284 0134 80800240 		.word	1073905792
+ 286              		.align	1
+ 287              		.global	GPIO_GetIntStatus
+ 288              		.syntax unified
+ 289              		.thumb
+ 290              		.thumb_func
+ 291              		.fpu softvfp
+ 293              	GPIO_GetIntStatus:
+ 294              		@ args = 0, pretend = 0, frame = 0
+ 295              		@ frame_needed = 0, uses_anonymous_args = 0
+ 296              		@ link register save eliminated.
+ 297 0138 0346     		mov	r3, r0
+ 298 013a 70B9     		cbnz	r0, .L63
+ 299 013c 3AB1     		cbz	r2, .L70
+ 300 013e 012A     		cmp	r2, #1
+ 301 0140 0DD1     		bne	.L66
+ 302 0142 104B     		ldr	r3, .L73
+ 303 0144 9868     		ldr	r0, [r3, #8]
+ 304 0146 C840     		lsrs	r0, r0, r1
+ 305 0148 00F00100 		and	r0, r0, #1
+ 306 014c 7047     		bx	lr
+ 307              	.L70:
+ 308 014e 0D4B     		ldr	r3, .L73
+ 309 0150 5868     		ldr	r0, [r3, #4]
+ 310 0152 C840     		lsrs	r0, r0, r1
+ 311 0154 00F00100 		and	r0, r0, #1
+ 312 0158 7047     		bx	lr
+ 313              	.L63:
+ 314 015a 0228     		cmp	r0, #2
+ 315 015c 02D0     		beq	.L71
+ 316              	.L66:
+ 317 015e 022B     		cmp	r3, #2
+ 318 0160 01D0     		beq	.L67
+ 319              	.L68:
+ 320              	.L69:
+ 321 0162 FEE7     		b	.L69
+ 322              	.L71:
+ 323 0164 3AB1     		cbz	r2, .L72
+ 324              	.L67:
+ 325 0166 012A     		cmp	r2, #1
+ 326 0168 FBD1     		bne	.L68
+ 327 016a 064B     		ldr	r3, .L73
+ 328 016c 986A     		ldr	r0, [r3, #40]
+ 329 016e C840     		lsrs	r0, r0, r1
+ 330 0170 00F00100 		and	r0, r0, #1
+ 331 0174 7047     		bx	lr
+ 332              	.L72:
+ 333 0176 034B     		ldr	r3, .L73
+ 334 0178 586A     		ldr	r0, [r3, #36]
+ 335 017a C840     		lsrs	r0, r0, r1
+ 336 017c 00F00100 		and	r0, r0, #1
+ 337 0180 7047     		bx	lr
+ 338              	.L74:
+ 339 0182 00BF     		.align	2
+ 340              	.L73:
+ 341 0184 80800240 		.word	1073905792
+ 343              		.align	1
+ 344              		.global	GPIO_ClearInt
+ 345              		.syntax unified
+ 346              		.thumb
+ 347              		.thumb_func
+ 348              		.fpu softvfp
+ 350              	GPIO_ClearInt:
+ 351              		@ args = 0, pretend = 0, frame = 0
+ 352              		@ frame_needed = 0, uses_anonymous_args = 0
+ 353              		@ link register save eliminated.
+ 354 0188 10B1     		cbz	r0, .L81
+ 355 018a 0228     		cmp	r0, #2
+ 356 018c 03D0     		beq	.L82
+ 357              	.L78:
+ 358 018e FEE7     		b	.L78
+ 359              	.L81:
+ 360 0190 024B     		ldr	r3, .L83
+ 361 0192 D960     		str	r1, [r3, #12]
+ 362 0194 7047     		bx	lr
+ 363              	.L82:
+ 364 0196 014B     		ldr	r3, .L83
+ 365 0198 D962     		str	r1, [r3, #44]
+ 366 019a 7047     		bx	lr
+ 367              	.L84:
+ 368              		.align	2
+ 369              	.L83:
+ 370 019c 80800240 		.word	1073905792
+ 372              		.align	1
+ 373              		.global	FIO_SetDir
+ 374              		.syntax unified
+ 375              		.thumb
+ 376              		.thumb_func
+ 377              		.fpu softvfp
+ 379              	FIO_SetDir:
+ 380              		@ args = 0, pretend = 0, frame = 0
+ 381              		@ frame_needed = 0, uses_anonymous_args = 0
+ 382 01a0 08B5     		push	{r3, lr}
+ 383 01a2 FFF7FEFF 		bl	GPIO_SetDir
+ 384 01a6 08BD     		pop	{r3, pc}
+ 386              		.align	1
+ 387              		.global	FIO_SetValue
+ 388              		.syntax unified
+ 389              		.thumb
+ 390              		.thumb_func
+ 391              		.fpu softvfp
+ 393              	FIO_SetValue:
+ 394              		@ args = 0, pretend = 0, frame = 0
+ 395              		@ frame_needed = 0, uses_anonymous_args = 0
+ 396 01a8 08B5     		push	{r3, lr}
+ 397 01aa FFF7FEFF 		bl	GPIO_SetValue
+ 398 01ae 08BD     		pop	{r3, pc}
+ 400              		.align	1
+ 401              		.global	FIO_ClearValue
+ 402              		.syntax unified
+ 403              		.thumb
+ 404              		.thumb_func
+ 405              		.fpu softvfp
+ 407              	FIO_ClearValue:
+ 408              		@ args = 0, pretend = 0, frame = 0
+ 409              		@ frame_needed = 0, uses_anonymous_args = 0
+ 410 01b0 08B5     		push	{r3, lr}
+ 411 01b2 FFF7FEFF 		bl	GPIO_ClearValue
+ 412 01b6 08BD     		pop	{r3, pc}
+ 414              		.align	1
+ 415              		.global	FIO_ReadValue
+ 416              		.syntax unified
+ 417              		.thumb
+ 418              		.thumb_func
+ 419              		.fpu softvfp
+ 421              	FIO_ReadValue:
+ 422              		@ args = 0, pretend = 0, frame = 0
+ 423              		@ frame_needed = 0, uses_anonymous_args = 0
+ 424 01b8 08B5     		push	{r3, lr}
+ 425 01ba FFF7FEFF 		bl	GPIO_ReadValue
+ 426 01be 08BD     		pop	{r3, pc}
+ 428              		.align	1
+ 429              		.global	FIO_IntCmd
+ 430              		.syntax unified
+ 431              		.thumb
+ 432              		.thumb_func
+ 433              		.fpu softvfp
+ 435              	FIO_IntCmd:
+ 436              		@ args = 0, pretend = 0, frame = 0
+ 437              		@ frame_needed = 0, uses_anonymous_args = 0
+ 438 01c0 08B5     		push	{r3, lr}
+ 439 01c2 FFF7FEFF 		bl	GPIO_IntCmd
+ 440 01c6 08BD     		pop	{r3, pc}
+ 442              		.align	1
+ 443              		.global	FIO_GetIntStatus
+ 444              		.syntax unified
+ 445              		.thumb
+ 446              		.thumb_func
+ 447              		.fpu softvfp
+ 449              	FIO_GetIntStatus:
+ 450              		@ args = 0, pretend = 0, frame = 0
+ 451              		@ frame_needed = 0, uses_anonymous_args = 0
+ 452 01c8 08B5     		push	{r3, lr}
+ 453 01ca FFF7FEFF 		bl	GPIO_GetIntStatus
+ 454 01ce 08BD     		pop	{r3, pc}
+ 456              		.align	1
+ 457              		.global	FIO_ClearInt
+ 458              		.syntax unified
+ 459              		.thumb
+ 460              		.thumb_func
+ 461              		.fpu softvfp
+ 463              	FIO_ClearInt:
+ 464              		@ args = 0, pretend = 0, frame = 0
+ 465              		@ frame_needed = 0, uses_anonymous_args = 0
+ 466 01d0 08B5     		push	{r3, lr}
+ 467 01d2 FFF7FEFF 		bl	GPIO_ClearInt
+ 468 01d6 08BD     		pop	{r3, pc}
+ 470              		.align	1
+ 471              		.global	FIO_SetMask
+ 472              		.syntax unified
+ 473              		.thumb
+ 474              		.thumb_func
+ 475              		.fpu softvfp
+ 477              	FIO_SetMask:
+ 478              		@ args = 0, pretend = 0, frame = 0
+ 479              		@ frame_needed = 0, uses_anonymous_args = 0
+ 480 01d8 38B5     		push	{r3, r4, r5, lr}
+ 481 01da 0C46     		mov	r4, r1
+ 482 01dc 1546     		mov	r5, r2
+ 483 01de FFF70FFF 		bl	GPIO_GetPointer
+ 484 01e2 20B1     		cbz	r0, .L99
+ 485 01e4 25B9     		cbnz	r5, .L103
+ 486 01e6 0269     		ldr	r2, [r0, #16]
+ 487 01e8 22EA0404 		bic	r4, r2, r4
+ 488 01ec 0461     		str	r4, [r0, #16]
+ 489              	.L99:
+ 490 01ee 38BD     		pop	{r3, r4, r5, pc}
+ 491              	.L103:
+ 492 01f0 0269     		ldr	r2, [r0, #16]
+ 493 01f2 1443     		orrs	r4, r4, r2
+ 494 01f4 0461     		str	r4, [r0, #16]
+ 495 01f6 FAE7     		b	.L99
+ 497              		.align	1
+ 498              		.global	FIO_HalfWordSetDir
+ 499              		.syntax unified
+ 500              		.thumb
+ 501              		.thumb_func
+ 502              		.fpu softvfp
+ 504              	FIO_HalfWordSetDir:
+ 505              		@ args = 0, pretend = 0, frame = 0
+ 506              		@ frame_needed = 0, uses_anonymous_args = 0
+ 507 01f8 70B5     		push	{r4, r5, r6, lr}
+ 508 01fa 0D46     		mov	r5, r1
+ 509 01fc 1446     		mov	r4, r2
+ 510 01fe 1E46     		mov	r6, r3
+ 511 0200 FFF71CFF 		bl	FIO_HalfWordGetPointer
+ 512 0204 70B1     		cbz	r0, .L104
+ 513 0206 46B1     		cbz	r6, .L106
+ 514 0208 1DB1     		cbz	r5, .L107
+ 515 020a 4288     		ldrh	r2, [r0, #2]
+ 516 020c 1443     		orrs	r4, r4, r2
+ 517 020e 4480     		strh	r4, [r0, #2]	@ movhi
+ 518 0210 08E0     		b	.L104
+ 519              	.L107:
+ 520 0212 0288     		ldrh	r2, [r0]
+ 521 0214 1443     		orrs	r4, r4, r2
+ 522 0216 0480     		strh	r4, [r0]	@ movhi
+ 523 0218 04E0     		b	.L104
+ 524              	.L106:
+ 525 021a 25B9     		cbnz	r5, .L110
+ 526 021c 0288     		ldrh	r2, [r0]
+ 527 021e 22EA0404 		bic	r4, r2, r4
+ 528 0222 0480     		strh	r4, [r0]	@ movhi
+ 529              	.L104:
+ 530 0224 70BD     		pop	{r4, r5, r6, pc}
+ 531              	.L110:
+ 532 0226 4288     		ldrh	r2, [r0, #2]
+ 533 0228 22EA0404 		bic	r4, r2, r4
+ 534 022c 4480     		strh	r4, [r0, #2]	@ movhi
+ 535 022e F9E7     		b	.L104
+ 537              		.align	1
+ 538              		.global	FIO_HalfWordSetMask
+ 539              		.syntax unified
+ 540              		.thumb
+ 541              		.thumb_func
+ 542              		.fpu softvfp
+ 544              	FIO_HalfWordSetMask:
+ 545              		@ args = 0, pretend = 0, frame = 0
+ 546              		@ frame_needed = 0, uses_anonymous_args = 0
+ 547 0230 70B5     		push	{r4, r5, r6, lr}
+ 548 0232 0D46     		mov	r5, r1
+ 549 0234 1446     		mov	r4, r2
+ 550 0236 1E46     		mov	r6, r3
+ 551 0238 FFF700FF 		bl	FIO_HalfWordGetPointer
+ 552 023c 70B1     		cbz	r0, .L111
+ 553 023e 46B1     		cbz	r6, .L113
+ 554 0240 1DB1     		cbz	r5, .L114
+ 555 0242 428A     		ldrh	r2, [r0, #18]
+ 556 0244 1443     		orrs	r4, r4, r2
+ 557 0246 4482     		strh	r4, [r0, #18]	@ movhi
+ 558 0248 08E0     		b	.L111
+ 559              	.L114:
+ 560 024a 028A     		ldrh	r2, [r0, #16]
+ 561 024c 1443     		orrs	r4, r4, r2
+ 562 024e 0482     		strh	r4, [r0, #16]	@ movhi
+ 563 0250 04E0     		b	.L111
+ 564              	.L113:
+ 565 0252 25B9     		cbnz	r5, .L117
+ 566 0254 028A     		ldrh	r2, [r0, #16]
+ 567 0256 22EA0404 		bic	r4, r2, r4
+ 568 025a 0482     		strh	r4, [r0, #16]	@ movhi
+ 569              	.L111:
+ 570 025c 70BD     		pop	{r4, r5, r6, pc}
+ 571              	.L117:
+ 572 025e 428A     		ldrh	r2, [r0, #18]
+ 573 0260 22EA0404 		bic	r4, r2, r4
+ 574 0264 4482     		strh	r4, [r0, #18]	@ movhi
+ 575 0266 F9E7     		b	.L111
+ 577              		.align	1
+ 578              		.global	FIO_HalfWordSetValue
+ 579              		.syntax unified
+ 580              		.thumb
+ 581              		.thumb_func
+ 582              		.fpu softvfp
+ 584              	FIO_HalfWordSetValue:
+ 585              		@ args = 0, pretend = 0, frame = 0
+ 586              		@ frame_needed = 0, uses_anonymous_args = 0
+ 587 0268 38B5     		push	{r3, r4, r5, lr}
+ 588 026a 0D46     		mov	r5, r1
+ 589 026c 1446     		mov	r4, r2
+ 590 026e FFF7E5FE 		bl	FIO_HalfWordGetPointer
+ 591 0272 08B1     		cbz	r0, .L118
+ 592 0274 0DB9     		cbnz	r5, .L122
+ 593 0276 0483     		strh	r4, [r0, #24]	@ movhi
+ 594              	.L118:
+ 595 0278 38BD     		pop	{r3, r4, r5, pc}
+ 596              	.L122:
+ 597 027a 4483     		strh	r4, [r0, #26]	@ movhi
+ 598 027c FCE7     		b	.L118
+ 600              		.align	1
+ 601              		.global	FIO_HalfWordClearValue
+ 602              		.syntax unified
+ 603              		.thumb
+ 604              		.thumb_func
+ 605              		.fpu softvfp
+ 607              	FIO_HalfWordClearValue:
+ 608              		@ args = 0, pretend = 0, frame = 0
+ 609              		@ frame_needed = 0, uses_anonymous_args = 0
+ 610 027e 38B5     		push	{r3, r4, r5, lr}
+ 611 0280 0D46     		mov	r5, r1
+ 612 0282 1446     		mov	r4, r2
+ 613 0284 FFF7DAFE 		bl	FIO_HalfWordGetPointer
+ 614 0288 08B1     		cbz	r0, .L123
+ 615 028a 0DB9     		cbnz	r5, .L127
+ 616 028c 8483     		strh	r4, [r0, #28]	@ movhi
+ 617              	.L123:
+ 618 028e 38BD     		pop	{r3, r4, r5, pc}
+ 619              	.L127:
+ 620 0290 C483     		strh	r4, [r0, #30]	@ movhi
+ 621 0292 FCE7     		b	.L123
+ 623              		.align	1
+ 624              		.global	FIO_HalfWordReadValue
+ 625              		.syntax unified
+ 626              		.thumb
+ 627              		.thumb_func
+ 628              		.fpu softvfp
+ 630              	FIO_HalfWordReadValue:
+ 631              		@ args = 0, pretend = 0, frame = 0
+ 632              		@ frame_needed = 0, uses_anonymous_args = 0
+ 633 0294 10B5     		push	{r4, lr}
+ 634 0296 0C46     		mov	r4, r1
+ 635 0298 FFF7D0FE 		bl	FIO_HalfWordGetPointer
+ 636 029c 30B1     		cbz	r0, .L131
+ 637 029e 14B9     		cbnz	r4, .L133
+ 638 02a0 808A     		ldrh	r0, [r0, #20]
+ 639 02a2 80B2     		uxth	r0, r0
+ 640              	.L129:
+ 641 02a4 10BD     		pop	{r4, pc}
+ 642              	.L133:
+ 643 02a6 C08A     		ldrh	r0, [r0, #22]
+ 644 02a8 80B2     		uxth	r0, r0
+ 645 02aa FBE7     		b	.L129
+ 646              	.L131:
+ 647 02ac 0020     		movs	r0, #0
+ 648 02ae F9E7     		b	.L129
+ 650              		.align	1
+ 651              		.global	FIO_ByteSetDir
+ 652              		.syntax unified
+ 653              		.thumb
+ 654              		.thumb_func
+ 655              		.fpu softvfp
+ 657              	FIO_ByteSetDir:
+ 658              		@ args = 0, pretend = 0, frame = 0
+ 659              		@ frame_needed = 0, uses_anonymous_args = 0
+ 660 02b0 70B5     		push	{r4, r5, r6, lr}
+ 661 02b2 0C46     		mov	r4, r1
+ 662 02b4 1646     		mov	r6, r2
+ 663 02b6 1D46     		mov	r5, r3
+ 664 02b8 FFF7DEFE 		bl	FIO_ByteGetPointer
+ 665 02bc 60B1     		cbz	r0, .L134
+ 666 02be 2DB1     		cbz	r5, .L136
+ 667 02c0 032C     		cmp	r4, #3
+ 668 02c2 09D8     		bhi	.L134
+ 669 02c4 025D     		ldrb	r2, [r0, r4]	@ zero_extendqisi2
+ 670 02c6 1643     		orrs	r6, r6, r2
+ 671 02c8 0655     		strb	r6, [r0, r4]
+ 672 02ca 05E0     		b	.L134
+ 673              	.L136:
+ 674 02cc 032C     		cmp	r4, #3
+ 675 02ce 03D8     		bhi	.L134
+ 676 02d0 025D     		ldrb	r2, [r0, r4]	@ zero_extendqisi2
+ 677 02d2 22EA0606 		bic	r6, r2, r6
+ 678 02d6 0655     		strb	r6, [r0, r4]
+ 679              	.L134:
+ 680 02d8 70BD     		pop	{r4, r5, r6, pc}
+ 682              		.align	1
+ 683              		.global	FIO_ByteSetMask
+ 684              		.syntax unified
+ 685              		.thumb
+ 686              		.thumb_func
+ 687              		.fpu softvfp
+ 689              	FIO_ByteSetMask:
+ 690              		@ args = 0, pretend = 0, frame = 0
+ 691              		@ frame_needed = 0, uses_anonymous_args = 0
+ 692 02da 70B5     		push	{r4, r5, r6, lr}
+ 693 02dc 0C46     		mov	r4, r1
+ 694 02de 1646     		mov	r6, r2
+ 695 02e0 1D46     		mov	r5, r3
+ 696 02e2 FFF7C9FE 		bl	FIO_ByteGetPointer
+ 697 02e6 78B1     		cbz	r0, .L138
+ 698 02e8 0146     		mov	r1, r0
+ 699 02ea 35B1     		cbz	r5, .L140
+ 700 02ec 032C     		cmp	r4, #3
+ 701 02ee 0BD8     		bhi	.L138
+ 702 02f0 2144     		add	r1, r1, r4
+ 703 02f2 0B7C     		ldrb	r3, [r1, #16]	@ zero_extendqisi2
+ 704 02f4 1E43     		orrs	r6, r6, r3
+ 705 02f6 0E74     		strb	r6, [r1, #16]
+ 706 02f8 06E0     		b	.L138
+ 707              	.L140:
+ 708 02fa 032C     		cmp	r4, #3
+ 709 02fc 04D8     		bhi	.L138
+ 710 02fe 2144     		add	r1, r1, r4
+ 711 0300 0B7C     		ldrb	r3, [r1, #16]	@ zero_extendqisi2
+ 712 0302 23EA0606 		bic	r6, r3, r6
+ 713 0306 0E74     		strb	r6, [r1, #16]
+ 714              	.L138:
+ 715 0308 70BD     		pop	{r4, r5, r6, pc}
+ 717              		.align	1
+ 718              		.global	FIO_ByteSetValue
+ 719              		.syntax unified
+ 720              		.thumb
+ 721              		.thumb_func
+ 722              		.fpu softvfp
+ 724              	FIO_ByteSetValue:
+ 725              		@ args = 0, pretend = 0, frame = 0
+ 726              		@ frame_needed = 0, uses_anonymous_args = 0
+ 727 030a 38B5     		push	{r3, r4, r5, lr}
+ 728 030c 0C46     		mov	r4, r1
+ 729 030e 1546     		mov	r5, r2
+ 730 0310 FFF7B2FE 		bl	FIO_ByteGetPointer
+ 731 0314 20B1     		cbz	r0, .L142
+ 732 0316 0146     		mov	r1, r0
+ 733 0318 032C     		cmp	r4, #3
+ 734 031a 9CBF     		itt	ls
+ 735 031c 0919     		addls	r1, r1, r4
+ 736 031e 0D76     		strbls	r5, [r1, #24]
+ 737              	.L142:
+ 738 0320 38BD     		pop	{r3, r4, r5, pc}
+ 740              		.align	1
+ 741              		.global	FIO_ByteClearValue
+ 742              		.syntax unified
+ 743              		.thumb
+ 744              		.thumb_func
+ 745              		.fpu softvfp
+ 747              	FIO_ByteClearValue:
+ 748              		@ args = 0, pretend = 0, frame = 0
+ 749              		@ frame_needed = 0, uses_anonymous_args = 0
+ 750 0322 38B5     		push	{r3, r4, r5, lr}
+ 751 0324 0C46     		mov	r4, r1
+ 752 0326 1546     		mov	r5, r2
+ 753 0328 FFF7A6FE 		bl	FIO_ByteGetPointer
+ 754 032c 20B1     		cbz	r0, .L145
+ 755 032e 0146     		mov	r1, r0
+ 756 0330 032C     		cmp	r4, #3
+ 757 0332 9CBF     		itt	ls
+ 758 0334 0919     		addls	r1, r1, r4
+ 759 0336 0D77     		strbls	r5, [r1, #28]
+ 760              	.L145:
+ 761 0338 38BD     		pop	{r3, r4, r5, pc}
+ 763              		.align	1
+ 764              		.global	FIO_ByteReadValue
+ 765              		.syntax unified
+ 766              		.thumb
+ 767              		.thumb_func
+ 768              		.fpu softvfp
+ 770              	FIO_ByteReadValue:
+ 771              		@ args = 0, pretend = 0, frame = 0
+ 772              		@ frame_needed = 0, uses_anonymous_args = 0
+ 773 033a 10B5     		push	{r4, lr}
+ 774 033c 0C46     		mov	r4, r1
+ 775 033e FFF79BFE 		bl	FIO_ByteGetPointer
+ 776 0342 30B1     		cbz	r0, .L150
+ 777 0344 0146     		mov	r1, r0
+ 778 0346 032C     		cmp	r4, #3
+ 779 0348 05D8     		bhi	.L151
+ 780 034a 2144     		add	r1, r1, r4
+ 781 034c 087D     		ldrb	r0, [r1, #20]	@ zero_extendqisi2
+ 782 034e C0B2     		uxtb	r0, r0
+ 783              	.L149:
+ 784 0350 10BD     		pop	{r4, pc}
+ 785              	.L150:
+ 786 0352 0020     		movs	r0, #0
+ 787 0354 FCE7     		b	.L149
+ 788              	.L151:
+ 789 0356 0020     		movs	r0, #0
+ 790 0358 FAE7     		b	.L149
+ 792 035a 00BF     		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 lpc17xx_gpio.c
+     /tmp/cc5qwU29.s:13     .text:0000000000000000 $t
+     /tmp/cc5qwU29.s:19     .text:0000000000000000 GPIO_GetPointer
+     /tmp/cc5qwU29.s:27     .text:0000000000000008 $d
+     /tmp/cc5qwU29.s:54     .text:0000000000000028 $d
+     /tmp/cc5qwU29.s:60     .text:000000000000003c $t
+     /tmp/cc5qwU29.s:66     .text:000000000000003c FIO_HalfWordGetPointer
+     /tmp/cc5qwU29.s:74     .text:0000000000000044 $d
+     /tmp/cc5qwU29.s:101    .text:0000000000000064 $d
+     /tmp/cc5qwU29.s:107    .text:0000000000000078 $t
+     /tmp/cc5qwU29.s:113    .text:0000000000000078 FIO_ByteGetPointer
+     /tmp/cc5qwU29.s:121    .text:0000000000000080 $d
+     /tmp/cc5qwU29.s:148    .text:00000000000000a0 $d
+     /tmp/cc5qwU29.s:154    .text:00000000000000b4 $t
+     /tmp/cc5qwU29.s:161    .text:00000000000000b4 GPIO_SetDir
+     /tmp/cc5qwU29.s:188    .text:00000000000000d4 GPIO_SetValue
+     /tmp/cc5qwU29.s:206    .text:00000000000000e2 GPIO_ClearValue
+     /tmp/cc5qwU29.s:224    .text:00000000000000f0 GPIO_ReadValue
+     /tmp/cc5qwU29.s:244    .text:0000000000000100 GPIO_IntCmd
+     /tmp/cc5qwU29.s:284    .text:0000000000000134 $d
+     /tmp/cc5qwU29.s:286    .text:0000000000000138 $t
+     /tmp/cc5qwU29.s:293    .text:0000000000000138 GPIO_GetIntStatus
+     /tmp/cc5qwU29.s:341    .text:0000000000000184 $d
+     /tmp/cc5qwU29.s:343    .text:0000000000000188 $t
+     /tmp/cc5qwU29.s:350    .text:0000000000000188 GPIO_ClearInt
+     /tmp/cc5qwU29.s:370    .text:000000000000019c $d
+     /tmp/cc5qwU29.s:372    .text:00000000000001a0 $t
+     /tmp/cc5qwU29.s:379    .text:00000000000001a0 FIO_SetDir
+     /tmp/cc5qwU29.s:393    .text:00000000000001a8 FIO_SetValue
+     /tmp/cc5qwU29.s:407    .text:00000000000001b0 FIO_ClearValue
+     /tmp/cc5qwU29.s:421    .text:00000000000001b8 FIO_ReadValue
+     /tmp/cc5qwU29.s:435    .text:00000000000001c0 FIO_IntCmd
+     /tmp/cc5qwU29.s:449    .text:00000000000001c8 FIO_GetIntStatus
+     /tmp/cc5qwU29.s:463    .text:00000000000001d0 FIO_ClearInt
+     /tmp/cc5qwU29.s:477    .text:00000000000001d8 FIO_SetMask
+     /tmp/cc5qwU29.s:504    .text:00000000000001f8 FIO_HalfWordSetDir
+     /tmp/cc5qwU29.s:544    .text:0000000000000230 FIO_HalfWordSetMask
+     /tmp/cc5qwU29.s:584    .text:0000000000000268 FIO_HalfWordSetValue
+     /tmp/cc5qwU29.s:607    .text:000000000000027e FIO_HalfWordClearValue
+     /tmp/cc5qwU29.s:630    .text:0000000000000294 FIO_HalfWordReadValue
+     /tmp/cc5qwU29.s:657    .text:00000000000002b0 FIO_ByteSetDir
+     /tmp/cc5qwU29.s:689    .text:00000000000002da FIO_ByteSetMask
+     /tmp/cc5qwU29.s:724    .text:000000000000030a FIO_ByteSetValue
+     /tmp/cc5qwU29.s:747    .text:0000000000000322 FIO_ByteClearValue
+     /tmp/cc5qwU29.s:770    .text:000000000000033a FIO_ByteReadValue
+     /tmp/cc5qwU29.s:32     .text:000000000000000d $d
+     /tmp/cc5qwU29.s:32     .text:000000000000000e $t
+     /tmp/cc5qwU29.s:79     .text:0000000000000049 $d
+     /tmp/cc5qwU29.s:79     .text:000000000000004a $t
+     /tmp/cc5qwU29.s:126    .text:0000000000000085 $d
+     /tmp/cc5qwU29.s:126    .text:0000000000000086 $t
+
+NO UNDEFINED SYMBOLS

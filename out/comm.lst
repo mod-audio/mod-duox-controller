@@ -1,0 +1,259 @@
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"comm.c"
+  12              		.text
+  13              		.align	1
+  14              		.syntax unified
+  15              		.thumb
+  16              		.thumb_func
+  17              		.fpu softvfp
+  19              	webgui_rx_cb:
+  20              		@ args = 0, pretend = 0, frame = 72
+  21              		@ frame_needed = 0, uses_anonymous_args = 0
+  22 0000 10B5     		push	{r4, lr}
+  23 0002 92B0     		sub	sp, sp, #72
+  24 0004 4022     		movs	r2, #64
+  25 0006 02A9     		add	r1, sp, #8
+  26 0008 0078     		ldrb	r0, [r0]	@ zero_extendqisi2
+  27 000a FFF7FEFF 		bl	serial_read
+  28 000e 08B9     		cbnz	r0, .L11
+  29              	.L1:
+  30 0010 12B0     		add	sp, sp, #72
+  31              		@ sp needed
+  32 0012 10BD     		pop	{r4, pc}
+  33              	.L11:
+  34 0014 0446     		mov	r4, r0
+  35 0016 0246     		mov	r2, r0
+  36 0018 02A9     		add	r1, sp, #8
+  37 001a 104B     		ldr	r3, .L12
+  38 001c 1868     		ldr	r0, [r3]
+  39 001e FFF7FEFF 		bl	ringbuff_write
+  40 0022 9DF80830 		ldrb	r3, [sp, #8]	@ zero_extendqisi2
+  41 0026 4BB1     		cbz	r3, .L3
+  42 0028 02AB     		add	r3, sp, #8
+  43 002a 0DF10702 		add	r2, sp, #7
+  44 002e 1019     		adds	r0, r2, r4
+  45              	.L5:
+  46 0030 8342     		cmp	r3, r0
+  47 0032 EDD0     		beq	.L1
+  48 0034 13F8011F 		ldrb	r1, [r3, #1]!	@ zero_extendqisi2
+  49 0038 0029     		cmp	r1, #0
+  50 003a F9D1     		bne	.L5
+  51              	.L3:
+  52 003c 12A9     		add	r1, sp, #72
+  53 003e 0023     		movs	r3, #0
+  54 0040 41F8443D 		str	r3, [r1, #-68]!
+  55 0044 054B     		ldr	r3, .L12
+  56 0046 5868     		ldr	r0, [r3, #4]
+  57 0048 FFF7FEFF 		bl	xQueueGiveFromISR
+  58 004c 019B     		ldr	r3, [sp, #4]
+  59 004e 002B     		cmp	r3, #0
+  60 0050 DED0     		beq	.L1
+  61 0052 034B     		ldr	r3, .L12+4
+  62 0054 4FF08052 		mov	r2, #268435456
+  63 0058 1A60     		str	r2, [r3]
+  64 005a D9E7     		b	.L1
+  65              	.L13:
+  66              		.align	2
+  67              	.L12:
+  68 005c 00000000 		.word	.LANCHOR0
+  69 0060 04ED00E0 		.word	-536810236
+  71              		.align	1
+  72              		.global	comm_init
+  73              		.syntax unified
+  74              		.thumb
+  75              		.thumb_func
+  76              		.fpu softvfp
+  78              	comm_init:
+  79              		@ args = 0, pretend = 0, frame = 0
+  80              		@ frame_needed = 0, uses_anonymous_args = 0
+  81 0064 10B5     		push	{r4, lr}
+  82 0066 0021     		movs	r1, #0
+  83 0068 0520     		movs	r0, #5
+  84 006a FFF7FEFF 		bl	xQueueCreateCountingSemaphore
+  85 006e 064C     		ldr	r4, .L16
+  86 0070 6060     		str	r0, [r4, #4]
+  87 0072 40F61840 		movw	r0, #3096
+  88 0076 FFF7FEFF 		bl	ringbuff_create
+  89 007a 2060     		str	r0, [r4]
+  90 007c 0349     		ldr	r1, .L16+4
+  91 007e 0120     		movs	r0, #1
+  92 0080 FFF7FEFF 		bl	serial_set_callback
+  93 0084 10BD     		pop	{r4, pc}
+  94              	.L17:
+  95 0086 00BF     		.align	2
+  96              	.L16:
+  97 0088 00000000 		.word	.LANCHOR0
+  98 008c 00000000 		.word	webgui_rx_cb
+ 100              		.align	1
+ 101              		.global	comm_webgui_send
+ 102              		.syntax unified
+ 103              		.thumb
+ 104              		.thumb_func
+ 105              		.fpu softvfp
+ 107              	comm_webgui_send:
+ 108              		@ args = 0, pretend = 0, frame = 0
+ 109              		@ frame_needed = 0, uses_anonymous_args = 0
+ 110 0090 08B5     		push	{r3, lr}
+ 111 0092 4A1C     		adds	r2, r1, #1
+ 112 0094 0146     		mov	r1, r0
+ 113 0096 0120     		movs	r0, #1
+ 114 0098 FFF7FEFF 		bl	serial_send
+ 115 009c 08BD     		pop	{r3, pc}
+ 117              		.align	1
+ 118              		.global	comm_webgui_read
+ 119              		.syntax unified
+ 120              		.thumb
+ 121              		.thumb_func
+ 122              		.fpu softvfp
+ 124              	comm_webgui_read:
+ 125              		@ args = 0, pretend = 0, frame = 0
+ 126              		@ frame_needed = 0, uses_anonymous_args = 0
+ 127 009e 08B5     		push	{r3, lr}
+ 128 00a0 0023     		movs	r3, #0
+ 129 00a2 4FF0FF32 		mov	r2, #-1
+ 130 00a6 1946     		mov	r1, r3
+ 131 00a8 0448     		ldr	r0, .L24
+ 132 00aa 4068     		ldr	r0, [r0, #4]
+ 133 00ac FFF7FEFF 		bl	xQueueGenericReceive
+ 134 00b0 0128     		cmp	r0, #1
+ 135 00b2 06BF     		itte	eq
+ 136 00b4 014B     		ldreq	r3, .L24
+ 137 00b6 1868     		ldreq	r0, [r3]
+ 138 00b8 0020     		movne	r0, #0
+ 139 00ba 08BD     		pop	{r3, pc}
+ 140              	.L25:
+ 141              		.align	2
+ 142              	.L24:
+ 143 00bc 00000000 		.word	.LANCHOR0
+ 145              		.align	1
+ 146              		.global	comm_webgui_set_response_cb
+ 147              		.syntax unified
+ 148              		.thumb
+ 149              		.thumb_func
+ 150              		.fpu softvfp
+ 152              	comm_webgui_set_response_cb:
+ 153              		@ args = 0, pretend = 0, frame = 0
+ 154              		@ frame_needed = 0, uses_anonymous_args = 0
+ 155              		@ link register save eliminated.
+ 156 00c0 014B     		ldr	r3, .L27
+ 157 00c2 9960     		str	r1, [r3, #8]
+ 158 00c4 D860     		str	r0, [r3, #12]
+ 159 00c6 7047     		bx	lr
+ 160              	.L28:
+ 161              		.align	2
+ 162              	.L27:
+ 163 00c8 00000000 		.word	.LANCHOR0
+ 165              		.align	1
+ 166              		.global	comm_webgui_response_cb
+ 167              		.syntax unified
+ 168              		.thumb
+ 169              		.thumb_func
+ 170              		.fpu softvfp
+ 172              	comm_webgui_response_cb:
+ 173              		@ args = 0, pretend = 0, frame = 0
+ 174              		@ frame_needed = 0, uses_anonymous_args = 0
+ 175 00cc 084B     		ldr	r3, .L35
+ 176 00ce DB68     		ldr	r3, [r3, #12]
+ 177 00d0 4BB1     		cbz	r3, .L32
+ 178 00d2 10B5     		push	{r4, lr}
+ 179 00d4 064C     		ldr	r4, .L35
+ 180 00d6 A168     		ldr	r1, [r4, #8]
+ 181 00d8 9847     		blx	r3
+ 182 00da 0023     		movs	r3, #0
+ 183 00dc E360     		str	r3, [r4, #12]
+ 184 00de 044B     		ldr	r3, .L35
+ 185 00e0 0022     		movs	r2, #0
+ 186 00e2 1A74     		strb	r2, [r3, #16]
+ 187 00e4 10BD     		pop	{r4, pc}
+ 188              	.L32:
+ 189 00e6 024B     		ldr	r3, .L35
+ 190 00e8 0022     		movs	r2, #0
+ 191 00ea 1A74     		strb	r2, [r3, #16]
+ 192 00ec 7047     		bx	lr
+ 193              	.L36:
+ 194 00ee 00BF     		.align	2
+ 195              	.L35:
+ 196 00f0 00000000 		.word	.LANCHOR0
+ 198              		.align	1
+ 199              		.global	comm_webgui_wait_response
+ 200              		.syntax unified
+ 201              		.thumb
+ 202              		.thumb_func
+ 203              		.fpu softvfp
+ 205              	comm_webgui_wait_response:
+ 206              		@ args = 0, pretend = 0, frame = 0
+ 207              		@ frame_needed = 0, uses_anonymous_args = 0
+ 208              		@ link register save eliminated.
+ 209 00f4 034B     		ldr	r3, .L40
+ 210 00f6 0122     		movs	r2, #1
+ 211 00f8 1A74     		strb	r2, [r3, #16]
+ 212 00fa 1A46     		mov	r2, r3
+ 213              	.L38:
+ 214 00fc 137C     		ldrb	r3, [r2, #16]	@ zero_extendqisi2
+ 215 00fe 002B     		cmp	r3, #0
+ 216 0100 FCD1     		bne	.L38
+ 217 0102 7047     		bx	lr
+ 218              	.L41:
+ 219              		.align	2
+ 220              	.L40:
+ 221 0104 00000000 		.word	.LANCHOR0
+ 223              		.bss
+ 224              		.align	2
+ 225              		.set	.LANCHOR0,. + 0
+ 228              	g_webgui_rx_rb:
+ 229 0000 00000000 		.space	4
+ 232              	g_webgui_sem:
+ 233 0004 00000000 		.space	4
+ 236              	g_current_item:
+ 237 0008 00000000 		.space	4
+ 240              	g_webgui_response_cb:
+ 241 000c 00000000 		.space	4
+ 244              	g_webgui_blocked:
+ 245 0010 00       		.space	1
+ 246              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 comm.c
+     /tmp/ccl7nKw1.s:13     .text:0000000000000000 $t
+     /tmp/ccl7nKw1.s:19     .text:0000000000000000 webgui_rx_cb
+     /tmp/ccl7nKw1.s:68     .text:000000000000005c $d
+     /tmp/ccl7nKw1.s:71     .text:0000000000000064 $t
+     /tmp/ccl7nKw1.s:78     .text:0000000000000064 comm_init
+     /tmp/ccl7nKw1.s:97     .text:0000000000000088 $d
+     /tmp/ccl7nKw1.s:100    .text:0000000000000090 $t
+     /tmp/ccl7nKw1.s:107    .text:0000000000000090 comm_webgui_send
+     /tmp/ccl7nKw1.s:124    .text:000000000000009e comm_webgui_read
+     /tmp/ccl7nKw1.s:143    .text:00000000000000bc $d
+     /tmp/ccl7nKw1.s:145    .text:00000000000000c0 $t
+     /tmp/ccl7nKw1.s:152    .text:00000000000000c0 comm_webgui_set_response_cb
+     /tmp/ccl7nKw1.s:163    .text:00000000000000c8 $d
+     /tmp/ccl7nKw1.s:165    .text:00000000000000cc $t
+     /tmp/ccl7nKw1.s:172    .text:00000000000000cc comm_webgui_response_cb
+     /tmp/ccl7nKw1.s:196    .text:00000000000000f0 $d
+     /tmp/ccl7nKw1.s:198    .text:00000000000000f4 $t
+     /tmp/ccl7nKw1.s:205    .text:00000000000000f4 comm_webgui_wait_response
+     /tmp/ccl7nKw1.s:221    .text:0000000000000104 $d
+     /tmp/ccl7nKw1.s:224    .bss:0000000000000000 $d
+     /tmp/ccl7nKw1.s:228    .bss:0000000000000000 g_webgui_rx_rb
+     /tmp/ccl7nKw1.s:232    .bss:0000000000000004 g_webgui_sem
+     /tmp/ccl7nKw1.s:236    .bss:0000000000000008 g_current_item
+     /tmp/ccl7nKw1.s:240    .bss:000000000000000c g_webgui_response_cb
+     /tmp/ccl7nKw1.s:244    .bss:0000000000000010 g_webgui_blocked
+
+UNDEFINED SYMBOLS
+serial_read
+ringbuff_write
+xQueueGiveFromISR
+xQueueCreateCountingSemaphore
+ringbuff_create
+serial_set_callback
+serial_send
+xQueueGenericReceive

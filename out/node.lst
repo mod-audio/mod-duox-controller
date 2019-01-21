@@ -1,0 +1,195 @@
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"node.c"
+  12              		.text
+  13              		.align	1
+  14              		.global	node_create
+  15              		.syntax unified
+  16              		.thumb
+  17              		.thumb_func
+  18              		.fpu softvfp
+  20              	node_create:
+  21              		@ args = 0, pretend = 0, frame = 0
+  22              		@ frame_needed = 0, uses_anonymous_args = 0
+  23 0000 10B5     		push	{r4, lr}
+  24 0002 0446     		mov	r4, r0
+  25 0004 1820     		movs	r0, #24
+  26 0006 FFF7FEFF 		bl	pvPortMalloc
+  27 000a 0346     		mov	r3, r0
+  28 000c 30B1     		cbz	r0, .L1
+  29 000e 0460     		str	r4, [r0]
+  30 0010 0022     		movs	r2, #0
+  31 0012 4260     		str	r2, [r0, #4]
+  32 0014 8260     		str	r2, [r0, #8]
+  33 0016 C260     		str	r2, [r0, #12]
+  34 0018 4261     		str	r2, [r0, #20]
+  35 001a 0261     		str	r2, [r0, #16]
+  36              	.L1:
+  37 001c 1846     		mov	r0, r3
+  38 001e 10BD     		pop	{r4, pc}
+  40              		.align	1
+  41              		.global	node_child
+  42              		.syntax unified
+  43              		.thumb
+  44              		.thumb_func
+  45              		.fpu softvfp
+  47              	node_child:
+  48              		@ args = 0, pretend = 0, frame = 0
+  49              		@ frame_needed = 0, uses_anonymous_args = 0
+  50 0020 10B5     		push	{r4, lr}
+  51 0022 0446     		mov	r4, r0
+  52 0024 0846     		mov	r0, r1
+  53 0026 FFF7FEFF 		bl	node_create
+  54 002a 4CB1     		cbz	r4, .L4
+  55 002c 40B1     		cbz	r0, .L4
+  56 002e A368     		ldr	r3, [r4, #8]
+  57 0030 3BB1     		cbz	r3, .L9
+  58              	.L6:
+  59 0032 E368     		ldr	r3, [r4, #12]
+  60 0034 03B1     		cbz	r3, .L7
+  61 0036 5861     		str	r0, [r3, #20]
+  62              	.L7:
+  63 0038 4460     		str	r4, [r0, #4]
+  64 003a E368     		ldr	r3, [r4, #12]
+  65 003c 0361     		str	r3, [r0, #16]
+  66 003e E060     		str	r0, [r4, #12]
+  67              	.L4:
+  68 0040 10BD     		pop	{r4, pc}
+  69              	.L9:
+  70 0042 A060     		str	r0, [r4, #8]
+  71 0044 F5E7     		b	.L6
+  73              		.align	1
+  74              		.global	node_cut
+  75              		.syntax unified
+  76              		.thumb
+  77              		.thumb_func
+  78              		.fpu softvfp
+  80              	node_cut:
+  81              		@ args = 0, pretend = 0, frame = 0
+  82              		@ frame_needed = 0, uses_anonymous_args = 0
+  83              		@ link register save eliminated.
+  84 0046 0346     		mov	r3, r0
+  85 0048 58B1     		cbz	r0, .L11
+  86 004a 0269     		ldr	r2, [r0, #16]
+  87 004c 92B1     		cbz	r2, .L12
+  88 004e 4169     		ldr	r1, [r0, #20]
+  89 0050 49B1     		cbz	r1, .L18
+  90 0052 5161     		str	r1, [r2, #20]
+  91 0054 4269     		ldr	r2, [r0, #20]
+  92 0056 0169     		ldr	r1, [r0, #16]
+  93 0058 1161     		str	r1, [r2, #16]
+  94              	.L15:
+  95 005a 0022     		movs	r2, #0
+  96 005c 5A60     		str	r2, [r3, #4]
+  97 005e 1A61     		str	r2, [r3, #16]
+  98 0060 5A61     		str	r2, [r3, #20]
+  99              	.L11:
+ 100 0062 1846     		mov	r0, r3
+ 101 0064 7047     		bx	lr
+ 102              	.L18:
+ 103 0066 4168     		ldr	r1, [r0, #4]
+ 104 0068 01B1     		cbz	r1, .L14
+ 105 006a CA60     		str	r2, [r1, #12]
+ 106              	.L14:
+ 107 006c 1A69     		ldr	r2, [r3, #16]
+ 108 006e 0021     		movs	r1, #0
+ 109 0070 5161     		str	r1, [r2, #20]
+ 110 0072 F2E7     		b	.L15
+ 111              	.L12:
+ 112 0074 4269     		ldr	r2, [r0, #20]
+ 113 0076 32B1     		cbz	r2, .L16
+ 114 0078 4168     		ldr	r1, [r0, #4]
+ 115 007a 01B1     		cbz	r1, .L17
+ 116 007c 8A60     		str	r2, [r1, #8]
+ 117              	.L17:
+ 118 007e 5A69     		ldr	r2, [r3, #20]
+ 119 0080 0021     		movs	r1, #0
+ 120 0082 1161     		str	r1, [r2, #16]
+ 121 0084 E9E7     		b	.L15
+ 122              	.L16:
+ 123 0086 4268     		ldr	r2, [r0, #4]
+ 124 0088 002A     		cmp	r2, #0
+ 125 008a E6D0     		beq	.L15
+ 126 008c 0021     		movs	r1, #0
+ 127 008e 9160     		str	r1, [r2, #8]
+ 128 0090 4268     		ldr	r2, [r0, #4]
+ 129 0092 D160     		str	r1, [r2, #12]
+ 130 0094 E1E7     		b	.L15
+ 132              		.align	1
+ 133              		.global	node_join
+ 134              		.syntax unified
+ 135              		.thumb
+ 136              		.thumb_func
+ 137              		.fpu softvfp
+ 139              	node_join:
+ 140              		@ args = 0, pretend = 0, frame = 0
+ 141              		@ frame_needed = 0, uses_anonymous_args = 0
+ 142              		@ link register save eliminated.
+ 143 0096 4369     		ldr	r3, [r0, #20]
+ 144 0098 03B1     		cbz	r3, .L20
+ 145 009a 4B61     		str	r3, [r1, #20]
+ 146              	.L20:
+ 147 009c 4161     		str	r1, [r0, #20]
+ 148 009e 0861     		str	r0, [r1, #16]
+ 149 00a0 4B68     		ldr	r3, [r1, #4]
+ 150 00a2 03B1     		cbz	r3, .L22
+ 151              	.L19:
+ 152 00a4 7047     		bx	lr
+ 153              	.L22:
+ 154 00a6 4368     		ldr	r3, [r0, #4]
+ 155 00a8 002B     		cmp	r3, #0
+ 156 00aa FBD0     		beq	.L19
+ 157 00ac 4B60     		str	r3, [r1, #4]
+ 158 00ae 4368     		ldr	r3, [r0, #4]
+ 159 00b0 DA68     		ldr	r2, [r3, #12]
+ 160 00b2 8242     		cmp	r2, r0
+ 161 00b4 08BF     		it	eq
+ 162 00b6 D960     		streq	r1, [r3, #12]
+ 163 00b8 F4E7     		b	.L19
+ 165              		.align	1
+ 166              		.global	node_destroy
+ 167              		.syntax unified
+ 168              		.thumb
+ 169              		.thumb_func
+ 170              		.fpu softvfp
+ 172              	node_destroy:
+ 173              		@ args = 0, pretend = 0, frame = 0
+ 174              		@ frame_needed = 0, uses_anonymous_args = 0
+ 175 00ba 70B1     		cbz	r0, .L29
+ 176 00bc 10B5     		push	{r4, lr}
+ 177 00be FFF7FEFF 		bl	node_cut
+ 178 00c2 0446     		mov	r4, r0
+ 179 00c4 8068     		ldr	r0, [r0, #8]
+ 180 00c6 20B1     		cbz	r0, .L25
+ 181              	.L26:
+ 182 00c8 FFF7FEFF 		bl	node_destroy
+ 183 00cc A068     		ldr	r0, [r4, #8]
+ 184 00ce 0028     		cmp	r0, #0
+ 185 00d0 FAD1     		bne	.L26
+ 186              	.L25:
+ 187 00d2 2046     		mov	r0, r4
+ 188 00d4 FFF7FEFF 		bl	vPortFree
+ 189 00d8 10BD     		pop	{r4, pc}
+ 190              	.L29:
+ 191 00da 7047     		bx	lr
+ 193              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 node.c
+     /tmp/ccTlatgL.s:13     .text:0000000000000000 $t
+     /tmp/ccTlatgL.s:20     .text:0000000000000000 node_create
+     /tmp/ccTlatgL.s:47     .text:0000000000000020 node_child
+     /tmp/ccTlatgL.s:80     .text:0000000000000046 node_cut
+     /tmp/ccTlatgL.s:139    .text:0000000000000096 node_join
+     /tmp/ccTlatgL.s:172    .text:00000000000000ba node_destroy
+
+UNDEFINED SYMBOLS
+pvPortMalloc
+vPortFree

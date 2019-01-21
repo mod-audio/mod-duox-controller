@@ -1,0 +1,649 @@
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"lpc17xx_ssp.c"
+  12              		.text
+  13              		.align	1
+  14              		.global	SSP_Init
+  15              		.syntax unified
+  16              		.thumb
+  17              		.thumb_func
+  18              		.fpu softvfp
+  20              	SSP_Init:
+  21              		@ args = 0, pretend = 0, frame = 0
+  22              		@ frame_needed = 0, uses_anonymous_args = 0
+  23 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+  24 0002 0446     		mov	r4, r0
+  25 0004 0D46     		mov	r5, r1
+  26 0006 2B4B     		ldr	r3, .L13
+  27 0008 9842     		cmp	r0, r3
+  28 000a 03D0     		beq	.L11
+  29 000c 2A4B     		ldr	r3, .L13+4
+  30 000e 9842     		cmp	r0, r3
+  31 0010 1ED0     		beq	.L12
+  32              	.L1:
+  33 0012 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+  34              	.L11:
+  35 0014 0121     		movs	r1, #1
+  36 0016 4FF40010 		mov	r0, #2097152
+  37 001a FFF7FEFF 		bl	CLKPWR_ConfigPPWR
+  38 001e 6B68     		ldr	r3, [r5, #4]
+  39 0020 AA68     		ldr	r2, [r5, #8]
+  40 0022 1343     		orrs	r3, r3, r2
+  41 0024 2A69     		ldr	r2, [r5, #16]
+  42 0026 1343     		orrs	r3, r3, r2
+  43 0028 2A68     		ldr	r2, [r5]
+  44 002a 1343     		orrs	r3, r3, r2
+  45 002c 9BB2     		uxth	r3, r3
+  46 002e 214A     		ldr	r2, .L13
+  47 0030 1360     		str	r3, [r2]
+  48 0032 EB68     		ldr	r3, [r5, #12]
+  49 0034 03F00F03 		and	r3, r3, #15
+  50 0038 5360     		str	r3, [r2, #4]
+  51 003a 6E69     		ldr	r6, [r5, #20]
+  52 003c 2A20     		movs	r0, #42
+  53 003e FFF7FEFF 		bl	CLKPWR_GetPCLK
+  54              	.L3:
+  55 0042 B6F1FF3F 		cmp	r6, #-1
+  56 0046 1BD0     		beq	.L8
+  57 0048 0225     		movs	r5, #2
+  58 004a 0022     		movs	r2, #0
+  59 004c 1746     		mov	r7, r2
+  60 004e 25E0     		b	.L7
+  61              	.L12:
+  62 0050 0121     		movs	r1, #1
+  63 0052 4FF48060 		mov	r0, #1024
+  64 0056 FFF7FEFF 		bl	CLKPWR_ConfigPPWR
+  65 005a 6B68     		ldr	r3, [r5, #4]
+  66 005c AA68     		ldr	r2, [r5, #8]
+  67 005e 1343     		orrs	r3, r3, r2
+  68 0060 2A69     		ldr	r2, [r5, #16]
+  69 0062 1343     		orrs	r3, r3, r2
+  70 0064 2A68     		ldr	r2, [r5]
+  71 0066 1343     		orrs	r3, r3, r2
+  72 0068 9BB2     		uxth	r3, r3
+  73 006a 134A     		ldr	r2, .L13+4
+  74 006c 1360     		str	r3, [r2]
+  75 006e EB68     		ldr	r3, [r5, #12]
+  76 0070 03F00F03 		and	r3, r3, #15
+  77 0074 5360     		str	r3, [r2, #4]
+  78 0076 6E69     		ldr	r6, [r5, #20]
+  79 0078 1420     		movs	r0, #20
+  80 007a FFF7FEFF 		bl	CLKPWR_GetPCLK
+  81 007e E0E7     		b	.L3
+  82              	.L8:
+  83 0080 0225     		movs	r5, #2
+  84 0082 0022     		movs	r2, #0
+  85              	.L5:
+  86 0084 2368     		ldr	r3, [r4]
+  87 0086 DBB2     		uxtb	r3, r3
+  88 0088 2360     		str	r3, [r4]
+  89 008a 2368     		ldr	r3, [r4]
+  90 008c 1202     		lsls	r2, r2, #8
+  91 008e 92B2     		uxth	r2, r2
+  92 0090 1A43     		orrs	r2, r2, r3
+  93 0092 2260     		str	r2, [r4]
+  94 0094 EDB2     		uxtb	r5, r5
+  95 0096 2561     		str	r5, [r4, #16]
+  96 0098 BBE7     		b	.L1
+  97              	.L9:
+  98 009a 0A46     		mov	r2, r1
+  99              	.L7:
+ 100 009c 511C     		adds	r1, r2, #1
+ 101 009e 05FB01F3 		mul	r3, r5, r1
+ 102 00a2 B0FBF3F3 		udiv	r3, r0, r3
+ 103 00a6 B342     		cmp	r3, r6
+ 104 00a8 ECD9     		bls	.L5
+ 105 00aa FF29     		cmp	r1, #255
+ 106 00ac F5D9     		bls	.L9
+ 107 00ae 0235     		adds	r5, r5, #2
+ 108 00b0 3A46     		mov	r2, r7
+ 109 00b2 F3E7     		b	.L7
+ 110              	.L14:
+ 111              		.align	2
+ 112              	.L13:
+ 113 00b4 00800840 		.word	1074298880
+ 114 00b8 00000340 		.word	1073938432
+ 116              		.align	1
+ 117              		.global	SSP_DeInit
+ 118              		.syntax unified
+ 119              		.thumb
+ 120              		.thumb_func
+ 121              		.fpu softvfp
+ 123              	SSP_DeInit:
+ 124              		@ args = 0, pretend = 0, frame = 0
+ 125              		@ frame_needed = 0, uses_anonymous_args = 0
+ 126 00bc 08B5     		push	{r3, lr}
+ 127 00be 094B     		ldr	r3, .L21
+ 128 00c0 9842     		cmp	r0, r3
+ 129 00c2 03D0     		beq	.L19
+ 130 00c4 084B     		ldr	r3, .L21+4
+ 131 00c6 9842     		cmp	r0, r3
+ 132 00c8 06D0     		beq	.L20
+ 133              	.L15:
+ 134 00ca 08BD     		pop	{r3, pc}
+ 135              	.L19:
+ 136 00cc 0021     		movs	r1, #0
+ 137 00ce 4FF40010 		mov	r0, #2097152
+ 138 00d2 FFF7FEFF 		bl	CLKPWR_ConfigPPWR
+ 139 00d6 F8E7     		b	.L15
+ 140              	.L20:
+ 141 00d8 0021     		movs	r1, #0
+ 142 00da 4FF48060 		mov	r0, #1024
+ 143 00de FFF7FEFF 		bl	CLKPWR_ConfigPPWR
+ 144 00e2 F2E7     		b	.L15
+ 145              	.L22:
+ 146              		.align	2
+ 147              	.L21:
+ 148 00e4 00800840 		.word	1074298880
+ 149 00e8 00000340 		.word	1073938432
+ 151              		.align	1
+ 152              		.global	SSP_GetDataSize
+ 153              		.syntax unified
+ 154              		.thumb
+ 155              		.thumb_func
+ 156              		.fpu softvfp
+ 158              	SSP_GetDataSize:
+ 159              		@ args = 0, pretend = 0, frame = 0
+ 160              		@ frame_needed = 0, uses_anonymous_args = 0
+ 161              		@ link register save eliminated.
+ 162 00ec 0068     		ldr	r0, [r0]
+ 163 00ee 00F00F00 		and	r0, r0, #15
+ 164 00f2 7047     		bx	lr
+ 166              		.align	1
+ 167              		.global	SSP_ConfigStructInit
+ 168              		.syntax unified
+ 169              		.thumb
+ 170              		.thumb_func
+ 171              		.fpu softvfp
+ 173              	SSP_ConfigStructInit:
+ 174              		@ args = 0, pretend = 0, frame = 0
+ 175              		@ frame_needed = 0, uses_anonymous_args = 0
+ 176              		@ link register save eliminated.
+ 177 00f4 0023     		movs	r3, #0
+ 178 00f6 4360     		str	r3, [r0, #4]
+ 179 00f8 8360     		str	r3, [r0, #8]
+ 180 00fa 034A     		ldr	r2, .L25
+ 181 00fc 4261     		str	r2, [r0, #20]
+ 182 00fe 0722     		movs	r2, #7
+ 183 0100 0260     		str	r2, [r0]
+ 184 0102 C360     		str	r3, [r0, #12]
+ 185 0104 0361     		str	r3, [r0, #16]
+ 186 0106 7047     		bx	lr
+ 187              	.L26:
+ 188              		.align	2
+ 189              	.L25:
+ 190 0108 40420F00 		.word	1000000
+ 192              		.align	1
+ 193              		.global	SSP_Cmd
+ 194              		.syntax unified
+ 195              		.thumb
+ 196              		.thumb_func
+ 197              		.fpu softvfp
+ 199              	SSP_Cmd:
+ 200              		@ args = 0, pretend = 0, frame = 0
+ 201              		@ frame_needed = 0, uses_anonymous_args = 0
+ 202              		@ link register save eliminated.
+ 203 010c 0129     		cmp	r1, #1
+ 204 010e 4368     		ldr	r3, [r0, #4]
+ 205 0110 0CBF     		ite	eq
+ 206 0112 43F00203 		orreq	r3, r3, #2
+ 207 0116 03F00D03 		andne	r3, r3, #13
+ 208 011a 4360     		str	r3, [r0, #4]
+ 209 011c 7047     		bx	lr
+ 211              		.align	1
+ 212              		.global	SSP_LoopBackCmd
+ 213              		.syntax unified
+ 214              		.thumb
+ 215              		.thumb_func
+ 216              		.fpu softvfp
+ 218              	SSP_LoopBackCmd:
+ 219              		@ args = 0, pretend = 0, frame = 0
+ 220              		@ frame_needed = 0, uses_anonymous_args = 0
+ 221              		@ link register save eliminated.
+ 222 011e 0129     		cmp	r1, #1
+ 223 0120 4368     		ldr	r3, [r0, #4]
+ 224 0122 0CBF     		ite	eq
+ 225 0124 43F00103 		orreq	r3, r3, #1
+ 226 0128 03F00E03 		andne	r3, r3, #14
+ 227 012c 4360     		str	r3, [r0, #4]
+ 228 012e 7047     		bx	lr
+ 230              		.align	1
+ 231              		.global	SSP_SlaveOutputCmd
+ 232              		.syntax unified
+ 233              		.thumb
+ 234              		.thumb_func
+ 235              		.fpu softvfp
+ 237              	SSP_SlaveOutputCmd:
+ 238              		@ args = 0, pretend = 0, frame = 0
+ 239              		@ frame_needed = 0, uses_anonymous_args = 0
+ 240              		@ link register save eliminated.
+ 241 0130 0129     		cmp	r1, #1
+ 242 0132 4368     		ldr	r3, [r0, #4]
+ 243 0134 0CBF     		ite	eq
+ 244 0136 03F00703 		andeq	r3, r3, #7
+ 245 013a 43F00803 		orrne	r3, r3, #8
+ 246 013e 4360     		str	r3, [r0, #4]
+ 247 0140 7047     		bx	lr
+ 249              		.align	1
+ 250              		.global	SSP_SendData
+ 251              		.syntax unified
+ 252              		.thumb
+ 253              		.thumb_func
+ 254              		.fpu softvfp
+ 256              	SSP_SendData:
+ 257              		@ args = 0, pretend = 0, frame = 0
+ 258              		@ frame_needed = 0, uses_anonymous_args = 0
+ 259              		@ link register save eliminated.
+ 260 0142 8160     		str	r1, [r0, #8]
+ 261 0144 7047     		bx	lr
+ 263              		.align	1
+ 264              		.global	SSP_ReceiveData
+ 265              		.syntax unified
+ 266              		.thumb
+ 267              		.thumb_func
+ 268              		.fpu softvfp
+ 270              	SSP_ReceiveData:
+ 271              		@ args = 0, pretend = 0, frame = 0
+ 272              		@ frame_needed = 0, uses_anonymous_args = 0
+ 273              		@ link register save eliminated.
+ 274 0146 8068     		ldr	r0, [r0, #8]
+ 275 0148 80B2     		uxth	r0, r0
+ 276 014a 7047     		bx	lr
+ 278              		.align	1
+ 279              		.global	SSP_ReadWrite
+ 280              		.syntax unified
+ 281              		.thumb
+ 282              		.thumb_func
+ 283              		.fpu softvfp
+ 285              	SSP_ReadWrite:
+ 286              		@ args = 0, pretend = 0, frame = 0
+ 287              		@ frame_needed = 0, uses_anonymous_args = 0
+ 288 014c 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 289 0150 0023     		movs	r3, #0
+ 290 0152 CB60     		str	r3, [r1, #12]
+ 291 0154 4B60     		str	r3, [r1, #4]
+ 292 0156 4B61     		str	r3, [r1, #20]
+ 293 0158 C368     		ldr	r3, [r0, #12]
+ 294 015a 13F0040F 		tst	r3, #4
+ 295 015e 04D0     		beq	.L39
+ 296              	.L40:
+ 297 0160 8368     		ldr	r3, [r0, #8]
+ 298 0162 C368     		ldr	r3, [r0, #12]
+ 299 0164 13F0040F 		tst	r3, #4
+ 300 0168 FAD1     		bne	.L40
+ 301              	.L39:
+ 302 016a 0323     		movs	r3, #3
+ 303 016c 0362     		str	r3, [r0, #32]
+ 304 016e 0468     		ldr	r4, [r0]
+ 305 0170 04F00F04 		and	r4, r4, #15
+ 306 0174 002A     		cmp	r2, #0
+ 307 0176 71D1     		bne	.L41
+ 308 0178 082C     		cmp	r4, #8
+ 309 017a 1BD8     		bhi	.L42
+ 310 017c 8D68     		ldr	r5, [r1, #8]
+ 311 017e 0F68     		ldr	r7, [r1]
+ 312 0180 4FF0000C 		mov	ip, #0
+ 313 0184 6646     		mov	r6, ip
+ 314              	.L43:
+ 315 0186 4FF6FF7E 		movw	lr, #65535
+ 316 018a 4FF0FF08 		mov	r8, #255
+ 317              	.L84:
+ 318 018e 4A68     		ldr	r2, [r1, #4]
+ 319 0190 0B69     		ldr	r3, [r1, #16]
+ 320 0192 9A42     		cmp	r2, r3
+ 321 0194 50D0     		beq	.L88
+ 322 0196 C368     		ldr	r3, [r0, #12]
+ 323 0198 13F0020F 		tst	r3, #2
+ 324 019c 10D1     		bne	.L89
+ 325              	.L46:
+ 326 019e 8369     		ldr	r3, [r0, #24]
+ 327 01a0 13F0010F 		tst	r3, #1
+ 328 01a4 37D0     		beq	.L48
+ 329 01a6 43F40073 		orr	r3, r3, #512
+ 330 01aa 4B61     		str	r3, [r1, #20]
+ 331 01ac 4FF0FF30 		mov	r0, #-1
+ 332              	.L38:
+ 333 01b0 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 334              	.L42:
+ 335 01b4 8E68     		ldr	r6, [r1, #8]
+ 336 01b6 D1F800C0 		ldr	ip, [r1]
+ 337 01ba 0027     		movs	r7, #0
+ 338 01bc 3D46     		mov	r5, r7
+ 339 01be E2E7     		b	.L43
+ 340              	.L89:
+ 341 01c0 0B68     		ldr	r3, [r1]
+ 342 01c2 43B1     		cbz	r3, .L90
+ 343 01c4 082C     		cmp	r4, #8
+ 344 01c6 14D8     		bhi	.L47
+ 345 01c8 17F8013B 		ldrb	r3, [r7], #1	@ zero_extendqisi2
+ 346 01cc 8360     		str	r3, [r0, #8]
+ 347 01ce 4B68     		ldr	r3, [r1, #4]
+ 348 01d0 0133     		adds	r3, r3, #1
+ 349 01d2 4B60     		str	r3, [r1, #4]
+ 350 01d4 E3E7     		b	.L46
+ 351              	.L90:
+ 352 01d6 082C     		cmp	r4, #8
+ 353 01d8 05D8     		bhi	.L45
+ 354 01da C0F80880 		str	r8, [r0, #8]
+ 355 01de 4B68     		ldr	r3, [r1, #4]
+ 356 01e0 0133     		adds	r3, r3, #1
+ 357 01e2 4B60     		str	r3, [r1, #4]
+ 358 01e4 DBE7     		b	.L46
+ 359              	.L45:
+ 360 01e6 C0F808E0 		str	lr, [r0, #8]
+ 361 01ea 4B68     		ldr	r3, [r1, #4]
+ 362 01ec 0233     		adds	r3, r3, #2
+ 363 01ee 4B60     		str	r3, [r1, #4]
+ 364 01f0 D5E7     		b	.L46
+ 365              	.L47:
+ 366 01f2 3CF8023B 		ldrh	r3, [ip], #2
+ 367 01f6 8360     		str	r3, [r0, #8]
+ 368 01f8 4B68     		ldr	r3, [r1, #4]
+ 369 01fa 0233     		adds	r3, r3, #2
+ 370 01fc 4B60     		str	r3, [r1, #4]
+ 371 01fe CEE7     		b	.L46
+ 372              	.L51:
+ 373 0200 26F8022B 		strh	r2, [r6], #2	@ movhi
+ 374              	.L53:
+ 375 0204 CB68     		ldr	r3, [r1, #12]
+ 376 0206 0233     		adds	r3, r3, #2
+ 377 0208 CB60     		str	r3, [r1, #12]
+ 378 020a 04E0     		b	.L48
+ 379              	.L50:
+ 380 020c 082C     		cmp	r4, #8
+ 381 020e F9D8     		bhi	.L53
+ 382              	.L52:
+ 383 0210 CB68     		ldr	r3, [r1, #12]
+ 384 0212 0133     		adds	r3, r3, #1
+ 385 0214 CB60     		str	r3, [r1, #12]
+ 386              	.L48:
+ 387 0216 C368     		ldr	r3, [r0, #12]
+ 388 0218 13F0040F 		tst	r3, #4
+ 389 021c B7D0     		beq	.L84
+ 390 021e CA68     		ldr	r2, [r1, #12]
+ 391 0220 0B69     		ldr	r3, [r1, #16]
+ 392 0222 9A42     		cmp	r2, r3
+ 393 0224 B3D0     		beq	.L84
+ 394 0226 8268     		ldr	r2, [r0, #8]
+ 395 0228 8B68     		ldr	r3, [r1, #8]
+ 396 022a 002B     		cmp	r3, #0
+ 397 022c EED0     		beq	.L50
+ 398 022e 082C     		cmp	r4, #8
+ 399 0230 E6D8     		bhi	.L51
+ 400 0232 05F8012B 		strb	r2, [r5], #1
+ 401 0236 EBE7     		b	.L52
+ 402              	.L88:
+ 403 0238 CB68     		ldr	r3, [r1, #12]
+ 404 023a 9A42     		cmp	r2, r3
+ 405 023c 01D0     		beq	.L91
+ 406 023e C368     		ldr	r3, [r0, #12]
+ 407 0240 ADE7     		b	.L46
+ 408              	.L91:
+ 409 0242 4FF48070 		mov	r0, #256
+ 410 0246 4861     		str	r0, [r1, #20]
+ 411 0248 0868     		ldr	r0, [r1]
+ 412 024a 08B1     		cbz	r0, .L59
+ 413 024c 1846     		mov	r0, r3
+ 414 024e AFE7     		b	.L38
+ 415              	.L59:
+ 416 0250 8B68     		ldr	r3, [r1, #8]
+ 417 0252 002B     		cmp	r3, #0
+ 418 0254 14BF     		ite	ne
+ 419 0256 1046     		movne	r0, r2
+ 420 0258 0020     		moveq	r0, #0
+ 421 025a A9E7     		b	.L38
+ 422              	.L41:
+ 423 025c 012A     		cmp	r2, #1
+ 424 025e 1DD1     		bne	.L85
+ 425 0260 4FF6FF77 		movw	r7, #65535
+ 426 0264 FF26     		movs	r6, #255
+ 427              	.L79:
+ 428 0266 C368     		ldr	r3, [r0, #12]
+ 429 0268 13F0020F 		tst	r3, #2
+ 430 026c 45D0     		beq	.L72
+ 431 026e 4B68     		ldr	r3, [r1, #4]
+ 432 0270 0A69     		ldr	r2, [r1, #16]
+ 433 0272 9342     		cmp	r3, r2
+ 434 0274 4DD0     		beq	.L92
+ 435 0276 0A68     		ldr	r2, [r1]
+ 436 0278 9AB1     		cbz	r2, .L93
+ 437 027a 082C     		cmp	r4, #8
+ 438 027c 1DD8     		bhi	.L64
+ 439 027e D35C     		ldrb	r3, [r2, r3]	@ zero_extendqisi2
+ 440 0280 8360     		str	r3, [r0, #8]
+ 441 0282 4B68     		ldr	r3, [r1, #4]
+ 442 0284 0133     		adds	r3, r3, #1
+ 443 0286 4B60     		str	r3, [r1, #4]
+ 444              	.L63:
+ 445 0288 8369     		ldr	r3, [r0, #24]
+ 446 028a 13F0010F 		tst	r3, #1
+ 447 028e 24D0     		beq	.L65
+ 448 0290 43F40073 		orr	r3, r3, #512
+ 449 0294 4B61     		str	r3, [r1, #20]
+ 450 0296 4FF0FF30 		mov	r0, #-1
+ 451 029a 89E7     		b	.L38
+ 452              	.L85:
+ 453 029c 4FF0FF30 		mov	r0, #-1
+ 454 02a0 86E7     		b	.L38
+ 455              	.L93:
+ 456 02a2 082C     		cmp	r4, #8
+ 457 02a4 04D8     		bhi	.L62
+ 458 02a6 8660     		str	r6, [r0, #8]
+ 459 02a8 4B68     		ldr	r3, [r1, #4]
+ 460 02aa 0133     		adds	r3, r3, #1
+ 461 02ac 4B60     		str	r3, [r1, #4]
+ 462 02ae EBE7     		b	.L63
+ 463              	.L62:
+ 464 02b0 8760     		str	r7, [r0, #8]
+ 465 02b2 4B68     		ldr	r3, [r1, #4]
+ 466 02b4 0233     		adds	r3, r3, #2
+ 467 02b6 4B60     		str	r3, [r1, #4]
+ 468 02b8 E6E7     		b	.L63
+ 469              	.L64:
+ 470 02ba D35A     		ldrh	r3, [r2, r3]
+ 471 02bc 8360     		str	r3, [r0, #8]
+ 472 02be 4B68     		ldr	r3, [r1, #4]
+ 473 02c0 0233     		adds	r3, r3, #2
+ 474 02c2 4B60     		str	r3, [r1, #4]
+ 475 02c4 E0E7     		b	.L63
+ 476              	.L67:
+ 477 02c6 D552     		strh	r5, [r2, r3]	@ movhi
+ 478              	.L69:
+ 479 02c8 CB68     		ldr	r3, [r1, #12]
+ 480 02ca 0233     		adds	r3, r3, #2
+ 481 02cc CB60     		str	r3, [r1, #12]
+ 482 02ce 04E0     		b	.L65
+ 483              	.L66:
+ 484 02d0 082C     		cmp	r4, #8
+ 485 02d2 F9D8     		bhi	.L69
+ 486              	.L68:
+ 487 02d4 CB68     		ldr	r3, [r1, #12]
+ 488 02d6 0133     		adds	r3, r3, #1
+ 489 02d8 CB60     		str	r3, [r1, #12]
+ 490              	.L65:
+ 491 02da C368     		ldr	r3, [r0, #12]
+ 492 02dc 13F0040F 		tst	r3, #4
+ 493 02e0 C1D0     		beq	.L79
+ 494 02e2 CB68     		ldr	r3, [r1, #12]
+ 495 02e4 0A69     		ldr	r2, [r1, #16]
+ 496 02e6 9342     		cmp	r3, r2
+ 497 02e8 BDD0     		beq	.L79
+ 498 02ea 8568     		ldr	r5, [r0, #8]
+ 499 02ec 8A68     		ldr	r2, [r1, #8]
+ 500 02ee 002A     		cmp	r2, #0
+ 501 02f0 EED0     		beq	.L66
+ 502 02f2 082C     		cmp	r4, #8
+ 503 02f4 E7D8     		bhi	.L67
+ 504 02f6 D554     		strb	r5, [r2, r3]
+ 505 02f8 ECE7     		b	.L68
+ 506              	.L72:
+ 507 02fa CB68     		ldr	r3, [r1, #12]
+ 508 02fc 0A69     		ldr	r2, [r1, #16]
+ 509 02fe 9342     		cmp	r3, r2
+ 510 0300 0AD1     		bne	.L75
+ 511 0302 4A68     		ldr	r2, [r1, #4]
+ 512 0304 9342     		cmp	r3, r2
+ 513 0306 07D1     		bne	.L75
+ 514              	.L76:
+ 515 0308 4FF48073 		mov	r3, #256
+ 516 030c 4B61     		str	r3, [r1, #20]
+ 517 030e 0020     		movs	r0, #0
+ 518 0310 4EE7     		b	.L38
+ 519              	.L92:
+ 520 0312 CA68     		ldr	r2, [r1, #12]
+ 521 0314 9342     		cmp	r3, r2
+ 522 0316 F7D0     		beq	.L76
+ 523              	.L75:
+ 524 0318 0F23     		movs	r3, #15
+ 525 031a 4361     		str	r3, [r0, #20]
+ 526 031c 0020     		movs	r0, #0
+ 527 031e 47E7     		b	.L38
+ 529              		.align	1
+ 530              		.global	SSP_GetStatus
+ 531              		.syntax unified
+ 532              		.thumb
+ 533              		.thumb_func
+ 534              		.fpu softvfp
+ 536              	SSP_GetStatus:
+ 537              		@ args = 0, pretend = 0, frame = 0
+ 538              		@ frame_needed = 0, uses_anonymous_args = 0
+ 539              		@ link register save eliminated.
+ 540 0320 C368     		ldr	r3, [r0, #12]
+ 541 0322 0B42     		tst	r3, r1
+ 542 0324 14BF     		ite	ne
+ 543 0326 0120     		movne	r0, #1
+ 544 0328 0020     		moveq	r0, #0
+ 545 032a 7047     		bx	lr
+ 547              		.align	1
+ 548              		.global	SSP_IntConfig
+ 549              		.syntax unified
+ 550              		.thumb
+ 551              		.thumb_func
+ 552              		.fpu softvfp
+ 554              	SSP_IntConfig:
+ 555              		@ args = 0, pretend = 0, frame = 0
+ 556              		@ frame_needed = 0, uses_anonymous_args = 0
+ 557              		@ link register save eliminated.
+ 558 032c 012A     		cmp	r2, #1
+ 559 032e 4369     		ldr	r3, [r0, #20]
+ 560 0330 0FBF     		iteee	eq
+ 561 0332 1943     		orreq	r1, r1, r3
+ 562 0334 C943     		mvnne	r1, r1
+ 563 0336 01F00F01 		andne	r1, r1, #15
+ 564 033a 1940     		andne	r1, r1, r3
+ 565 033c 4161     		str	r1, [r0, #20]
+ 566 033e 7047     		bx	lr
+ 568              		.align	1
+ 569              		.global	SSP_GetRawIntStatus
+ 570              		.syntax unified
+ 571              		.thumb
+ 572              		.thumb_func
+ 573              		.fpu softvfp
+ 575              	SSP_GetRawIntStatus:
+ 576              		@ args = 0, pretend = 0, frame = 0
+ 577              		@ frame_needed = 0, uses_anonymous_args = 0
+ 578              		@ link register save eliminated.
+ 579 0340 8369     		ldr	r3, [r0, #24]
+ 580 0342 0B42     		tst	r3, r1
+ 581 0344 14BF     		ite	ne
+ 582 0346 0120     		movne	r0, #1
+ 583 0348 0020     		moveq	r0, #0
+ 584 034a 7047     		bx	lr
+ 586              		.align	1
+ 587              		.global	SSP_GetRawIntStatusReg
+ 588              		.syntax unified
+ 589              		.thumb
+ 590              		.thumb_func
+ 591              		.fpu softvfp
+ 593              	SSP_GetRawIntStatusReg:
+ 594              		@ args = 0, pretend = 0, frame = 0
+ 595              		@ frame_needed = 0, uses_anonymous_args = 0
+ 596              		@ link register save eliminated.
+ 597 034c 8069     		ldr	r0, [r0, #24]
+ 598 034e 7047     		bx	lr
+ 600              		.align	1
+ 601              		.global	SSP_GetIntStatus
+ 602              		.syntax unified
+ 603              		.thumb
+ 604              		.thumb_func
+ 605              		.fpu softvfp
+ 607              	SSP_GetIntStatus:
+ 608              		@ args = 0, pretend = 0, frame = 0
+ 609              		@ frame_needed = 0, uses_anonymous_args = 0
+ 610              		@ link register save eliminated.
+ 611 0350 C369     		ldr	r3, [r0, #28]
+ 612 0352 0B42     		tst	r3, r1
+ 613 0354 14BF     		ite	ne
+ 614 0356 0120     		movne	r0, #1
+ 615 0358 0020     		moveq	r0, #0
+ 616 035a 7047     		bx	lr
+ 618              		.align	1
+ 619              		.global	SSP_ClearIntPending
+ 620              		.syntax unified
+ 621              		.thumb
+ 622              		.thumb_func
+ 623              		.fpu softvfp
+ 625              	SSP_ClearIntPending:
+ 626              		@ args = 0, pretend = 0, frame = 0
+ 627              		@ frame_needed = 0, uses_anonymous_args = 0
+ 628              		@ link register save eliminated.
+ 629 035c 0162     		str	r1, [r0, #32]
+ 630 035e 7047     		bx	lr
+ 632              		.align	1
+ 633              		.global	SSP_DMACmd
+ 634              		.syntax unified
+ 635              		.thumb
+ 636              		.thumb_func
+ 637              		.fpu softvfp
+ 639              	SSP_DMACmd:
+ 640              		@ args = 0, pretend = 0, frame = 0
+ 641              		@ frame_needed = 0, uses_anonymous_args = 0
+ 642              		@ link register save eliminated.
+ 643 0360 012A     		cmp	r2, #1
+ 644 0362 436A     		ldr	r3, [r0, #36]
+ 645 0364 0FBF     		iteee	eq
+ 646 0366 1943     		orreq	r1, r1, r3
+ 647 0368 C943     		mvnne	r1, r1
+ 648 036a 01F00301 		andne	r1, r1, #3
+ 649 036e 1940     		andne	r1, r1, r3
+ 650 0370 4162     		str	r1, [r0, #36]
+ 651 0372 7047     		bx	lr
+ 653              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 lpc17xx_ssp.c
+     /tmp/ccU4xxAB.s:13     .text:0000000000000000 $t
+     /tmp/ccU4xxAB.s:20     .text:0000000000000000 SSP_Init
+     /tmp/ccU4xxAB.s:113    .text:00000000000000b4 $d
+     /tmp/ccU4xxAB.s:116    .text:00000000000000bc $t
+     /tmp/ccU4xxAB.s:123    .text:00000000000000bc SSP_DeInit
+     /tmp/ccU4xxAB.s:148    .text:00000000000000e4 $d
+     /tmp/ccU4xxAB.s:151    .text:00000000000000ec $t
+     /tmp/ccU4xxAB.s:158    .text:00000000000000ec SSP_GetDataSize
+     /tmp/ccU4xxAB.s:173    .text:00000000000000f4 SSP_ConfigStructInit
+     /tmp/ccU4xxAB.s:190    .text:0000000000000108 $d
+     /tmp/ccU4xxAB.s:192    .text:000000000000010c $t
+     /tmp/ccU4xxAB.s:199    .text:000000000000010c SSP_Cmd
+     /tmp/ccU4xxAB.s:218    .text:000000000000011e SSP_LoopBackCmd
+     /tmp/ccU4xxAB.s:237    .text:0000000000000130 SSP_SlaveOutputCmd
+     /tmp/ccU4xxAB.s:256    .text:0000000000000142 SSP_SendData
+     /tmp/ccU4xxAB.s:270    .text:0000000000000146 SSP_ReceiveData
+     /tmp/ccU4xxAB.s:285    .text:000000000000014c SSP_ReadWrite
+     /tmp/ccU4xxAB.s:536    .text:0000000000000320 SSP_GetStatus
+     /tmp/ccU4xxAB.s:554    .text:000000000000032c SSP_IntConfig
+     /tmp/ccU4xxAB.s:575    .text:0000000000000340 SSP_GetRawIntStatus
+     /tmp/ccU4xxAB.s:593    .text:000000000000034c SSP_GetRawIntStatusReg
+     /tmp/ccU4xxAB.s:607    .text:0000000000000350 SSP_GetIntStatus
+     /tmp/ccU4xxAB.s:625    .text:000000000000035c SSP_ClearIntPending
+     /tmp/ccU4xxAB.s:639    .text:0000000000000360 SSP_DMACmd
+
+UNDEFINED SYMBOLS
+CLKPWR_ConfigPPWR
+CLKPWR_GetPCLK

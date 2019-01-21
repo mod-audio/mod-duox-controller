@@ -1,0 +1,1766 @@
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"uc1701.c"
+  12              		.text
+  13              		.align	1
+  14              		.syntax unified
+  15              		.thumb
+  16              		.thumb_func
+  17              		.fpu softvfp
+  19              	read_byte:
+  20              		@ args = 0, pretend = 0, frame = 0
+  21              		@ frame_needed = 0, uses_anonymous_args = 0
+  22              		@ link register save eliminated.
+  23 0000 30B4     		push	{r4, r5}
+  24 0002 12F00704 		ands	r4, r2, #7
+  25 0006 07D1     		bne	.L6
+  26 0008 D208     		lsrs	r2, r2, #3
+  27 000a 00EBC212 		add	r2, r0, r2, lsl #7
+  28 000e 521A     		subs	r2, r2, r1
+  29 0010 92F89700 		ldrb	r0, [r2, #151]	@ zero_extendqisi2
+  30              	.L4:
+  31 0014 30BC     		pop	{r4, r5}
+  32 0016 7047     		bx	lr
+  33              	.L6:
+  34 0018 C1F17F01 		rsb	r1, r1, #127
+  35 001c 02F10803 		add	r3, r2, #8
+  36 0020 DB10     		asrs	r3, r3, #3
+  37 0022 00EBC313 		add	r3, r0, r3, lsl #7
+  38 0026 0B44     		add	r3, r3, r1
+  39 0028 1B7E     		ldrb	r3, [r3, #24]	@ zero_extendqisi2
+  40 002a C4F10805 		rsb	r5, r4, #8
+  41 002e AB40     		lsls	r3, r3, r5
+  42 0030 D208     		lsrs	r2, r2, #3
+  43 0032 00EBC212 		add	r2, r0, r2, lsl #7
+  44 0036 0A44     		add	r2, r2, r1
+  45 0038 107E     		ldrb	r0, [r2, #24]	@ zero_extendqisi2
+  46 003a 2041     		asrs	r0, r0, r4
+  47 003c 1843     		orrs	r0, r0, r3
+  48 003e C0B2     		uxtb	r0, r0
+  49 0040 E8E7     		b	.L4
+  51              		.align	1
+  52              		.syntax unified
+  53              		.thumb
+  54              		.thumb_func
+  55              		.fpu softvfp
+  57              	write_byte:
+  58              		@ args = 0, pretend = 0, frame = 0
+  59              		@ frame_needed = 0, uses_anonymous_args = 0
+  60              		@ link register save eliminated.
+  61 0042 F0B4     		push	{r4, r5, r6, r7}
+  62 0044 12F00704 		ands	r4, r2, #7
+  63 0048 2BD0     		beq	.L8
+  64 004a D508     		lsrs	r5, r2, #3
+  65 004c C1F17F06 		rsb	r6, r1, #127
+  66 0050 03FA04F1 		lsl	r1, r3, r4
+  67 0054 00EBC515 		add	r5, r0, r5, lsl #7
+  68 0058 3544     		add	r5, r5, r6
+  69 005a 2F7E     		ldrb	r7, [r5, #24]	@ zero_extendqisi2
+  70 005c 3943     		orrs	r1, r1, r7
+  71 005e 2976     		strb	r1, [r5, #24]
+  72 0060 C17D     		ldrb	r1, [r0, #23]	@ zero_extendqisi2
+  73 0062 11F0020F 		tst	r1, #2
+  74 0066 0CBF     		ite	eq
+  75 0068 41F00101 		orreq	r1, r1, #1
+  76 006c 41F00501 		orrne	r1, r1, #5
+  77 0070 C175     		strb	r1, [r0, #23]
+  78 0072 02F10801 		add	r1, r2, #8
+  79 0076 C1F3C401 		ubfx	r1, r1, #3, #5
+  80 007a C4F10804 		rsb	r4, r4, #8
+  81 007e 2341     		asrs	r3, r3, r4
+  82 0080 00EBC111 		add	r1, r0, r1, lsl #7
+  83 0084 3144     		add	r1, r1, r6
+  84 0086 0A7E     		ldrb	r2, [r1, #24]	@ zero_extendqisi2
+  85 0088 1343     		orrs	r3, r3, r2
+  86 008a 0B76     		strb	r3, [r1, #24]
+  87 008c C37D     		ldrb	r3, [r0, #23]	@ zero_extendqisi2
+  88 008e 13F0020F 		tst	r3, #2
+  89 0092 0CBF     		ite	eq
+  90 0094 43F00103 		orreq	r3, r3, #1
+  91 0098 43F00503 		orrne	r3, r3, #5
+  92 009c C375     		strb	r3, [r0, #23]
+  93              	.L7:
+  94 009e F0BC     		pop	{r4, r5, r6, r7}
+  95 00a0 7047     		bx	lr
+  96              	.L8:
+  97 00a2 D208     		lsrs	r2, r2, #3
+  98 00a4 00EBC212 		add	r2, r0, r2, lsl #7
+  99 00a8 511A     		subs	r1, r2, r1
+ 100 00aa 81F89730 		strb	r3, [r1, #151]
+ 101 00ae C37D     		ldrb	r3, [r0, #23]	@ zero_extendqisi2
+ 102 00b0 13F0020F 		tst	r3, #2
+ 103 00b4 0CBF     		ite	eq
+ 104 00b6 43F00103 		orreq	r3, r3, #1
+ 105 00ba 43F00503 		orrne	r3, r3, #5
+ 106 00be C375     		strb	r3, [r0, #23]
+ 107 00c0 EDE7     		b	.L7
+ 109              		.align	1
+ 110              		.syntax unified
+ 111              		.thumb
+ 112              		.thumb_func
+ 113              		.fpu softvfp
+ 115              	write_cmd:
+ 116              		@ args = 0, pretend = 0, frame = 0
+ 117              		@ frame_needed = 0, uses_anonymous_args = 0
+ 118 00c2 70B5     		push	{r4, r5, r6, lr}
+ 119 00c4 0446     		mov	r4, r0
+ 120 00c6 0E46     		mov	r6, r1
+ 121 00c8 C17B     		ldrb	r1, [r0, #15]	@ zero_extendqisi2
+ 122 00ca 0125     		movs	r5, #1
+ 123 00cc 05FA01F1 		lsl	r1, r5, r1
+ 124 00d0 807B     		ldrb	r0, [r0, #14]	@ zero_extendqisi2
+ 125 00d2 FFF7FEFF 		bl	GPIO_ClearValue
+ 126 00d6 617C     		ldrb	r1, [r4, #17]	@ zero_extendqisi2
+ 127 00d8 05FA01F1 		lsl	r1, r5, r1
+ 128 00dc 207C     		ldrb	r0, [r4, #16]	@ zero_extendqisi2
+ 129 00de FFF7FEFF 		bl	GPIO_ClearValue
+ 130 00e2 FFF7FEFF 		bl	vPortEnterCritical
+ 131 00e6 3146     		mov	r1, r6
+ 132 00e8 2068     		ldr	r0, [r4]
+ 133 00ea FFF7FEFF 		bl	SSP_SendData
+ 134 00ee FFF7FEFF 		bl	vPortExitCritical
+ 135 00f2 1026     		movs	r6, #16
+ 136              	.L16:
+ 137 00f4 2946     		mov	r1, r5
+ 138 00f6 2068     		ldr	r0, [r4]
+ 139 00f8 FFF7FEFF 		bl	SSP_GetStatus
+ 140 00fc 0028     		cmp	r0, #0
+ 141 00fe F9D0     		beq	.L16
+ 142 0100 3146     		mov	r1, r6
+ 143 0102 2068     		ldr	r0, [r4]
+ 144 0104 FFF7FEFF 		bl	SSP_GetStatus
+ 145 0108 0128     		cmp	r0, #1
+ 146 010a F3D0     		beq	.L16
+ 147 010c E37B     		ldrb	r3, [r4, #15]	@ zero_extendqisi2
+ 148 010e 0121     		movs	r1, #1
+ 149 0110 9940     		lsls	r1, r1, r3
+ 150 0112 A07B     		ldrb	r0, [r4, #14]	@ zero_extendqisi2
+ 151 0114 FFF7FEFF 		bl	GPIO_SetValue
+ 152 0118 70BD     		pop	{r4, r5, r6, pc}
+ 154              		.align	1
+ 155              		.global	uc1701_backlight
+ 156              		.syntax unified
+ 157              		.thumb
+ 158              		.thumb_func
+ 159              		.fpu softvfp
+ 161              	uc1701_backlight:
+ 162              		@ args = 0, pretend = 0, frame = 0
+ 163              		@ frame_needed = 0, uses_anonymous_args = 0
+ 164 011a 08B5     		push	{r3, lr}
+ 165 011c 31B9     		cbnz	r1, .L25
+ 166 011e 437D     		ldrb	r3, [r0, #21]	@ zero_extendqisi2
+ 167 0120 0121     		movs	r1, #1
+ 168 0122 9940     		lsls	r1, r1, r3
+ 169 0124 007D     		ldrb	r0, [r0, #20]	@ zero_extendqisi2
+ 170 0126 FFF7FEFF 		bl	GPIO_ClearValue
+ 171              	.L21:
+ 172 012a 08BD     		pop	{r3, pc}
+ 173              	.L25:
+ 174 012c 437D     		ldrb	r3, [r0, #21]	@ zero_extendqisi2
+ 175 012e 0121     		movs	r1, #1
+ 176 0130 9940     		lsls	r1, r1, r3
+ 177 0132 007D     		ldrb	r0, [r0, #20]	@ zero_extendqisi2
+ 178 0134 FFF7FEFF 		bl	GPIO_SetValue
+ 179 0138 F7E7     		b	.L21
+ 181              		.align	1
+ 182              		.global	uc1701_clear
+ 183              		.syntax unified
+ 184              		.thumb
+ 185              		.thumb_func
+ 186              		.fpu softvfp
+ 188              	uc1701_clear:
+ 189              		@ args = 0, pretend = 0, frame = 0
+ 190              		@ frame_needed = 0, uses_anonymous_args = 0
+ 191              		@ link register save eliminated.
+ 192 013a 00F11703 		add	r3, r0, #23
+ 193 013e 00F19702 		add	r2, r0, #151
+ 194              	.L27:
+ 195 0142 03F8011F 		strb	r1, [r3, #1]!
+ 196 0146 83F88010 		strb	r1, [r3, #128]
+ 197 014a 83F80011 		strb	r1, [r3, #256]
+ 198 014e 83F88011 		strb	r1, [r3, #384]
+ 199 0152 83F80012 		strb	r1, [r3, #512]
+ 200 0156 83F88012 		strb	r1, [r3, #640]
+ 201 015a 83F80013 		strb	r1, [r3, #768]
+ 202 015e 83F88013 		strb	r1, [r3, #896]
+ 203 0162 9342     		cmp	r3, r2
+ 204 0164 EDD1     		bne	.L27
+ 205 0166 C37D     		ldrb	r3, [r0, #23]	@ zero_extendqisi2
+ 206 0168 43F00103 		orr	r3, r3, #1
+ 207 016c C375     		strb	r3, [r0, #23]
+ 208 016e 7047     		bx	lr
+ 210              		.align	1
+ 211              		.global	uc1701_update
+ 212              		.syntax unified
+ 213              		.thumb
+ 214              		.thumb_func
+ 215              		.fpu softvfp
+ 217              	uc1701_update:
+ 218              		@ args = 0, pretend = 0, frame = 0
+ 219              		@ frame_needed = 0, uses_anonymous_args = 0
+ 220 0170 2DE9F84F 		push	{r3, r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 221 0174 C37D     		ldrb	r3, [r0, #23]	@ zero_extendqisi2
+ 222 0176 13F0010F 		tst	r3, #1
+ 223 017a 61D0     		beq	.L29
+ 224 017c 0446     		mov	r4, r0
+ 225 017e 43F00203 		orr	r3, r3, #2
+ 226 0182 C375     		strb	r3, [r0, #23]
+ 227 0184 4FF0000A 		mov	r10, #0
+ 228 0188 1026     		movs	r6, #16
+ 229 018a 4FF00108 		mov	r8, #1
+ 230 018e 4546     		mov	r5, r8
+ 231 0190 04E0     		b	.L31
+ 232              	.L32:
+ 233 0192 23F00403 		bic	r3, r3, #4
+ 234 0196 E375     		strb	r3, [r4, #23]
+ 235 0198 4FF0000A 		mov	r10, #0
+ 236              	.L31:
+ 237 019c AAF15001 		sub	r1, r10, #80
+ 238 01a0 C9B2     		uxtb	r1, r1
+ 239 01a2 2046     		mov	r0, r4
+ 240 01a4 FFF78DFF 		bl	write_cmd
+ 241 01a8 3146     		mov	r1, r6
+ 242 01aa 2046     		mov	r0, r4
+ 243 01ac FFF789FF 		bl	write_cmd
+ 244 01b0 0421     		movs	r1, #4
+ 245 01b2 2046     		mov	r0, r4
+ 246 01b4 FFF785FF 		bl	write_cmd
+ 247 01b8 E37D     		ldrb	r3, [r4, #23]	@ zero_extendqisi2
+ 248 01ba 13F0040F 		tst	r3, #4
+ 249 01be E8D1     		bne	.L32
+ 250 01c0 4FEACA13 		lsl	r3, r10, #7
+ 251 01c4 03F11807 		add	r7, r3, #24
+ 252 01c8 2744     		add	r7, r7, r4
+ 253 01ca 04F19809 		add	r9, r4, #152
+ 254 01ce 9944     		add	r9, r9, r3
+ 255              	.L34:
+ 256 01d0 17F801BB 		ldrb	fp, [r7], #1	@ zero_extendqisi2
+ 257 01d4 E17B     		ldrb	r1, [r4, #15]	@ zero_extendqisi2
+ 258 01d6 08FA01F1 		lsl	r1, r8, r1
+ 259 01da A07B     		ldrb	r0, [r4, #14]	@ zero_extendqisi2
+ 260 01dc FFF7FEFF 		bl	GPIO_ClearValue
+ 261 01e0 617C     		ldrb	r1, [r4, #17]	@ zero_extendqisi2
+ 262 01e2 08FA01F1 		lsl	r1, r8, r1
+ 263 01e6 207C     		ldrb	r0, [r4, #16]	@ zero_extendqisi2
+ 264 01e8 FFF7FEFF 		bl	GPIO_SetValue
+ 265 01ec FFF7FEFF 		bl	vPortEnterCritical
+ 266 01f0 5946     		mov	r1, fp
+ 267 01f2 2068     		ldr	r0, [r4]
+ 268 01f4 FFF7FEFF 		bl	SSP_SendData
+ 269 01f8 FFF7FEFF 		bl	vPortExitCritical
+ 270              	.L36:
+ 271 01fc 2946     		mov	r1, r5
+ 272 01fe 2068     		ldr	r0, [r4]
+ 273 0200 FFF7FEFF 		bl	SSP_GetStatus
+ 274 0204 0028     		cmp	r0, #0
+ 275 0206 F9D0     		beq	.L36
+ 276 0208 3146     		mov	r1, r6
+ 277 020a 2068     		ldr	r0, [r4]
+ 278 020c FFF7FEFF 		bl	SSP_GetStatus
+ 279 0210 0128     		cmp	r0, #1
+ 280 0212 F3D0     		beq	.L36
+ 281 0214 E17B     		ldrb	r1, [r4, #15]	@ zero_extendqisi2
+ 282 0216 08FA01F1 		lsl	r1, r8, r1
+ 283 021a A07B     		ldrb	r0, [r4, #14]	@ zero_extendqisi2
+ 284 021c FFF7FEFF 		bl	GPIO_SetValue
+ 285 0220 4F45     		cmp	r7, r9
+ 286 0222 04D0     		beq	.L44
+ 287 0224 E37D     		ldrb	r3, [r4, #23]	@ zero_extendqisi2
+ 288 0226 13F0040F 		tst	r3, #4
+ 289 022a D1D0     		beq	.L34
+ 290 022c B1E7     		b	.L32
+ 291              	.L44:
+ 292 022e 0AF1010A 		add	r10, r10, #1
+ 293 0232 BAF1070F 		cmp	r10, #7
+ 294 0236 B1DD     		ble	.L31
+ 295 0238 E37D     		ldrb	r3, [r4, #23]	@ zero_extendqisi2
+ 296 023a 23F00303 		bic	r3, r3, #3
+ 297 023e E375     		strb	r3, [r4, #23]
+ 298              	.L29:
+ 299 0240 BDE8F88F 		pop	{r3, r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 301              		.align	1
+ 302              		.global	uc1701_init
+ 303              		.syntax unified
+ 304              		.thumb
+ 305              		.thumb_func
+ 306              		.fpu softvfp
+ 308              	uc1701_init:
+ 309              		@ args = 0, pretend = 0, frame = 24
+ 310              		@ frame_needed = 0, uses_anonymous_args = 0
+ 311 0244 F0B5     		push	{r4, r5, r6, r7, lr}
+ 312 0246 87B0     		sub	sp, sp, #28
+ 313 0248 0446     		mov	r4, r0
+ 314 024a C17B     		ldrb	r1, [r0, #15]	@ zero_extendqisi2
+ 315 024c 0125     		movs	r5, #1
+ 316 024e 2A46     		mov	r2, r5
+ 317 0250 05FA01F1 		lsl	r1, r5, r1
+ 318 0254 807B     		ldrb	r0, [r0, #14]	@ zero_extendqisi2
+ 319 0256 FFF7FEFF 		bl	GPIO_SetDir
+ 320 025a E17C     		ldrb	r1, [r4, #19]	@ zero_extendqisi2
+ 321 025c 2A46     		mov	r2, r5
+ 322 025e 05FA01F1 		lsl	r1, r5, r1
+ 323 0262 A07C     		ldrb	r0, [r4, #18]	@ zero_extendqisi2
+ 324 0264 FFF7FEFF 		bl	GPIO_SetDir
+ 325 0268 617C     		ldrb	r1, [r4, #17]	@ zero_extendqisi2
+ 326 026a 2A46     		mov	r2, r5
+ 327 026c 05FA01F1 		lsl	r1, r5, r1
+ 328 0270 207C     		ldrb	r0, [r4, #16]	@ zero_extendqisi2
+ 329 0272 FFF7FEFF 		bl	GPIO_SetDir
+ 330 0276 E17B     		ldrb	r1, [r4, #15]	@ zero_extendqisi2
+ 331 0278 05FA01F1 		lsl	r1, r5, r1
+ 332 027c A07B     		ldrb	r0, [r4, #14]	@ zero_extendqisi2
+ 333 027e FFF7FEFF 		bl	GPIO_SetValue
+ 334 0282 E17C     		ldrb	r1, [r4, #19]	@ zero_extendqisi2
+ 335 0284 05FA01F1 		lsl	r1, r5, r1
+ 336 0288 A07C     		ldrb	r0, [r4, #18]	@ zero_extendqisi2
+ 337 028a FFF7FEFF 		bl	GPIO_SetValue
+ 338 028e 617C     		ldrb	r1, [r4, #17]	@ zero_extendqisi2
+ 339 0290 05FA01F1 		lsl	r1, r5, r1
+ 340 0294 207C     		ldrb	r0, [r4, #16]	@ zero_extendqisi2
+ 341 0296 FFF7FEFF 		bl	GPIO_SetValue
+ 342 029a 617D     		ldrb	r1, [r4, #21]	@ zero_extendqisi2
+ 343 029c 2A46     		mov	r2, r5
+ 344 029e 05FA01F1 		lsl	r1, r5, r1
+ 345 02a2 207D     		ldrb	r0, [r4, #20]	@ zero_extendqisi2
+ 346 02a4 FFF7FEFF 		bl	GPIO_SetDir
+ 347 02a8 617D     		ldrb	r1, [r4, #21]	@ zero_extendqisi2
+ 348 02aa 05FA01F1 		lsl	r1, r5, r1
+ 349 02ae 207D     		ldrb	r0, [r4, #20]	@ zero_extendqisi2
+ 350 02b0 FFF7FEFF 		bl	GPIO_SetValue
+ 351 02b4 A27A     		ldrb	r2, [r4, #10]	@ zero_extendqisi2
+ 352 02b6 617A     		ldrb	r1, [r4, #9]	@ zero_extendqisi2
+ 353 02b8 207A     		ldrb	r0, [r4, #8]	@ zero_extendqisi2
+ 354 02ba FFF7FEFF 		bl	PINSEL_SetPinFunc
+ 355 02be 627B     		ldrb	r2, [r4, #13]	@ zero_extendqisi2
+ 356 02c0 217B     		ldrb	r1, [r4, #12]	@ zero_extendqisi2
+ 357 02c2 E07A     		ldrb	r0, [r4, #11]	@ zero_extendqisi2
+ 358 02c4 FFF7FEFF 		bl	PINSEL_SetPinFunc
+ 359 02c8 6846     		mov	r0, sp
+ 360 02ca FFF7FEFF 		bl	SSP_ConfigStructInit
+ 361 02ce 6368     		ldr	r3, [r4, #4]
+ 362 02d0 0593     		str	r3, [sp, #20]
+ 363 02d2 6946     		mov	r1, sp
+ 364 02d4 2068     		ldr	r0, [r4]
+ 365 02d6 FFF7FEFF 		bl	SSP_Init
+ 366 02da 2946     		mov	r1, r5
+ 367 02dc 2068     		ldr	r0, [r4]
+ 368 02de FFF7FEFF 		bl	SSP_Cmd
+ 369 02e2 E17C     		ldrb	r1, [r4, #19]	@ zero_extendqisi2
+ 370 02e4 05FA01F1 		lsl	r1, r5, r1
+ 371 02e8 A07C     		ldrb	r0, [r4, #18]	@ zero_extendqisi2
+ 372 02ea FFF7FEFF 		bl	GPIO_ClearValue
+ 373 02ee 0220     		movs	r0, #2
+ 374 02f0 FFF7FEFF 		bl	delay_ms
+ 375 02f4 E17C     		ldrb	r1, [r4, #19]	@ zero_extendqisi2
+ 376 02f6 05FA01F1 		lsl	r1, r5, r1
+ 377 02fa A07C     		ldrb	r0, [r4, #18]	@ zero_extendqisi2
+ 378 02fc FFF7FEFF 		bl	GPIO_SetValue
+ 379 0300 0220     		movs	r0, #2
+ 380 0302 FFF7FEFF 		bl	delay_ms
+ 381 0306 A221     		movs	r1, #162
+ 382 0308 2046     		mov	r0, r4
+ 383 030a FFF7DAFE 		bl	write_cmd
+ 384 030e A021     		movs	r1, #160
+ 385 0310 2046     		mov	r0, r4
+ 386 0312 FFF7D6FE 		bl	write_cmd
+ 387 0316 C021     		movs	r1, #192
+ 388 0318 2046     		mov	r0, r4
+ 389 031a FFF7D2FE 		bl	write_cmd
+ 390 031e 2721     		movs	r1, #39
+ 391 0320 2046     		mov	r0, r4
+ 392 0322 FFF7CEFE 		bl	write_cmd
+ 393 0326 A77D     		ldrb	r7, [r4, #22]	@ zero_extendqisi2
+ 394 0328 E17B     		ldrb	r1, [r4, #15]	@ zero_extendqisi2
+ 395 032a 05FA01F1 		lsl	r1, r5, r1
+ 396 032e A07B     		ldrb	r0, [r4, #14]	@ zero_extendqisi2
+ 397 0330 FFF7FEFF 		bl	GPIO_ClearValue
+ 398 0334 617C     		ldrb	r1, [r4, #17]	@ zero_extendqisi2
+ 399 0336 05FA01F1 		lsl	r1, r5, r1
+ 400 033a 207C     		ldrb	r0, [r4, #16]	@ zero_extendqisi2
+ 401 033c FFF7FEFF 		bl	GPIO_ClearValue
+ 402 0340 FFF7FEFF 		bl	vPortEnterCritical
+ 403 0344 8121     		movs	r1, #129
+ 404 0346 2068     		ldr	r0, [r4]
+ 405 0348 FFF7FEFF 		bl	SSP_SendData
+ 406 034c FFF7FEFF 		bl	vPortExitCritical
+ 407 0350 1026     		movs	r6, #16
+ 408              	.L46:
+ 409 0352 2946     		mov	r1, r5
+ 410 0354 2068     		ldr	r0, [r4]
+ 411 0356 FFF7FEFF 		bl	SSP_GetStatus
+ 412 035a 0028     		cmp	r0, #0
+ 413 035c F9D0     		beq	.L46
+ 414 035e 3146     		mov	r1, r6
+ 415 0360 2068     		ldr	r0, [r4]
+ 416 0362 FFF7FEFF 		bl	SSP_GetStatus
+ 417 0366 0128     		cmp	r0, #1
+ 418 0368 F3D0     		beq	.L46
+ 419 036a FFF7FEFF 		bl	vPortEnterCritical
+ 420 036e 3946     		mov	r1, r7
+ 421 0370 2068     		ldr	r0, [r4]
+ 422 0372 FFF7FEFF 		bl	SSP_SendData
+ 423 0376 FFF7FEFF 		bl	vPortExitCritical
+ 424 037a 0125     		movs	r5, #1
+ 425 037c 1026     		movs	r6, #16
+ 426              	.L48:
+ 427 037e 2946     		mov	r1, r5
+ 428 0380 2068     		ldr	r0, [r4]
+ 429 0382 FFF7FEFF 		bl	SSP_GetStatus
+ 430 0386 0028     		cmp	r0, #0
+ 431 0388 F9D0     		beq	.L48
+ 432 038a 3146     		mov	r1, r6
+ 433 038c 2068     		ldr	r0, [r4]
+ 434 038e FFF7FEFF 		bl	SSP_GetStatus
+ 435 0392 0128     		cmp	r0, #1
+ 436 0394 F3D0     		beq	.L48
+ 437 0396 E37B     		ldrb	r3, [r4, #15]	@ zero_extendqisi2
+ 438 0398 0121     		movs	r1, #1
+ 439 039a 9940     		lsls	r1, r1, r3
+ 440 039c A07B     		ldrb	r0, [r4, #14]	@ zero_extendqisi2
+ 441 039e FFF7FEFF 		bl	GPIO_SetValue
+ 442 03a2 2C21     		movs	r1, #44
+ 443 03a4 2046     		mov	r0, r4
+ 444 03a6 FFF78CFE 		bl	write_cmd
+ 445 03aa 0220     		movs	r0, #2
+ 446 03ac FFF7FEFF 		bl	delay_ms
+ 447 03b0 2E21     		movs	r1, #46
+ 448 03b2 2046     		mov	r0, r4
+ 449 03b4 FFF785FE 		bl	write_cmd
+ 450 03b8 0220     		movs	r0, #2
+ 451 03ba FFF7FEFF 		bl	delay_ms
+ 452 03be 2F21     		movs	r1, #47
+ 453 03c0 2046     		mov	r0, r4
+ 454 03c2 FFF77EFE 		bl	write_cmd
+ 455 03c6 0220     		movs	r0, #2
+ 456 03c8 FFF7FEFF 		bl	delay_ms
+ 457 03cc 4021     		movs	r1, #64
+ 458 03ce 2046     		mov	r0, r4
+ 459 03d0 FFF777FE 		bl	write_cmd
+ 460 03d4 AF21     		movs	r1, #175
+ 461 03d6 2046     		mov	r0, r4
+ 462 03d8 FFF773FE 		bl	write_cmd
+ 463 03dc 0021     		movs	r1, #0
+ 464 03de 2046     		mov	r0, r4
+ 465 03e0 FFF7FEFF 		bl	uc1701_clear
+ 466 03e4 2046     		mov	r0, r4
+ 467 03e6 FFF7FEFF 		bl	uc1701_update
+ 468 03ea 0220     		movs	r0, #2
+ 469 03ec FFF7FEFF 		bl	delay_ms
+ 470 03f0 A121     		movs	r1, #161
+ 471 03f2 2046     		mov	r0, r4
+ 472 03f4 FFF765FE 		bl	write_cmd
+ 473 03f8 C821     		movs	r1, #200
+ 474 03fa 2046     		mov	r0, r4
+ 475 03fc FFF761FE 		bl	write_cmd
+ 476 0400 07B0     		add	sp, sp, #28
+ 477              		@ sp needed
+ 478 0402 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 480              		.align	1
+ 481              		.global	uc1701_set_pixel
+ 482              		.syntax unified
+ 483              		.thumb
+ 484              		.thumb_func
+ 485              		.fpu softvfp
+ 487              	uc1701_set_pixel:
+ 488              		@ args = 0, pretend = 0, frame = 0
+ 489              		@ frame_needed = 0, uses_anonymous_args = 0
+ 490              		@ link register save eliminated.
+ 491 0404 30B4     		push	{r4, r5}
+ 492 0406 C2F3C204 		ubfx	r4, r2, #3, #3
+ 493 040a 01F07F01 		and	r1, r1, #127
+ 494 040e C1F17F01 		rsb	r1, r1, #127
+ 495 0412 02F00702 		and	r2, r2, #7
+ 496 0416 0125     		movs	r5, #1
+ 497 0418 9540     		lsls	r5, r5, r2
+ 498 041a 00EBC414 		add	r4, r0, r4, lsl #7
+ 499 041e 2144     		add	r1, r1, r4
+ 500 0420 0C7E     		ldrb	r4, [r1, #24]	@ zero_extendqisi2
+ 501 0422 24EA0504 		bic	r4, r4, r5
+ 502 0426 03F00103 		and	r3, r3, #1
+ 503 042a 03FA02F2 		lsl	r2, r3, r2
+ 504 042e 1443     		orrs	r4, r4, r2
+ 505 0430 0C76     		strb	r4, [r1, #24]
+ 506 0432 C37D     		ldrb	r3, [r0, #23]	@ zero_extendqisi2
+ 507 0434 13F0020F 		tst	r3, #2
+ 508 0438 0CBF     		ite	eq
+ 509 043a 43F00103 		orreq	r3, r3, #1
+ 510 043e 43F00503 		orrne	r3, r3, #5
+ 511 0442 C375     		strb	r3, [r0, #23]
+ 512 0444 30BC     		pop	{r4, r5}
+ 513 0446 7047     		bx	lr
+ 515              		.align	1
+ 516              		.global	uc1701_hline
+ 517              		.syntax unified
+ 518              		.thumb
+ 519              		.thumb_func
+ 520              		.fpu softvfp
+ 522              	uc1701_hline:
+ 523              		@ args = 4, pretend = 0, frame = 0
+ 524              		@ frame_needed = 0, uses_anonymous_args = 0
+ 525 0448 2DE9F047 		push	{r4, r5, r6, r7, r8, r9, r10, lr}
+ 526 044c 9DF82050 		ldrb	r5, [sp, #32]	@ zero_extendqisi2
+ 527 0450 FBB1     		cbz	r3, .L59
+ 528 0452 5E1E     		subs	r6, r3, #1
+ 529 0454 F6B2     		uxtb	r6, r6
+ 530 0456 9246     		mov	r10, r2
+ 531 0458 8946     		mov	r9, r1
+ 532 045a 8046     		mov	r8, r0
+ 533 045c 0136     		adds	r6, r6, #1
+ 534 045e 2F46     		mov	r7, r5
+ 535 0460 0024     		movs	r4, #0
+ 536 0462 0BE0     		b	.L63
+ 537              	.L66:
+ 538 0464 83F00107 		eor	r7, r3, #1
+ 539 0468 07F00107 		and	r7, r7, #1
+ 540              	.L62:
+ 541 046c 3B46     		mov	r3, r7
+ 542 046e 5246     		mov	r2, r10
+ 543 0470 4046     		mov	r0, r8
+ 544 0472 FFF7FEFF 		bl	uc1701_set_pixel
+ 545 0476 0134     		adds	r4, r4, #1
+ 546 0478 B442     		cmp	r4, r6
+ 547 047a 0AD0     		beq	.L59
+ 548              	.L63:
+ 549 047c E3B2     		uxtb	r3, r4
+ 550 047e 09EB0301 		add	r1, r9, r3
+ 551 0482 C9B2     		uxtb	r1, r1
+ 552 0484 022D     		cmp	r5, #2
+ 553 0486 EDD0     		beq	.L66
+ 554 0488 032D     		cmp	r5, #3
+ 555 048a 08BF     		it	eq
+ 556 048c 03F00107 		andeq	r7, r3, #1
+ 557 0490 ECE7     		b	.L62
+ 558              	.L59:
+ 559 0492 BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 561              		.align	1
+ 562              		.global	uc1701_vline
+ 563              		.syntax unified
+ 564              		.thumb
+ 565              		.thumb_func
+ 566              		.fpu softvfp
+ 568              	uc1701_vline:
+ 569              		@ args = 4, pretend = 0, frame = 0
+ 570              		@ frame_needed = 0, uses_anonymous_args = 0
+ 571 0496 2DE9F047 		push	{r4, r5, r6, r7, r8, r9, r10, lr}
+ 572 049a 9DF82050 		ldrb	r5, [sp, #32]	@ zero_extendqisi2
+ 573 049e FBB1     		cbz	r3, .L67
+ 574 04a0 5E1E     		subs	r6, r3, #1
+ 575 04a2 F6B2     		uxtb	r6, r6
+ 576 04a4 9246     		mov	r10, r2
+ 577 04a6 8946     		mov	r9, r1
+ 578 04a8 8046     		mov	r8, r0
+ 579 04aa 0136     		adds	r6, r6, #1
+ 580 04ac 2F46     		mov	r7, r5
+ 581 04ae 0024     		movs	r4, #0
+ 582 04b0 0BE0     		b	.L71
+ 583              	.L74:
+ 584 04b2 83F00107 		eor	r7, r3, #1
+ 585 04b6 07F00107 		and	r7, r7, #1
+ 586              	.L70:
+ 587 04ba 3B46     		mov	r3, r7
+ 588 04bc 4946     		mov	r1, r9
+ 589 04be 4046     		mov	r0, r8
+ 590 04c0 FFF7FEFF 		bl	uc1701_set_pixel
+ 591 04c4 0134     		adds	r4, r4, #1
+ 592 04c6 B442     		cmp	r4, r6
+ 593 04c8 0AD0     		beq	.L67
+ 594              	.L71:
+ 595 04ca E3B2     		uxtb	r3, r4
+ 596 04cc 0AEB0302 		add	r2, r10, r3
+ 597 04d0 D2B2     		uxtb	r2, r2
+ 598 04d2 022D     		cmp	r5, #2
+ 599 04d4 EDD0     		beq	.L74
+ 600 04d6 032D     		cmp	r5, #3
+ 601 04d8 08BF     		it	eq
+ 602 04da 03F00107 		andeq	r7, r3, #1
+ 603 04de ECE7     		b	.L70
+ 604              	.L67:
+ 605 04e0 BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 607              		.align	1
+ 608              		.global	uc1701_line
+ 609              		.syntax unified
+ 610              		.thumb
+ 611              		.thumb_func
+ 612              		.fpu softvfp
+ 614              	uc1701_line:
+ 615              		@ args = 8, pretend = 0, frame = 24
+ 616              		@ frame_needed = 0, uses_anonymous_args = 0
+ 617 04e4 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 618 04e8 87B0     		sub	sp, sp, #28
+ 619 04ea 0390     		str	r0, [sp, #12]
+ 620 04ec 0E46     		mov	r6, r1
+ 621 04ee 1746     		mov	r7, r2
+ 622 04f0 9DF84080 		ldrb	r8, [sp, #64]	@ zero_extendqisi2
+ 623 04f4 9DF84490 		ldrb	r9, [sp, #68]	@ zero_extendqisi2
+ 624 04f8 4245     		cmp	r2, r8
+ 625 04fa 8CBF     		ite	hi
+ 626 04fc A2EB080A 		subhi	r10, r2, r8
+ 627 0500 A8EB020A 		subls	r10, r8, r2
+ 628 0504 9942     		cmp	r1, r3
+ 629 0506 1BD9     		bls	.L78
+ 630 0508 A1EB030B 		sub	fp, r1, r3
+ 631 050c DA45     		cmp	r10, fp
+ 632 050e 64DC     		bgt	.L79
+ 633 0510 4646     		mov	r6, r8
+ 634 0512 8846     		mov	r8, r1
+ 635 0514 3A46     		mov	r2, r7
+ 636 0516 1F46     		mov	r7, r3
+ 637 0518 1346     		mov	r3, r2
+ 638              	.L80:
+ 639 051a A8EB0702 		sub	r2, r8, r7
+ 640 051e D2B2     		uxtb	r2, r2
+ 641 0520 0492     		str	r2, [sp, #16]
+ 642 0522 9E42     		cmp	r6, r3
+ 643 0524 1CD2     		bcs	.L82
+ 644              	.L91:
+ 645 0526 9B1B     		subs	r3, r3, r6
+ 646 0528 DBB2     		uxtb	r3, r3
+ 647 052a 0293     		str	r3, [sp, #8]
+ 648 052c 049B     		ldr	r3, [sp, #16]
+ 649 052e 5C08     		lsrs	r4, r3, #1
+ 650 0530 0123     		movs	r3, #1
+ 651 0532 0593     		str	r3, [sp, #20]
+ 652              	.L83:
+ 653 0534 4745     		cmp	r7, r8
+ 654 0536 5DD8     		bhi	.L75
+ 655 0538 CDF80490 		str	r9, [sp, #4]
+ 656 053c 0025     		movs	r5, #0
+ 657 053e 2AE0     		b	.L90
+ 658              	.L78:
+ 659 0540 A3EB010B 		sub	fp, r3, r1
+ 660 0544 DA45     		cmp	r10, fp
+ 661 0546 14DD     		ble	.L96
+ 662 0548 4245     		cmp	r2, r8
+ 663 054a E6D9     		bls	.L80
+ 664 054c A7EB0802 		sub	r2, r7, r8
+ 665 0550 D2B2     		uxtb	r2, r2
+ 666 0552 0492     		str	r2, [sp, #16]
+ 667 0554 3246     		mov	r2, r6
+ 668 0556 1E46     		mov	r6, r3
+ 669 0558 1346     		mov	r3, r2
+ 670 055a 3A46     		mov	r2, r7
+ 671 055c 4746     		mov	r7, r8
+ 672 055e 9046     		mov	r8, r2
+ 673              	.L82:
+ 674 0560 F31A     		subs	r3, r6, r3
+ 675 0562 DBB2     		uxtb	r3, r3
+ 676 0564 0293     		str	r3, [sp, #8]
+ 677 0566 049B     		ldr	r3, [sp, #16]
+ 678 0568 5C08     		lsrs	r4, r3, #1
+ 679 056a 4FF0FF33 		mov	r3, #-1
+ 680 056e 0593     		str	r3, [sp, #20]
+ 681 0570 E0E7     		b	.L83
+ 682              	.L96:
+ 683 0572 4246     		mov	r2, r8
+ 684 0574 9846     		mov	r8, r3
+ 685 0576 1346     		mov	r3, r2
+ 686 0578 3A46     		mov	r2, r7
+ 687 057a 0F46     		mov	r7, r1
+ 688 057c 1646     		mov	r6, r2
+ 689 057e CCE7     		b	.L80
+ 690              	.L97:
+ 691 0580 83F00103 		eor	r3, r3, #1
+ 692 0584 03F00103 		and	r3, r3, #1
+ 693 0588 0193     		str	r3, [sp, #4]
+ 694 058a 10E0     		b	.L86
+ 695              	.L89:
+ 696 058c 0135     		adds	r5, r5, #1
+ 697 058e 7B19     		adds	r3, r7, r5
+ 698 0590 DBB2     		uxtb	r3, r3
+ 699 0592 4345     		cmp	r3, r8
+ 700 0594 2ED8     		bhi	.L75
+ 701              	.L90:
+ 702 0596 EBB2     		uxtb	r3, r5
+ 703 0598 D919     		adds	r1, r3, r7
+ 704 059a C9B2     		uxtb	r1, r1
+ 705 059c B9F1020F 		cmp	r9, #2
+ 706 05a0 EED0     		beq	.L97
+ 707 05a2 B9F1030F 		cmp	r9, #3
+ 708 05a6 04BF     		itt	eq
+ 709 05a8 03F00103 		andeq	r3, r3, #1
+ 710 05ac 0193     		streq	r3, [sp, #4]
+ 711              	.L86:
+ 712 05ae DA45     		cmp	r10, fp
+ 713 05b0 019B     		ldr	r3, [sp, #4]
+ 714 05b2 C6BF     		itte	gt
+ 715 05b4 0A46     		movgt	r2, r1
+ 716 05b6 3146     		movgt	r1, r6
+ 717 05b8 3246     		movle	r2, r6
+ 718 05ba 0398     		ldr	r0, [sp, #12]
+ 719 05bc FFF7FEFF 		bl	uc1701_set_pixel
+ 720 05c0 029B     		ldr	r3, [sp, #8]
+ 721 05c2 E41A     		subs	r4, r4, r3
+ 722 05c4 E3B2     		uxtb	r3, r4
+ 723 05c6 5CB2     		sxtb	r4, r3
+ 724 05c8 002C     		cmp	r4, #0
+ 725 05ca DFDA     		bge	.L89
+ 726 05cc 059A     		ldr	r2, [sp, #20]
+ 727 05ce 1644     		add	r6, r6, r2
+ 728 05d0 F6B2     		uxtb	r6, r6
+ 729 05d2 049A     		ldr	r2, [sp, #16]
+ 730 05d4 9C18     		adds	r4, r3, r2
+ 731 05d6 64B2     		sxtb	r4, r4
+ 732 05d8 D8E7     		b	.L89
+ 733              	.L79:
+ 734 05da 4245     		cmp	r2, r8
+ 735 05dc 9DD9     		bls	.L80
+ 736 05de A7EB0802 		sub	r2, r7, r8
+ 737 05e2 D2B2     		uxtb	r2, r2
+ 738 05e4 0492     		str	r2, [sp, #16]
+ 739 05e6 3246     		mov	r2, r6
+ 740 05e8 1E46     		mov	r6, r3
+ 741 05ea 1346     		mov	r3, r2
+ 742 05ec 3A46     		mov	r2, r7
+ 743 05ee 4746     		mov	r7, r8
+ 744 05f0 9046     		mov	r8, r2
+ 745 05f2 98E7     		b	.L91
+ 746              	.L75:
+ 747 05f4 07B0     		add	sp, sp, #28
+ 748              		@ sp needed
+ 749 05f6 BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 751              		.align	1
+ 752              		.global	uc1701_rect
+ 753              		.syntax unified
+ 754              		.thumb
+ 755              		.thumb_func
+ 756              		.fpu softvfp
+ 758              	uc1701_rect:
+ 759              		@ args = 8, pretend = 0, frame = 0
+ 760              		@ frame_needed = 0, uses_anonymous_args = 0
+ 761 05fa 2DE9F043 		push	{r4, r5, r6, r7, r8, r9, lr}
+ 762 05fe 83B0     		sub	sp, sp, #12
+ 763 0600 0746     		mov	r7, r0
+ 764 0602 0C46     		mov	r4, r1
+ 765 0604 9046     		mov	r8, r2
+ 766 0606 1E46     		mov	r6, r3
+ 767 0608 9DF82890 		ldrb	r9, [sp, #40]	@ zero_extendqisi2
+ 768 060c 9DF82C50 		ldrb	r5, [sp, #44]	@ zero_extendqisi2
+ 769 0610 0095     		str	r5, [sp]
+ 770 0612 FFF7FEFF 		bl	uc1701_hline
+ 771 0616 09F1FF32 		add	r2, r9, #-1
+ 772 061a 4244     		add	r2, r2, r8
+ 773 061c 0095     		str	r5, [sp]
+ 774 061e 3346     		mov	r3, r6
+ 775 0620 D2B2     		uxtb	r2, r2
+ 776 0622 2146     		mov	r1, r4
+ 777 0624 3846     		mov	r0, r7
+ 778 0626 FFF7FEFF 		bl	uc1701_hline
+ 779 062a 0095     		str	r5, [sp]
+ 780 062c 4B46     		mov	r3, r9
+ 781 062e 4246     		mov	r2, r8
+ 782 0630 2146     		mov	r1, r4
+ 783 0632 3846     		mov	r0, r7
+ 784 0634 FFF7FEFF 		bl	uc1701_vline
+ 785 0638 711E     		subs	r1, r6, #1
+ 786 063a 2144     		add	r1, r1, r4
+ 787 063c 0095     		str	r5, [sp]
+ 788 063e 4B46     		mov	r3, r9
+ 789 0640 4246     		mov	r2, r8
+ 790 0642 C9B2     		uxtb	r1, r1
+ 791 0644 3846     		mov	r0, r7
+ 792 0646 FFF7FEFF 		bl	uc1701_vline
+ 793 064a 03B0     		add	sp, sp, #12
+ 794              		@ sp needed
+ 795 064c BDE8F083 		pop	{r4, r5, r6, r7, r8, r9, pc}
+ 797              		.align	1
+ 798              		.global	uc1701_rect_fill
+ 799              		.syntax unified
+ 800              		.thumb
+ 801              		.thumb_func
+ 802              		.fpu softvfp
+ 804              	uc1701_rect_fill:
+ 805              		@ args = 8, pretend = 0, frame = 0
+ 806              		@ frame_needed = 0, uses_anonymous_args = 0
+ 807 0650 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 808 0654 83B0     		sub	sp, sp, #12
+ 809 0656 9DF830B0 		ldrb	fp, [sp, #48]	@ zero_extendqisi2
+ 810 065a 9DF834A0 		ldrb	r10, [sp, #52]	@ zero_extendqisi2
+ 811 065e FBB1     		cbz	r3, .L100
+ 812 0660 5D1E     		subs	r5, r3, #1
+ 813 0662 EDB2     		uxtb	r5, r5
+ 814 0664 9146     		mov	r9, r2
+ 815 0666 8846     		mov	r8, r1
+ 816 0668 0746     		mov	r7, r0
+ 817 066a 0135     		adds	r5, r5, #1
+ 818 066c 5646     		mov	r6, r10
+ 819 066e 0024     		movs	r4, #0
+ 820 0670 08E0     		b	.L103
+ 821              	.L102:
+ 822 0672 0096     		str	r6, [sp]
+ 823 0674 5B46     		mov	r3, fp
+ 824 0676 4A46     		mov	r2, r9
+ 825 0678 3846     		mov	r0, r7
+ 826 067a FFF7FEFF 		bl	uc1701_vline
+ 827 067e 0134     		adds	r4, r4, #1
+ 828 0680 AC42     		cmp	r4, r5
+ 829 0682 0DD0     		beq	.L100
+ 830              	.L103:
+ 831 0684 E3B2     		uxtb	r3, r4
+ 832 0686 08EB0301 		add	r1, r8, r3
+ 833 068a C9B2     		uxtb	r1, r1
+ 834 068c BAF1040F 		cmp	r10, #4
+ 835 0690 EFD1     		bne	.L102
+ 836 0692 03F00103 		and	r3, r3, #1
+ 837 0696 002B     		cmp	r3, #0
+ 838 0698 0CBF     		ite	eq
+ 839 069a 0226     		moveq	r6, #2
+ 840 069c 0326     		movne	r6, #3
+ 841 069e E8E7     		b	.L102
+ 842              	.L100:
+ 843 06a0 03B0     		add	sp, sp, #12
+ 844              		@ sp needed
+ 845 06a2 BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 847              		.align	1
+ 848              		.global	uc1701_rect_invert
+ 849              		.syntax unified
+ 850              		.thumb
+ 851              		.thumb_func
+ 852              		.fpu softvfp
+ 854              	uc1701_rect_invert:
+ 855              		@ args = 4, pretend = 0, frame = 8
+ 856              		@ frame_needed = 0, uses_anonymous_args = 0
+ 857 06a6 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 858 06aa 83B0     		sub	sp, sp, #12
+ 859 06ac 0092     		str	r2, [sp]
+ 860 06ae 9DF830B0 		ldrb	fp, [sp, #48]	@ zero_extendqisi2
+ 861 06b2 02F00702 		and	r2, r2, #7
+ 862 06b6 D946     		mov	r9, fp
+ 863 06b8 C2F10804 		rsb	r4, r2, #8
+ 864 06bc A345     		cmp	fp, r4
+ 865 06be 61DA     		bge	.L108
+ 866 06c0 CBF10804 		rsb	r4, fp, #8
+ 867 06c4 4FF0FF0C 		mov	ip, #255
+ 868 06c8 4CFA04FC 		asr	ip, ip, r4
+ 869 06cc 5FFA8CFC 		uxtb	ip, ip
+ 870 06d0 CDF804B0 		str	fp, [sp, #4]
+ 871              	.L109:
+ 872 06d4 0CFA02FC 		lsl	ip, ip, r2
+ 873 06d8 5FFA8CFA 		uxtb	r10, ip
+ 874 06dc 13B3     		cbz	r3, .L110
+ 875 06de 009A     		ldr	r2, [sp]
+ 876 06e0 4FEAD20E 		lsr	lr, r2, #3
+ 877 06e4 C77D     		ldrb	r7, [r0, #23]	@ zero_extendqisi2
+ 878 06e6 03EB0108 		add	r8, r3, r1
+ 879 06ea 5FFA88F8 		uxtb	r8, r8
+ 880 06ee 0D46     		mov	r5, r1
+ 881 06f0 00EBCE1E 		add	lr, r0, lr, lsl #7
+ 882 06f4 6FEA0C0C 		mvn	ip, ip
+ 883              	.L113:
+ 884 06f8 C5F17F02 		rsb	r2, r5, #127
+ 885 06fc 7244     		add	r2, r2, lr
+ 886 06fe 147E     		ldrb	r4, [r2, #24]	@ zero_extendqisi2
+ 887 0700 2AEA0406 		bic	r6, r10, r4
+ 888 0704 0CEA0404 		and	r4, ip, r4
+ 889 0708 3443     		orrs	r4, r4, r6
+ 890 070a 1476     		strb	r4, [r2, #24]
+ 891 070c 17F0020F 		tst	r7, #2
+ 892 0710 0CBF     		ite	eq
+ 893 0712 47F00107 		orreq	r7, r7, #1
+ 894 0716 47F00507 		orrne	r7, r7, #5
+ 895 071a 0135     		adds	r5, r5, #1
+ 896 071c EDB2     		uxtb	r5, r5
+ 897 071e 4545     		cmp	r5, r8
+ 898 0720 EAD1     		bne	.L113
+ 899 0722 C775     		strb	r7, [r0, #23]
+ 900              	.L110:
+ 901 0724 009C     		ldr	r4, [sp]
+ 902 0726 A446     		mov	ip, r4
+ 903 0728 019A     		ldr	r2, [sp, #4]
+ 904 072a A2EB0408 		sub	r8, r2, r4
+ 905 072e 03EB010E 		add	lr, r3, r1
+ 906 0732 5FFA8EFE 		uxtb	lr, lr
+ 907 0736 8A46     		mov	r10, r1
+ 908              	.L114:
+ 909 0738 0CEB0802 		add	r2, ip, r8
+ 910 073c D2B2     		uxtb	r2, r2
+ 911 073e 02F10804 		add	r4, r2, #8
+ 912 0742 A145     		cmp	r9, r4
+ 913 0744 25DB     		blt	.L128
+ 914 0746 0CF1080C 		add	ip, ip, #8
+ 915 074a 5FFA8CFC 		uxtb	ip, ip
+ 916 074e 002B     		cmp	r3, #0
+ 917 0750 F2D0     		beq	.L114
+ 918 0752 4FEADC07 		lsr	r7, ip, #3
+ 919 0756 C67D     		ldrb	r6, [r0, #23]	@ zero_extendqisi2
+ 920 0758 5246     		mov	r2, r10
+ 921 075a 00EBC717 		add	r7, r0, r7, lsl #7
+ 922              	.L118:
+ 923 075e C2F17F04 		rsb	r4, r2, #127
+ 924 0762 3C44     		add	r4, r4, r7
+ 925 0764 257E     		ldrb	r5, [r4, #24]	@ zero_extendqisi2
+ 926 0766 ED43     		mvns	r5, r5
+ 927 0768 2576     		strb	r5, [r4, #24]
+ 928 076a 16F0020F 		tst	r6, #2
+ 929 076e 0CBF     		ite	eq
+ 930 0770 46F00106 		orreq	r6, r6, #1
+ 931 0774 46F00506 		orrne	r6, r6, #5
+ 932 0778 0132     		adds	r2, r2, #1
+ 933 077a D2B2     		uxtb	r2, r2
+ 934 077c 7245     		cmp	r2, lr
+ 935 077e EED1     		bne	.L118
+ 936 0780 C675     		strb	r6, [r0, #23]
+ 937 0782 D9E7     		b	.L114
+ 938              	.L108:
+ 939 0784 C2F10804 		rsb	r4, r2, #8
+ 940 0788 E4B2     		uxtb	r4, r4
+ 941 078a 0194     		str	r4, [sp, #4]
+ 942 078c 4FF0FF0C 		mov	ip, #255
+ 943 0790 A0E7     		b	.L109
+ 944              	.L128:
+ 945 0792 9345     		cmp	fp, r2
+ 946 0794 2ED9     		bls	.L107
+ 947 0796 ABEB0205 		sub	r5, fp, r2
+ 948 079a FF26     		movs	r6, #255
+ 949 079c 06FA05F5 		lsl	r5, r6, r5
+ 950 07a0 EEB2     		uxtb	r6, r5
+ 951 07a2 F243     		mvns	r2, r6
+ 952 07a4 D2B2     		uxtb	r2, r2
+ 953 07a6 0CF1080C 		add	ip, ip, #8
+ 954 07aa 5FFA8CFC 		uxtb	ip, ip
+ 955 07ae 0BB3     		cbz	r3, .L107
+ 956 07b0 4FEADC0C 		lsr	ip, ip, #3
+ 957 07b4 90F817E0 		ldrb	lr, [r0, #23]	@ zero_extendqisi2
+ 958 07b8 0B44     		add	r3, r3, r1
+ 959 07ba DFB2     		uxtb	r7, r3
+ 960 07bc 00EBCC13 		add	r3, r0, ip, lsl #7
+ 961 07c0 6FEA020C 		mvn	ip, r2
+ 962              	.L123:
+ 963 07c4 C1F17F04 		rsb	r4, r1, #127
+ 964 07c8 1C44     		add	r4, r4, r3
+ 965 07ca 227E     		ldrb	r2, [r4, #24]	@ zero_extendqisi2
+ 966 07cc 46EA0205 		orr	r5, r6, r2
+ 967 07d0 0CEA0202 		and	r2, ip, r2
+ 968 07d4 62EA0502 		orn	r2, r2, r5
+ 969 07d8 2276     		strb	r2, [r4, #24]
+ 970 07da 1EF0020F 		tst	lr, #2
+ 971 07de 0CBF     		ite	eq
+ 972 07e0 4EF0010E 		orreq	lr, lr, #1
+ 973 07e4 4EF0050E 		orrne	lr, lr, #5
+ 974 07e8 0131     		adds	r1, r1, #1
+ 975 07ea C9B2     		uxtb	r1, r1
+ 976 07ec B942     		cmp	r1, r7
+ 977 07ee E9D1     		bne	.L123
+ 978 07f0 80F817E0 		strb	lr, [r0, #23]
+ 979              	.L107:
+ 980 07f4 03B0     		add	sp, sp, #12
+ 981              		@ sp needed
+ 982 07f6 BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 984              		.align	1
+ 985              		.global	uc1701_draw_image
+ 986              		.syntax unified
+ 987              		.thumb
+ 988              		.thumb_func
+ 989              		.fpu softvfp
+ 991              	uc1701_draw_image:
+ 992              		@ args = 4, pretend = 0, frame = 0
+ 993              		@ frame_needed = 0, uses_anonymous_args = 0
+ 994 07fa 2DE9F043 		push	{r4, r5, r6, r7, r8, r9, lr}
+ 995 07fe 8946     		mov	r9, r1
+ 996 0800 9046     		mov	r8, r2
+ 997 0802 9DF81C20 		ldrb	r2, [sp, #28]	@ zero_extendqisi2
+ 998 0806 1C46     		mov	r4, r3
+ 999 0808 14F8021B 		ldrb	r1, [r4], #2	@ zero_extendqisi2
+ 1000 080c 93F801E0 		ldrb	lr, [r3, #1]	@ zero_extendqisi2
+ 1001 0810 BEF1000F 		cmp	lr, #0
+ 1002 0814 2CD0     		beq	.L129
+ 1003 0816 0027     		movs	r7, #0
+ 1004 0818 C9F19709 		rsb	r9, r9, #151
+ 1005 081c 01F1FF3C 		add	ip, r1, #-1
+ 1006 0820 5FFA8CFC 		uxtb	ip, ip
+ 1007 0824 0CF1010C 		add	ip, ip, #1
+ 1008 0828 17E0     		b	.L130
+ 1009              	.L133:
+ 1010 082a 05F80139 		strb	r3, [r5], #-1
+ 1011 082e C37D     		ldrb	r3, [r0, #23]	@ zero_extendqisi2
+ 1012 0830 13F0020F 		tst	r3, #2
+ 1013 0834 0CBF     		ite	eq
+ 1014 0836 43F00103 		orreq	r3, r3, #1
+ 1015 083a 43F00503 		orrne	r3, r3, #5
+ 1016 083e C375     		strb	r3, [r0, #23]
+ 1017 0840 B442     		cmp	r4, r6
+ 1018 0842 06D0     		beq	.L138
+ 1019              	.L136:
+ 1020 0844 14F8013B 		ldrb	r3, [r4], #1	@ zero_extendqisi2
+ 1021 0848 002A     		cmp	r2, #0
+ 1022 084a EED1     		bne	.L133
+ 1023 084c DB43     		mvns	r3, r3
+ 1024 084e DBB2     		uxtb	r3, r3
+ 1025 0850 EBE7     		b	.L133
+ 1026              	.L138:
+ 1027 0852 0837     		adds	r7, r7, #8
+ 1028 0854 FFB2     		uxtb	r7, r7
+ 1029 0856 BE45     		cmp	lr, r7
+ 1030 0858 0AD9     		bls	.L129
+ 1031              	.L130:
+ 1032 085a 0029     		cmp	r1, #0
+ 1033 085c F9D0     		beq	.L138
+ 1034 085e 08EB0705 		add	r5, r8, r7
+ 1035 0862 ED10     		asrs	r5, r5, #3
+ 1036 0864 09EBC515 		add	r5, r9, r5, lsl #7
+ 1037 0868 0544     		add	r5, r5, r0
+ 1038 086a 04EB0C06 		add	r6, r4, ip
+ 1039 086e E9E7     		b	.L136
+ 1040              	.L129:
+ 1041 0870 BDE8F083 		pop	{r4, r5, r6, r7, r8, r9, pc}
+ 1043              		.align	1
+ 1044              		.global	uc1701_text
+ 1045              		.syntax unified
+ 1046              		.thumb
+ 1047              		.thumb_func
+ 1048              		.fpu softvfp
+ 1050              	uc1701_text:
+ 1051              		@ args = 8, pretend = 0, frame = 80
+ 1052              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1053 0874 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 1054 0878 95B0     		sub	sp, sp, #84
+ 1055 087a 0290     		str	r0, [sp, #8]
+ 1056 087c 0E91     		str	r1, [sp, #56]
+ 1057 087e 9DF87C70 		ldrb	r7, [sp, #124]	@ zero_extendqisi2
+ 1058 0882 7049     		ldr	r1, .L167
+ 1059 0884 1E98     		ldr	r0, [sp, #120]
+ 1060 0886 0028     		cmp	r0, #0
+ 1061 0888 08BF     		it	eq
+ 1062 088a 0846     		moveq	r0, r1
+ 1063 088c 1E90     		str	r0, [sp, #120]
+ 1064 088e 8178     		ldrb	r1, [r0, #2]	@ zero_extendqisi2
+ 1065 0890 0691     		str	r1, [sp, #24]
+ 1066 0892 0146     		mov	r1, r0
+ 1067 0894 90F803B0 		ldrb	fp, [r0, #3]	@ zero_extendqisi2
+ 1068 0898 0079     		ldrb	r0, [r0, #4]	@ zero_extendqisi2
+ 1069 089a 0D90     		str	r0, [sp, #52]
+ 1070 089c 4C79     		ldrb	r4, [r1, #5]	@ zero_extendqisi2
+ 1071 089e 1394     		str	r4, [sp, #76]
+ 1072 08a0 CDF848B0 		str	fp, [sp, #72]
+ 1073 08a4 0BF10701 		add	r1, fp, #7
+ 1074 08a8 C908     		lsrs	r1, r1, #3
+ 1075 08aa 1191     		str	r1, [sp, #68]
+ 1076 08ac 8DB2     		uxth	r5, r1
+ 1077 08ae 1095     		str	r5, [sp, #64]
+ 1078 08b0 0593     		str	r3, [sp, #20]
+ 1079 08b2 4B1E     		subs	r3, r1, #1
+ 1080 08b4 DBB2     		uxtb	r3, r3
+ 1081 08b6 0233     		adds	r3, r3, #2
+ 1082 08b8 DB00     		lsls	r3, r3, #3
+ 1083 08ba 0893     		str	r3, [sp, #32]
+ 1084 08bc 0319     		adds	r3, r0, r4
+ 1085 08be 0F93     		str	r3, [sp, #60]
+ 1086 08c0 A2F10803 		sub	r3, r2, #8
+ 1087 08c4 0993     		str	r3, [sp, #36]
+ 1088 08c6 98E0     		b	.L145
+ 1089              	.L147:
+ 1090 08c8 1E9A     		ldr	r2, [sp, #120]
+ 1091 08ca 1A44     		add	r2, r2, r3
+ 1092 08cc 9279     		ldrb	r2, [r2, #6]	@ zero_extendqisi2
+ 1093 08ce 0692     		str	r2, [sp, #24]
+ 1094 08d0 002B     		cmp	r3, #0
+ 1095 08d2 31D0     		beq	.L161
+ 1096 08d4 1E9A     		ldr	r2, [sp, #120]
+ 1097 08d6 511D     		adds	r1, r2, #5
+ 1098 08d8 901D     		adds	r0, r2, #6
+ 1099 08da 013B     		subs	r3, r3, #1
+ 1100 08dc DBB2     		uxtb	r3, r3
+ 1101 08de 1844     		add	r0, r0, r3
+ 1102 08e0 0023     		movs	r3, #0
+ 1103              	.L150:
+ 1104 08e2 11F8012F 		ldrb	r2, [r1, #1]!	@ zero_extendqisi2
+ 1105 08e6 1344     		add	r3, r3, r2
+ 1106 08e8 9BB2     		uxth	r3, r3
+ 1107 08ea 8142     		cmp	r1, r0
+ 1108 08ec F9D1     		bne	.L150
+ 1109              	.L149:
+ 1110 08ee 139A     		ldr	r2, [sp, #76]
+ 1111 08f0 0632     		adds	r2, r2, #6
+ 1112 08f2 1099     		ldr	r1, [sp, #64]
+ 1113 08f4 03FB0123 		mla	r3, r3, r1, r2
+ 1114 08f8 9BB2     		uxth	r3, r3
+ 1115 08fa 0A93     		str	r3, [sp, #40]
+ 1116              	.L148:
+ 1117 08fc 0E9A     		ldr	r2, [sp, #56]
+ 1118 08fe 0699     		ldr	r1, [sp, #24]
+ 1119 0900 5318     		adds	r3, r2, r1
+ 1120 0902 802B     		cmp	r3, #128
+ 1121 0904 00F39A80 		bgt	.L142
+ 1122 0908 119B     		ldr	r3, [sp, #68]
+ 1123 090a 002B     		cmp	r3, #0
+ 1124 090c 6ED0     		beq	.L152
+ 1125 090e 8BB2     		uxth	r3, r1
+ 1126 0910 0793     		str	r3, [sp, #28]
+ 1127 0912 1346     		mov	r3, r2
+ 1128 0914 02EB0109 		add	r9, r2, r1
+ 1129 0918 5FFA89F9 		uxtb	r9, r9
+ 1130 091c 0029     		cmp	r1, #0
+ 1131 091e 18BF     		it	ne
+ 1132 0920 4A46     		movne	r2, r9
+ 1133 0922 0C92     		str	r2, [sp, #48]
+ 1134 0924 4FF0000A 		mov	r10, #0
+ 1135 0928 4FF00808 		mov	r8, #8
+ 1136 092c 0B93     		str	r3, [sp, #44]
+ 1137 092e CDF80CA0 		str	r10, [sp, #12]
+ 1138 0932 DDF848A0 		ldr	r10, [sp, #72]
+ 1139 0936 42E0     		b	.L159
+ 1140              	.L161:
+ 1141 0938 0023     		movs	r3, #0
+ 1142 093a D8E7     		b	.L149
+ 1143              	.L155:
+ 1144 093c 019A     		ldr	r2, [sp, #4]
+ 1145 093e 2146     		mov	r1, r4
+ 1146 0940 0298     		ldr	r0, [sp, #8]
+ 1147 0942 FFF77EFB 		bl	write_byte
+ 1148 0946 0134     		adds	r4, r4, #1
+ 1149 0948 E4B2     		uxtb	r4, r4
+ 1150 094a A145     		cmp	r9, r4
+ 1151 094c 15D0     		beq	.L153
+ 1152              	.L156:
+ 1153 094e 16F8013B 		ldrb	r3, [r6], #1	@ zero_extendqisi2
+ 1154 0952 0FB9     		cbnz	r7, .L154
+ 1155 0954 DB43     		mvns	r3, r3
+ 1156 0956 DBB2     		uxtb	r3, r3
+ 1157              	.L154:
+ 1158 0958 BBF1080F 		cmp	fp, #8
+ 1159 095c EED9     		bls	.L155
+ 1160 095e C245     		cmp	r10, r8
+ 1161 0960 ECDA     		bge	.L155
+ 1162 0962 049A     		ldr	r2, [sp, #16]
+ 1163 0964 43FA02F5 		asr	r5, r3, r2
+ 1164 0968 EDB2     		uxtb	r5, r5
+ 1165 096a 019A     		ldr	r2, [sp, #4]
+ 1166 096c 2146     		mov	r1, r4
+ 1167 096e 0298     		ldr	r0, [sp, #8]
+ 1168 0970 FFF746FB 		bl	read_byte
+ 1169 0974 2843     		orrs	r0, r0, r5
+ 1170 0976 C3B2     		uxtb	r3, r0
+ 1171 0978 E0E7     		b	.L155
+ 1172              	.L153:
+ 1173 097a 012F     		cmp	r7, #1
+ 1174 097c 14BF     		ite	ne
+ 1175 097e FF23     		movne	r3, #255
+ 1176 0980 0023     		moveq	r3, #0
+ 1177 0982 BBF1080F 		cmp	fp, #8
+ 1178 0986 0DD9     		bls	.L157
+ 1179 0988 C245     		cmp	r10, r8
+ 1180 098a 0BDA     		bge	.L157
+ 1181 098c A8EB0B04 		sub	r4, r8, fp
+ 1182 0990 43FA04F4 		asr	r4, r3, r4
+ 1183 0994 E4B2     		uxtb	r4, r4
+ 1184 0996 019A     		ldr	r2, [sp, #4]
+ 1185 0998 0C99     		ldr	r1, [sp, #48]
+ 1186 099a 0298     		ldr	r0, [sp, #8]
+ 1187 099c FFF730FB 		bl	read_byte
+ 1188 09a0 2043     		orrs	r0, r0, r4
+ 1189 09a2 C3B2     		uxtb	r3, r0
+ 1190              	.L157:
+ 1191 09a4 059A     		ldr	r2, [sp, #20]
+ 1192 09a6 1278     		ldrb	r2, [r2]	@ zero_extendqisi2
+ 1193 09a8 D2B9     		cbnz	r2, .L166
+ 1194              	.L158:
+ 1195 09aa 08F10808 		add	r8, r8, #8
+ 1196 09ae 039B     		ldr	r3, [sp, #12]
+ 1197 09b0 079A     		ldr	r2, [sp, #28]
+ 1198 09b2 1344     		add	r3, r3, r2
+ 1199 09b4 9BB2     		uxth	r3, r3
+ 1200 09b6 0393     		str	r3, [sp, #12]
+ 1201 09b8 089B     		ldr	r3, [sp, #32]
+ 1202 09ba 9845     		cmp	r8, r3
+ 1203 09bc 16D0     		beq	.L152
+ 1204              	.L159:
+ 1205 09be 099B     		ldr	r3, [sp, #36]
+ 1206 09c0 4344     		add	r3, r3, r8
+ 1207 09c2 DBB2     		uxtb	r3, r3
+ 1208 09c4 0193     		str	r3, [sp, #4]
+ 1209 09c6 069B     		ldr	r3, [sp, #24]
+ 1210 09c8 002B     		cmp	r3, #0
+ 1211 09ca D6D0     		beq	.L153
+ 1212 09cc A8EB0B03 		sub	r3, r8, fp
+ 1213 09d0 0493     		str	r3, [sp, #16]
+ 1214 09d2 0A9B     		ldr	r3, [sp, #40]
+ 1215 09d4 039A     		ldr	r2, [sp, #12]
+ 1216 09d6 9E18     		adds	r6, r3, r2
+ 1217 09d8 1E9B     		ldr	r3, [sp, #120]
+ 1218 09da 1E44     		add	r6, r6, r3
+ 1219 09dc 0B9C     		ldr	r4, [sp, #44]
+ 1220 09de B6E7     		b	.L156
+ 1221              	.L166:
+ 1222 09e0 019A     		ldr	r2, [sp, #4]
+ 1223 09e2 0C99     		ldr	r1, [sp, #48]
+ 1224 09e4 0298     		ldr	r0, [sp, #8]
+ 1225 09e6 FFF72CFB 		bl	write_byte
+ 1226 09ea DEE7     		b	.L158
+ 1227              	.L152:
+ 1228 09ec 0E9B     		ldr	r3, [sp, #56]
+ 1229 09ee 0133     		adds	r3, r3, #1
+ 1230 09f0 069A     		ldr	r2, [sp, #24]
+ 1231 09f2 1344     		add	r3, r3, r2
+ 1232 09f4 03F0FF03 		and	r3, r3, #255
+ 1233 09f8 0E93     		str	r3, [sp, #56]
+ 1234              	.L145:
+ 1235 09fa 059A     		ldr	r2, [sp, #20]
+ 1236 09fc 12F8013B 		ldrb	r3, [r2], #1	@ zero_extendqisi2
+ 1237 0a00 0592     		str	r2, [sp, #20]
+ 1238 0a02 DBB1     		cbz	r3, .L142
+ 1239 0a04 0D9A     		ldr	r2, [sp, #52]
+ 1240 0a06 9342     		cmp	r3, r2
+ 1241 0a08 F7D3     		bcc	.L145
+ 1242 0a0a 0F99     		ldr	r1, [sp, #60]
+ 1243 0a0c 8B42     		cmp	r3, r1
+ 1244 0a0e F4DA     		bge	.L145
+ 1245 0a10 9B1A     		subs	r3, r3, r2
+ 1246 0a12 DBB2     		uxtb	r3, r3
+ 1247 0a14 1E9A     		ldr	r2, [sp, #120]
+ 1248 0a16 1278     		ldrb	r2, [r2]	@ zero_extendqisi2
+ 1249 0a18 002A     		cmp	r2, #0
+ 1250 0a1a 7FF455AF 		bne	.L147
+ 1251 0a1e 1E9A     		ldr	r2, [sp, #120]
+ 1252 0a20 5278     		ldrb	r2, [r2, #1]	@ zero_extendqisi2
+ 1253 0a22 002A     		cmp	r2, #0
+ 1254 0a24 7FF450AF 		bne	.L147
+ 1255 0a28 069A     		ldr	r2, [sp, #24]
+ 1256 0a2a 1099     		ldr	r1, [sp, #64]
+ 1257 0a2c 02FB01F2 		mul	r2, r2, r1
+ 1258 0a30 02FB03F3 		mul	r3, r2, r3
+ 1259 0a34 0633     		adds	r3, r3, #6
+ 1260 0a36 9BB2     		uxth	r3, r3
+ 1261 0a38 0A93     		str	r3, [sp, #40]
+ 1262 0a3a 5FE7     		b	.L148
+ 1263              	.L142:
+ 1264 0a3c 15B0     		add	sp, sp, #84
+ 1265              		@ sp needed
+ 1266 0a3e BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 1267              	.L168:
+ 1268 0a42 00BF     		.align	2
+ 1269              	.L167:
+ 1270 0a44 00000000 		.word	.LANCHOR0
+ 1272              		.section	.rodata
+ 1273              		.align	2
+ 1274              		.set	.LANCHOR0,. + 0
+ 1277              	System5x7:
+ 1278 0000 00       		.byte	0
+ 1279 0001 00       		.byte	0
+ 1280 0002 05       		.byte	5
+ 1281 0003 07       		.byte	7
+ 1282 0004 20       		.byte	32
+ 1283 0005 60       		.byte	96
+ 1284 0006 00       		.byte	0
+ 1285 0007 00       		.byte	0
+ 1286 0008 00       		.byte	0
+ 1287 0009 00       		.byte	0
+ 1288 000a 00       		.byte	0
+ 1289 000b 00       		.byte	0
+ 1290 000c 00       		.byte	0
+ 1291 000d 5F       		.byte	95
+ 1292 000e 00       		.byte	0
+ 1293 000f 00       		.byte	0
+ 1294 0010 00       		.byte	0
+ 1295 0011 07       		.byte	7
+ 1296 0012 00       		.byte	0
+ 1297 0013 07       		.byte	7
+ 1298 0014 00       		.byte	0
+ 1299 0015 14       		.byte	20
+ 1300 0016 7F       		.byte	127
+ 1301 0017 14       		.byte	20
+ 1302 0018 7F       		.byte	127
+ 1303 0019 14       		.byte	20
+ 1304 001a 24       		.byte	36
+ 1305 001b 2A       		.byte	42
+ 1306 001c 7F       		.byte	127
+ 1307 001d 2A       		.byte	42
+ 1308 001e 12       		.byte	18
+ 1309 001f 23       		.byte	35
+ 1310 0020 13       		.byte	19
+ 1311 0021 08       		.byte	8
+ 1312 0022 64       		.byte	100
+ 1313 0023 62       		.byte	98
+ 1314 0024 36       		.byte	54
+ 1315 0025 49       		.byte	73
+ 1316 0026 55       		.byte	85
+ 1317 0027 22       		.byte	34
+ 1318 0028 50       		.byte	80
+ 1319 0029 00       		.byte	0
+ 1320 002a 05       		.byte	5
+ 1321 002b 03       		.byte	3
+ 1322 002c 00       		.byte	0
+ 1323 002d 00       		.byte	0
+ 1324 002e 00       		.byte	0
+ 1325 002f 1C       		.byte	28
+ 1326 0030 22       		.byte	34
+ 1327 0031 41       		.byte	65
+ 1328 0032 00       		.byte	0
+ 1329 0033 00       		.byte	0
+ 1330 0034 41       		.byte	65
+ 1331 0035 22       		.byte	34
+ 1332 0036 1C       		.byte	28
+ 1333 0037 00       		.byte	0
+ 1334 0038 08       		.byte	8
+ 1335 0039 2A       		.byte	42
+ 1336 003a 1C       		.byte	28
+ 1337 003b 2A       		.byte	42
+ 1338 003c 08       		.byte	8
+ 1339 003d 08       		.byte	8
+ 1340 003e 08       		.byte	8
+ 1341 003f 3E       		.byte	62
+ 1342 0040 08       		.byte	8
+ 1343 0041 08       		.byte	8
+ 1344 0042 00       		.byte	0
+ 1345 0043 50       		.byte	80
+ 1346 0044 30       		.byte	48
+ 1347 0045 00       		.byte	0
+ 1348 0046 00       		.byte	0
+ 1349 0047 08       		.byte	8
+ 1350 0048 08       		.byte	8
+ 1351 0049 08       		.byte	8
+ 1352 004a 08       		.byte	8
+ 1353 004b 08       		.byte	8
+ 1354 004c 00       		.byte	0
+ 1355 004d 60       		.byte	96
+ 1356 004e 60       		.byte	96
+ 1357 004f 00       		.byte	0
+ 1358 0050 00       		.byte	0
+ 1359 0051 20       		.byte	32
+ 1360 0052 10       		.byte	16
+ 1361 0053 08       		.byte	8
+ 1362 0054 04       		.byte	4
+ 1363 0055 02       		.byte	2
+ 1364 0056 3E       		.byte	62
+ 1365 0057 51       		.byte	81
+ 1366 0058 49       		.byte	73
+ 1367 0059 45       		.byte	69
+ 1368 005a 3E       		.byte	62
+ 1369 005b 00       		.byte	0
+ 1370 005c 42       		.byte	66
+ 1371 005d 7F       		.byte	127
+ 1372 005e 40       		.byte	64
+ 1373 005f 00       		.byte	0
+ 1374 0060 42       		.byte	66
+ 1375 0061 61       		.byte	97
+ 1376 0062 51       		.byte	81
+ 1377 0063 49       		.byte	73
+ 1378 0064 46       		.byte	70
+ 1379 0065 21       		.byte	33
+ 1380 0066 41       		.byte	65
+ 1381 0067 45       		.byte	69
+ 1382 0068 4B       		.byte	75
+ 1383 0069 31       		.byte	49
+ 1384 006a 18       		.byte	24
+ 1385 006b 14       		.byte	20
+ 1386 006c 12       		.byte	18
+ 1387 006d 7F       		.byte	127
+ 1388 006e 10       		.byte	16
+ 1389 006f 27       		.byte	39
+ 1390 0070 45       		.byte	69
+ 1391 0071 45       		.byte	69
+ 1392 0072 45       		.byte	69
+ 1393 0073 39       		.byte	57
+ 1394 0074 3C       		.byte	60
+ 1395 0075 4A       		.byte	74
+ 1396 0076 49       		.byte	73
+ 1397 0077 49       		.byte	73
+ 1398 0078 30       		.byte	48
+ 1399 0079 01       		.byte	1
+ 1400 007a 71       		.byte	113
+ 1401 007b 09       		.byte	9
+ 1402 007c 05       		.byte	5
+ 1403 007d 03       		.byte	3
+ 1404 007e 36       		.byte	54
+ 1405 007f 49       		.byte	73
+ 1406 0080 49       		.byte	73
+ 1407 0081 49       		.byte	73
+ 1408 0082 36       		.byte	54
+ 1409 0083 06       		.byte	6
+ 1410 0084 49       		.byte	73
+ 1411 0085 49       		.byte	73
+ 1412 0086 29       		.byte	41
+ 1413 0087 1E       		.byte	30
+ 1414 0088 00       		.byte	0
+ 1415 0089 36       		.byte	54
+ 1416 008a 36       		.byte	54
+ 1417 008b 00       		.byte	0
+ 1418 008c 00       		.byte	0
+ 1419 008d 00       		.byte	0
+ 1420 008e 56       		.byte	86
+ 1421 008f 36       		.byte	54
+ 1422 0090 00       		.byte	0
+ 1423 0091 00       		.byte	0
+ 1424 0092 00       		.byte	0
+ 1425 0093 08       		.byte	8
+ 1426 0094 14       		.byte	20
+ 1427 0095 22       		.byte	34
+ 1428 0096 41       		.byte	65
+ 1429 0097 14       		.byte	20
+ 1430 0098 14       		.byte	20
+ 1431 0099 14       		.byte	20
+ 1432 009a 14       		.byte	20
+ 1433 009b 14       		.byte	20
+ 1434 009c 41       		.byte	65
+ 1435 009d 22       		.byte	34
+ 1436 009e 14       		.byte	20
+ 1437 009f 08       		.byte	8
+ 1438 00a0 00       		.byte	0
+ 1439 00a1 02       		.byte	2
+ 1440 00a2 01       		.byte	1
+ 1441 00a3 51       		.byte	81
+ 1442 00a4 09       		.byte	9
+ 1443 00a5 06       		.byte	6
+ 1444 00a6 32       		.byte	50
+ 1445 00a7 49       		.byte	73
+ 1446 00a8 79       		.byte	121
+ 1447 00a9 41       		.byte	65
+ 1448 00aa 3E       		.byte	62
+ 1449 00ab 7E       		.byte	126
+ 1450 00ac 11       		.byte	17
+ 1451 00ad 11       		.byte	17
+ 1452 00ae 11       		.byte	17
+ 1453 00af 7E       		.byte	126
+ 1454 00b0 7F       		.byte	127
+ 1455 00b1 49       		.byte	73
+ 1456 00b2 49       		.byte	73
+ 1457 00b3 49       		.byte	73
+ 1458 00b4 36       		.byte	54
+ 1459 00b5 3E       		.byte	62
+ 1460 00b6 41       		.byte	65
+ 1461 00b7 41       		.byte	65
+ 1462 00b8 41       		.byte	65
+ 1463 00b9 22       		.byte	34
+ 1464 00ba 7F       		.byte	127
+ 1465 00bb 41       		.byte	65
+ 1466 00bc 41       		.byte	65
+ 1467 00bd 22       		.byte	34
+ 1468 00be 1C       		.byte	28
+ 1469 00bf 7F       		.byte	127
+ 1470 00c0 49       		.byte	73
+ 1471 00c1 49       		.byte	73
+ 1472 00c2 49       		.byte	73
+ 1473 00c3 41       		.byte	65
+ 1474 00c4 7F       		.byte	127
+ 1475 00c5 09       		.byte	9
+ 1476 00c6 09       		.byte	9
+ 1477 00c7 01       		.byte	1
+ 1478 00c8 01       		.byte	1
+ 1479 00c9 3E       		.byte	62
+ 1480 00ca 41       		.byte	65
+ 1481 00cb 41       		.byte	65
+ 1482 00cc 51       		.byte	81
+ 1483 00cd 32       		.byte	50
+ 1484 00ce 7F       		.byte	127
+ 1485 00cf 08       		.byte	8
+ 1486 00d0 08       		.byte	8
+ 1487 00d1 08       		.byte	8
+ 1488 00d2 7F       		.byte	127
+ 1489 00d3 00       		.byte	0
+ 1490 00d4 41       		.byte	65
+ 1491 00d5 7F       		.byte	127
+ 1492 00d6 41       		.byte	65
+ 1493 00d7 00       		.byte	0
+ 1494 00d8 20       		.byte	32
+ 1495 00d9 40       		.byte	64
+ 1496 00da 41       		.byte	65
+ 1497 00db 3F       		.byte	63
+ 1498 00dc 01       		.byte	1
+ 1499 00dd 7F       		.byte	127
+ 1500 00de 08       		.byte	8
+ 1501 00df 14       		.byte	20
+ 1502 00e0 22       		.byte	34
+ 1503 00e1 41       		.byte	65
+ 1504 00e2 7F       		.byte	127
+ 1505 00e3 40       		.byte	64
+ 1506 00e4 40       		.byte	64
+ 1507 00e5 40       		.byte	64
+ 1508 00e6 40       		.byte	64
+ 1509 00e7 7F       		.byte	127
+ 1510 00e8 02       		.byte	2
+ 1511 00e9 04       		.byte	4
+ 1512 00ea 02       		.byte	2
+ 1513 00eb 7F       		.byte	127
+ 1514 00ec 7F       		.byte	127
+ 1515 00ed 04       		.byte	4
+ 1516 00ee 08       		.byte	8
+ 1517 00ef 10       		.byte	16
+ 1518 00f0 7F       		.byte	127
+ 1519 00f1 3E       		.byte	62
+ 1520 00f2 41       		.byte	65
+ 1521 00f3 41       		.byte	65
+ 1522 00f4 41       		.byte	65
+ 1523 00f5 3E       		.byte	62
+ 1524 00f6 7F       		.byte	127
+ 1525 00f7 09       		.byte	9
+ 1526 00f8 09       		.byte	9
+ 1527 00f9 09       		.byte	9
+ 1528 00fa 06       		.byte	6
+ 1529 00fb 3E       		.byte	62
+ 1530 00fc 41       		.byte	65
+ 1531 00fd 51       		.byte	81
+ 1532 00fe 21       		.byte	33
+ 1533 00ff 5E       		.byte	94
+ 1534 0100 7F       		.byte	127
+ 1535 0101 09       		.byte	9
+ 1536 0102 19       		.byte	25
+ 1537 0103 29       		.byte	41
+ 1538 0104 46       		.byte	70
+ 1539 0105 46       		.byte	70
+ 1540 0106 49       		.byte	73
+ 1541 0107 49       		.byte	73
+ 1542 0108 49       		.byte	73
+ 1543 0109 31       		.byte	49
+ 1544 010a 01       		.byte	1
+ 1545 010b 01       		.byte	1
+ 1546 010c 7F       		.byte	127
+ 1547 010d 01       		.byte	1
+ 1548 010e 01       		.byte	1
+ 1549 010f 3F       		.byte	63
+ 1550 0110 40       		.byte	64
+ 1551 0111 40       		.byte	64
+ 1552 0112 40       		.byte	64
+ 1553 0113 3F       		.byte	63
+ 1554 0114 1F       		.byte	31
+ 1555 0115 20       		.byte	32
+ 1556 0116 40       		.byte	64
+ 1557 0117 20       		.byte	32
+ 1558 0118 1F       		.byte	31
+ 1559 0119 7F       		.byte	127
+ 1560 011a 20       		.byte	32
+ 1561 011b 18       		.byte	24
+ 1562 011c 20       		.byte	32
+ 1563 011d 7F       		.byte	127
+ 1564 011e 63       		.byte	99
+ 1565 011f 14       		.byte	20
+ 1566 0120 08       		.byte	8
+ 1567 0121 14       		.byte	20
+ 1568 0122 63       		.byte	99
+ 1569 0123 03       		.byte	3
+ 1570 0124 04       		.byte	4
+ 1571 0125 78       		.byte	120
+ 1572 0126 04       		.byte	4
+ 1573 0127 03       		.byte	3
+ 1574 0128 61       		.byte	97
+ 1575 0129 51       		.byte	81
+ 1576 012a 49       		.byte	73
+ 1577 012b 45       		.byte	69
+ 1578 012c 43       		.byte	67
+ 1579 012d 00       		.byte	0
+ 1580 012e 00       		.byte	0
+ 1581 012f 7F       		.byte	127
+ 1582 0130 41       		.byte	65
+ 1583 0131 41       		.byte	65
+ 1584 0132 02       		.byte	2
+ 1585 0133 04       		.byte	4
+ 1586 0134 08       		.byte	8
+ 1587 0135 10       		.byte	16
+ 1588 0136 20       		.byte	32
+ 1589 0137 41       		.byte	65
+ 1590 0138 41       		.byte	65
+ 1591 0139 7F       		.byte	127
+ 1592 013a 00       		.byte	0
+ 1593 013b 00       		.byte	0
+ 1594 013c 04       		.byte	4
+ 1595 013d 02       		.byte	2
+ 1596 013e 01       		.byte	1
+ 1597 013f 02       		.byte	2
+ 1598 0140 04       		.byte	4
+ 1599 0141 40       		.byte	64
+ 1600 0142 40       		.byte	64
+ 1601 0143 40       		.byte	64
+ 1602 0144 40       		.byte	64
+ 1603 0145 40       		.byte	64
+ 1604 0146 00       		.byte	0
+ 1605 0147 01       		.byte	1
+ 1606 0148 02       		.byte	2
+ 1607 0149 04       		.byte	4
+ 1608 014a 00       		.byte	0
+ 1609 014b 20       		.byte	32
+ 1610 014c 54       		.byte	84
+ 1611 014d 54       		.byte	84
+ 1612 014e 54       		.byte	84
+ 1613 014f 78       		.byte	120
+ 1614 0150 7F       		.byte	127
+ 1615 0151 48       		.byte	72
+ 1616 0152 44       		.byte	68
+ 1617 0153 44       		.byte	68
+ 1618 0154 38       		.byte	56
+ 1619 0155 38       		.byte	56
+ 1620 0156 44       		.byte	68
+ 1621 0157 44       		.byte	68
+ 1622 0158 44       		.byte	68
+ 1623 0159 20       		.byte	32
+ 1624 015a 38       		.byte	56
+ 1625 015b 44       		.byte	68
+ 1626 015c 44       		.byte	68
+ 1627 015d 48       		.byte	72
+ 1628 015e 7F       		.byte	127
+ 1629 015f 38       		.byte	56
+ 1630 0160 54       		.byte	84
+ 1631 0161 54       		.byte	84
+ 1632 0162 54       		.byte	84
+ 1633 0163 18       		.byte	24
+ 1634 0164 08       		.byte	8
+ 1635 0165 7E       		.byte	126
+ 1636 0166 09       		.byte	9
+ 1637 0167 01       		.byte	1
+ 1638 0168 02       		.byte	2
+ 1639 0169 08       		.byte	8
+ 1640 016a 14       		.byte	20
+ 1641 016b 54       		.byte	84
+ 1642 016c 54       		.byte	84
+ 1643 016d 3C       		.byte	60
+ 1644 016e 7F       		.byte	127
+ 1645 016f 08       		.byte	8
+ 1646 0170 04       		.byte	4
+ 1647 0171 04       		.byte	4
+ 1648 0172 78       		.byte	120
+ 1649 0173 00       		.byte	0
+ 1650 0174 44       		.byte	68
+ 1651 0175 7D       		.byte	125
+ 1652 0176 40       		.byte	64
+ 1653 0177 00       		.byte	0
+ 1654 0178 20       		.byte	32
+ 1655 0179 40       		.byte	64
+ 1656 017a 44       		.byte	68
+ 1657 017b 3D       		.byte	61
+ 1658 017c 00       		.byte	0
+ 1659 017d 00       		.byte	0
+ 1660 017e 7F       		.byte	127
+ 1661 017f 10       		.byte	16
+ 1662 0180 28       		.byte	40
+ 1663 0181 44       		.byte	68
+ 1664 0182 00       		.byte	0
+ 1665 0183 41       		.byte	65
+ 1666 0184 7F       		.byte	127
+ 1667 0185 40       		.byte	64
+ 1668 0186 00       		.byte	0
+ 1669 0187 7C       		.byte	124
+ 1670 0188 04       		.byte	4
+ 1671 0189 18       		.byte	24
+ 1672 018a 04       		.byte	4
+ 1673 018b 78       		.byte	120
+ 1674 018c 7C       		.byte	124
+ 1675 018d 08       		.byte	8
+ 1676 018e 04       		.byte	4
+ 1677 018f 04       		.byte	4
+ 1678 0190 78       		.byte	120
+ 1679 0191 38       		.byte	56
+ 1680 0192 44       		.byte	68
+ 1681 0193 44       		.byte	68
+ 1682 0194 44       		.byte	68
+ 1683 0195 38       		.byte	56
+ 1684 0196 7C       		.byte	124
+ 1685 0197 14       		.byte	20
+ 1686 0198 14       		.byte	20
+ 1687 0199 14       		.byte	20
+ 1688 019a 08       		.byte	8
+ 1689 019b 08       		.byte	8
+ 1690 019c 14       		.byte	20
+ 1691 019d 14       		.byte	20
+ 1692 019e 18       		.byte	24
+ 1693 019f 7C       		.byte	124
+ 1694 01a0 7C       		.byte	124
+ 1695 01a1 08       		.byte	8
+ 1696 01a2 04       		.byte	4
+ 1697 01a3 04       		.byte	4
+ 1698 01a4 08       		.byte	8
+ 1699 01a5 48       		.byte	72
+ 1700 01a6 54       		.byte	84
+ 1701 01a7 54       		.byte	84
+ 1702 01a8 54       		.byte	84
+ 1703 01a9 20       		.byte	32
+ 1704 01aa 04       		.byte	4
+ 1705 01ab 3F       		.byte	63
+ 1706 01ac 44       		.byte	68
+ 1707 01ad 40       		.byte	64
+ 1708 01ae 20       		.byte	32
+ 1709 01af 3C       		.byte	60
+ 1710 01b0 40       		.byte	64
+ 1711 01b1 40       		.byte	64
+ 1712 01b2 20       		.byte	32
+ 1713 01b3 7C       		.byte	124
+ 1714 01b4 1C       		.byte	28
+ 1715 01b5 20       		.byte	32
+ 1716 01b6 40       		.byte	64
+ 1717 01b7 20       		.byte	32
+ 1718 01b8 1C       		.byte	28
+ 1719 01b9 3C       		.byte	60
+ 1720 01ba 40       		.byte	64
+ 1721 01bb 30       		.byte	48
+ 1722 01bc 40       		.byte	64
+ 1723 01bd 3C       		.byte	60
+ 1724 01be 44       		.byte	68
+ 1725 01bf 28       		.byte	40
+ 1726 01c0 10       		.byte	16
+ 1727 01c1 28       		.byte	40
+ 1728 01c2 44       		.byte	68
+ 1729 01c3 0C       		.byte	12
+ 1730 01c4 50       		.byte	80
+ 1731 01c5 50       		.byte	80
+ 1732 01c6 50       		.byte	80
+ 1733 01c7 3C       		.byte	60
+ 1734 01c8 44       		.byte	68
+ 1735 01c9 64       		.byte	100
+ 1736 01ca 54       		.byte	84
+ 1737 01cb 4C       		.byte	76
+ 1738 01cc 44       		.byte	68
+ 1739 01cd 00       		.byte	0
+ 1740 01ce 08       		.byte	8
+ 1741 01cf 36       		.byte	54
+ 1742 01d0 41       		.byte	65
+ 1743 01d1 00       		.byte	0
+ 1744 01d2 00       		.byte	0
+ 1745 01d3 00       		.byte	0
+ 1746 01d4 7F       		.byte	127
+ 1747 01d5 00       		.byte	0
+ 1748 01d6 00       		.byte	0
+ 1749 01d7 00       		.byte	0
+ 1750 01d8 41       		.byte	65
+ 1751 01d9 36       		.byte	54
+ 1752 01da 08       		.byte	8
+ 1753 01db 00       		.byte	0
+ 1754 01dc 08       		.byte	8
+ 1755 01dd 08       		.byte	8
+ 1756 01de 2A       		.byte	42
+ 1757 01df 1C       		.byte	28
+ 1758 01e0 08       		.byte	8
+ 1759 01e1 08       		.byte	8
+ 1760 01e2 1C       		.byte	28
+ 1761 01e3 2A       		.byte	42
+ 1762 01e4 08       		.byte	8
+ 1763 01e5 08       		.byte	8
+ 1764              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 uc1701.c
+     /tmp/ccC98D7n.s:13     .text:0000000000000000 $t
+     /tmp/ccC98D7n.s:19     .text:0000000000000000 read_byte
+     /tmp/ccC98D7n.s:57     .text:0000000000000042 write_byte
+     /tmp/ccC98D7n.s:115    .text:00000000000000c2 write_cmd
+     /tmp/ccC98D7n.s:161    .text:000000000000011a uc1701_backlight
+     /tmp/ccC98D7n.s:188    .text:000000000000013a uc1701_clear
+     /tmp/ccC98D7n.s:217    .text:0000000000000170 uc1701_update
+     /tmp/ccC98D7n.s:308    .text:0000000000000244 uc1701_init
+     /tmp/ccC98D7n.s:487    .text:0000000000000404 uc1701_set_pixel
+     /tmp/ccC98D7n.s:522    .text:0000000000000448 uc1701_hline
+     /tmp/ccC98D7n.s:568    .text:0000000000000496 uc1701_vline
+     /tmp/ccC98D7n.s:614    .text:00000000000004e4 uc1701_line
+     /tmp/ccC98D7n.s:758    .text:00000000000005fa uc1701_rect
+     /tmp/ccC98D7n.s:804    .text:0000000000000650 uc1701_rect_fill
+     /tmp/ccC98D7n.s:854    .text:00000000000006a6 uc1701_rect_invert
+     /tmp/ccC98D7n.s:991    .text:00000000000007fa uc1701_draw_image
+     /tmp/ccC98D7n.s:1050   .text:0000000000000874 uc1701_text
+     /tmp/ccC98D7n.s:1270   .text:0000000000000a44 $d
+     /tmp/ccC98D7n.s:1273   .rodata:0000000000000000 $d
+     /tmp/ccC98D7n.s:1277   .rodata:0000000000000000 System5x7
+
+UNDEFINED SYMBOLS
+GPIO_ClearValue
+vPortEnterCritical
+SSP_SendData
+vPortExitCritical
+SSP_GetStatus
+GPIO_SetValue
+GPIO_SetDir
+PINSEL_SetPinFunc
+SSP_ConfigStructInit
+SSP_Init
+SSP_Cmd
+delay_ms

@@ -1,0 +1,289 @@
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"lpc17xx_adc.c"
+  12              		.text
+  13              		.align	1
+  14              		.global	ADC_Init
+  15              		.syntax unified
+  16              		.thumb
+  17              		.thumb_func
+  18              		.fpu softvfp
+  20              	ADC_Init:
+  21              		@ args = 0, pretend = 0, frame = 0
+  22              		@ frame_needed = 0, uses_anonymous_args = 0
+  23 0000 38B5     		push	{r3, r4, r5, lr}
+  24 0002 0546     		mov	r5, r0
+  25 0004 0C46     		mov	r4, r1
+  26 0006 0121     		movs	r1, #1
+  27 0008 4FF48050 		mov	r0, #4096
+  28 000c FFF7FEFF 		bl	CLKPWR_ConfigPPWR
+  29 0010 0023     		movs	r3, #0
+  30 0012 2B60     		str	r3, [r5]
+  31 0014 1820     		movs	r0, #24
+  32 0016 FFF7FEFF 		bl	CLKPWR_GetPCLK
+  33 001a 04EB8414 		add	r4, r4, r4, lsl #6
+  34 001e 04EB4003 		add	r3, r4, r0, lsl #1
+  35 0022 6400     		lsls	r4, r4, #1
+  36 0024 B3FBF4F3 		udiv	r3, r3, r4
+  37 0028 013B     		subs	r3, r3, #1
+  38 002a 1B02     		lsls	r3, r3, #8
+  39 002c 43F40013 		orr	r3, r3, #2097152
+  40 0030 2B60     		str	r3, [r5]
+  41 0032 38BD     		pop	{r3, r4, r5, pc}
+  43              		.align	1
+  44              		.global	ADC_DeInit
+  45              		.syntax unified
+  46              		.thumb
+  47              		.thumb_func
+  48              		.fpu softvfp
+  50              	ADC_DeInit:
+  51              		@ args = 0, pretend = 0, frame = 0
+  52              		@ frame_needed = 0, uses_anonymous_args = 0
+  53 0034 08B5     		push	{r3, lr}
+  54 0036 0368     		ldr	r3, [r0]
+  55 0038 23F40013 		bic	r3, r3, #2097152
+  56 003c 0360     		str	r3, [r0]
+  57 003e 0021     		movs	r1, #0
+  58 0040 4FF48050 		mov	r0, #4096
+  59 0044 FFF7FEFF 		bl	CLKPWR_ConfigPPWR
+  60 0048 08BD     		pop	{r3, pc}
+  62              		.align	1
+  63              		.global	ADC_GetData
+  64              		.syntax unified
+  65              		.thumb
+  66              		.thumb_func
+  67              		.fpu softvfp
+  69              	ADC_GetData:
+  70              		@ args = 0, pretend = 0, frame = 0
+  71              		@ frame_needed = 0, uses_anonymous_args = 0
+  72              		@ link register save eliminated.
+  73 004a 034B     		ldr	r3, .L6
+  74 004c 53F82000 		ldr	r0, [r3, r0, lsl #2]
+  75 0050 C0F30B10 		ubfx	r0, r0, #4, #12
+  76 0054 7047     		bx	lr
+  77              	.L7:
+  78 0056 00BF     		.align	2
+  79              	.L6:
+  80 0058 10400340 		.word	1073954832
+  82              		.align	1
+  83              		.global	ADC_StartCmd
+  84              		.syntax unified
+  85              		.thumb
+  86              		.thumb_func
+  87              		.fpu softvfp
+  89              	ADC_StartCmd:
+  90              		@ args = 0, pretend = 0, frame = 0
+  91              		@ frame_needed = 0, uses_anonymous_args = 0
+  92              		@ link register save eliminated.
+  93 005c 0368     		ldr	r3, [r0]
+  94 005e 23F0E063 		bic	r3, r3, #117440512
+  95 0062 0360     		str	r3, [r0]
+  96 0064 0368     		ldr	r3, [r0]
+  97 0066 43EA0161 		orr	r1, r3, r1, lsl #24
+  98 006a 0160     		str	r1, [r0]
+  99 006c 7047     		bx	lr
+ 101              		.align	1
+ 102              		.global	ADC_BurstCmd
+ 103              		.syntax unified
+ 104              		.thumb
+ 105              		.thumb_func
+ 106              		.fpu softvfp
+ 108              	ADC_BurstCmd:
+ 109              		@ args = 0, pretend = 0, frame = 0
+ 110              		@ frame_needed = 0, uses_anonymous_args = 0
+ 111              		@ link register save eliminated.
+ 112 006e 0368     		ldr	r3, [r0]
+ 113 0070 23F48033 		bic	r3, r3, #65536
+ 114 0074 0360     		str	r3, [r0]
+ 115 0076 19B1     		cbz	r1, .L9
+ 116 0078 0368     		ldr	r3, [r0]
+ 117 007a 43F48033 		orr	r3, r3, #65536
+ 118 007e 0360     		str	r3, [r0]
+ 119              	.L9:
+ 120 0080 7047     		bx	lr
+ 122              		.align	1
+ 123              		.global	ADC_PowerdownCmd
+ 124              		.syntax unified
+ 125              		.thumb
+ 126              		.thumb_func
+ 127              		.fpu softvfp
+ 129              	ADC_PowerdownCmd:
+ 130              		@ args = 0, pretend = 0, frame = 0
+ 131              		@ frame_needed = 0, uses_anonymous_args = 0
+ 132              		@ link register save eliminated.
+ 133 0082 0368     		ldr	r3, [r0]
+ 134 0084 23F40013 		bic	r3, r3, #2097152
+ 135 0088 0360     		str	r3, [r0]
+ 136 008a 19B1     		cbz	r1, .L11
+ 137 008c 0368     		ldr	r3, [r0]
+ 138 008e 43F40013 		orr	r3, r3, #2097152
+ 139 0092 0360     		str	r3, [r0]
+ 140              	.L11:
+ 141 0094 7047     		bx	lr
+ 143              		.align	1
+ 144              		.global	ADC_EdgeStartConfig
+ 145              		.syntax unified
+ 146              		.thumb
+ 147              		.thumb_func
+ 148              		.fpu softvfp
+ 150              	ADC_EdgeStartConfig:
+ 151              		@ args = 0, pretend = 0, frame = 0
+ 152              		@ frame_needed = 0, uses_anonymous_args = 0
+ 153              		@ link register save eliminated.
+ 154 0096 0368     		ldr	r3, [r0]
+ 155 0098 23F00063 		bic	r3, r3, #134217728
+ 156 009c 0360     		str	r3, [r0]
+ 157 009e 19B1     		cbz	r1, .L13
+ 158 00a0 0368     		ldr	r3, [r0]
+ 159 00a2 43F00063 		orr	r3, r3, #134217728
+ 160 00a6 0360     		str	r3, [r0]
+ 161              	.L13:
+ 162 00a8 7047     		bx	lr
+ 164              		.align	1
+ 165              		.global	ADC_IntConfig
+ 166              		.syntax unified
+ 167              		.thumb
+ 168              		.thumb_func
+ 169              		.fpu softvfp
+ 171              	ADC_IntConfig:
+ 172              		@ args = 0, pretend = 0, frame = 0
+ 173              		@ frame_needed = 0, uses_anonymous_args = 0
+ 174              		@ link register save eliminated.
+ 175 00aa 10B4     		push	{r4}
+ 176 00ac C468     		ldr	r4, [r0, #12]
+ 177 00ae 0123     		movs	r3, #1
+ 178 00b0 03FA01F1 		lsl	r1, r3, r1
+ 179 00b4 24EA0104 		bic	r4, r4, r1
+ 180 00b8 C460     		str	r4, [r0, #12]
+ 181 00ba 12B1     		cbz	r2, .L15
+ 182 00bc C368     		ldr	r3, [r0, #12]
+ 183 00be 1943     		orrs	r1, r1, r3
+ 184 00c0 C160     		str	r1, [r0, #12]
+ 185              	.L15:
+ 186 00c2 10BC     		pop	{r4}
+ 187 00c4 7047     		bx	lr
+ 189              		.align	1
+ 190              		.global	ADC_ChannelCmd
+ 191              		.syntax unified
+ 192              		.thumb
+ 193              		.thumb_func
+ 194              		.fpu softvfp
+ 196              	ADC_ChannelCmd:
+ 197              		@ args = 0, pretend = 0, frame = 0
+ 198              		@ frame_needed = 0, uses_anonymous_args = 0
+ 199              		@ link register save eliminated.
+ 200 00c6 012A     		cmp	r2, #1
+ 201 00c8 07D0     		beq	.L21
+ 202 00ca 0368     		ldr	r3, [r0]
+ 203 00cc 0122     		movs	r2, #1
+ 204 00ce 02FA01F1 		lsl	r1, r2, r1
+ 205 00d2 23EA0101 		bic	r1, r3, r1
+ 206 00d6 0160     		str	r1, [r0]
+ 207 00d8 7047     		bx	lr
+ 208              	.L21:
+ 209 00da 0268     		ldr	r2, [r0]
+ 210 00dc 0123     		movs	r3, #1
+ 211 00de 03FA01F1 		lsl	r1, r3, r1
+ 212 00e2 1143     		orrs	r1, r1, r2
+ 213 00e4 0160     		str	r1, [r0]
+ 214 00e6 7047     		bx	lr
+ 216              		.align	1
+ 217              		.global	ADC_ChannelGetData
+ 218              		.syntax unified
+ 219              		.thumb
+ 220              		.thumb_func
+ 221              		.fpu softvfp
+ 223              	ADC_ChannelGetData:
+ 224              		@ args = 0, pretend = 0, frame = 0
+ 225              		@ frame_needed = 0, uses_anonymous_args = 0
+ 226              		@ link register save eliminated.
+ 227 00e8 00EB8101 		add	r1, r0, r1, lsl #2
+ 228 00ec 0869     		ldr	r0, [r1, #16]
+ 229 00ee C0F30B10 		ubfx	r0, r0, #4, #12
+ 230 00f2 7047     		bx	lr
+ 232              		.align	1
+ 233              		.global	ADC_ChannelGetStatus
+ 234              		.syntax unified
+ 235              		.thumb
+ 236              		.thumb_func
+ 237              		.fpu softvfp
+ 239              	ADC_ChannelGetStatus:
+ 240              		@ args = 0, pretend = 0, frame = 0
+ 241              		@ frame_needed = 0, uses_anonymous_args = 0
+ 242              		@ link register save eliminated.
+ 243 00f4 00EB8101 		add	r1, r0, r1, lsl #2
+ 244 00f8 0869     		ldr	r0, [r1, #16]
+ 245 00fa 2AB1     		cbz	r2, .L24
+ 246 00fc 00F00040 		and	r0, r0, #-2147483648
+ 247              	.L25:
+ 248 0100 0030     		adds	r0, r0, #0
+ 249 0102 18BF     		it	ne
+ 250 0104 0120     		movne	r0, #1
+ 251 0106 7047     		bx	lr
+ 252              	.L24:
+ 253 0108 00F08040 		and	r0, r0, #1073741824
+ 254 010c F8E7     		b	.L25
+ 256              		.align	1
+ 257              		.global	ADC_GlobalGetData
+ 258              		.syntax unified
+ 259              		.thumb
+ 260              		.thumb_func
+ 261              		.fpu softvfp
+ 263              	ADC_GlobalGetData:
+ 264              		@ args = 0, pretend = 0, frame = 0
+ 265              		@ frame_needed = 0, uses_anonymous_args = 0
+ 266              		@ link register save eliminated.
+ 267 010e 4068     		ldr	r0, [r0, #4]
+ 268 0110 7047     		bx	lr
+ 270              		.align	1
+ 271              		.global	ADC_GlobalGetStatus
+ 272              		.syntax unified
+ 273              		.thumb
+ 274              		.thumb_func
+ 275              		.fpu softvfp
+ 277              	ADC_GlobalGetStatus:
+ 278              		@ args = 0, pretend = 0, frame = 0
+ 279              		@ frame_needed = 0, uses_anonymous_args = 0
+ 280              		@ link register save eliminated.
+ 281 0112 4068     		ldr	r0, [r0, #4]
+ 282 0114 29B1     		cbz	r1, .L28
+ 283 0116 00F00040 		and	r0, r0, #-2147483648
+ 284              	.L29:
+ 285 011a 0030     		adds	r0, r0, #0
+ 286 011c 18BF     		it	ne
+ 287 011e 0120     		movne	r0, #1
+ 288 0120 7047     		bx	lr
+ 289              	.L28:
+ 290 0122 00F08040 		and	r0, r0, #1073741824
+ 291 0126 F8E7     		b	.L29
+ 293              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 lpc17xx_adc.c
+     /tmp/ccDNDOr8.s:13     .text:0000000000000000 $t
+     /tmp/ccDNDOr8.s:20     .text:0000000000000000 ADC_Init
+     /tmp/ccDNDOr8.s:50     .text:0000000000000034 ADC_DeInit
+     /tmp/ccDNDOr8.s:69     .text:000000000000004a ADC_GetData
+     /tmp/ccDNDOr8.s:80     .text:0000000000000058 $d
+     /tmp/ccDNDOr8.s:82     .text:000000000000005c $t
+     /tmp/ccDNDOr8.s:89     .text:000000000000005c ADC_StartCmd
+     /tmp/ccDNDOr8.s:108    .text:000000000000006e ADC_BurstCmd
+     /tmp/ccDNDOr8.s:129    .text:0000000000000082 ADC_PowerdownCmd
+     /tmp/ccDNDOr8.s:150    .text:0000000000000096 ADC_EdgeStartConfig
+     /tmp/ccDNDOr8.s:171    .text:00000000000000aa ADC_IntConfig
+     /tmp/ccDNDOr8.s:196    .text:00000000000000c6 ADC_ChannelCmd
+     /tmp/ccDNDOr8.s:223    .text:00000000000000e8 ADC_ChannelGetData
+     /tmp/ccDNDOr8.s:239    .text:00000000000000f4 ADC_ChannelGetStatus
+     /tmp/ccDNDOr8.s:263    .text:000000000000010e ADC_GlobalGetData
+     /tmp/ccDNDOr8.s:277    .text:0000000000000112 ADC_GlobalGetStatus
+
+UNDEFINED SYMBOLS
+CLKPWR_ConfigPPWR
+CLKPWR_GetPCLK

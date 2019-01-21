@@ -1,0 +1,202 @@
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"lpc17xx_systick.c"
+  12              		.text
+  13              		.global	__aeabi_ui2f
+  14              		.global	__aeabi_fcmpgt
+  15              		.align	1
+  16              		.global	SYSTICK_InternalInit
+  17              		.syntax unified
+  18              		.thumb
+  19              		.thumb_func
+  20              		.fpu softvfp
+  22              	SYSTICK_InternalInit:
+  23              		@ args = 0, pretend = 0, frame = 0
+  24              		@ frame_needed = 0, uses_anonymous_args = 0
+  25 0000 70B5     		push	{r4, r5, r6, lr}
+  26 0002 0546     		mov	r5, r0
+  27 0004 0F4B     		ldr	r3, .L7
+  28 0006 1C68     		ldr	r4, [r3]
+  29 0008 0F4B     		ldr	r3, .L7+4
+  30 000a A3FB0434 		umull	r3, r4, r3, r4
+  31 000e A409     		lsrs	r4, r4, #6
+  32 0010 FFF7FEFF 		bl	__aeabi_ui2f
+  33 0014 0646     		mov	r6, r0
+  34 0016 4FF08070 		mov	r0, #16777216
+  35 001a B0FBF4F0 		udiv	r0, r0, r4
+  36 001e FFF7FEFF 		bl	__aeabi_ui2f
+  37 0022 0146     		mov	r1, r0
+  38 0024 3046     		mov	r0, r6
+  39 0026 FFF7FEFF 		bl	__aeabi_fcmpgt
+  40 002a 00B1     		cbz	r0, .L5
+  41              	.L4:
+  42 002c FEE7     		b	.L4
+  43              	.L5:
+  44 002e 074A     		ldr	r2, .L7+8
+  45 0030 1368     		ldr	r3, [r2]
+  46 0032 43F00403 		orr	r3, r3, #4
+  47 0036 1360     		str	r3, [r2]
+  48 0038 05FB04F3 		mul	r3, r5, r4
+  49 003c 013B     		subs	r3, r3, #1
+  50 003e 5360     		str	r3, [r2, #4]
+  51 0040 70BD     		pop	{r4, r5, r6, pc}
+  52              	.L8:
+  53 0042 00BF     		.align	2
+  54              	.L7:
+  55 0044 00000000 		.word	SystemCoreClock
+  56 0048 D34D6210 		.word	274877907
+  57 004c 10E000E0 		.word	-536813552
+  59              		.align	1
+  60              		.global	SYSTICK_ExternalInit
+  61              		.syntax unified
+  62              		.thumb
+  63              		.thumb_func
+  64              		.fpu softvfp
+  66              	SYSTICK_ExternalInit:
+  67              		@ args = 0, pretend = 0, frame = 0
+  68              		@ frame_needed = 0, uses_anonymous_args = 0
+  69 0050 70B5     		push	{r4, r5, r6, lr}
+  70 0052 0C46     		mov	r4, r1
+  71 0054 0E4B     		ldr	r3, .L15
+  72 0056 A3FB0023 		umull	r2, r3, r3, r0
+  73 005a 9D09     		lsrs	r5, r3, #6
+  74 005c 0846     		mov	r0, r1
+  75 005e FFF7FEFF 		bl	__aeabi_ui2f
+  76 0062 0646     		mov	r6, r0
+  77 0064 4FF08070 		mov	r0, #16777216
+  78 0068 B0FBF5F0 		udiv	r0, r0, r5
+  79 006c FFF7FEFF 		bl	__aeabi_ui2f
+  80 0070 0146     		mov	r1, r0
+  81 0072 3046     		mov	r0, r6
+  82 0074 FFF7FEFF 		bl	__aeabi_fcmpgt
+  83 0078 00B1     		cbz	r0, .L13
+  84              	.L12:
+  85 007a FEE7     		b	.L12
+  86              	.L13:
+  87 007c 054A     		ldr	r2, .L15+4
+  88 007e 1368     		ldr	r3, [r2]
+  89 0080 23F00403 		bic	r3, r3, #4
+  90 0084 1360     		str	r3, [r2]
+  91 0086 04FB05F3 		mul	r3, r4, r5
+  92 008a 013B     		subs	r3, r3, #1
+  93 008c 5360     		str	r3, [r2, #4]
+  94 008e 70BD     		pop	{r4, r5, r6, pc}
+  95              	.L16:
+  96              		.align	2
+  97              	.L15:
+  98 0090 D34D6210 		.word	274877907
+  99 0094 10E000E0 		.word	-536813552
+ 101              		.align	1
+ 102              		.global	SYSTICK_Cmd
+ 103              		.syntax unified
+ 104              		.thumb
+ 105              		.thumb_func
+ 106              		.fpu softvfp
+ 108              	SYSTICK_Cmd:
+ 109              		@ args = 0, pretend = 0, frame = 0
+ 110              		@ frame_needed = 0, uses_anonymous_args = 0
+ 111              		@ link register save eliminated.
+ 112 0098 0128     		cmp	r0, #1
+ 113 009a 044A     		ldr	r2, .L20
+ 114 009c 1368     		ldr	r3, [r2]
+ 115 009e 0CBF     		ite	eq
+ 116 00a0 43F00103 		orreq	r3, r3, #1
+ 117 00a4 23F00103 		bicne	r3, r3, #1
+ 118 00a8 1360     		str	r3, [r2]
+ 119 00aa 7047     		bx	lr
+ 120              	.L21:
+ 121              		.align	2
+ 122              	.L20:
+ 123 00ac 10E000E0 		.word	-536813552
+ 125              		.align	1
+ 126              		.global	SYSTICK_IntCmd
+ 127              		.syntax unified
+ 128              		.thumb
+ 129              		.thumb_func
+ 130              		.fpu softvfp
+ 132              	SYSTICK_IntCmd:
+ 133              		@ args = 0, pretend = 0, frame = 0
+ 134              		@ frame_needed = 0, uses_anonymous_args = 0
+ 135              		@ link register save eliminated.
+ 136 00b0 0128     		cmp	r0, #1
+ 137 00b2 044A     		ldr	r2, .L25
+ 138 00b4 1368     		ldr	r3, [r2]
+ 139 00b6 0CBF     		ite	eq
+ 140 00b8 43F00203 		orreq	r3, r3, #2
+ 141 00bc 23F00203 		bicne	r3, r3, #2
+ 142 00c0 1360     		str	r3, [r2]
+ 143 00c2 7047     		bx	lr
+ 144              	.L26:
+ 145              		.align	2
+ 146              	.L25:
+ 147 00c4 10E000E0 		.word	-536813552
+ 149              		.align	1
+ 150              		.global	SYSTICK_GetCurrentValue
+ 151              		.syntax unified
+ 152              		.thumb
+ 153              		.thumb_func
+ 154              		.fpu softvfp
+ 156              	SYSTICK_GetCurrentValue:
+ 157              		@ args = 0, pretend = 0, frame = 0
+ 158              		@ frame_needed = 0, uses_anonymous_args = 0
+ 159              		@ link register save eliminated.
+ 160 00c8 014B     		ldr	r3, .L28
+ 161 00ca 9868     		ldr	r0, [r3, #8]
+ 162 00cc 7047     		bx	lr
+ 163              	.L29:
+ 164 00ce 00BF     		.align	2
+ 165              	.L28:
+ 166 00d0 10E000E0 		.word	-536813552
+ 168              		.align	1
+ 169              		.global	SYSTICK_ClearCounterFlag
+ 170              		.syntax unified
+ 171              		.thumb
+ 172              		.thumb_func
+ 173              		.fpu softvfp
+ 175              	SYSTICK_ClearCounterFlag:
+ 176              		@ args = 0, pretend = 0, frame = 0
+ 177              		@ frame_needed = 0, uses_anonymous_args = 0
+ 178              		@ link register save eliminated.
+ 179 00d4 024A     		ldr	r2, .L31
+ 180 00d6 1368     		ldr	r3, [r2]
+ 181 00d8 23F48033 		bic	r3, r3, #65536
+ 182 00dc 1360     		str	r3, [r2]
+ 183 00de 7047     		bx	lr
+ 184              	.L32:
+ 185              		.align	2
+ 186              	.L31:
+ 187 00e0 10E000E0 		.word	-536813552
+ 189              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 lpc17xx_systick.c
+     /tmp/cclFVaHk.s:15     .text:0000000000000000 $t
+     /tmp/cclFVaHk.s:22     .text:0000000000000000 SYSTICK_InternalInit
+     /tmp/cclFVaHk.s:55     .text:0000000000000044 $d
+     /tmp/cclFVaHk.s:59     .text:0000000000000050 $t
+     /tmp/cclFVaHk.s:66     .text:0000000000000050 SYSTICK_ExternalInit
+     /tmp/cclFVaHk.s:98     .text:0000000000000090 $d
+     /tmp/cclFVaHk.s:101    .text:0000000000000098 $t
+     /tmp/cclFVaHk.s:108    .text:0000000000000098 SYSTICK_Cmd
+     /tmp/cclFVaHk.s:123    .text:00000000000000ac $d
+     /tmp/cclFVaHk.s:125    .text:00000000000000b0 $t
+     /tmp/cclFVaHk.s:132    .text:00000000000000b0 SYSTICK_IntCmd
+     /tmp/cclFVaHk.s:147    .text:00000000000000c4 $d
+     /tmp/cclFVaHk.s:149    .text:00000000000000c8 $t
+     /tmp/cclFVaHk.s:156    .text:00000000000000c8 SYSTICK_GetCurrentValue
+     /tmp/cclFVaHk.s:166    .text:00000000000000d0 $d
+     /tmp/cclFVaHk.s:168    .text:00000000000000d4 $t
+     /tmp/cclFVaHk.s:175    .text:00000000000000d4 SYSTICK_ClearCounterFlag
+     /tmp/cclFVaHk.s:187    .text:00000000000000e0 $d
+
+UNDEFINED SYMBOLS
+__aeabi_ui2f
+__aeabi_fcmpgt
+SystemCoreClock

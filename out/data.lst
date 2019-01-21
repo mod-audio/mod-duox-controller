@@ -1,0 +1,280 @@
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"data.c"
+  12              		.text
+  13              		.align	1
+  14              		.global	data_free_control
+  15              		.syntax unified
+  16              		.thumb
+  17              		.thumb_func
+  18              		.fpu softvfp
+  20              	data_free_control:
+  21              		@ args = 0, pretend = 0, frame = 0
+  22              		@ frame_needed = 0, uses_anonymous_args = 0
+  23 0000 60B3     		cbz	r0, .L9
+  24 0002 38B5     		push	{r3, r4, r5, lr}
+  25 0004 0546     		mov	r5, r0
+  26 0006 8068     		ldr	r0, [r0, #8]
+  27 0008 FFF7FEFF 		bl	vPortFree
+  28 000c 6868     		ldr	r0, [r5, #4]
+  29 000e FFF7FEFF 		bl	vPortFree
+  30 0012 E868     		ldr	r0, [r5, #12]
+  31 0014 FFF7FEFF 		bl	vPortFree
+  32 0018 AB6A     		ldr	r3, [r5, #40]
+  33 001a DBB1     		cbz	r3, .L3
+  34 001c 95F82430 		ldrb	r3, [r5, #36]	@ zero_extendqisi2
+  35 0020 ABB1     		cbz	r3, .L4
+  36 0022 0024     		movs	r4, #0
+  37 0024 05E0     		b	.L6
+  38              	.L5:
+  39 0026 0134     		adds	r4, r4, #1
+  40 0028 E4B2     		uxtb	r4, r4
+  41 002a 95F82430 		ldrb	r3, [r5, #36]	@ zero_extendqisi2
+  42 002e A342     		cmp	r3, r4
+  43 0030 0DD9     		bls	.L4
+  44              	.L6:
+  45 0032 AB6A     		ldr	r3, [r5, #40]
+  46 0034 53F82430 		ldr	r3, [r3, r4, lsl #2]
+  47 0038 002B     		cmp	r3, #0
+  48 003a F4D0     		beq	.L5
+  49 003c 1868     		ldr	r0, [r3]
+  50 003e FFF7FEFF 		bl	vPortFree
+  51 0042 AB6A     		ldr	r3, [r5, #40]
+  52 0044 53F82400 		ldr	r0, [r3, r4, lsl #2]
+  53 0048 FFF7FEFF 		bl	vPortFree
+  54 004c EBE7     		b	.L5
+  55              	.L4:
+  56 004e A86A     		ldr	r0, [r5, #40]
+  57 0050 FFF7FEFF 		bl	vPortFree
+  58              	.L3:
+  59 0054 2846     		mov	r0, r5
+  60 0056 FFF7FEFF 		bl	vPortFree
+  61 005a 38BD     		pop	{r3, r4, r5, pc}
+  62              	.L9:
+  63 005c 7047     		bx	lr
+  65              		.global	__aeabi_d2f
+  66              		.global	__aeabi_d2iz
+  67              		.align	1
+  68              		.global	data_parse_control
+  69              		.syntax unified
+  70              		.thumb
+  71              		.thumb_func
+  72              		.fpu softvfp
+  74              	data_parse_control:
+  75              		@ args = 0, pretend = 0, frame = 0
+  76              		@ frame_needed = 0, uses_anonymous_args = 0
+  77 005e 2DE9F843 		push	{r3, r4, r5, r6, r7, r8, r9, lr}
+  78 0062 0546     		mov	r5, r0
+  79 0064 FFF7FEFF 		bl	strarr_length
+  80 0068 0646     		mov	r6, r0
+  81 006a 0F28     		cmp	r0, #15
+  82 006c 0DD8     		bhi	.L31
+  83 006e 0024     		movs	r4, #0
+  84              	.L13:
+  85 0070 0023     		movs	r3, #0
+  86 0072 A374     		strb	r3, [r4, #18]
+  87 0074 637C     		ldrb	r3, [r4, #17]	@ zero_extendqisi2
+  88 0076 13F0040F 		tst	r3, #4
+  89 007a 61D0     		beq	.L15
+  90 007c 0423     		movs	r3, #4
+  91 007e A374     		strb	r3, [r4, #18]
+  92 0080 102E     		cmp	r6, #16
+  93 0082 64D8     		bhi	.L16
+  94              	.L12:
+  95 0084 2046     		mov	r0, r4
+  96 0086 BDE8F883 		pop	{r3, r4, r5, r6, r7, r8, r9, pc}
+  97              	.L31:
+  98 008a 2C20     		movs	r0, #44
+  99 008c FFF7FEFF 		bl	pvPortMalloc
+ 100 0090 0446     		mov	r4, r0
+ 101 0092 0028     		cmp	r0, #0
+ 102 0094 4FD0     		beq	.L14
+ 103 0096 6868     		ldr	r0, [r5, #4]
+ 104 0098 FFF7FEFF 		bl	atoi
+ 105 009c 2074     		strb	r0, [r4, #16]
+ 106 009e A868     		ldr	r0, [r5, #8]
+ 107 00a0 FFF7FEFF 		bl	str_duplicate
+ 108 00a4 A060     		str	r0, [r4, #8]
+ 109 00a6 E868     		ldr	r0, [r5, #12]
+ 110 00a8 FFF7FEFF 		bl	str_duplicate
+ 111 00ac 6060     		str	r0, [r4, #4]
+ 112 00ae 2869     		ldr	r0, [r5, #16]
+ 113 00b0 FFF7FEFF 		bl	atoi
+ 114 00b4 6074     		strb	r0, [r4, #17]
+ 115 00b6 6869     		ldr	r0, [r5, #20]
+ 116 00b8 FFF7FEFF 		bl	str_duplicate
+ 117 00bc E060     		str	r0, [r4, #12]
+ 118 00be A869     		ldr	r0, [r5, #24]
+ 119 00c0 FFF7FEFF 		bl	atof
+ 120 00c4 FFF7FEFF 		bl	__aeabi_d2f
+ 121 00c8 6061     		str	r0, [r4, #20]	@ float
+ 122 00ca E869     		ldr	r0, [r5, #28]
+ 123 00cc FFF7FEFF 		bl	atof
+ 124 00d0 FFF7FEFF 		bl	__aeabi_d2f
+ 125 00d4 E061     		str	r0, [r4, #28]	@ float
+ 126 00d6 286A     		ldr	r0, [r5, #32]
+ 127 00d8 FFF7FEFF 		bl	atof
+ 128 00dc FFF7FEFF 		bl	__aeabi_d2f
+ 129 00e0 A061     		str	r0, [r4, #24]	@ float
+ 130 00e2 686A     		ldr	r0, [r5, #36]
+ 131 00e4 FFF7FEFF 		bl	atoi
+ 132 00e8 84F82100 		strb	r0, [r4, #33]
+ 133 00ec A86A     		ldr	r0, [r5, #40]
+ 134 00ee FFF7FEFF 		bl	atoi
+ 135 00f2 2070     		strb	r0, [r4]
+ 136 00f4 E86A     		ldr	r0, [r5, #44]
+ 137 00f6 FFF7FEFF 		bl	atoi
+ 138 00fa 6070     		strb	r0, [r4, #1]
+ 139 00fc 286B     		ldr	r0, [r5, #48]
+ 140 00fe FFF7FEFF 		bl	atoi
+ 141 0102 A070     		strb	r0, [r4, #2]
+ 142 0104 686B     		ldr	r0, [r5, #52]
+ 143 0106 FFF7FEFF 		bl	atoi
+ 144 010a E070     		strb	r0, [r4, #3]
+ 145 010c A86B     		ldr	r0, [r5, #56]
+ 146 010e FFF7FEFF 		bl	atoi
+ 147 0112 84F82200 		strb	r0, [r4, #34]
+ 148 0116 E86B     		ldr	r0, [r5, #60]
+ 149 0118 FFF7FEFF 		bl	atoi
+ 150 011c 84F82300 		strb	r0, [r4, #35]
+ 151 0120 0023     		movs	r3, #0
+ 152 0122 84F82430 		strb	r3, [r4, #36]
+ 153 0126 A362     		str	r3, [r4, #40]
+ 154 0128 A368     		ldr	r3, [r4, #8]
+ 155 012a 23B1     		cbz	r3, .L14
+ 156 012c 6368     		ldr	r3, [r4, #4]
+ 157 012e 13B1     		cbz	r3, .L14
+ 158 0130 E368     		ldr	r3, [r4, #12]
+ 159 0132 002B     		cmp	r3, #0
+ 160 0134 9CD1     		bne	.L13
+ 161              	.L14:
+ 162 0136 2046     		mov	r0, r4
+ 163 0138 FFF7FEFF 		bl	data_free_control
+ 164 013c 0024     		movs	r4, #0
+ 165 013e A1E7     		b	.L12
+ 166              	.L15:
+ 167 0140 13F0080F 		tst	r3, #8
+ 168 0144 4ED0     		beq	.L18
+ 169 0146 0823     		movs	r3, #8
+ 170 0148 A374     		strb	r3, [r4, #18]
+ 171 014a 102E     		cmp	r6, #16
+ 172 014c 9AD9     		bls	.L12
+ 173              	.L16:
+ 174 014e 286C     		ldr	r0, [r5, #64]
+ 175 0150 FFF7FEFF 		bl	atoi
+ 176 0154 C3B2     		uxtb	r3, r0
+ 177 0156 84F82430 		strb	r3, [r4, #36]
+ 178 015a 002B     		cmp	r3, #0
+ 179 015c 92D0     		beq	.L12
+ 180 015e 9800     		lsls	r0, r3, #2
+ 181 0160 FFF7FEFF 		bl	pvPortMalloc
+ 182 0164 A062     		str	r0, [r4, #40]
+ 183 0166 0028     		cmp	r0, #0
+ 184 0168 E5D0     		beq	.L14
+ 185 016a 94F82430 		ldrb	r3, [r4, #36]	@ zero_extendqisi2
+ 186 016e 002B     		cmp	r3, #0
+ 187 0170 88D0     		beq	.L12
+ 188 0172 0023     		movs	r3, #0
+ 189 0174 1946     		mov	r1, r3
+ 190              	.L25:
+ 191 0176 A26A     		ldr	r2, [r4, #40]
+ 192 0178 42F82310 		str	r1, [r2, r3, lsl #2]
+ 193 017c 0133     		adds	r3, r3, #1
+ 194 017e DBB2     		uxtb	r3, r3
+ 195 0180 94F82420 		ldrb	r2, [r4, #36]	@ zero_extendqisi2
+ 196 0184 9A42     		cmp	r2, r3
+ 197 0186 F6D8     		bhi	.L25
+ 198 0188 002A     		cmp	r2, #0
+ 199 018a 3FF47BAF 		beq	.L12
+ 200 018e 0026     		movs	r6, #0
+ 201 0190 4FF00808 		mov	r8, #8
+ 202              	.L26:
+ 203 0194 A76A     		ldr	r7, [r4, #40]
+ 204 0196 4046     		mov	r0, r8
+ 205 0198 FFF7FEFF 		bl	pvPortMalloc
+ 206 019c 47F82600 		str	r0, [r7, r6, lsl #2]
+ 207 01a0 A36A     		ldr	r3, [r4, #40]
+ 208 01a2 53F82690 		ldr	r9, [r3, r6, lsl #2]
+ 209 01a6 05EBC607 		add	r7, r5, r6, lsl #3
+ 210 01aa 786C     		ldr	r0, [r7, #68]
+ 211 01ac FFF7FEFF 		bl	str_duplicate
+ 212 01b0 C9F80000 		str	r0, [r9]
+ 213 01b4 B86C     		ldr	r0, [r7, #72]
+ 214 01b6 FFF7FEFF 		bl	atof
+ 215 01ba A36A     		ldr	r3, [r4, #40]
+ 216 01bc 53F82670 		ldr	r7, [r3, r6, lsl #2]
+ 217 01c0 FFF7FEFF 		bl	__aeabi_d2iz
+ 218 01c4 3871     		strb	r0, [r7, #4]
+ 219 01c6 A36A     		ldr	r3, [r4, #40]
+ 220 01c8 53F82630 		ldr	r3, [r3, r6, lsl #2]
+ 221 01cc 002B     		cmp	r3, #0
+ 222 01ce B2D0     		beq	.L14
+ 223 01d0 1B68     		ldr	r3, [r3]
+ 224 01d2 002B     		cmp	r3, #0
+ 225 01d4 AFD0     		beq	.L14
+ 226 01d6 0136     		adds	r6, r6, #1
+ 227 01d8 F6B2     		uxtb	r6, r6
+ 228 01da 94F82430 		ldrb	r3, [r4, #36]	@ zero_extendqisi2
+ 229 01de B342     		cmp	r3, r6
+ 230 01e0 D8D8     		bhi	.L26
+ 231 01e2 4FE7     		b	.L12
+ 232              	.L18:
+ 233 01e4 13F0020F 		tst	r3, #2
+ 234 01e8 02D0     		beq	.L19
+ 235 01ea 0223     		movs	r3, #2
+ 236 01ec A374     		strb	r3, [r4, #18]
+ 237 01ee 49E7     		b	.L12
+ 238              	.L19:
+ 239 01f0 13F0010F 		tst	r3, #1
+ 240 01f4 02D0     		beq	.L21
+ 241 01f6 0123     		movs	r3, #1
+ 242 01f8 A374     		strb	r3, [r4, #18]
+ 243 01fa 43E7     		b	.L12
+ 244              	.L21:
+ 245 01fc 13F0100F 		tst	r3, #16
+ 246 0200 02D0     		beq	.L22
+ 247 0202 1023     		movs	r3, #16
+ 248 0204 A374     		strb	r3, [r4, #18]
+ 249 0206 3DE7     		b	.L12
+ 250              	.L22:
+ 251 0208 13F0200F 		tst	r3, #32
+ 252 020c 02D0     		beq	.L23
+ 253 020e 2023     		movs	r3, #32
+ 254 0210 A374     		strb	r3, [r4, #18]
+ 255 0212 37E7     		b	.L12
+ 256              	.L23:
+ 257 0214 13F0400F 		tst	r3, #64
+ 258 0218 02D0     		beq	.L24
+ 259 021a 4023     		movs	r3, #64
+ 260 021c A374     		strb	r3, [r4, #18]
+ 261 021e 31E7     		b	.L12
+ 262              	.L24:
+ 263 0220 13F0800F 		tst	r3, #128
+ 264 0224 3FF42EAF 		beq	.L12
+ 265 0228 8023     		movs	r3, #128
+ 266 022a A374     		strb	r3, [r4, #18]
+ 267 022c 2AE7     		b	.L12
+ 269              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 data.c
+     /tmp/ccdY4X2H.s:13     .text:0000000000000000 $t
+     /tmp/ccdY4X2H.s:20     .text:0000000000000000 data_free_control
+     /tmp/ccdY4X2H.s:74     .text:000000000000005e data_parse_control
+
+UNDEFINED SYMBOLS
+vPortFree
+__aeabi_d2f
+__aeabi_d2iz
+strarr_length
+pvPortMalloc
+atoi
+str_duplicate
+atof

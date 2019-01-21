@@ -1,0 +1,283 @@
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"lpc17xx_clkpwr.c"
+  12              		.text
+  13              		.align	1
+  14              		.global	CLKPWR_SetPCLKDiv
+  15              		.syntax unified
+  16              		.thumb
+  17              		.thumb_func
+  18              		.fpu softvfp
+  20              	CLKPWR_SetPCLKDiv:
+  21              		@ args = 0, pretend = 0, frame = 0
+  22              		@ frame_needed = 0, uses_anonymous_args = 0
+  23              		@ link register save eliminated.
+  24 0000 10B4     		push	{r4}
+  25 0002 1F28     		cmp	r0, #31
+  26 0004 12D9     		bls	.L2
+  27 0006 2038     		subs	r0, r0, #32
+  28 0008 114B     		ldr	r3, .L5
+  29 000a D3F8AC21 		ldr	r2, [r3, #428]
+  30 000e 0324     		movs	r4, #3
+  31 0010 8440     		lsls	r4, r4, r0
+  32 0012 22EA0402 		bic	r2, r2, r4
+  33 0016 C3F8AC21 		str	r2, [r3, #428]
+  34 001a D3F8AC21 		ldr	r2, [r3, #428]
+  35 001e 01FA00F0 		lsl	r0, r1, r0
+  36 0022 1043     		orrs	r0, r0, r2
+  37 0024 C3F8AC01 		str	r0, [r3, #428]
+  38              	.L1:
+  39 0028 10BC     		pop	{r4}
+  40 002a 7047     		bx	lr
+  41              	.L2:
+  42 002c 084B     		ldr	r3, .L5
+  43 002e D3F8A821 		ldr	r2, [r3, #424]
+  44 0032 0324     		movs	r4, #3
+  45 0034 8440     		lsls	r4, r4, r0
+  46 0036 22EA0402 		bic	r2, r2, r4
+  47 003a C3F8A821 		str	r2, [r3, #424]
+  48 003e D3F8A821 		ldr	r2, [r3, #424]
+  49 0042 01FA00F0 		lsl	r0, r1, r0
+  50 0046 1043     		orrs	r0, r0, r2
+  51 0048 C3F8A801 		str	r0, [r3, #424]
+  52 004c ECE7     		b	.L1
+  53              	.L6:
+  54 004e 00BF     		.align	2
+  55              	.L5:
+  56 0050 00C00F40 		.word	1074774016
+  58              		.align	1
+  59              		.global	CLKPWR_GetPCLKSEL
+  60              		.syntax unified
+  61              		.thumb
+  62              		.thumb_func
+  63              		.fpu softvfp
+  65              	CLKPWR_GetPCLKSEL:
+  66              		@ args = 0, pretend = 0, frame = 0
+  67              		@ frame_needed = 0, uses_anonymous_args = 0
+  68              		@ link register save eliminated.
+  69 0054 1F28     		cmp	r0, #31
+  70 0056 08D9     		bls	.L10
+  71 0058 2038     		subs	r0, r0, #32
+  72 005a 064B     		ldr	r3, .L11
+  73 005c D3F8AC31 		ldr	r3, [r3, #428]
+  74              	.L9:
+  75 0060 23FA00F0 		lsr	r0, r3, r0
+  76 0064 00F00300 		and	r0, r0, #3
+  77 0068 7047     		bx	lr
+  78              	.L10:
+  79 006a 024B     		ldr	r3, .L11
+  80 006c D3F8A831 		ldr	r3, [r3, #424]
+  81 0070 F6E7     		b	.L9
+  82              	.L12:
+  83 0072 00BF     		.align	2
+  84              	.L11:
+  85 0074 00C00F40 		.word	1074774016
+  87              		.align	1
+  88              		.global	CLKPWR_GetPCLK
+  89              		.syntax unified
+  90              		.thumb
+  91              		.thumb_func
+  92              		.fpu softvfp
+  94              	CLKPWR_GetPCLK:
+  95              		@ args = 0, pretend = 0, frame = 0
+  96              		@ frame_needed = 0, uses_anonymous_args = 0
+  97 0078 10B5     		push	{r4, lr}
+  98 007a 074B     		ldr	r3, .L18
+  99 007c 1C68     		ldr	r4, [r3]
+ 100 007e FFF7FEFF 		bl	CLKPWR_GetPCLKSEL
+ 101 0082 38B1     		cbz	r0, .L15
+ 102 0084 0346     		mov	r3, r0
+ 103 0086 0328     		cmp	r0, #3
+ 104 0088 14BF     		ite	ne
+ 105 008a 0346     		movne	r3, r0
+ 106 008c 0823     		moveq	r3, #8
+ 107              	.L14:
+ 108 008e B4FBF3F0 		udiv	r0, r4, r3
+ 109 0092 10BD     		pop	{r4, pc}
+ 110              	.L15:
+ 111 0094 0423     		movs	r3, #4
+ 112 0096 FAE7     		b	.L14
+ 113              	.L19:
+ 114              		.align	2
+ 115              	.L18:
+ 116 0098 00000000 		.word	SystemCoreClock
+ 118              		.align	1
+ 119              		.global	CLKPWR_ConfigPPWR
+ 120              		.syntax unified
+ 121              		.thumb
+ 122              		.thumb_func
+ 123              		.fpu softvfp
+ 125              	CLKPWR_ConfigPPWR:
+ 126              		@ args = 0, pretend = 0, frame = 0
+ 127              		@ frame_needed = 0, uses_anonymous_args = 0
+ 128              		@ link register save eliminated.
+ 129 009c 0129     		cmp	r1, #1
+ 130 009e 0AD0     		beq	.L23
+ 131 00a0 41B9     		cbnz	r1, .L20
+ 132 00a2 094A     		ldr	r2, .L24
+ 133 00a4 D2F8C410 		ldr	r1, [r2, #196]
+ 134 00a8 084B     		ldr	r3, .L24+4
+ 135 00aa 0B40     		ands	r3, r3, r1
+ 136 00ac 23EA0003 		bic	r3, r3, r0
+ 137 00b0 C2F8C430 		str	r3, [r2, #196]
+ 138              	.L20:
+ 139 00b4 7047     		bx	lr
+ 140              	.L23:
+ 141 00b6 044B     		ldr	r3, .L24
+ 142 00b8 D3F8C410 		ldr	r1, [r3, #196]
+ 143 00bc 034A     		ldr	r2, .L24+4
+ 144 00be 0240     		ands	r2, r2, r0
+ 145 00c0 0A43     		orrs	r2, r2, r1
+ 146 00c2 C3F8C420 		str	r2, [r3, #196]
+ 147 00c6 7047     		bx	lr
+ 148              	.L25:
+ 149              		.align	2
+ 150              	.L24:
+ 151 00c8 00C00F40 		.word	1074774016
+ 152 00cc DEF7EFEF 		.word	-269486114
+ 154              		.align	1
+ 155              		.global	CLKPWR_Sleep
+ 156              		.syntax unified
+ 157              		.thumb
+ 158              		.thumb_func
+ 159              		.fpu softvfp
+ 161              	CLKPWR_Sleep:
+ 162              		@ args = 0, pretend = 0, frame = 0
+ 163              		@ frame_needed = 0, uses_anonymous_args = 0
+ 164              		@ link register save eliminated.
+ 165 00d0 024B     		ldr	r3, .L27
+ 166 00d2 0022     		movs	r2, #0
+ 167 00d4 C3F8C020 		str	r2, [r3, #192]
+ 168              		.syntax unified
+ 169              	@ 473 "./nxp-lpc/CMSISv2p00_LPC17xx/inc/core_cmInstr.h" 1
+ 170 00d8 30BF     		wfi
+ 171              	@ 0 "" 2
+ 172              		.thumb
+ 173              		.syntax unified
+ 174 00da 7047     		bx	lr
+ 175              	.L28:
+ 176              		.align	2
+ 177              	.L27:
+ 178 00dc 00C00F40 		.word	1074774016
+ 180              		.align	1
+ 181              		.global	CLKPWR_DeepSleep
+ 182              		.syntax unified
+ 183              		.thumb
+ 184              		.thumb_func
+ 185              		.fpu softvfp
+ 187              	CLKPWR_DeepSleep:
+ 188              		@ args = 0, pretend = 0, frame = 0
+ 189              		@ frame_needed = 0, uses_anonymous_args = 0
+ 190              		@ link register save eliminated.
+ 191 00e0 044B     		ldr	r3, .L30
+ 192 00e2 0422     		movs	r2, #4
+ 193 00e4 1A61     		str	r2, [r3, #16]
+ 194 00e6 044B     		ldr	r3, .L30+4
+ 195 00e8 0822     		movs	r2, #8
+ 196 00ea C3F8C020 		str	r2, [r3, #192]
+ 197              		.syntax unified
+ 198              	@ 473 "./nxp-lpc/CMSISv2p00_LPC17xx/inc/core_cmInstr.h" 1
+ 199 00ee 30BF     		wfi
+ 200              	@ 0 "" 2
+ 201              		.thumb
+ 202              		.syntax unified
+ 203 00f0 7047     		bx	lr
+ 204              	.L31:
+ 205 00f2 00BF     		.align	2
+ 206              	.L30:
+ 207 00f4 00ED00E0 		.word	-536810240
+ 208 00f8 00C00F40 		.word	1074774016
+ 210              		.align	1
+ 211              		.global	CLKPWR_PowerDown
+ 212              		.syntax unified
+ 213              		.thumb
+ 214              		.thumb_func
+ 215              		.fpu softvfp
+ 217              	CLKPWR_PowerDown:
+ 218              		@ args = 0, pretend = 0, frame = 0
+ 219              		@ frame_needed = 0, uses_anonymous_args = 0
+ 220              		@ link register save eliminated.
+ 221 00fc 044B     		ldr	r3, .L33
+ 222 00fe 0422     		movs	r2, #4
+ 223 0100 1A61     		str	r2, [r3, #16]
+ 224 0102 044B     		ldr	r3, .L33+4
+ 225 0104 0922     		movs	r2, #9
+ 226 0106 C3F8C020 		str	r2, [r3, #192]
+ 227              		.syntax unified
+ 228              	@ 473 "./nxp-lpc/CMSISv2p00_LPC17xx/inc/core_cmInstr.h" 1
+ 229 010a 30BF     		wfi
+ 230              	@ 0 "" 2
+ 231              		.thumb
+ 232              		.syntax unified
+ 233 010c 7047     		bx	lr
+ 234              	.L34:
+ 235 010e 00BF     		.align	2
+ 236              	.L33:
+ 237 0110 00ED00E0 		.word	-536810240
+ 238 0114 00C00F40 		.word	1074774016
+ 240              		.align	1
+ 241              		.global	CLKPWR_DeepPowerDown
+ 242              		.syntax unified
+ 243              		.thumb
+ 244              		.thumb_func
+ 245              		.fpu softvfp
+ 247              	CLKPWR_DeepPowerDown:
+ 248              		@ args = 0, pretend = 0, frame = 0
+ 249              		@ frame_needed = 0, uses_anonymous_args = 0
+ 250              		@ link register save eliminated.
+ 251 0118 044B     		ldr	r3, .L36
+ 252 011a 0422     		movs	r2, #4
+ 253 011c 1A61     		str	r2, [r3, #16]
+ 254 011e 044B     		ldr	r3, .L36+4
+ 255 0120 0322     		movs	r2, #3
+ 256 0122 C3F8C020 		str	r2, [r3, #192]
+ 257              		.syntax unified
+ 258              	@ 473 "./nxp-lpc/CMSISv2p00_LPC17xx/inc/core_cmInstr.h" 1
+ 259 0126 30BF     		wfi
+ 260              	@ 0 "" 2
+ 261              		.thumb
+ 262              		.syntax unified
+ 263 0128 7047     		bx	lr
+ 264              	.L37:
+ 265 012a 00BF     		.align	2
+ 266              	.L36:
+ 267 012c 00ED00E0 		.word	-536810240
+ 268 0130 00C00F40 		.word	1074774016
+ 270              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 lpc17xx_clkpwr.c
+     /tmp/cc0l0P82.s:13     .text:0000000000000000 $t
+     /tmp/cc0l0P82.s:20     .text:0000000000000000 CLKPWR_SetPCLKDiv
+     /tmp/cc0l0P82.s:56     .text:0000000000000050 $d
+     /tmp/cc0l0P82.s:58     .text:0000000000000054 $t
+     /tmp/cc0l0P82.s:65     .text:0000000000000054 CLKPWR_GetPCLKSEL
+     /tmp/cc0l0P82.s:85     .text:0000000000000074 $d
+     /tmp/cc0l0P82.s:87     .text:0000000000000078 $t
+     /tmp/cc0l0P82.s:94     .text:0000000000000078 CLKPWR_GetPCLK
+     /tmp/cc0l0P82.s:116    .text:0000000000000098 $d
+     /tmp/cc0l0P82.s:118    .text:000000000000009c $t
+     /tmp/cc0l0P82.s:125    .text:000000000000009c CLKPWR_ConfigPPWR
+     /tmp/cc0l0P82.s:151    .text:00000000000000c8 $d
+     /tmp/cc0l0P82.s:154    .text:00000000000000d0 $t
+     /tmp/cc0l0P82.s:161    .text:00000000000000d0 CLKPWR_Sleep
+     /tmp/cc0l0P82.s:178    .text:00000000000000dc $d
+     /tmp/cc0l0P82.s:180    .text:00000000000000e0 $t
+     /tmp/cc0l0P82.s:187    .text:00000000000000e0 CLKPWR_DeepSleep
+     /tmp/cc0l0P82.s:207    .text:00000000000000f4 $d
+     /tmp/cc0l0P82.s:210    .text:00000000000000fc $t
+     /tmp/cc0l0P82.s:217    .text:00000000000000fc CLKPWR_PowerDown
+     /tmp/cc0l0P82.s:237    .text:0000000000000110 $d
+     /tmp/cc0l0P82.s:240    .text:0000000000000118 $t
+     /tmp/cc0l0P82.s:247    .text:0000000000000118 CLKPWR_DeepPowerDown
+     /tmp/cc0l0P82.s:267    .text:000000000000012c $d
+
+UNDEFINED SYMBOLS
+SystemCoreClock

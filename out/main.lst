@@ -1,0 +1,1405 @@
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"main.c"
+  12              		.text
+  13              		.align	1
+  14              		.syntax unified
+  15              		.thumb
+  16              		.thumb_func
+  17              		.fpu softvfp
+  19              	setup_task:
+  20              		@ args = 0, pretend = 0, frame = 0
+  21              		@ frame_needed = 0, uses_anonymous_args = 0
+  22 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  23 0002 85B0     		sub	sp, sp, #20
+  24 0004 FFF7FEFF 		bl	cli_init
+  25 0008 FFF7FEFF 		bl	comm_init
+  26 000c 4FF49670 		mov	r0, #300
+  27 0010 FFF7FEFF 		bl	delay_ms
+  28 0014 6649     		ldr	r1, .L7
+  29 0016 0020     		movs	r0, #0
+  30 0018 FFF7FEFF 		bl	screen_image
+  31 001c 0020     		movs	r0, #0
+  32 001e FFF7FEFF 		bl	hardware_glcds
+  33 0022 FFF7FEFF 		bl	uc1701_update
+  34 0026 6349     		ldr	r1, .L7+4
+  35 0028 0120     		movs	r0, #1
+  36 002a FFF7FEFF 		bl	screen_image
+  37 002e 0120     		movs	r0, #1
+  38 0030 FFF7FEFF 		bl	hardware_glcds
+  39 0034 FFF7FEFF 		bl	uc1701_update
+  40 0038 0022     		movs	r2, #0
+  41 003a 0421     		movs	r1, #4
+  42 003c 0520     		movs	r0, #5
+  43 003e FFF7FEFF 		bl	xQueueGenericCreate
+  44 0042 5D4B     		ldr	r3, .L7+8
+  45 0044 1860     		str	r0, [r3]
+  46 0046 0025     		movs	r5, #0
+  47 0048 0395     		str	r5, [sp, #12]
+  48 004a 0295     		str	r5, [sp, #8]
+  49 004c 0195     		str	r5, [sp, #4]
+  50 004e 0423     		movs	r3, #4
+  51 0050 0093     		str	r3, [sp]
+  52 0052 2B46     		mov	r3, r5
+  53 0054 4FF48072 		mov	r2, #256
+  54 0058 5849     		ldr	r1, .L7+12
+  55 005a 5948     		ldr	r0, .L7+16
+  56 005c FFF7FEFF 		bl	xTaskGenericCreate
+  57 0060 0395     		str	r5, [sp, #12]
+  58 0062 0295     		str	r5, [sp, #8]
+  59 0064 0195     		str	r5, [sp, #4]
+  60 0066 0323     		movs	r3, #3
+  61 0068 0093     		str	r3, [sp]
+  62 006a 2B46     		mov	r3, r5
+  63 006c 4FF48072 		mov	r2, #256
+  64 0070 5449     		ldr	r1, .L7+20
+  65 0072 5548     		ldr	r0, .L7+24
+  66 0074 FFF7FEFF 		bl	xTaskGenericCreate
+  67 0078 0395     		str	r5, [sp, #12]
+  68 007a 0295     		str	r5, [sp, #8]
+  69 007c 0195     		str	r5, [sp, #4]
+  70 007e 0224     		movs	r4, #2
+  71 0080 0094     		str	r4, [sp]
+  72 0082 2B46     		mov	r3, r5
+  73 0084 4FF48072 		mov	r2, #256
+  74 0088 5049     		ldr	r1, .L7+28
+  75 008a 5148     		ldr	r0, .L7+32
+  76 008c FFF7FEFF 		bl	xTaskGenericCreate
+  77 0090 0395     		str	r5, [sp, #12]
+  78 0092 0295     		str	r5, [sp, #8]
+  79 0094 0195     		str	r5, [sp, #4]
+  80 0096 0126     		movs	r6, #1
+  81 0098 0096     		str	r6, [sp]
+  82 009a 2B46     		mov	r3, r5
+  83 009c 8022     		movs	r2, #128
+  84 009e 4D49     		ldr	r1, .L7+36
+  85 00a0 4D48     		ldr	r0, .L7+40
+  86 00a2 FFF7FEFF 		bl	xTaskGenericCreate
+  87 00a6 2846     		mov	r0, r5
+  88 00a8 FFF7FEFF 		bl	hardware_actuators
+  89 00ac 4B4F     		ldr	r7, .L7+44
+  90 00ae 3946     		mov	r1, r7
+  91 00b0 FFF7FEFF 		bl	actuator_set_event
+  92 00b4 2846     		mov	r0, r5
+  93 00b6 FFF7FEFF 		bl	hardware_actuators
+  94 00ba EF21     		movs	r1, #239
+  95 00bc FFF7FEFF 		bl	actuator_enable_event
+  96 00c0 3046     		mov	r0, r6
+  97 00c2 FFF7FEFF 		bl	hardware_actuators
+  98 00c6 3946     		mov	r1, r7
+  99 00c8 FFF7FEFF 		bl	actuator_set_event
+ 100 00cc 3046     		mov	r0, r6
+ 101 00ce FFF7FEFF 		bl	hardware_actuators
+ 102 00d2 EF21     		movs	r1, #239
+ 103 00d4 FFF7FEFF 		bl	actuator_enable_event
+ 104 00d8 3E46     		mov	r6, r7
+ 105 00da 2546     		mov	r5, r4
+ 106              	.L2:
+ 107 00dc 2046     		mov	r0, r4
+ 108 00de FFF7FEFF 		bl	hardware_actuators
+ 109 00e2 3146     		mov	r1, r6
+ 110 00e4 FFF7FEFF 		bl	actuator_set_event
+ 111 00e8 2046     		mov	r0, r4
+ 112 00ea FFF7FEFF 		bl	hardware_actuators
+ 113 00ee 2946     		mov	r1, r5
+ 114 00f0 FFF7FEFF 		bl	actuator_enable_event
+ 115 00f4 0134     		adds	r4, r4, #1
+ 116 00f6 E4B2     		uxtb	r4, r4
+ 117 00f8 092C     		cmp	r4, #9
+ 118 00fa EFD1     		bne	.L2
+ 119 00fc 374E     		ldr	r6, .L7+44
+ 120 00fe 8025     		movs	r5, #128
+ 121              	.L3:
+ 122 0100 2046     		mov	r0, r4
+ 123 0102 FFF7FEFF 		bl	hardware_actuators
+ 124 0106 3146     		mov	r1, r6
+ 125 0108 FFF7FEFF 		bl	actuator_set_event
+ 126 010c 2046     		mov	r0, r4
+ 127 010e FFF7FEFF 		bl	hardware_actuators
+ 128 0112 2946     		mov	r1, r5
+ 129 0114 FFF7FEFF 		bl	actuator_enable_event
+ 130 0118 0134     		adds	r4, r4, #1
+ 131 011a E4B2     		uxtb	r4, r4
+ 132 011c 112C     		cmp	r4, #17
+ 133 011e EFD1     		bne	.L3
+ 134 0120 2F49     		ldr	r1, .L7+48
+ 135 0122 3048     		ldr	r0, .L7+52
+ 136 0124 FFF7FEFF 		bl	protocol_add_command
+ 137 0128 2F49     		ldr	r1, .L7+56
+ 138 012a 3048     		ldr	r0, .L7+60
+ 139 012c FFF7FEFF 		bl	protocol_add_command
+ 140 0130 2F49     		ldr	r1, .L7+64
+ 141 0132 3048     		ldr	r0, .L7+68
+ 142 0134 FFF7FEFF 		bl	protocol_add_command
+ 143 0138 2F49     		ldr	r1, .L7+72
+ 144 013a 3048     		ldr	r0, .L7+76
+ 145 013c FFF7FEFF 		bl	protocol_add_command
+ 146 0140 2F49     		ldr	r1, .L7+80
+ 147 0142 3048     		ldr	r0, .L7+84
+ 148 0144 FFF7FEFF 		bl	protocol_add_command
+ 149 0148 2F49     		ldr	r1, .L7+88
+ 150 014a 3048     		ldr	r0, .L7+92
+ 151 014c FFF7FEFF 		bl	protocol_add_command
+ 152 0150 2F4C     		ldr	r4, .L7+96
+ 153 0152 2146     		mov	r1, r4
+ 154 0154 2F48     		ldr	r0, .L7+100
+ 155 0156 FFF7FEFF 		bl	protocol_add_command
+ 156 015a 2146     		mov	r1, r4
+ 157 015c 2E48     		ldr	r0, .L7+104
+ 158 015e FFF7FEFF 		bl	protocol_add_command
+ 159 0162 2E49     		ldr	r1, .L7+108
+ 160 0164 2E48     		ldr	r0, .L7+112
+ 161 0166 FFF7FEFF 		bl	protocol_add_command
+ 162 016a 2E49     		ldr	r1, .L7+116
+ 163 016c 2E48     		ldr	r0, .L7+120
+ 164 016e FFF7FEFF 		bl	protocol_add_command
+ 165 0172 2E49     		ldr	r1, .L7+124
+ 166 0174 2E48     		ldr	r0, .L7+128
+ 167 0176 FFF7FEFF 		bl	protocol_add_command
+ 168 017a 2E49     		ldr	r1, .L7+132
+ 169 017c 2E48     		ldr	r0, .L7+136
+ 170 017e FFF7FEFF 		bl	protocol_add_command
+ 171 0182 2E49     		ldr	r1, .L7+140
+ 172 0184 2E48     		ldr	r0, .L7+144
+ 173 0186 FFF7FEFF 		bl	protocol_add_command
+ 174 018a 2E49     		ldr	r1, .L7+148
+ 175 018c 2E48     		ldr	r0, .L7+152
+ 176 018e FFF7FEFF 		bl	protocol_add_command
+ 177 0192 2E49     		ldr	r1, .L7+156
+ 178 0194 2E48     		ldr	r0, .L7+160
+ 179 0196 FFF7FEFF 		bl	protocol_add_command
+ 180 019a 2E49     		ldr	r1, .L7+164
+ 181 019c 2E48     		ldr	r0, .L7+168
+ 182 019e FFF7FEFF 		bl	protocol_add_command
+ 183 01a2 FFF7FEFF 		bl	naveg_init
+ 184 01a6 0020     		movs	r0, #0
+ 185 01a8 FFF7FEFF 		bl	vTaskDelete
+ 186 01ac 05B0     		add	sp, sp, #20
+ 187              		@ sp needed
+ 188 01ae F0BD     		pop	{r4, r5, r6, r7, pc}
+ 189              	.L8:
+ 190              		.align	2
+ 191              	.L7:
+ 192 01b0 00000000 		.word	mod_logo
+ 193 01b4 00000000 		.word	mod_duo
+ 194 01b8 00000000 		.word	.LANCHOR0
+ 195 01bc 00000000 		.word	.LC0
+ 196 01c0 00000000 		.word	procotol_task
+ 197 01c4 08000000 		.word	.LC1
+ 198 01c8 00000000 		.word	actuators_task
+ 199 01cc 0C000000 		.word	.LC2
+ 200 01d0 00000000 		.word	cli_task
+ 201 01d4 10000000 		.word	.LC3
+ 202 01d8 00000000 		.word	displays_task
+ 203 01dc 00000000 		.word	actuators_cb
+ 204 01e0 00000000 		.word	ping_cb
+ 205 01e4 18000000 		.word	.LC4
+ 206 01e8 00000000 		.word	say_cb
+ 207 01ec 20000000 		.word	.LC5
+ 208 01f0 00000000 		.word	led_cb
+ 209 01f4 2C000000 		.word	.LC6
+ 210 01f8 00000000 		.word	glcd_text_cb
+ 211 01fc 40000000 		.word	.LC7
+ 212 0200 00000000 		.word	glcd_dialog_cb
+ 213 0204 58000000 		.word	.LC8
+ 214 0208 00000000 		.word	glcd_draw_cb
+ 215 020c 68000000 		.word	.LC9
+ 216 0210 00000000 		.word	gui_connection_cb
+ 217 0214 80000000 		.word	.LC10
+ 218 0218 88000000 		.word	.LC11
+ 219 021c 00000000 		.word	control_add_cb
+ 220 0220 90000000 		.word	.LC12
+ 221 0224 00000000 		.word	control_rm_cb
+ 222 0228 D0000000 		.word	.LC13
+ 223 022c 00000000 		.word	control_set_cb
+ 224 0230 E4000000 		.word	.LC14
+ 225 0234 00000000 		.word	control_get_cb
+ 226 0238 FC000000 		.word	.LC15
+ 227 023c 00000000 		.word	initial_state_cb
+ 228 0240 10010000 		.word	.LC16
+ 229 0244 00000000 		.word	tuner_cb
+ 230 0248 28010000 		.word	.LC17
+ 231 024c 00000000 		.word	resp_cb
+ 232 0250 38010000 		.word	.LC18
+ 233 0254 00000000 		.word	restore_cb
+ 234 0258 44010000 		.word	.LC19
+ 236              		.align	1
+ 237              		.syntax unified
+ 238              		.thumb
+ 239              		.thumb_func
+ 240              		.fpu softvfp
+ 242              	restore_cb:
+ 243              		@ args = 0, pretend = 0, frame = 0
+ 244              		@ frame_needed = 0, uses_anonymous_args = 0
+ 245 025c 10B5     		push	{r4, lr}
+ 246 025e 0446     		mov	r4, r0
+ 247 0260 0020     		movs	r0, #0
+ 248 0262 FFF7FEFF 		bl	cli_restore
+ 249 0266 2146     		mov	r1, r4
+ 250 0268 0148     		ldr	r0, .L11
+ 251 026a FFF7FEFF 		bl	protocol_response
+ 252 026e 10BD     		pop	{r4, pc}
+ 253              	.L12:
+ 254              		.align	2
+ 255              	.L11:
+ 256 0270 4C010000 		.word	.LC20
+ 258              		.align	1
+ 259              		.syntax unified
+ 260              		.thumb
+ 261              		.thumb_func
+ 262              		.fpu softvfp
+ 264              	initial_state_cb:
+ 265              		@ args = 0, pretend = 0, frame = 0
+ 266              		@ frame_needed = 0, uses_anonymous_args = 0
+ 267 0274 08B5     		push	{r3, lr}
+ 268 0276 0146     		mov	r1, r0
+ 269 0278 0148     		ldr	r0, .L15
+ 270 027a FFF7FEFF 		bl	protocol_response
+ 271 027e 08BD     		pop	{r3, pc}
+ 272              	.L16:
+ 273              		.align	2
+ 274              	.L15:
+ 275 0280 4C010000 		.word	.LC20
+ 277              		.align	1
+ 278              		.syntax unified
+ 279              		.thumb
+ 280              		.thumb_func
+ 281              		.fpu softvfp
+ 283              	say_cb:
+ 284              		@ args = 0, pretend = 0, frame = 0
+ 285              		@ frame_needed = 0, uses_anonymous_args = 0
+ 286 0284 08B5     		push	{r3, lr}
+ 287 0286 0146     		mov	r1, r0
+ 288 0288 0368     		ldr	r3, [r0]
+ 289 028a 5868     		ldr	r0, [r3, #4]
+ 290 028c FFF7FEFF 		bl	protocol_response
+ 291 0290 08BD     		pop	{r3, pc}
+ 293              		.align	1
+ 294              		.syntax unified
+ 295              		.thumb
+ 296              		.thumb_func
+ 297              		.fpu softvfp
+ 299              	ping_cb:
+ 300              		@ args = 0, pretend = 0, frame = 0
+ 301              		@ frame_needed = 0, uses_anonymous_args = 0
+ 302 0292 08B5     		push	{r3, lr}
+ 303 0294 0146     		mov	r1, r0
+ 304 0296 0248     		ldr	r0, .L21
+ 305 0298 FFF7FEFF 		bl	protocol_response
+ 306 029c 08BD     		pop	{r3, pc}
+ 307              	.L22:
+ 308 029e 00BF     		.align	2
+ 309              	.L21:
+ 310 02a0 4C010000 		.word	.LC20
+ 312              		.align	1
+ 313              		.syntax unified
+ 314              		.thumb
+ 315              		.thumb_func
+ 316              		.fpu softvfp
+ 318              	resp_cb:
+ 319              		@ args = 0, pretend = 0, frame = 0
+ 320              		@ frame_needed = 0, uses_anonymous_args = 0
+ 321 02a4 08B5     		push	{r3, lr}
+ 322 02a6 0068     		ldr	r0, [r0]
+ 323 02a8 FFF7FEFF 		bl	comm_webgui_response_cb
+ 324 02ac 08BD     		pop	{r3, pc}
+ 326              		.global	__aeabi_d2f
+ 327              		.align	1
+ 328              		.syntax unified
+ 329              		.thumb
+ 330              		.thumb_func
+ 331              		.fpu softvfp
+ 333              	tuner_cb:
+ 334              		@ args = 0, pretend = 0, frame = 0
+ 335              		@ frame_needed = 0, uses_anonymous_args = 0
+ 336 02ae 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 337 02b2 0446     		mov	r4, r0
+ 338 02b4 0368     		ldr	r3, [r0]
+ 339 02b6 5868     		ldr	r0, [r3, #4]
+ 340 02b8 FFF7FEFF 		bl	atof
+ 341 02bc 0646     		mov	r6, r0
+ 342 02be 0F46     		mov	r7, r1
+ 343 02c0 2368     		ldr	r3, [r4]
+ 344 02c2 9D68     		ldr	r5, [r3, #8]
+ 345 02c4 D868     		ldr	r0, [r3, #12]
+ 346 02c6 FFF7FEFF 		bl	atoi
+ 347 02ca 4FFA80F8 		sxtb	r8, r0
+ 348 02ce 3046     		mov	r0, r6
+ 349 02d0 3946     		mov	r1, r7
+ 350 02d2 FFF7FEFF 		bl	__aeabi_d2f
+ 351 02d6 4246     		mov	r2, r8
+ 352 02d8 2946     		mov	r1, r5
+ 353 02da FFF7FEFF 		bl	screen_tuner
+ 354 02de 2146     		mov	r1, r4
+ 355 02e0 0248     		ldr	r0, .L27
+ 356 02e2 FFF7FEFF 		bl	protocol_response
+ 357 02e6 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 358              	.L28:
+ 359 02ea 00BF     		.align	2
+ 360              	.L27:
+ 361 02ec 4C010000 		.word	.LC20
+ 363              		.align	1
+ 364              		.syntax unified
+ 365              		.thumb
+ 366              		.thumb_func
+ 367              		.fpu softvfp
+ 369              	control_get_cb:
+ 370              		@ args = 0, pretend = 0, frame = 32
+ 371              		@ frame_needed = 0, uses_anonymous_args = 0
+ 372 02f0 70B5     		push	{r4, r5, r6, lr}
+ 373 02f2 88B0     		sub	sp, sp, #32
+ 374 02f4 0546     		mov	r5, r0
+ 375 02f6 0368     		ldr	r3, [r0]
+ 376 02f8 5868     		ldr	r0, [r3, #4]
+ 377 02fa FFF7FEFF 		bl	atoi
+ 378 02fe 2B68     		ldr	r3, [r5]
+ 379 0300 9968     		ldr	r1, [r3, #8]
+ 380 0302 FFF7FEFF 		bl	naveg_get_control
+ 381 0306 0646     		mov	r6, r0
+ 382 0308 6C46     		mov	r4, sp
+ 383 030a 0A4B     		ldr	r3, .L31
+ 384 030c 93E80300 		ldm	r3, {r0, r1}
+ 385 0310 84E80300 		stm	r4, {r0, r1}
+ 386 0314 2046     		mov	r0, r4
+ 387 0316 FFF7FEFF 		bl	strlen
+ 388 031a 0323     		movs	r3, #3
+ 389 031c 0822     		movs	r2, #8
+ 390 031e 2118     		adds	r1, r4, r0
+ 391 0320 3046     		mov	r0, r6
+ 392 0322 FFF7FEFF 		bl	float_to_str
+ 393 0326 2946     		mov	r1, r5
+ 394 0328 2046     		mov	r0, r4
+ 395 032a FFF7FEFF 		bl	protocol_response
+ 396 032e 08B0     		add	sp, sp, #32
+ 397              		@ sp needed
+ 398 0330 70BD     		pop	{r4, r5, r6, pc}
+ 399              	.L32:
+ 400 0332 00BF     		.align	2
+ 401              	.L31:
+ 402 0334 54010000 		.word	.LC21
+ 404              		.align	1
+ 405              		.syntax unified
+ 406              		.thumb
+ 407              		.thumb_func
+ 408              		.fpu softvfp
+ 410              	control_set_cb:
+ 411              		@ args = 0, pretend = 0, frame = 0
+ 412              		@ frame_needed = 0, uses_anonymous_args = 0
+ 413 0338 70B5     		push	{r4, r5, r6, lr}
+ 414 033a 0446     		mov	r4, r0
+ 415 033c 0368     		ldr	r3, [r0]
+ 416 033e 5868     		ldr	r0, [r3, #4]
+ 417 0340 FFF7FEFF 		bl	atoi
+ 418 0344 0546     		mov	r5, r0
+ 419 0346 2368     		ldr	r3, [r4]
+ 420 0348 9E68     		ldr	r6, [r3, #8]
+ 421 034a D868     		ldr	r0, [r3, #12]
+ 422 034c FFF7FEFF 		bl	atof
+ 423 0350 FFF7FEFF 		bl	__aeabi_d2f
+ 424 0354 0246     		mov	r2, r0
+ 425 0356 3146     		mov	r1, r6
+ 426 0358 2846     		mov	r0, r5
+ 427 035a FFF7FEFF 		bl	naveg_set_control
+ 428 035e 2146     		mov	r1, r4
+ 429 0360 0148     		ldr	r0, .L35
+ 430 0362 FFF7FEFF 		bl	protocol_response
+ 431 0366 70BD     		pop	{r4, r5, r6, pc}
+ 432              	.L36:
+ 433              		.align	2
+ 434              	.L35:
+ 435 0368 4C010000 		.word	.LC20
+ 437              		.align	1
+ 438              		.syntax unified
+ 439              		.thumb
+ 440              		.thumb_func
+ 441              		.fpu softvfp
+ 443              	control_rm_cb:
+ 444              		@ args = 0, pretend = 0, frame = 0
+ 445              		@ frame_needed = 0, uses_anonymous_args = 0
+ 446 036c 10B5     		push	{r4, lr}
+ 447 036e 0446     		mov	r4, r0
+ 448 0370 0368     		ldr	r3, [r0]
+ 449 0372 5868     		ldr	r0, [r3, #4]
+ 450 0374 FFF7FEFF 		bl	atoi
+ 451 0378 2368     		ldr	r3, [r4]
+ 452 037a 9968     		ldr	r1, [r3, #8]
+ 453 037c FFF7FEFF 		bl	naveg_remove_control
+ 454 0380 2146     		mov	r1, r4
+ 455 0382 0248     		ldr	r0, .L39
+ 456 0384 FFF7FEFF 		bl	protocol_response
+ 457 0388 10BD     		pop	{r4, pc}
+ 458              	.L40:
+ 459 038a 00BF     		.align	2
+ 460              	.L39:
+ 461 038c 4C010000 		.word	.LC20
+ 463              		.align	1
+ 464              		.syntax unified
+ 465              		.thumb
+ 466              		.thumb_func
+ 467              		.fpu softvfp
+ 469              	control_add_cb:
+ 470              		@ args = 0, pretend = 0, frame = 0
+ 471              		@ frame_needed = 0, uses_anonymous_args = 0
+ 472 0390 10B5     		push	{r4, lr}
+ 473 0392 0446     		mov	r4, r0
+ 474 0394 0068     		ldr	r0, [r0]
+ 475 0396 FFF7FEFF 		bl	data_parse_control
+ 476 039a FFF7FEFF 		bl	naveg_add_control
+ 477 039e 2146     		mov	r1, r4
+ 478 03a0 0148     		ldr	r0, .L43
+ 479 03a2 FFF7FEFF 		bl	protocol_response
+ 480 03a6 10BD     		pop	{r4, pc}
+ 481              	.L44:
+ 482              		.align	2
+ 483              	.L43:
+ 484 03a8 4C010000 		.word	.LC20
+ 486              		.align	1
+ 487              		.syntax unified
+ 488              		.thumb
+ 489              		.thumb_func
+ 490              		.fpu softvfp
+ 492              	gui_connection_cb:
+ 493              		@ args = 0, pretend = 0, frame = 0
+ 494              		@ frame_needed = 0, uses_anonymous_args = 0
+ 495 03ac 10B5     		push	{r4, lr}
+ 496 03ae 0446     		mov	r4, r0
+ 497 03b0 0368     		ldr	r3, [r0]
+ 498 03b2 0849     		ldr	r1, .L50
+ 499 03b4 1868     		ldr	r0, [r3]
+ 500 03b6 FFF7FEFF 		bl	strcmp
+ 501 03ba 38B1     		cbz	r0, .L49
+ 502 03bc 0020     		movs	r0, #0
+ 503 03be FFF7FEFF 		bl	naveg_ui_connection
+ 504              	.L47:
+ 505 03c2 2146     		mov	r1, r4
+ 506 03c4 0448     		ldr	r0, .L50+4
+ 507 03c6 FFF7FEFF 		bl	protocol_response
+ 508 03ca 10BD     		pop	{r4, pc}
+ 509              	.L49:
+ 510 03cc 0120     		movs	r0, #1
+ 511 03ce FFF7FEFF 		bl	naveg_ui_connection
+ 512 03d2 F6E7     		b	.L47
+ 513              	.L51:
+ 514              		.align	2
+ 515              	.L50:
+ 516 03d4 80000000 		.word	.LC10
+ 517 03d8 4C010000 		.word	.LC20
+ 519              		.align	1
+ 520              		.syntax unified
+ 521              		.thumb
+ 522              		.thumb_func
+ 523              		.fpu softvfp
+ 525              	glcd_draw_cb:
+ 526              		@ args = 0, pretend = 0, frame = 0
+ 527              		@ frame_needed = 0, uses_anonymous_args = 0
+ 528 03dc 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 529 03e0 82B0     		sub	sp, sp, #8
+ 530 03e2 0446     		mov	r4, r0
+ 531 03e4 0368     		ldr	r3, [r0]
+ 532 03e6 5868     		ldr	r0, [r3, #4]
+ 533 03e8 FFF7FEFF 		bl	atoi
+ 534 03ec C5B2     		uxtb	r5, r0
+ 535 03ee 2368     		ldr	r3, [r4]
+ 536 03f0 9868     		ldr	r0, [r3, #8]
+ 537 03f2 FFF7FEFF 		bl	atoi
+ 538 03f6 0646     		mov	r6, r0
+ 539 03f8 2368     		ldr	r3, [r4]
+ 540 03fa D868     		ldr	r0, [r3, #12]
+ 541 03fc FFF7FEFF 		bl	atoi
+ 542 0400 012D     		cmp	r5, #1
+ 543 0402 02D9     		bls	.L55
+ 544              	.L52:
+ 545 0404 02B0     		add	sp, sp, #8
+ 546              		@ sp needed
+ 547 0406 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 548              	.L55:
+ 549 040a 0746     		mov	r7, r0
+ 550 040c DFF83080 		ldr	r8, .L56+4
+ 551 0410 2368     		ldr	r3, [r4]
+ 552 0412 40F61842 		movw	r2, #3096
+ 553 0416 4146     		mov	r1, r8
+ 554 0418 1869     		ldr	r0, [r3, #16]
+ 555 041a FFF7FEFF 		bl	str_to_hex
+ 556 041e 2846     		mov	r0, r5
+ 557 0420 FFF7FEFF 		bl	hardware_glcds
+ 558 0424 0123     		movs	r3, #1
+ 559 0426 0093     		str	r3, [sp]
+ 560 0428 4346     		mov	r3, r8
+ 561 042a FAB2     		uxtb	r2, r7
+ 562 042c F1B2     		uxtb	r1, r6
+ 563 042e FFF7FEFF 		bl	uc1701_draw_image
+ 564 0432 2146     		mov	r1, r4
+ 565 0434 0148     		ldr	r0, .L56
+ 566 0436 FFF7FEFF 		bl	protocol_response
+ 567 043a E3E7     		b	.L52
+ 568              	.L57:
+ 569              		.align	2
+ 570              	.L56:
+ 571 043c 4C010000 		.word	.LC20
+ 572 0440 04000000 		.word	.LANCHOR0+4
+ 574              		.align	1
+ 575              		.syntax unified
+ 576              		.thumb
+ 577              		.thumb_func
+ 578              		.fpu softvfp
+ 580              	glcd_dialog_cb:
+ 581              		@ args = 0, pretend = 0, frame = 16
+ 582              		@ frame_needed = 0, uses_anonymous_args = 0
+ 583 0444 10B5     		push	{r4, lr}
+ 584 0446 84B0     		sub	sp, sp, #16
+ 585 0448 0446     		mov	r4, r0
+ 586 044a 0368     		ldr	r3, [r0]
+ 587 044c 5868     		ldr	r0, [r3, #4]
+ 588 044e FFF7FEFF 		bl	naveg_dialog
+ 589 0452 0246     		mov	r2, r0
+ 590 0454 6B46     		mov	r3, sp
+ 591 0456 0849     		ldr	r1, .L60
+ 592 0458 03C9     		ldm	r1, {r0, r1}
+ 593 045a 83E80300 		stm	r3, {r0, r1}
+ 594 045e 3032     		adds	r2, r2, #48
+ 595 0460 8DF80720 		strb	r2, [sp, #7]
+ 596 0464 0022     		movs	r2, #0
+ 597 0466 8DF80820 		strb	r2, [sp, #8]
+ 598 046a 2146     		mov	r1, r4
+ 599 046c 1846     		mov	r0, r3
+ 600 046e FFF7FEFF 		bl	protocol_response
+ 601 0472 04B0     		add	sp, sp, #16
+ 602              		@ sp needed
+ 603 0474 10BD     		pop	{r4, pc}
+ 604              	.L61:
+ 605 0476 00BF     		.align	2
+ 606              	.L60:
+ 607 0478 54010000 		.word	.LC21
+ 609              		.align	1
+ 610              		.syntax unified
+ 611              		.thumb
+ 612              		.thumb_func
+ 613              		.fpu softvfp
+ 615              	glcd_text_cb:
+ 616              		@ args = 0, pretend = 0, frame = 0
+ 617              		@ frame_needed = 0, uses_anonymous_args = 0
+ 618 047c F0B5     		push	{r4, r5, r6, r7, lr}
+ 619 047e 83B0     		sub	sp, sp, #12
+ 620 0480 0446     		mov	r4, r0
+ 621 0482 0368     		ldr	r3, [r0]
+ 622 0484 5868     		ldr	r0, [r3, #4]
+ 623 0486 FFF7FEFF 		bl	atoi
+ 624 048a C5B2     		uxtb	r5, r0
+ 625 048c 2368     		ldr	r3, [r4]
+ 626 048e 9868     		ldr	r0, [r3, #8]
+ 627 0490 FFF7FEFF 		bl	atoi
+ 628 0494 0646     		mov	r6, r0
+ 629 0496 2368     		ldr	r3, [r4]
+ 630 0498 D868     		ldr	r0, [r3, #12]
+ 631 049a FFF7FEFF 		bl	atoi
+ 632 049e 012D     		cmp	r5, #1
+ 633 04a0 01D9     		bls	.L65
+ 634              	.L62:
+ 635 04a2 03B0     		add	sp, sp, #12
+ 636              		@ sp needed
+ 637 04a4 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 638              	.L65:
+ 639 04a6 0746     		mov	r7, r0
+ 640 04a8 2846     		mov	r0, r5
+ 641 04aa FFF7FEFF 		bl	hardware_glcds
+ 642 04ae 2368     		ldr	r3, [r4]
+ 643 04b0 1B69     		ldr	r3, [r3, #16]
+ 644 04b2 0122     		movs	r2, #1
+ 645 04b4 0192     		str	r2, [sp, #4]
+ 646 04b6 0022     		movs	r2, #0
+ 647 04b8 0092     		str	r2, [sp]
+ 648 04ba FAB2     		uxtb	r2, r7
+ 649 04bc F1B2     		uxtb	r1, r6
+ 650 04be FFF7FEFF 		bl	uc1701_text
+ 651 04c2 2146     		mov	r1, r4
+ 652 04c4 0148     		ldr	r0, .L66
+ 653 04c6 FFF7FEFF 		bl	protocol_response
+ 654 04ca EAE7     		b	.L62
+ 655              	.L67:
+ 656              		.align	2
+ 657              	.L66:
+ 658 04cc 4C010000 		.word	.LC20
+ 660              		.align	1
+ 661              		.syntax unified
+ 662              		.thumb
+ 663              		.thumb_func
+ 664              		.fpu softvfp
+ 666              	led_cb:
+ 667              		@ args = 0, pretend = 0, frame = 0
+ 668              		@ frame_needed = 0, uses_anonymous_args = 0
+ 669 04d0 70B5     		push	{r4, r5, r6, lr}
+ 670 04d2 0446     		mov	r4, r0
+ 671 04d4 0368     		ldr	r3, [r0]
+ 672 04d6 5868     		ldr	r0, [r3, #4]
+ 673 04d8 FFF7FEFF 		bl	atoi
+ 674 04dc C0B2     		uxtb	r0, r0
+ 675 04de FFF7FEFF 		bl	hardware_leds
+ 676 04e2 0546     		mov	r5, r0
+ 677 04e4 2368     		ldr	r3, [r4]
+ 678 04e6 9868     		ldr	r0, [r3, #8]
+ 679 04e8 FFF7FEFF 		bl	atoi
+ 680 04ec 0246     		mov	r2, r0
+ 681 04ee 0121     		movs	r1, #1
+ 682 04f0 2846     		mov	r0, r5
+ 683 04f2 FFF7FEFF 		bl	ledz_set
+ 684 04f6 2368     		ldr	r3, [r4]
+ 685 04f8 D868     		ldr	r0, [r3, #12]
+ 686 04fa FFF7FEFF 		bl	atoi
+ 687 04fe 0246     		mov	r2, r0
+ 688 0500 0221     		movs	r1, #2
+ 689 0502 2846     		mov	r0, r5
+ 690 0504 FFF7FEFF 		bl	ledz_set
+ 691 0508 2368     		ldr	r3, [r4]
+ 692 050a 1869     		ldr	r0, [r3, #16]
+ 693 050c FFF7FEFF 		bl	atoi
+ 694 0510 0246     		mov	r2, r0
+ 695 0512 0421     		movs	r1, #4
+ 696 0514 2846     		mov	r0, r5
+ 697 0516 FFF7FEFF 		bl	ledz_set
+ 698 051a 6368     		ldr	r3, [r4, #4]
+ 699 051c 072B     		cmp	r3, #7
+ 700 051e 04D0     		beq	.L71
+ 701              	.L69:
+ 702 0520 2146     		mov	r1, r4
+ 703 0522 0A48     		ldr	r0, .L72
+ 704 0524 FFF7FEFF 		bl	protocol_response
+ 705 0528 70BD     		pop	{r4, r5, r6, pc}
+ 706              	.L71:
+ 707 052a 2368     		ldr	r3, [r4]
+ 708 052c 5869     		ldr	r0, [r3, #20]
+ 709 052e FFF7FEFF 		bl	atoi
+ 710 0532 0646     		mov	r6, r0
+ 711 0534 2368     		ldr	r3, [r4]
+ 712 0536 9869     		ldr	r0, [r3, #24]
+ 713 0538 FFF7FEFF 		bl	atoi
+ 714 053c 83B2     		uxth	r3, r0
+ 715 053e B2B2     		uxth	r2, r6
+ 716 0540 0721     		movs	r1, #7
+ 717 0542 2846     		mov	r0, r5
+ 718 0544 FFF7FEFF 		bl	ledz_blink
+ 719 0548 EAE7     		b	.L69
+ 720              	.L73:
+ 721 054a 00BF     		.align	2
+ 722              	.L72:
+ 723 054c 4C010000 		.word	.LC20
+ 725              		.align	1
+ 726              		.syntax unified
+ 727              		.thumb
+ 728              		.thumb_func
+ 729              		.fpu softvfp
+ 731              	actuators_cb:
+ 732              		@ args = 0, pretend = 0, frame = 8
+ 733              		@ frame_needed = 0, uses_anonymous_args = 0
+ 734 0550 30B5     		push	{r4, r5, lr}
+ 735 0552 83B0     		sub	sp, sp, #12
+ 736 0554 164B     		ldr	r3, .L79
+ 737 0556 93F81C1C 		ldrb	r1, [r3, #3100]	@ zero_extendqisi2
+ 738 055a 03F54263 		add	r3, r3, #3104
+ 739 055e 03EB8104 		add	r4, r3, r1, lsl #2
+ 740 0562 0194     		str	r4, [sp, #4]
+ 741 0564 4A1C     		adds	r2, r1, #1
+ 742 0566 D2B2     		uxtb	r2, r2
+ 743 0568 052A     		cmp	r2, #5
+ 744 056a 1CD0     		beq	.L75
+ 745 056c A3F54265 		sub	r5, r3, #3104
+ 746 0570 85F81C2C 		strb	r2, [r5, #3100]
+ 747              	.L76:
+ 748 0574 4278     		ldrb	r2, [r0, #1]	@ zero_extendqisi2
+ 749 0576 03F82120 		strb	r2, [r3, r1, lsl #2]
+ 750 057a 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 751 057c 6370     		strb	r3, [r4, #1]
+ 752 057e FFF7FEFF 		bl	actuator_get_status
+ 753 0582 A070     		strb	r0, [r4, #2]
+ 754 0584 0023     		movs	r3, #0
+ 755 0586 02AA     		add	r2, sp, #8
+ 756 0588 42F8083D 		str	r3, [r2, #-8]!
+ 757 058c 01A9     		add	r1, sp, #4
+ 758 058e 0848     		ldr	r0, .L79
+ 759 0590 0068     		ldr	r0, [r0]
+ 760 0592 FFF7FEFF 		bl	xQueueGenericSendFromISR
+ 761 0596 009B     		ldr	r3, [sp]
+ 762 0598 1BB1     		cbz	r3, .L74
+ 763 059a 064B     		ldr	r3, .L79+4
+ 764 059c 4FF08052 		mov	r2, #268435456
+ 765 05a0 1A60     		str	r2, [r3]
+ 766              	.L74:
+ 767 05a2 03B0     		add	sp, sp, #12
+ 768              		@ sp needed
+ 769 05a4 30BD     		pop	{r4, r5, pc}
+ 770              	.L75:
+ 771 05a6 024A     		ldr	r2, .L79
+ 772 05a8 0025     		movs	r5, #0
+ 773 05aa 82F81C5C 		strb	r5, [r2, #3100]
+ 774 05ae E1E7     		b	.L76
+ 775              	.L80:
+ 776              		.align	2
+ 777              	.L79:
+ 778 05b0 00000000 		.word	.LANCHOR0
+ 779 05b4 04ED00E0 		.word	-536810236
+ 781              		.align	1
+ 782              		.syntax unified
+ 783              		.thumb
+ 784              		.thumb_func
+ 785              		.fpu softvfp
+ 787              	displays_task:
+ 788              		@ args = 0, pretend = 0, frame = 0
+ 789              		@ frame_needed = 0, uses_anonymous_args = 0
+ 790 05b8 70B5     		push	{r4, r5, r6, lr}
+ 791 05ba 0020     		movs	r0, #0
+ 792 05bc FFF7FEFF 		bl	hardware_glcds
+ 793 05c0 FFF7FEFF 		bl	uc1701_update
+ 794 05c4 0025     		movs	r5, #0
+ 795 05c6 0124     		movs	r4, #1
+ 796 05c8 0C4E     		ldr	r6, .L88
+ 797 05ca 0CE0     		b	.L82
+ 798              	.L86:
+ 799 05cc 0025     		movs	r5, #0
+ 800              	.L83:
+ 801 05ce FFF7FEFF 		bl	vPortYield
+ 802 05d2 2046     		mov	r0, r4
+ 803 05d4 FFF7FEFF 		bl	hardware_glcds
+ 804 05d8 FFF7FEFF 		bl	uc1701_update
+ 805 05dc 0134     		adds	r4, r4, #1
+ 806 05de E4B2     		uxtb	r4, r4
+ 807 05e0 022C     		cmp	r4, #2
+ 808 05e2 08BF     		it	eq
+ 809 05e4 0024     		moveq	r4, #0
+ 810              	.L82:
+ 811 05e6 FFF7FEFF 		bl	naveg_need_update
+ 812 05ea 0028     		cmp	r0, #0
+ 813 05ec EED0     		beq	.L86
+ 814 05ee 0135     		adds	r5, r5, #1
+ 815 05f0 B542     		cmp	r5, r6
+ 816 05f2 ECD1     		bne	.L83
+ 817 05f4 FFF7FEFF 		bl	naveg_update
+ 818 05f8 0025     		movs	r5, #0
+ 819 05fa E8E7     		b	.L83
+ 820              	.L89:
+ 821              		.align	2
+ 822              	.L88:
+ 823 05fc 20A10700 		.word	500000
+ 825              		.align	1
+ 826              		.syntax unified
+ 827              		.thumb
+ 828              		.thumb_func
+ 829              		.fpu softvfp
+ 831              	cli_task:
+ 832              		@ Volatile: function does not return.
+ 833              		@ args = 0, pretend = 0, frame = 0
+ 834              		@ frame_needed = 0, uses_anonymous_args = 0
+ 835 0600 08B5     		push	{r3, lr}
+ 836              	.L91:
+ 837 0602 FFF7FEFF 		bl	cli_process
+ 838 0606 FCE7     		b	.L91
+ 840              		.align	1
+ 841              		.syntax unified
+ 842              		.thumb
+ 843              		.thumb_func
+ 844              		.fpu softvfp
+ 846              	actuators_task:
+ 847              		@ args = 0, pretend = 0, frame = 8
+ 848              		@ frame_needed = 0, uses_anonymous_args = 0
+ 849 0608 F0B5     		push	{r4, r5, r6, r7, lr}
+ 850 060a 83B0     		sub	sp, sp, #12
+ 851 060c 3A4D     		ldr	r5, .L117
+ 852 060e 0024     		movs	r4, #0
+ 853 0610 26E0     		b	.L95
+ 854              	.L113:
+ 855 0612 16F0010F 		tst	r6, #1
+ 856 0616 10D1     		bne	.L110
+ 857              	.L98:
+ 858 0618 16F0080F 		tst	r6, #8
+ 859 061c 43D0     		beq	.L99
+ 860 061e 87B1     		cbz	r7, .L100
+ 861 0620 3846     		mov	r0, r7
+ 862 0622 FFF7FEFF 		bl	naveg_master_volume
+ 863 0626 16F0040F 		tst	r6, #4
+ 864 062a 0ED0     		beq	.L102
+ 865              	.L101:
+ 866 062c FFF7FEFF 		bl	naveg_is_master_vol
+ 867 0630 58B1     		cbz	r0, .L102
+ 868 0632 3846     		mov	r0, r7
+ 869 0634 FFF7FEFF 		bl	naveg_master_volume
+ 870 0638 07E0     		b	.L102
+ 871              	.L110:
+ 872 063a 3846     		mov	r0, r7
+ 873 063c FFF7FEFF 		bl	naveg_enter
+ 874 0640 EAE7     		b	.L98
+ 875              	.L100:
+ 876 0642 2146     		mov	r1, r4
+ 877 0644 2046     		mov	r0, r4
+ 878 0646 FFF7FEFF 		bl	naveg_toggle_tool
+ 879              	.L102:
+ 880 064a 16F0200F 		tst	r6, #32
+ 881 064e 30D1     		bne	.L111
+ 882              	.L103:
+ 883 0650 16F0400F 		tst	r6, #64
+ 884 0654 34D1     		bne	.L112
+ 885              	.L104:
+ 886 0656 3846     		mov	r0, r7
+ 887 0658 FFF7FEFF 		bl	hardware_glcds
+ 888 065c FFF7FEFF 		bl	uc1701_update
+ 889              	.L95:
+ 890 0660 2346     		mov	r3, r4
+ 891 0662 4FF0FF32 		mov	r2, #-1
+ 892 0666 01A9     		add	r1, sp, #4
+ 893 0668 2868     		ldr	r0, [r5]
+ 894 066a FFF7FEFF 		bl	xQueueGenericReceive
+ 895 066e 0128     		cmp	r0, #1
+ 896 0670 F6D1     		bne	.L95
+ 897 0672 FFF7FEFF 		bl	cli_restore
+ 898 0676 0128     		cmp	r0, #1
+ 899 0678 F2D1     		bne	.L95
+ 900 067a 019B     		ldr	r3, [sp, #4]
+ 901 067c 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 902 067e 5F78     		ldrb	r7, [r3, #1]	@ zero_extendqisi2
+ 903 0680 9E78     		ldrb	r6, [r3, #2]	@ zero_extendqisi2
+ 904 0682 012A     		cmp	r2, #1
+ 905 0684 C5D0     		beq	.L113
+ 906 0686 022A     		cmp	r2, #2
+ 907 0688 21D0     		beq	.L114
+ 908 068a 002A     		cmp	r2, #0
+ 909 068c E8D1     		bne	.L95
+ 910 068e 16F0020F 		tst	r6, #2
+ 911 0692 2CD1     		bne	.L115
+ 912              	.L107:
+ 913 0694 012F     		cmp	r7, #1
+ 914 0696 94BF     		ite	ls
+ 915 0698 0020     		movls	r0, #0
+ 916 069a 0120     		movhi	r0, #1
+ 917 069c FFF7FEFF 		bl	hardware_glcds
+ 918 06a0 FFF7FEFF 		bl	uc1701_update
+ 919 06a4 DCE7     		b	.L95
+ 920              	.L99:
+ 921 06a6 16F0040F 		tst	r6, #4
+ 922 06aa CED0     		beq	.L102
+ 923 06ac 002F     		cmp	r7, #0
+ 924 06ae CCD0     		beq	.L102
+ 925 06b0 BCE7     		b	.L101
+ 926              	.L111:
+ 927 06b2 3846     		mov	r0, r7
+ 928 06b4 FFF7FEFF 		bl	naveg_inc_control
+ 929 06b8 3846     		mov	r0, r7
+ 930 06ba FFF7FEFF 		bl	naveg_down
+ 931 06be C7E7     		b	.L103
+ 932              	.L112:
+ 933 06c0 3846     		mov	r0, r7
+ 934 06c2 FFF7FEFF 		bl	naveg_dec_control
+ 935 06c6 3846     		mov	r0, r7
+ 936 06c8 FFF7FEFF 		bl	naveg_up
+ 937 06cc C3E7     		b	.L104
+ 938              	.L114:
+ 939 06ce 16F0800F 		tst	r6, #128
+ 940 06d2 08D1     		bne	.L116
+ 941              	.L106:
+ 942 06d4 032F     		cmp	r7, #3
+ 943 06d6 94BF     		ite	ls
+ 944 06d8 0020     		movls	r0, #0
+ 945 06da 0120     		movhi	r0, #1
+ 946 06dc FFF7FEFF 		bl	hardware_glcds
+ 947 06e0 FFF7FEFF 		bl	uc1701_update
+ 948 06e4 BCE7     		b	.L95
+ 949              	.L116:
+ 950 06e6 3846     		mov	r0, r7
+ 951 06e8 FFF7FEFF 		bl	naveg_pot_change
+ 952 06ec F2E7     		b	.L106
+ 953              	.L115:
+ 954 06ee 3846     		mov	r0, r7
+ 955 06f0 FFF7FEFF 		bl	naveg_foot_change
+ 956 06f4 CEE7     		b	.L107
+ 957              	.L118:
+ 958 06f6 00BF     		.align	2
+ 959              	.L117:
+ 960 06f8 00000000 		.word	.LANCHOR0
+ 962              		.align	1
+ 963              		.syntax unified
+ 964              		.thumb
+ 965              		.thumb_func
+ 966              		.fpu softvfp
+ 968              	procotol_task:
+ 969              		@ args = 0, pretend = 0, frame = 16
+ 970              		@ frame_needed = 0, uses_anonymous_args = 0
+ 971 06fc 70B5     		push	{r4, r5, r6, lr}
+ 972 06fe 84B0     		sub	sp, sp, #16
+ 973 0700 094D     		ldr	r5, .L124
+ 974 0702 0024     		movs	r4, #0
+ 975 0704 40F61846 		movw	r6, #3096
+ 976              	.L120:
+ 977 0708 FFF7FEFF 		bl	comm_webgui_read
+ 978 070c 2346     		mov	r3, r4
+ 979 070e 3246     		mov	r2, r6
+ 980 0710 2946     		mov	r1, r5
+ 981 0712 FFF7FEFF 		bl	ringbuff_read_until
+ 982 0716 0028     		cmp	r0, #0
+ 983 0718 F6D0     		beq	.L120
+ 984 071a 0194     		str	r4, [sp, #4]
+ 985 071c 0295     		str	r5, [sp, #8]
+ 986 071e 0390     		str	r0, [sp, #12]
+ 987 0720 01A8     		add	r0, sp, #4
+ 988 0722 FFF7FEFF 		bl	protocol_parse
+ 989 0726 EFE7     		b	.L120
+ 990              	.L125:
+ 991              		.align	2
+ 992              	.L124:
+ 993 0728 04000000 		.word	.LANCHOR0+4
+ 995              		.align	1
+ 996              		.global	main
+ 997              		.syntax unified
+ 998              		.thumb
+ 999              		.thumb_func
+ 1000              		.fpu softvfp
+ 1002              	main:
+ 1003              		@ Volatile: function does not return.
+ 1004              		@ args = 0, pretend = 0, frame = 0
+ 1005              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1006 072c 00B5     		push	{lr}
+ 1007 072e 85B0     		sub	sp, sp, #20
+ 1008 0730 FFF7FEFF 		bl	hardware_setup
+ 1009 0734 0021     		movs	r1, #0
+ 1010 0736 0391     		str	r1, [sp, #12]
+ 1011 0738 0291     		str	r1, [sp, #8]
+ 1012 073a 0191     		str	r1, [sp, #4]
+ 1013 073c 0123     		movs	r3, #1
+ 1014 073e 0093     		str	r3, [sp]
+ 1015 0740 0B46     		mov	r3, r1
+ 1016 0742 4FF48072 		mov	r2, #256
+ 1017 0746 0348     		ldr	r0, .L129
+ 1018 0748 FFF7FEFF 		bl	xTaskGenericCreate
+ 1019 074c FFF7FEFF 		bl	vTaskStartScheduler
+ 1020              	.L127:
+ 1021 0750 FEE7     		b	.L127
+ 1022              	.L130:
+ 1023 0752 00BF     		.align	2
+ 1024              	.L129:
+ 1025 0754 00000000 		.word	setup_task
+ 1027              		.align	1
+ 1028              		.global	serial_error
+ 1029              		.syntax unified
+ 1030              		.thumb
+ 1031              		.thumb_func
+ 1032              		.fpu softvfp
+ 1034              	serial_error:
+ 1035              		@ args = 0, pretend = 0, frame = 0
+ 1036              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1037              		@ link register save eliminated.
+ 1038 0758 7047     		bx	lr
+ 1040              		.align	1
+ 1041              		.global	HardFault_Handler
+ 1042              		.syntax unified
+ 1043              		.thumb
+ 1044              		.thumb_func
+ 1045              		.fpu softvfp
+ 1047              	HardFault_Handler:
+ 1048              		@ Volatile: function does not return.
+ 1049              		@ args = 0, pretend = 0, frame = 0
+ 1050              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1051 075a 08B5     		push	{r3, lr}
+ 1052 075c 0020     		movs	r0, #0
+ 1053 075e FFF7FEFF 		bl	hardware_leds
+ 1054 0762 0621     		movs	r1, #6
+ 1055 0764 FFF7FEFF 		bl	ledz_on
+ 1056              	.L133:
+ 1057 0768 FEE7     		b	.L133
+ 1059              		.align	1
+ 1060              		.global	MemManage_Handler
+ 1061              		.syntax unified
+ 1062              		.thumb
+ 1063              		.thumb_func
+ 1064              		.fpu softvfp
+ 1066              	MemManage_Handler:
+ 1067              		@ Volatile: function does not return.
+ 1068              		@ args = 0, pretend = 0, frame = 0
+ 1069              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1070 076a 08B5     		push	{r3, lr}
+ 1071 076c 0120     		movs	r0, #1
+ 1072 076e FFF7FEFF 		bl	hardware_leds
+ 1073 0772 0621     		movs	r1, #6
+ 1074 0774 FFF7FEFF 		bl	ledz_on
+ 1075              	.L136:
+ 1076 0778 FEE7     		b	.L136
+ 1078              		.align	1
+ 1079              		.global	BusFault_Handler
+ 1080              		.syntax unified
+ 1081              		.thumb
+ 1082              		.thumb_func
+ 1083              		.fpu softvfp
+ 1085              	BusFault_Handler:
+ 1086              		@ Volatile: function does not return.
+ 1087              		@ args = 0, pretend = 0, frame = 0
+ 1088              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1089 077a 08B5     		push	{r3, lr}
+ 1090 077c 0220     		movs	r0, #2
+ 1091 077e FFF7FEFF 		bl	hardware_leds
+ 1092 0782 0621     		movs	r1, #6
+ 1093 0784 FFF7FEFF 		bl	ledz_on
+ 1094              	.L139:
+ 1095 0788 FEE7     		b	.L139
+ 1097              		.align	1
+ 1098              		.global	UsageFault_Handler
+ 1099              		.syntax unified
+ 1100              		.thumb
+ 1101              		.thumb_func
+ 1102              		.fpu softvfp
+ 1104              	UsageFault_Handler:
+ 1105              		@ Volatile: function does not return.
+ 1106              		@ args = 0, pretend = 0, frame = 0
+ 1107              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1108 078a 08B5     		push	{r3, lr}
+ 1109 078c 0320     		movs	r0, #3
+ 1110 078e FFF7FEFF 		bl	hardware_leds
+ 1111 0792 0621     		movs	r1, #6
+ 1112 0794 FFF7FEFF 		bl	ledz_on
+ 1113              	.L142:
+ 1114 0798 FEE7     		b	.L142
+ 1116              		.align	1
+ 1117              		.global	vApplicationMallocFailedHook
+ 1118              		.syntax unified
+ 1119              		.thumb
+ 1120              		.thumb_func
+ 1121              		.fpu softvfp
+ 1123              	vApplicationMallocFailedHook:
+ 1124              		@ Volatile: function does not return.
+ 1125              		@ args = 0, pretend = 0, frame = 0
+ 1126              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1127 079a 08B5     		push	{r3, lr}
+ 1128 079c 0420     		movs	r0, #4
+ 1129 079e FFF7FEFF 		bl	hardware_leds
+ 1130 07a2 0621     		movs	r1, #6
+ 1131 07a4 FFF7FEFF 		bl	ledz_on
+ 1132              	.L145:
+ 1133 07a8 FEE7     		b	.L145
+ 1135              		.align	1
+ 1136              		.global	vApplicationStackOverflowHook
+ 1137              		.syntax unified
+ 1138              		.thumb
+ 1139              		.thumb_func
+ 1140              		.fpu softvfp
+ 1142              	vApplicationStackOverflowHook:
+ 1143              		@ args = 0, pretend = 0, frame = 0
+ 1144              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1145 07aa F0B5     		push	{r4, r5, r6, r7, lr}
+ 1146 07ac 83B0     		sub	sp, sp, #12
+ 1147 07ae 0F46     		mov	r7, r1
+ 1148 07b0 0020     		movs	r0, #0
+ 1149 07b2 FFF7FEFF 		bl	hardware_glcds
+ 1150 07b6 0546     		mov	r5, r0
+ 1151 07b8 0021     		movs	r1, #0
+ 1152 07ba FFF7FEFF 		bl	uc1701_clear
+ 1153 07be 0126     		movs	r6, #1
+ 1154 07c0 0196     		str	r6, [sp, #4]
+ 1155 07c2 0024     		movs	r4, #0
+ 1156 07c4 0094     		str	r4, [sp]
+ 1157 07c6 0C4B     		ldr	r3, .L150
+ 1158 07c8 2246     		mov	r2, r4
+ 1159 07ca 2146     		mov	r1, r4
+ 1160 07cc 2846     		mov	r0, r5
+ 1161 07ce FFF7FEFF 		bl	uc1701_text
+ 1162 07d2 0196     		str	r6, [sp, #4]
+ 1163 07d4 0094     		str	r4, [sp]
+ 1164 07d6 3B46     		mov	r3, r7
+ 1165 07d8 0A22     		movs	r2, #10
+ 1166 07da 2146     		mov	r1, r4
+ 1167 07dc 2846     		mov	r0, r5
+ 1168 07de FFF7FEFF 		bl	uc1701_text
+ 1169 07e2 2846     		mov	r0, r5
+ 1170 07e4 FFF7FEFF 		bl	uc1701_update
+ 1171 07e8 0520     		movs	r0, #5
+ 1172 07ea FFF7FEFF 		bl	hardware_leds
+ 1173 07ee 0621     		movs	r1, #6
+ 1174 07f0 FFF7FEFF 		bl	ledz_on
+ 1175              	.L148:
+ 1176 07f4 FEE7     		b	.L148
+ 1177              	.L151:
+ 1178 07f6 00BF     		.align	2
+ 1179              	.L150:
+ 1180 07f8 5C010000 		.word	.LC22
+ 1182              		.bss
+ 1183              		.align	2
+ 1184              		.set	.LANCHOR0,. + 0
+ 1187              	g_actuators_queue:
+ 1188 0000 00000000 		.space	4
+ 1191              	g_msg_buffer:
+ 1192 0004 00000000 		.space	3096
+ 1192      00000000 
+ 1192      00000000 
+ 1192      00000000 
+ 1192      00000000 
+ 1195              	i.9024:
+ 1196 0c1c 00       		.space	1
+ 1197 0c1d 000000   		.space	3
+ 1200              	info.9025:
+ 1201 0c20 00000000 		.space	20
+ 1201      00000000 
+ 1201      00000000 
+ 1201      00000000 
+ 1201      00000000 
+ 1202              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 1203              		.align	2
+ 1204              	.LC0:
+ 1205 0000 70726F74 		.ascii	"proto\000"
+ 1205      6F00
+ 1206 0006 0000     		.space	2
+ 1207              	.LC1:
+ 1208 0008 61637400 		.ascii	"act\000"
+ 1209              	.LC2:
+ 1210 000c 636C6900 		.ascii	"cli\000"
+ 1211              	.LC3:
+ 1212 0010 64697370 		.ascii	"disp\000"
+ 1212      00
+ 1213 0015 000000   		.space	3
+ 1214              	.LC4:
+ 1215 0018 70696E67 		.ascii	"ping\000"
+ 1215      00
+ 1216 001d 000000   		.space	3
+ 1217              	.LC5:
+ 1218 0020 73617920 		.ascii	"say %s ...\000"
+ 1218      2573202E 
+ 1218      2E2E00
+ 1219 002b 00       		.space	1
+ 1220              	.LC6:
+ 1221 002c 6C656420 		.ascii	"led %i %i %i %i ...\000"
+ 1221      25692025 
+ 1221      69202569 
+ 1221      20256920 
+ 1221      2E2E2E00 
+ 1222              	.LC7:
+ 1223 0040 676C6364 		.ascii	"glcd_text %i %i %i %s\000"
+ 1223      5F746578 
+ 1223      74202569 
+ 1223      20256920 
+ 1223      25692025 
+ 1224 0056 0000     		.space	2
+ 1225              	.LC8:
+ 1226 0058 676C6364 		.ascii	"glcd_dialog %s\000"
+ 1226      5F646961 
+ 1226      6C6F6720 
+ 1226      257300
+ 1227 0067 00       		.space	1
+ 1228              	.LC9:
+ 1229 0068 676C6364 		.ascii	"glcd_draw %i %i %i %s\000"
+ 1229      5F647261 
+ 1229      77202569 
+ 1229      20256920 
+ 1229      25692025 
+ 1230 007e 0000     		.space	2
+ 1231              	.LC10:
+ 1232 0080 75695F63 		.ascii	"ui_con\000"
+ 1232      6F6E00
+ 1233 0087 00       		.space	1
+ 1234              	.LC11:
+ 1235 0088 75695F64 		.ascii	"ui_dis\000"
+ 1235      697300
+ 1236 008f 00       		.space	1
+ 1237              	.LC12:
+ 1238 0090 636F6E74 		.ascii	"control_add %i %s %s %i %s %f %f %f %i %i %i %i %i "
+ 1238      726F6C5F 
+ 1238      61646420 
+ 1238      25692025 
+ 1238      73202573 
+ 1239 00c3 25692025 		.ascii	"%i %i ...\000"
+ 1239      69202E2E 
+ 1239      2E00
+ 1240 00cd 000000   		.space	3
+ 1241              	.LC13:
+ 1242 00d0 636F6E74 		.ascii	"control_rm %i %s\000"
+ 1242      726F6C5F 
+ 1242      726D2025 
+ 1242      69202573 
+ 1242      00
+ 1243 00e1 000000   		.space	3
+ 1244              	.LC14:
+ 1245 00e4 636F6E74 		.ascii	"control_set %i %s %f\000"
+ 1245      726F6C5F 
+ 1245      73657420 
+ 1245      25692025 
+ 1245      73202566 
+ 1246 00f9 000000   		.space	3
+ 1247              	.LC15:
+ 1248 00fc 636F6E74 		.ascii	"control_get %i %s\000"
+ 1248      726F6C5F 
+ 1248      67657420 
+ 1248      25692025 
+ 1248      7300
+ 1249 010e 0000     		.space	2
+ 1250              	.LC16:
+ 1251 0110 696E6974 		.ascii	"initial_state %s %s ...\000"
+ 1251      69616C5F 
+ 1251      73746174 
+ 1251      65202573 
+ 1251      20257320 
+ 1252              	.LC17:
+ 1253 0128 74756E65 		.ascii	"tuner %f %s %i\000"
+ 1253      72202566 
+ 1253      20257320 
+ 1253      256900
+ 1254 0137 00       		.space	1
+ 1255              	.LC18:
+ 1256 0138 72657370 		.ascii	"resp %i ...\000"
+ 1256      20256920 
+ 1256      2E2E2E00 
+ 1257              	.LC19:
+ 1258 0144 72657374 		.ascii	"restore\000"
+ 1258      6F726500 
+ 1259              	.LC20:
+ 1260 014c 72657370 		.ascii	"resp 0\000"
+ 1260      203000
+ 1261 0153 00       		.space	1
+ 1262              	.LC21:
+ 1263 0154 72657370 		.ascii	"resp 0 \000"
+ 1263      20302000 
+ 1264              	.LC22:
+ 1265 015c 73746163 		.ascii	"stack overflow\000"
+ 1265      6B206F76 
+ 1265      6572666C 
+ 1265      6F7700
+ 1266              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.c
+     /tmp/ccfMDBAb.s:13     .text:0000000000000000 $t
+     /tmp/ccfMDBAb.s:19     .text:0000000000000000 setup_task
+     /tmp/ccfMDBAb.s:192    .text:00000000000001b0 $d
+     /tmp/ccfMDBAb.s:968    .text:00000000000006fc procotol_task
+     /tmp/ccfMDBAb.s:846    .text:0000000000000608 actuators_task
+     /tmp/ccfMDBAb.s:831    .text:0000000000000600 cli_task
+     /tmp/ccfMDBAb.s:787    .text:00000000000005b8 displays_task
+     /tmp/ccfMDBAb.s:731    .text:0000000000000550 actuators_cb
+     /tmp/ccfMDBAb.s:299    .text:0000000000000292 ping_cb
+     /tmp/ccfMDBAb.s:283    .text:0000000000000284 say_cb
+     /tmp/ccfMDBAb.s:666    .text:00000000000004d0 led_cb
+     /tmp/ccfMDBAb.s:615    .text:000000000000047c glcd_text_cb
+     /tmp/ccfMDBAb.s:580    .text:0000000000000444 glcd_dialog_cb
+     /tmp/ccfMDBAb.s:525    .text:00000000000003dc glcd_draw_cb
+     /tmp/ccfMDBAb.s:492    .text:00000000000003ac gui_connection_cb
+     /tmp/ccfMDBAb.s:469    .text:0000000000000390 control_add_cb
+     /tmp/ccfMDBAb.s:443    .text:000000000000036c control_rm_cb
+     /tmp/ccfMDBAb.s:410    .text:0000000000000338 control_set_cb
+     /tmp/ccfMDBAb.s:369    .text:00000000000002f0 control_get_cb
+     /tmp/ccfMDBAb.s:264    .text:0000000000000274 initial_state_cb
+     /tmp/ccfMDBAb.s:333    .text:00000000000002ae tuner_cb
+     /tmp/ccfMDBAb.s:318    .text:00000000000002a4 resp_cb
+     /tmp/ccfMDBAb.s:242    .text:000000000000025c restore_cb
+     /tmp/ccfMDBAb.s:236    .text:000000000000025c $t
+     /tmp/ccfMDBAb.s:256    .text:0000000000000270 $d
+     /tmp/ccfMDBAb.s:258    .text:0000000000000274 $t
+     /tmp/ccfMDBAb.s:275    .text:0000000000000280 $d
+     /tmp/ccfMDBAb.s:277    .text:0000000000000284 $t
+     /tmp/ccfMDBAb.s:310    .text:00000000000002a0 $d
+     /tmp/ccfMDBAb.s:312    .text:00000000000002a4 $t
+     /tmp/ccfMDBAb.s:361    .text:00000000000002ec $d
+     /tmp/ccfMDBAb.s:363    .text:00000000000002f0 $t
+     /tmp/ccfMDBAb.s:402    .text:0000000000000334 $d
+     /tmp/ccfMDBAb.s:404    .text:0000000000000338 $t
+     /tmp/ccfMDBAb.s:435    .text:0000000000000368 $d
+     /tmp/ccfMDBAb.s:437    .text:000000000000036c $t
+     /tmp/ccfMDBAb.s:461    .text:000000000000038c $d
+     /tmp/ccfMDBAb.s:463    .text:0000000000000390 $t
+     /tmp/ccfMDBAb.s:484    .text:00000000000003a8 $d
+     /tmp/ccfMDBAb.s:486    .text:00000000000003ac $t
+     /tmp/ccfMDBAb.s:516    .text:00000000000003d4 $d
+     /tmp/ccfMDBAb.s:519    .text:00000000000003dc $t
+     /tmp/ccfMDBAb.s:571    .text:000000000000043c $d
+     /tmp/ccfMDBAb.s:574    .text:0000000000000444 $t
+     /tmp/ccfMDBAb.s:607    .text:0000000000000478 $d
+     /tmp/ccfMDBAb.s:609    .text:000000000000047c $t
+     /tmp/ccfMDBAb.s:658    .text:00000000000004cc $d
+     /tmp/ccfMDBAb.s:660    .text:00000000000004d0 $t
+     /tmp/ccfMDBAb.s:723    .text:000000000000054c $d
+     /tmp/ccfMDBAb.s:725    .text:0000000000000550 $t
+     /tmp/ccfMDBAb.s:778    .text:00000000000005b0 $d
+     /tmp/ccfMDBAb.s:781    .text:00000000000005b8 $t
+     /tmp/ccfMDBAb.s:823    .text:00000000000005fc $d
+     /tmp/ccfMDBAb.s:825    .text:0000000000000600 $t
+     /tmp/ccfMDBAb.s:960    .text:00000000000006f8 $d
+     /tmp/ccfMDBAb.s:962    .text:00000000000006fc $t
+     /tmp/ccfMDBAb.s:993    .text:0000000000000728 $d
+     /tmp/ccfMDBAb.s:995    .text:000000000000072c $t
+     /tmp/ccfMDBAb.s:1002   .text:000000000000072c main
+     /tmp/ccfMDBAb.s:1025   .text:0000000000000754 $d
+     /tmp/ccfMDBAb.s:1027   .text:0000000000000758 $t
+     /tmp/ccfMDBAb.s:1034   .text:0000000000000758 serial_error
+     /tmp/ccfMDBAb.s:1047   .text:000000000000075a HardFault_Handler
+     /tmp/ccfMDBAb.s:1066   .text:000000000000076a MemManage_Handler
+     /tmp/ccfMDBAb.s:1085   .text:000000000000077a BusFault_Handler
+     /tmp/ccfMDBAb.s:1104   .text:000000000000078a UsageFault_Handler
+     /tmp/ccfMDBAb.s:1123   .text:000000000000079a vApplicationMallocFailedHook
+     /tmp/ccfMDBAb.s:1142   .text:00000000000007aa vApplicationStackOverflowHook
+     /tmp/ccfMDBAb.s:1180   .text:00000000000007f8 $d
+     /tmp/ccfMDBAb.s:1183   .bss:0000000000000000 $d
+     /tmp/ccfMDBAb.s:1187   .bss:0000000000000000 g_actuators_queue
+     /tmp/ccfMDBAb.s:1191   .bss:0000000000000004 g_msg_buffer
+     /tmp/ccfMDBAb.s:1195   .bss:0000000000000c1c i.9024
+     /tmp/ccfMDBAb.s:1200   .bss:0000000000000c20 info.9025
+     /tmp/ccfMDBAb.s:1203   .rodata.str1.4:0000000000000000 $d
+
+UNDEFINED SYMBOLS
+cli_init
+comm_init
+delay_ms
+screen_image
+hardware_glcds
+uc1701_update
+xQueueGenericCreate
+xTaskGenericCreate
+hardware_actuators
+actuator_set_event
+actuator_enable_event
+protocol_add_command
+naveg_init
+vTaskDelete
+mod_logo
+mod_duo
+cli_restore
+protocol_response
+comm_webgui_response_cb
+__aeabi_d2f
+atof
+atoi
+screen_tuner
+naveg_get_control
+strlen
+float_to_str
+naveg_set_control
+naveg_remove_control
+data_parse_control
+naveg_add_control
+strcmp
+naveg_ui_connection
+str_to_hex
+uc1701_draw_image
+naveg_dialog
+uc1701_text
+hardware_leds
+ledz_set
+ledz_blink
+actuator_get_status
+xQueueGenericSendFromISR
+vPortYield
+naveg_need_update
+naveg_update
+cli_process
+naveg_master_volume
+naveg_is_master_vol
+naveg_enter
+naveg_toggle_tool
+xQueueGenericReceive
+naveg_inc_control
+naveg_down
+naveg_dec_control
+naveg_up
+naveg_pot_change
+naveg_foot_change
+comm_webgui_read
+ringbuff_read_until
+protocol_parse
+hardware_setup
+vTaskStartScheduler
+ledz_on
+uc1701_clear

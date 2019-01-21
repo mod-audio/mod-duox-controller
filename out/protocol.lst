@@ -1,0 +1,390 @@
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"protocol.c"
+  12              		.text
+  13              		.align	1
+  14              		.global	protocol_parse
+  15              		.syntax unified
+  16              		.thumb
+  17              		.thumb_func
+  18              		.fpu softvfp
+  20              	protocol_parse:
+  21              		@ args = 0, pretend = 0, frame = 32
+  22              		@ frame_needed = 0, uses_anonymous_args = 0
+  23 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+  24 0004 89B0     		sub	sp, sp, #36
+  25 0006 4068     		ldr	r0, [r0, #4]
+  26 0008 FFF7FEFF 		bl	strarr_split
+  27 000c 0490     		str	r0, [sp, #16]
+  28 000e FFF7FEFF 		bl	strarr_length
+  29 0012 0590     		str	r0, [sp, #20]
+  30 0014 0023     		movs	r3, #0
+  31 0016 0693     		str	r3, [sp, #24]
+  32 0018 0028     		cmp	r0, #0
+  33 001a 65D0     		beq	.L1
+  34 001c 8246     		mov	r10, r0
+  35 001e 504B     		ldr	r3, .L29
+  36 0020 1B68     		ldr	r3, [r3]
+  37 0022 0193     		str	r3, [sp, #4]
+  38 0024 002B     		cmp	r3, #0
+  39 0026 46D0     		beq	.L22
+  40 0028 049B     		ldr	r3, [sp, #16]
+  41 002a 0293     		str	r3, [sp, #8]
+  42 002c DFF83CB1 		ldr	fp, .L29+12
+  43 0030 0023     		movs	r3, #0
+  44 0032 0393     		str	r3, [sp, #12]
+  45 0034 0093     		str	r3, [sp]
+  46 0036 28E0     		b	.L4
+  47              	.L5:
+  48 0038 47B1     		cbz	r7, .L6
+  49 003a 002D     		cmp	r5, #0
+  50 003c 57D0     		beq	.L7
+  51 003e 2521     		movs	r1, #37
+  52 0040 2846     		mov	r0, r5
+  53 0042 FFF7FEFF 		bl	strchr
+  54 0046 0028     		cmp	r0, #0
+  55 0048 51D0     		beq	.L7
+  56 004a 0137     		adds	r7, r7, #1
+  57              	.L6:
+  58 004c A245     		cmp	r10, r4
+  59 004e 12D9     		bls	.L9
+  60              	.L20:
+  61 0050 631C     		adds	r3, r4, #1
+  62 0052 4C45     		cmp	r4, r9
+  63 0054 0FD2     		bcs	.L9
+  64 0056 1C46     		mov	r4, r3
+  65              	.L10:
+  66 0058 56F8045F 		ldr	r5, [r6, #4]!
+  67 005c 58F8041F 		ldr	r1, [r8, #4]!
+  68 0060 2846     		mov	r0, r5
+  69 0062 FFF7FEFF 		bl	strcmp
+  70 0066 0028     		cmp	r0, #0
+  71 0068 E6D1     		bne	.L5
+  72 006a 0137     		adds	r7, r7, #1
+  73 006c EEE7     		b	.L6
+  74              	.L19:
+  75 006e 0137     		adds	r7, r7, #1
+  76 0070 0123     		movs	r3, #1
+  77 0072 0393     		str	r3, [sp, #12]
+  78 0074 EAE7     		b	.L6
+  79              	.L9:
+  80 0076 002F     		cmp	r7, #0
+  81 0078 41D1     		bne	.L21
+  82              	.L11:
+  83 007a 009B     		ldr	r3, [sp]
+  84 007c 0133     		adds	r3, r3, #1
+  85 007e 0093     		str	r3, [sp]
+  86 0080 0BF1100B 		add	fp, fp, #16
+  87 0084 019A     		ldr	r2, [sp, #4]
+  88 0086 9342     		cmp	r3, r2
+  89 0088 1ED0     		beq	.L27
+  90              	.L4:
+  91 008a DBF80890 		ldr	r9, [fp, #8]
+  92 008e B9F1000F 		cmp	r9, #0
+  93 0092 F2D0     		beq	.L11
+  94 0094 DBF80460 		ldr	r6, [fp, #4]
+  95 0098 043E     		subs	r6, r6, #4
+  96 009a 029B     		ldr	r3, [sp, #8]
+  97 009c A3F10408 		sub	r8, r3, #4
+  98 00a0 0124     		movs	r4, #1
+  99 00a2 0027     		movs	r7, #0
+ 100 00a4 D8E7     		b	.L10
+ 101              	.L13:
+ 102 00a6 BA45     		cmp	r10, r7
+ 103 00a8 46D0     		beq	.L14
+ 104 00aa 039B     		ldr	r3, [sp, #12]
+ 105 00ac 002B     		cmp	r3, #0
+ 106 00ae 43D1     		bne	.L14
+ 107 00b0 4FF0FF33 		mov	r3, #-1
+ 108 00b4 0AE0     		b	.L3
+ 109              	.L22:
+ 110 00b6 4FF0FF33 		mov	r3, #-1
+ 111 00ba 07E0     		b	.L3
+ 112              	.L24:
+ 113 00bc 6FF00203 		mvn	r3, #2
+ 114 00c0 04E0     		b	.L3
+ 115              	.L25:
+ 116 00c2 6FF00103 		mvn	r3, #1
+ 117 00c6 01E0     		b	.L3
+ 118              	.L27:
+ 119 00c8 4FF0FF33 		mov	r3, #-1
+ 120              	.L3:
+ 121 00cc DB43     		mvns	r3, r3
+ 122 00ce 254A     		ldr	r2, .L29+4
+ 123 00d0 52F82340 		ldr	r4, [r2, r3, lsl #2]
+ 124 00d4 2046     		mov	r0, r4
+ 125 00d6 FFF7FEFF 		bl	strlen
+ 126 00da 0146     		mov	r1, r0
+ 127 00dc 2046     		mov	r0, r4
+ 128 00de FFF7FEFF 		bl	comm_webgui_send
+ 129              	.L17:
+ 130 00e2 0498     		ldr	r0, [sp, #16]
+ 131 00e4 FFF7FEFF 		bl	vPortFree
+ 132              	.L1:
+ 133 00e8 09B0     		add	sp, sp, #36
+ 134              		@ sp needed
+ 135 00ea BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 136              	.L7:
+ 137 00ee 1E49     		ldr	r1, .L29+8
+ 138 00f0 2846     		mov	r0, r5
+ 139 00f2 FFF7FEFF 		bl	strcmp
+ 140 00f6 0028     		cmp	r0, #0
+ 141 00f8 B9D0     		beq	.L19
+ 142 00fa A245     		cmp	r10, r4
+ 143 00fc A8D8     		bhi	.L20
+ 144              	.L21:
+ 145 00fe 184B     		ldr	r3, .L29
+ 146 0100 009A     		ldr	r2, [sp]
+ 147 0102 03EB0213 		add	r3, r3, r2, lsl #4
+ 148 0106 DD68     		ldr	r5, [r3, #12]
+ 149 0108 A542     		cmp	r5, r4
+ 150 010a 0DD9     		bls	.L12
+ 151 010c 144B     		ldr	r3, .L29
+ 152 010e 03EB0213 		add	r3, r3, r2, lsl #4
+ 153 0112 9B68     		ldr	r3, [r3, #8]
+ 154 0114 1449     		ldr	r1, .L29+8
+ 155 0116 53F82400 		ldr	r0, [r3, r4, lsl #2]
+ 156 011a FFF7FEFF 		bl	strcmp
+ 157 011e 0028     		cmp	r0, #0
+ 158 0120 039B     		ldr	r3, [sp, #12]
+ 159 0122 08BF     		it	eq
+ 160 0124 0123     		moveq	r3, #1
+ 161 0126 0393     		str	r3, [sp, #12]
+ 162              	.L12:
+ 163 0128 039A     		ldr	r2, [sp, #12]
+ 164 012a AB1A     		subs	r3, r5, r2
+ 165 012c 9A45     		cmp	r10, r3
+ 166 012e C5D3     		bcc	.L24
+ 167 0130 AA45     		cmp	r10, r5
+ 168 0132 B8D9     		bls	.L13
+ 169 0134 002A     		cmp	r2, #0
+ 170 0136 C4D0     		beq	.L25
+ 171              	.L14:
+ 172 0138 009A     		ldr	r2, [sp]
+ 173 013a 1346     		mov	r3, r2
+ 174 013c 002A     		cmp	r2, #0
+ 175 013e C5DB     		blt	.L3
+ 176 0140 074B     		ldr	r3, .L29
+ 177 0142 009A     		ldr	r2, [sp]
+ 178 0144 03EB0213 		add	r3, r3, r2, lsl #4
+ 179 0148 1B69     		ldr	r3, [r3, #16]
+ 180 014a 002B     		cmp	r3, #0
+ 181 014c C9D0     		beq	.L17
+ 182 014e 04A8     		add	r0, sp, #16
+ 183 0150 9847     		blx	r3
+ 184 0152 0698     		ldr	r0, [sp, #24]
+ 185 0154 0028     		cmp	r0, #0
+ 186 0156 C4D0     		beq	.L17
+ 187 0158 0799     		ldr	r1, [sp, #28]
+ 188 015a FFF7FEFF 		bl	comm_webgui_send
+ 189 015e C0E7     		b	.L17
+ 190              	.L30:
+ 191              		.align	2
+ 192              	.L29:
+ 193 0160 00000000 		.word	.LANCHOR0
+ 194 0164 00000000 		.word	.LANCHOR1
+ 195 0168 00000000 		.word	.LC0
+ 196 016c 04000000 		.word	.LANCHOR0+4
+ 198              		.align	1
+ 199              		.global	protocol_add_command
+ 200              		.syntax unified
+ 201              		.thumb
+ 202              		.thumb_func
+ 203              		.fpu softvfp
+ 205              	protocol_add_command:
+ 206              		@ args = 0, pretend = 0, frame = 0
+ 207              		@ frame_needed = 0, uses_anonymous_args = 0
+ 208 0170 0F4B     		ldr	r3, .L36
+ 209 0172 1B68     		ldr	r3, [r3]
+ 210 0174 132B     		cmp	r3, #19
+ 211 0176 00D9     		bls	.L32
+ 212              	.L33:
+ 213 0178 FEE7     		b	.L33
+ 214              	.L32:
+ 215 017a 70B5     		push	{r4, r5, r6, lr}
+ 216 017c 0E46     		mov	r6, r1
+ 217 017e FFF7FEFF 		bl	str_duplicate
+ 218 0182 0B4C     		ldr	r4, .L36
+ 219 0184 2568     		ldr	r5, [r4]
+ 220 0186 04EB0515 		add	r5, r4, r5, lsl #4
+ 221 018a 6860     		str	r0, [r5, #4]
+ 222 018c FFF7FEFF 		bl	strarr_split
+ 223 0190 A860     		str	r0, [r5, #8]
+ 224 0192 2568     		ldr	r5, [r4]
+ 225 0194 04EB0515 		add	r5, r4, r5, lsl #4
+ 226 0198 A868     		ldr	r0, [r5, #8]
+ 227 019a FFF7FEFF 		bl	strarr_length
+ 228 019e E860     		str	r0, [r5, #12]
+ 229 01a0 2368     		ldr	r3, [r4]
+ 230 01a2 04EB0312 		add	r2, r4, r3, lsl #4
+ 231 01a6 1661     		str	r6, [r2, #16]
+ 232 01a8 0133     		adds	r3, r3, #1
+ 233 01aa 2360     		str	r3, [r4]
+ 234 01ac 70BD     		pop	{r4, r5, r6, pc}
+ 235              	.L37:
+ 236 01ae 00BF     		.align	2
+ 237              	.L36:
+ 238 01b0 00000000 		.word	.LANCHOR0
+ 240              		.align	1
+ 241              		.global	protocol_response
+ 242              		.syntax unified
+ 243              		.thumb
+ 244              		.thumb_func
+ 245              		.fpu softvfp
+ 247              	protocol_response:
+ 248              		@ args = 0, pretend = 0, frame = 0
+ 249              		@ frame_needed = 0, uses_anonymous_args = 0
+ 250 01b4 70B5     		push	{r4, r5, r6, lr}
+ 251 01b6 0646     		mov	r6, r0
+ 252 01b8 0D46     		mov	r5, r1
+ 253 01ba 0B4B     		ldr	r3, .L42
+ 254 01bc 8B60     		str	r3, [r1, #8]
+ 255 01be FFF7FEFF 		bl	strlen
+ 256 01c2 1F28     		cmp	r0, #31
+ 257 01c4 92BF     		itee	ls
+ 258 01c6 E860     		strls	r0, [r5, #12]
+ 259 01c8 1F23     		movhi	r3, #31
+ 260 01ca EB60     		strhi	r3, [r5, #12]
+ 261 01cc 074C     		ldr	r4, .L42+4
+ 262 01ce 2022     		movs	r2, #32
+ 263 01d0 3146     		mov	r1, r6
+ 264 01d2 04F5A270 		add	r0, r4, #324
+ 265 01d6 FFF7FEFF 		bl	strncpy
+ 266 01da EB68     		ldr	r3, [r5, #12]
+ 267 01dc 1C44     		add	r4, r4, r3
+ 268 01de 0023     		movs	r3, #0
+ 269 01e0 84F84431 		strb	r3, [r4, #324]
+ 270 01e4 70BD     		pop	{r4, r5, r6, pc}
+ 271              	.L43:
+ 272 01e6 00BF     		.align	2
+ 273              	.L42:
+ 274 01e8 44010000 		.word	.LANCHOR0+324
+ 275 01ec 00000000 		.word	.LANCHOR0
+ 277              		.align	1
+ 278              		.global	protocol_remove_commands
+ 279              		.syntax unified
+ 280              		.thumb
+ 281              		.thumb_func
+ 282              		.fpu softvfp
+ 284              	protocol_remove_commands:
+ 285              		@ args = 0, pretend = 0, frame = 0
+ 286              		@ frame_needed = 0, uses_anonymous_args = 0
+ 287 01f0 094B     		ldr	r3, .L52
+ 288 01f2 1B68     		ldr	r3, [r3]
+ 289 01f4 7BB1     		cbz	r3, .L49
+ 290 01f6 70B5     		push	{r4, r5, r6, lr}
+ 291 01f8 084C     		ldr	r4, .L52+4
+ 292 01fa 0025     		movs	r5, #0
+ 293 01fc 261F     		subs	r6, r4, #4
+ 294              	.L46:
+ 295 01fe 2068     		ldr	r0, [r4]
+ 296 0200 FFF7FEFF 		bl	vPortFree
+ 297 0204 6068     		ldr	r0, [r4, #4]
+ 298 0206 FFF7FEFF 		bl	vPortFree
+ 299 020a 0135     		adds	r5, r5, #1
+ 300 020c 1034     		adds	r4, r4, #16
+ 301 020e 3368     		ldr	r3, [r6]
+ 302 0210 AB42     		cmp	r3, r5
+ 303 0212 F4D8     		bhi	.L46
+ 304 0214 70BD     		pop	{r4, r5, r6, pc}
+ 305              	.L49:
+ 306 0216 7047     		bx	lr
+ 307              	.L53:
+ 308              		.align	2
+ 309              	.L52:
+ 310 0218 00000000 		.word	.LANCHOR0
+ 311 021c 04000000 		.word	.LANCHOR0+4
+ 313              		.global	g_error_messages
+ 314              		.data
+ 315              		.align	2
+ 316              		.set	.LANCHOR1,. + 0
+ 319              	g_error_messages:
+ 320 0000 04000000 		.word	.LC1
+ 321 0004 10000000 		.word	.LC2
+ 322 0008 20000000 		.word	.LC3
+ 323 000c 30000000 		.word	.LC4
+ 324              		.bss
+ 325              		.align	2
+ 326              		.set	.LANCHOR0,. + 0
+ 329              	g_command_count:
+ 330 0000 00000000 		.space	4
+ 333              	g_commands:
+ 334 0004 00000000 		.space	320
+ 334      00000000 
+ 334      00000000 
+ 334      00000000 
+ 334      00000000 
+ 337              	response_buffer.7774:
+ 338 0144 00000000 		.space	32
+ 338      00000000 
+ 338      00000000 
+ 338      00000000 
+ 338      00000000 
+ 339              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 340              		.align	2
+ 341              	.LC0:
+ 342 0000 2E2E2E00 		.ascii	"...\000"
+ 343              	.LC1:
+ 344 0004 6E6F7420 		.ascii	"not found\000"
+ 344      666F756E 
+ 344      6400
+ 345 000e 0000     		.space	2
+ 346              	.LC2:
+ 347 0010 6D616E79 		.ascii	"many arguments\000"
+ 347      20617267 
+ 347      756D656E 
+ 347      747300
+ 348 001f 00       		.space	1
+ 349              	.LC3:
+ 350 0020 66657720 		.ascii	"few arguments\000"
+ 350      61726775 
+ 350      6D656E74 
+ 350      7300
+ 351 002e 0000     		.space	2
+ 352              	.LC4:
+ 353 0030 696E7661 		.ascii	"invalid argument\000"
+ 353      6C696420 
+ 353      61726775 
+ 353      6D656E74 
+ 353      00
+ 354              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 protocol.c
+     /tmp/ccRVo5mX.s:13     .text:0000000000000000 $t
+     /tmp/ccRVo5mX.s:20     .text:0000000000000000 protocol_parse
+     /tmp/ccRVo5mX.s:193    .text:0000000000000160 $d
+     /tmp/ccRVo5mX.s:198    .text:0000000000000170 $t
+     /tmp/ccRVo5mX.s:205    .text:0000000000000170 protocol_add_command
+     /tmp/ccRVo5mX.s:238    .text:00000000000001b0 $d
+     /tmp/ccRVo5mX.s:240    .text:00000000000001b4 $t
+     /tmp/ccRVo5mX.s:247    .text:00000000000001b4 protocol_response
+     /tmp/ccRVo5mX.s:274    .text:00000000000001e8 $d
+     /tmp/ccRVo5mX.s:277    .text:00000000000001f0 $t
+     /tmp/ccRVo5mX.s:284    .text:00000000000001f0 protocol_remove_commands
+     /tmp/ccRVo5mX.s:310    .text:0000000000000218 $d
+     /tmp/ccRVo5mX.s:319    .data:0000000000000000 g_error_messages
+     /tmp/ccRVo5mX.s:315    .data:0000000000000000 $d
+     /tmp/ccRVo5mX.s:325    .bss:0000000000000000 $d
+     /tmp/ccRVo5mX.s:329    .bss:0000000000000000 g_command_count
+     /tmp/ccRVo5mX.s:333    .bss:0000000000000004 g_commands
+     /tmp/ccRVo5mX.s:337    .bss:0000000000000144 response_buffer.7774
+     /tmp/ccRVo5mX.s:340    .rodata.str1.4:0000000000000000 $d
+
+UNDEFINED SYMBOLS
+strarr_split
+strarr_length
+strchr
+strcmp
+strlen
+comm_webgui_send
+vPortFree
+str_duplicate
+strncpy

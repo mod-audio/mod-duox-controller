@@ -1,0 +1,559 @@
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 1
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"lpc17xx_timer.c"
+  12              		.text
+  13              		.align	1
+  14              		.global	TIM_GetIntStatus
+  15              		.syntax unified
+  16              		.thumb
+  17              		.thumb_func
+  18              		.fpu softvfp
+  20              	TIM_GetIntStatus:
+  21              		@ args = 0, pretend = 0, frame = 0
+  22              		@ frame_needed = 0, uses_anonymous_args = 0
+  23              		@ link register save eliminated.
+  24 0000 0268     		ldr	r2, [r0]
+  25 0002 0123     		movs	r3, #1
+  26 0004 03FA01F1 		lsl	r1, r3, r1
+  27 0008 1140     		ands	r1, r1, r2
+  28 000a 11F0FF0F 		tst	r1, #255
+  29 000e 14BF     		ite	ne
+  30 0010 1846     		movne	r0, r3
+  31 0012 0020     		moveq	r0, #0
+  32 0014 7047     		bx	lr
+  34              		.align	1
+  35              		.global	TIM_GetIntCaptureStatus
+  36              		.syntax unified
+  37              		.thumb
+  38              		.thumb_func
+  39              		.fpu softvfp
+  41              	TIM_GetIntCaptureStatus:
+  42              		@ args = 0, pretend = 0, frame = 0
+  43              		@ frame_needed = 0, uses_anonymous_args = 0
+  44              		@ link register save eliminated.
+  45 0016 0368     		ldr	r3, [r0]
+  46 0018 0A1D     		adds	r2, r1, #4
+  47 001a 0121     		movs	r1, #1
+  48 001c 9140     		lsls	r1, r1, r2
+  49 001e 1940     		ands	r1, r1, r3
+  50 0020 11F0FF0F 		tst	r1, #255
+  51 0024 14BF     		ite	ne
+  52 0026 0120     		movne	r0, #1
+  53 0028 0020     		moveq	r0, #0
+  54 002a 7047     		bx	lr
+  56              		.align	1
+  57              		.global	TIM_ClearIntPending
+  58              		.syntax unified
+  59              		.thumb
+  60              		.thumb_func
+  61              		.fpu softvfp
+  63              	TIM_ClearIntPending:
+  64              		@ args = 0, pretend = 0, frame = 0
+  65              		@ frame_needed = 0, uses_anonymous_args = 0
+  66              		@ link register save eliminated.
+  67 002c 0123     		movs	r3, #1
+  68 002e 03FA01F1 		lsl	r1, r3, r1
+  69 0032 0160     		str	r1, [r0]
+  70 0034 7047     		bx	lr
+  72              		.align	1
+  73              		.global	TIM_ClearIntCapturePending
+  74              		.syntax unified
+  75              		.thumb
+  76              		.thumb_func
+  77              		.fpu softvfp
+  79              	TIM_ClearIntCapturePending:
+  80              		@ args = 0, pretend = 0, frame = 0
+  81              		@ frame_needed = 0, uses_anonymous_args = 0
+  82              		@ link register save eliminated.
+  83 0036 0431     		adds	r1, r1, #4
+  84 0038 0123     		movs	r3, #1
+  85 003a 03FA01F1 		lsl	r1, r3, r1
+  86 003e 0160     		str	r1, [r0]
+  87 0040 7047     		bx	lr
+  89              		.align	1
+  90              		.global	TIM_ConfigStructInit
+  91              		.syntax unified
+  92              		.thumb
+  93              		.thumb_func
+  94              		.fpu softvfp
+  96              	TIM_ConfigStructInit:
+  97              		@ args = 0, pretend = 0, frame = 0
+  98              		@ frame_needed = 0, uses_anonymous_args = 0
+  99              		@ link register save eliminated.
+ 100 0042 10B1     		cbz	r0, .L8
+ 101 0044 0023     		movs	r3, #0
+ 102 0046 4B70     		strb	r3, [r1, #1]
+ 103 0048 7047     		bx	lr
+ 104              	.L8:
+ 105 004a 0123     		movs	r3, #1
+ 106 004c 0B70     		strb	r3, [r1]
+ 107 004e 4B60     		str	r3, [r1, #4]
+ 108 0050 7047     		bx	lr
+ 110              		.global	__aeabi_uldivmod
+ 111              		.align	1
+ 112              		.global	TIM_Init
+ 113              		.syntax unified
+ 114              		.thumb
+ 115              		.thumb_func
+ 116              		.fpu softvfp
+ 118              	TIM_Init:
+ 119              		@ args = 0, pretend = 0, frame = 0
+ 120              		@ frame_needed = 0, uses_anonymous_args = 0
+ 121 0052 70B5     		push	{r4, r5, r6, lr}
+ 122 0054 0446     		mov	r4, r0
+ 123 0056 0E46     		mov	r6, r1
+ 124 0058 1546     		mov	r5, r2
+ 125 005a B0F1402F 		cmp	r0, #1073758208
+ 126 005e 25D0     		beq	.L26
+ 127 0060 424B     		ldr	r3, .L31
+ 128 0062 9842     		cmp	r0, r3
+ 129 0064 2BD0     		beq	.L27
+ 130 0066 424B     		ldr	r3, .L31+4
+ 131 0068 9842     		cmp	r0, r3
+ 132 006a 31D0     		beq	.L28
+ 133 006c 414B     		ldr	r3, .L31+8
+ 134 006e 9842     		cmp	r0, r3
+ 135 0070 38D0     		beq	.L29
+ 136              	.L11:
+ 137 0072 A36A     		ldr	r3, [r4, #40]
+ 138 0074 23F00303 		bic	r3, r3, #3
+ 139 0078 A362     		str	r3, [r4, #40]
+ 140 007a A36A     		ldr	r3, [r4, #40]
+ 141 007c A362     		str	r3, [r4, #40]
+ 142 007e 0023     		movs	r3, #0
+ 143 0080 A360     		str	r3, [r4, #8]
+ 144 0082 2361     		str	r3, [r4, #16]
+ 145 0084 E360     		str	r3, [r4, #12]
+ 146 0086 6368     		ldr	r3, [r4, #4]
+ 147 0088 43F00203 		orr	r3, r3, #2
+ 148 008c 6360     		str	r3, [r4, #4]
+ 149 008e 6368     		ldr	r3, [r4, #4]
+ 150 0090 23F00203 		bic	r3, r3, #2
+ 151 0094 6360     		str	r3, [r4, #4]
+ 152 0096 002E     		cmp	r6, #0
+ 153 0098 47D1     		bne	.L14
+ 154 009a 2B78     		ldrb	r3, [r5]	@ zero_extendqisi2
+ 155 009c 63BB     		cbnz	r3, .L15
+ 156 009e 6B68     		ldr	r3, [r5, #4]
+ 157 00a0 013B     		subs	r3, r3, #1
+ 158 00a2 E360     		str	r3, [r4, #12]
+ 159              	.L16:
+ 160 00a4 4FF0FF33 		mov	r3, #-1
+ 161 00a8 2360     		str	r3, [r4]
+ 162 00aa 70BD     		pop	{r4, r5, r6, pc}
+ 163              	.L26:
+ 164 00ac 0121     		movs	r1, #1
+ 165 00ae 0220     		movs	r0, #2
+ 166 00b0 FFF7FEFF 		bl	CLKPWR_ConfigPPWR
+ 167 00b4 0021     		movs	r1, #0
+ 168 00b6 0220     		movs	r0, #2
+ 169 00b8 FFF7FEFF 		bl	CLKPWR_SetPCLKDiv
+ 170 00bc D9E7     		b	.L11
+ 171              	.L27:
+ 172 00be 0121     		movs	r1, #1
+ 173 00c0 0420     		movs	r0, #4
+ 174 00c2 FFF7FEFF 		bl	CLKPWR_ConfigPPWR
+ 175 00c6 0021     		movs	r1, #0
+ 176 00c8 0420     		movs	r0, #4
+ 177 00ca FFF7FEFF 		bl	CLKPWR_SetPCLKDiv
+ 178 00ce D0E7     		b	.L11
+ 179              	.L28:
+ 180 00d0 0121     		movs	r1, #1
+ 181 00d2 4FF48000 		mov	r0, #4194304
+ 182 00d6 FFF7FEFF 		bl	CLKPWR_ConfigPPWR
+ 183 00da 0021     		movs	r1, #0
+ 184 00dc 2C20     		movs	r0, #44
+ 185 00de FFF7FEFF 		bl	CLKPWR_SetPCLKDiv
+ 186 00e2 C6E7     		b	.L11
+ 187              	.L29:
+ 188 00e4 0121     		movs	r1, #1
+ 189 00e6 4FF40000 		mov	r0, #8388608
+ 190 00ea FFF7FEFF 		bl	CLKPWR_ConfigPPWR
+ 191 00ee 0021     		movs	r1, #0
+ 192 00f0 2E20     		movs	r0, #46
+ 193 00f2 FFF7FEFF 		bl	CLKPWR_SetPCLKDiv
+ 194 00f6 BCE7     		b	.L11
+ 195              	.L15:
+ 196 00f8 B4F1402F 		cmp	r4, #1073758208
+ 197 00fc 2BD0     		beq	.L17
+ 198 00fe 1B4B     		ldr	r3, .L31
+ 199 0100 9C42     		cmp	r4, r3
+ 200 0102 2DD0     		beq	.L18
+ 201 0104 03F50823 		add	r3, r3, #557056
+ 202 0108 9C42     		cmp	r4, r3
+ 203 010a 1AD0     		beq	.L19
+ 204 010c 03F58043 		add	r3, r3, #16384
+ 205 0110 9C42     		cmp	r4, r3
+ 206 0112 1BD0     		beq	.L30
+ 207 0114 6D68     		ldr	r5, [r5, #4]
+ 208 0116 0020     		movs	r0, #0
+ 209              	.L22:
+ 210 0118 174A     		ldr	r2, .L31+12
+ 211 011a 0023     		movs	r3, #0
+ 212 011c A0FB0501 		umull	r0, r1, r0, r5
+ 213 0120 FFF7FEFF 		bl	__aeabi_uldivmod
+ 214 0124 0138     		subs	r0, r0, #1
+ 215 0126 E060     		str	r0, [r4, #12]
+ 216 0128 BCE7     		b	.L16
+ 217              	.L14:
+ 218 012a A36A     		ldr	r3, [r4, #40]
+ 219 012c 23F00C03 		bic	r3, r3, #12
+ 220 0130 A362     		str	r3, [r4, #40]
+ 221 0132 6B78     		ldrb	r3, [r5, #1]	@ zero_extendqisi2
+ 222 0134 012B     		cmp	r3, #1
+ 223 0136 B5D1     		bne	.L16
+ 224 0138 A36A     		ldr	r3, [r4, #40]
+ 225 013a 43F00403 		orr	r3, r3, #4
+ 226 013e A362     		str	r3, [r4, #40]
+ 227 0140 B0E7     		b	.L16
+ 228              	.L19:
+ 229 0142 6D68     		ldr	r5, [r5, #4]
+ 230 0144 2C20     		movs	r0, #44
+ 231 0146 FFF7FEFF 		bl	CLKPWR_GetPCLK
+ 232 014a E5E7     		b	.L22
+ 233              	.L30:
+ 234 014c 6D68     		ldr	r5, [r5, #4]
+ 235 014e 2E20     		movs	r0, #46
+ 236 0150 FFF7FEFF 		bl	CLKPWR_GetPCLK
+ 237 0154 E0E7     		b	.L22
+ 238              	.L17:
+ 239 0156 6D68     		ldr	r5, [r5, #4]
+ 240 0158 0220     		movs	r0, #2
+ 241 015a FFF7FEFF 		bl	CLKPWR_GetPCLK
+ 242 015e DBE7     		b	.L22
+ 243              	.L18:
+ 244 0160 6D68     		ldr	r5, [r5, #4]
+ 245 0162 0420     		movs	r0, #4
+ 246 0164 FFF7FEFF 		bl	CLKPWR_GetPCLK
+ 247 0168 D6E7     		b	.L22
+ 248              	.L32:
+ 249 016a 00BF     		.align	2
+ 250              	.L31:
+ 251 016c 00800040 		.word	1073774592
+ 252 0170 00000940 		.word	1074331648
+ 253 0174 00400940 		.word	1074348032
+ 254 0178 40420F00 		.word	1000000
+ 256              		.align	1
+ 257              		.global	TIM_DeInit
+ 258              		.syntax unified
+ 259              		.thumb
+ 260              		.thumb_func
+ 261              		.fpu softvfp
+ 263              	TIM_DeInit:
+ 264              		@ args = 0, pretend = 0, frame = 0
+ 265              		@ frame_needed = 0, uses_anonymous_args = 0
+ 266 017c 08B5     		push	{r3, lr}
+ 267 017e 0023     		movs	r3, #0
+ 268 0180 4360     		str	r3, [r0, #4]
+ 269 0182 B0F1402F 		cmp	r0, #1073758208
+ 270 0186 09D0     		beq	.L39
+ 271 0188 0F4B     		ldr	r3, .L43
+ 272 018a 9842     		cmp	r0, r3
+ 273 018c 0BD0     		beq	.L40
+ 274 018e 0F4B     		ldr	r3, .L43+4
+ 275 0190 9842     		cmp	r0, r3
+ 276 0192 0DD0     		beq	.L41
+ 277 0194 0E4B     		ldr	r3, .L43+8
+ 278 0196 9842     		cmp	r0, r3
+ 279 0198 10D0     		beq	.L42
+ 280              	.L33:
+ 281 019a 08BD     		pop	{r3, pc}
+ 282              	.L39:
+ 283 019c 1946     		mov	r1, r3
+ 284 019e 0220     		movs	r0, #2
+ 285 01a0 FFF7FEFF 		bl	CLKPWR_ConfigPPWR
+ 286 01a4 F9E7     		b	.L33
+ 287              	.L40:
+ 288 01a6 0021     		movs	r1, #0
+ 289 01a8 0420     		movs	r0, #4
+ 290 01aa FFF7FEFF 		bl	CLKPWR_ConfigPPWR
+ 291 01ae F4E7     		b	.L33
+ 292              	.L41:
+ 293 01b0 0021     		movs	r1, #0
+ 294 01b2 4FF48000 		mov	r0, #4194304
+ 295 01b6 FFF7FEFF 		bl	CLKPWR_ConfigPPWR
+ 296 01ba EEE7     		b	.L33
+ 297              	.L42:
+ 298 01bc 0021     		movs	r1, #0
+ 299 01be 4FF48000 		mov	r0, #4194304
+ 300 01c2 FFF7FEFF 		bl	CLKPWR_ConfigPPWR
+ 301 01c6 E8E7     		b	.L33
+ 302              	.L44:
+ 303              		.align	2
+ 304              	.L43:
+ 305 01c8 00800040 		.word	1073774592
+ 306 01cc 00000940 		.word	1074331648
+ 307 01d0 00400940 		.word	1074348032
+ 309              		.align	1
+ 310              		.global	TIM_Cmd
+ 311              		.syntax unified
+ 312              		.thumb
+ 313              		.thumb_func
+ 314              		.fpu softvfp
+ 316              	TIM_Cmd:
+ 317              		@ args = 0, pretend = 0, frame = 0
+ 318              		@ frame_needed = 0, uses_anonymous_args = 0
+ 319              		@ link register save eliminated.
+ 320 01d4 0129     		cmp	r1, #1
+ 321 01d6 4368     		ldr	r3, [r0, #4]
+ 322 01d8 0CBF     		ite	eq
+ 323 01da 43F00103 		orreq	r3, r3, #1
+ 324 01de 23F00103 		bicne	r3, r3, #1
+ 325 01e2 4360     		str	r3, [r0, #4]
+ 326 01e4 7047     		bx	lr
+ 328              		.align	1
+ 329              		.global	TIM_ResetCounter
+ 330              		.syntax unified
+ 331              		.thumb
+ 332              		.thumb_func
+ 333              		.fpu softvfp
+ 335              	TIM_ResetCounter:
+ 336              		@ args = 0, pretend = 0, frame = 0
+ 337              		@ frame_needed = 0, uses_anonymous_args = 0
+ 338              		@ link register save eliminated.
+ 339 01e6 4368     		ldr	r3, [r0, #4]
+ 340 01e8 43F00203 		orr	r3, r3, #2
+ 341 01ec 4360     		str	r3, [r0, #4]
+ 342 01ee 4368     		ldr	r3, [r0, #4]
+ 343 01f0 23F00203 		bic	r3, r3, #2
+ 344 01f4 4360     		str	r3, [r0, #4]
+ 345 01f6 7047     		bx	lr
+ 347              		.align	1
+ 348              		.global	TIM_ConfigMatch
+ 349              		.syntax unified
+ 350              		.thumb
+ 351              		.thumb_func
+ 352              		.fpu softvfp
+ 354              	TIM_ConfigMatch:
+ 355              		@ args = 0, pretend = 0, frame = 0
+ 356              		@ frame_needed = 0, uses_anonymous_args = 0
+ 357              		@ link register save eliminated.
+ 358 01f8 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 359 01fa 032B     		cmp	r3, #3
+ 360 01fc 03D8     		bhi	.L60
+ 361 01fe DFE803F0 		tbb	[pc, r3]
+ 362              	.L52:
+ 363 0202 03       		.byte	(.L51-.L52)/2
+ 364 0203 48       		.byte	(.L53-.L52)/2
+ 365 0204 4B       		.byte	(.L54-.L52)/2
+ 366 0205 4E       		.byte	(.L55-.L52)/2
+ 367              		.p2align 1
+ 368              	.L60:
+ 369              	.L50:
+ 370 0206 FEE7     		b	.L50
+ 371              	.L51:
+ 372 0208 8B68     		ldr	r3, [r1, #8]
+ 373 020a 8361     		str	r3, [r0, #24]
+ 374              	.L56:
+ 375 020c 10B4     		push	{r4}
+ 376 020e 4269     		ldr	r2, [r0, #20]
+ 377 0210 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 378 0212 03EB4303 		add	r3, r3, r3, lsl #1
+ 379 0216 0724     		movs	r4, #7
+ 380 0218 04FA03F3 		lsl	r3, r4, r3
+ 381 021c 22EA0303 		bic	r3, r2, r3
+ 382 0220 4361     		str	r3, [r0, #20]
+ 383 0222 4B78     		ldrb	r3, [r1, #1]	@ zero_extendqisi2
+ 384 0224 3BB1     		cbz	r3, .L57
+ 385 0226 4469     		ldr	r4, [r0, #20]
+ 386 0228 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 387 022a 03EB4302 		add	r2, r3, r3, lsl #1
+ 388 022e 0123     		movs	r3, #1
+ 389 0230 9340     		lsls	r3, r3, r2
+ 390 0232 2343     		orrs	r3, r3, r4
+ 391 0234 4361     		str	r3, [r0, #20]
+ 392              	.L57:
+ 393 0236 CB78     		ldrb	r3, [r1, #3]	@ zero_extendqisi2
+ 394 0238 4BB1     		cbz	r3, .L58
+ 395 023a 4469     		ldr	r4, [r0, #20]
+ 396 023c 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 397 023e 03EB4303 		add	r3, r3, r3, lsl #1
+ 398 0242 0133     		adds	r3, r3, #1
+ 399 0244 0122     		movs	r2, #1
+ 400 0246 02FA03F3 		lsl	r3, r2, r3
+ 401 024a 2343     		orrs	r3, r3, r4
+ 402 024c 4361     		str	r3, [r0, #20]
+ 403              	.L58:
+ 404 024e 8B78     		ldrb	r3, [r1, #2]	@ zero_extendqisi2
+ 405 0250 4BB1     		cbz	r3, .L59
+ 406 0252 4469     		ldr	r4, [r0, #20]
+ 407 0254 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 408 0256 03EB4303 		add	r3, r3, r3, lsl #1
+ 409 025a 0233     		adds	r3, r3, #2
+ 410 025c 0122     		movs	r2, #1
+ 411 025e 02FA03F3 		lsl	r3, r2, r3
+ 412 0262 2343     		orrs	r3, r3, r4
+ 413 0264 4361     		str	r3, [r0, #20]
+ 414              	.L59:
+ 415 0266 C26B     		ldr	r2, [r0, #60]
+ 416 0268 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 417 026a 5B00     		lsls	r3, r3, #1
+ 418 026c 0433     		adds	r3, r3, #4
+ 419 026e 0324     		movs	r4, #3
+ 420 0270 04FA03F3 		lsl	r3, r4, r3
+ 421 0274 22EA0303 		bic	r3, r2, r3
+ 422 0278 C363     		str	r3, [r0, #60]
+ 423 027a C46B     		ldr	r4, [r0, #60]
+ 424 027c 0B79     		ldrb	r3, [r1, #4]	@ zero_extendqisi2
+ 425 027e 03F00303 		and	r3, r3, #3
+ 426 0282 0A78     		ldrb	r2, [r1]	@ zero_extendqisi2
+ 427 0284 5200     		lsls	r2, r2, #1
+ 428 0286 0432     		adds	r2, r2, #4
+ 429 0288 9340     		lsls	r3, r3, r2
+ 430 028a 2343     		orrs	r3, r3, r4
+ 431 028c C363     		str	r3, [r0, #60]
+ 432 028e 10BC     		pop	{r4}
+ 433 0290 7047     		bx	lr
+ 434              	.L53:
+ 435 0292 8B68     		ldr	r3, [r1, #8]
+ 436 0294 C361     		str	r3, [r0, #28]
+ 437 0296 B9E7     		b	.L56
+ 438              	.L54:
+ 439 0298 8B68     		ldr	r3, [r1, #8]
+ 440 029a 0362     		str	r3, [r0, #32]
+ 441 029c B6E7     		b	.L56
+ 442              	.L55:
+ 443 029e 8B68     		ldr	r3, [r1, #8]
+ 444 02a0 4362     		str	r3, [r0, #36]
+ 445 02a2 B3E7     		b	.L56
+ 447              		.align	1
+ 448              		.global	TIM_UpdateMatchValue
+ 449              		.syntax unified
+ 450              		.thumb
+ 451              		.thumb_func
+ 452              		.fpu softvfp
+ 454              	TIM_UpdateMatchValue:
+ 455              		@ args = 0, pretend = 0, frame = 0
+ 456              		@ frame_needed = 0, uses_anonymous_args = 0
+ 457              		@ link register save eliminated.
+ 458 02a4 0329     		cmp	r1, #3
+ 459 02a6 03D8     		bhi	.L71
+ 460 02a8 DFE801F0 		tbb	[pc, r1]
+ 461              	.L66:
+ 462 02ac 03       		.byte	(.L65-.L66)/2
+ 463 02ad 05       		.byte	(.L67-.L66)/2
+ 464 02ae 07       		.byte	(.L68-.L66)/2
+ 465 02af 09       		.byte	(.L69-.L66)/2
+ 466              		.p2align 1
+ 467              	.L71:
+ 468              	.L64:
+ 469 02b0 FEE7     		b	.L64
+ 470              	.L65:
+ 471 02b2 8261     		str	r2, [r0, #24]
+ 472 02b4 7047     		bx	lr
+ 473              	.L67:
+ 474 02b6 C261     		str	r2, [r0, #28]
+ 475 02b8 7047     		bx	lr
+ 476              	.L68:
+ 477 02ba 0262     		str	r2, [r0, #32]
+ 478 02bc 7047     		bx	lr
+ 479              	.L69:
+ 480 02be 4262     		str	r2, [r0, #36]
+ 481 02c0 7047     		bx	lr
+ 483              		.align	1
+ 484              		.global	TIM_ConfigCapture
+ 485              		.syntax unified
+ 486              		.thumb
+ 487              		.thumb_func
+ 488              		.fpu softvfp
+ 490              	TIM_ConfigCapture:
+ 491              		@ args = 0, pretend = 0, frame = 0
+ 492              		@ frame_needed = 0, uses_anonymous_args = 0
+ 493              		@ link register save eliminated.
+ 494 02c2 10B4     		push	{r4}
+ 495 02c4 826A     		ldr	r2, [r0, #40]
+ 496 02c6 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 497 02c8 03EB4303 		add	r3, r3, r3, lsl #1
+ 498 02cc 0724     		movs	r4, #7
+ 499 02ce 04FA03F3 		lsl	r3, r4, r3
+ 500 02d2 22EA0303 		bic	r3, r2, r3
+ 501 02d6 8362     		str	r3, [r0, #40]
+ 502 02d8 4B78     		ldrb	r3, [r1, #1]	@ zero_extendqisi2
+ 503 02da 3BB1     		cbz	r3, .L73
+ 504 02dc 846A     		ldr	r4, [r0, #40]
+ 505 02de 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 506 02e0 03EB4302 		add	r2, r3, r3, lsl #1
+ 507 02e4 0123     		movs	r3, #1
+ 508 02e6 9340     		lsls	r3, r3, r2
+ 509 02e8 2343     		orrs	r3, r3, r4
+ 510 02ea 8362     		str	r3, [r0, #40]
+ 511              	.L73:
+ 512 02ec 8B78     		ldrb	r3, [r1, #2]	@ zero_extendqisi2
+ 513 02ee 4BB1     		cbz	r3, .L74
+ 514 02f0 846A     		ldr	r4, [r0, #40]
+ 515 02f2 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 516 02f4 03EB4303 		add	r3, r3, r3, lsl #1
+ 517 02f8 0133     		adds	r3, r3, #1
+ 518 02fa 0122     		movs	r2, #1
+ 519 02fc 02FA03F3 		lsl	r3, r2, r3
+ 520 0300 2343     		orrs	r3, r3, r4
+ 521 0302 8362     		str	r3, [r0, #40]
+ 522              	.L74:
+ 523 0304 CB78     		ldrb	r3, [r1, #3]	@ zero_extendqisi2
+ 524 0306 4BB1     		cbz	r3, .L72
+ 525 0308 846A     		ldr	r4, [r0, #40]
+ 526 030a 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 527 030c 03EB4303 		add	r3, r3, r3, lsl #1
+ 528 0310 0233     		adds	r3, r3, #2
+ 529 0312 0122     		movs	r2, #1
+ 530 0314 02FA03F3 		lsl	r3, r2, r3
+ 531 0318 2343     		orrs	r3, r3, r4
+ 532 031a 8362     		str	r3, [r0, #40]
+ 533              	.L72:
+ 534 031c 10BC     		pop	{r4}
+ 535 031e 7047     		bx	lr
+ 537              		.align	1
+ 538              		.global	TIM_GetCaptureValue
+ 539              		.syntax unified
+ 540              		.thumb
+ 541              		.thumb_func
+ 542              		.fpu softvfp
+ 544              	TIM_GetCaptureValue:
+ 545              		@ args = 0, pretend = 0, frame = 0
+ 546              		@ frame_needed = 0, uses_anonymous_args = 0
+ 547              		@ link register save eliminated.
+ 548 0320 09B1     		cbz	r1, .L80
+ 549 0322 006B     		ldr	r0, [r0, #48]
+ 550 0324 7047     		bx	lr
+ 551              	.L80:
+ 552 0326 C06A     		ldr	r0, [r0, #44]
+ 553 0328 7047     		bx	lr
+ 555 032a 00BF     		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 lpc17xx_timer.c
+     /tmp/cc3Un6un.s:13     .text:0000000000000000 $t
+     /tmp/cc3Un6un.s:20     .text:0000000000000000 TIM_GetIntStatus
+     /tmp/cc3Un6un.s:41     .text:0000000000000016 TIM_GetIntCaptureStatus
+     /tmp/cc3Un6un.s:63     .text:000000000000002c TIM_ClearIntPending
+     /tmp/cc3Un6un.s:79     .text:0000000000000036 TIM_ClearIntCapturePending
+     /tmp/cc3Un6un.s:96     .text:0000000000000042 TIM_ConfigStructInit
+     /tmp/cc3Un6un.s:118    .text:0000000000000052 TIM_Init
+     /tmp/cc3Un6un.s:251    .text:000000000000016c $d
+     /tmp/cc3Un6un.s:256    .text:000000000000017c $t
+     /tmp/cc3Un6un.s:263    .text:000000000000017c TIM_DeInit
+     /tmp/cc3Un6un.s:305    .text:00000000000001c8 $d
+     /tmp/cc3Un6un.s:309    .text:00000000000001d4 $t
+     /tmp/cc3Un6un.s:316    .text:00000000000001d4 TIM_Cmd
+     /tmp/cc3Un6un.s:335    .text:00000000000001e6 TIM_ResetCounter
+     /tmp/cc3Un6un.s:354    .text:00000000000001f8 TIM_ConfigMatch
+     /tmp/cc3Un6un.s:363    .text:0000000000000202 $d
+     /tmp/cc3Un6un.s:367    .text:0000000000000206 $t
+     /tmp/cc3Un6un.s:454    .text:00000000000002a4 TIM_UpdateMatchValue
+     /tmp/cc3Un6un.s:462    .text:00000000000002ac $d
+     /tmp/cc3Un6un.s:466    .text:00000000000002b0 $t
+     /tmp/cc3Un6un.s:490    .text:00000000000002c2 TIM_ConfigCapture
+     /tmp/cc3Un6un.s:544    .text:0000000000000320 TIM_GetCaptureValue
+
+UNDEFINED SYMBOLS
+__aeabi_uldivmod
+CLKPWR_ConfigPPWR
+CLKPWR_SetPCLKDiv
+CLKPWR_GetPCLK
