@@ -2072,8 +2072,8 @@
  2076              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 images.c
-     /tmp/cccZuP9P.s:19     .rodata:0000000000000000 mod_duo
-     /tmp/cccZuP9P.s:1049   .rodata:0000000000000404 mod_logo
-     /tmp/cccZuP9P.s:16     .rodata:0000000000000000 $d
+     /tmp/ccpOI5HP.s:19     .rodata:0000000000000000 mod_duo
+     /tmp/ccpOI5HP.s:1049   .rodata:0000000000000404 mod_logo
+     /tmp/ccpOI5HP.s:16     .rodata:0000000000000000 $d
 
 NO UNDEFINED SYMBOLS

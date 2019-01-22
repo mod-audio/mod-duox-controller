@@ -179,20 +179,20 @@
  191              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 lpc17xx_pinsel.c
-     /tmp/cci20Hkf.s:13     .text:0000000000000000 $t
-     /tmp/cci20Hkf.s:20     .text:0000000000000000 PINSEL_SetPinFunc
-     /tmp/cci20Hkf.s:52     .text:0000000000000032 PINSEL_SetResistorMode
-     /tmp/cci20Hkf.s:77     .text:0000000000000060 $d
-     /tmp/cci20Hkf.s:79     .text:0000000000000064 $t
-     /tmp/cci20Hkf.s:86     .text:0000000000000064 PINSEL_SetOpenDrainMode
-     /tmp/cci20Hkf.s:109    .text:0000000000000090 $d
-     /tmp/cci20Hkf.s:111    .text:0000000000000094 $t
-     /tmp/cci20Hkf.s:118    .text:0000000000000094 PINSEL_ConfigTraceFunc
-     /tmp/cci20Hkf.s:140    .text:00000000000000b4 $d
-     /tmp/cci20Hkf.s:142    .text:00000000000000b8 $t
-     /tmp/cci20Hkf.s:149    .text:00000000000000b8 PINSEL_SetI2C0Pins
-     /tmp/cci20Hkf.s:163    .text:00000000000000c8 $d
-     /tmp/cci20Hkf.s:165    .text:00000000000000cc $t
-     /tmp/cci20Hkf.s:172    .text:00000000000000cc PINSEL_ConfigPin
+     /tmp/ccB1AJXb.s:13     .text:0000000000000000 $t
+     /tmp/ccB1AJXb.s:20     .text:0000000000000000 PINSEL_SetPinFunc
+     /tmp/ccB1AJXb.s:52     .text:0000000000000032 PINSEL_SetResistorMode
+     /tmp/ccB1AJXb.s:77     .text:0000000000000060 $d
+     /tmp/ccB1AJXb.s:79     .text:0000000000000064 $t
+     /tmp/ccB1AJXb.s:86     .text:0000000000000064 PINSEL_SetOpenDrainMode
+     /tmp/ccB1AJXb.s:109    .text:0000000000000090 $d
+     /tmp/ccB1AJXb.s:111    .text:0000000000000094 $t
+     /tmp/ccB1AJXb.s:118    .text:0000000000000094 PINSEL_ConfigTraceFunc
+     /tmp/ccB1AJXb.s:140    .text:00000000000000b4 $d
+     /tmp/ccB1AJXb.s:142    .text:00000000000000b8 $t
+     /tmp/ccB1AJXb.s:149    .text:00000000000000b8 PINSEL_SetI2C0Pins
+     /tmp/ccB1AJXb.s:163    .text:00000000000000c8 $d
+     /tmp/ccB1AJXb.s:165    .text:00000000000000cc $t
+     /tmp/ccB1AJXb.s:172    .text:00000000000000cc PINSEL_ConfigPin
 
 NO UNDEFINED SYMBOLS

@@ -422,26 +422,26 @@
  441              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 ledz.c
-     /tmp/cc2c3iMS.s:13     .text:0000000000000000 $t
-     /tmp/cc2c3iMS.s:20     .text:0000000000000000 ledz_create
-     /tmp/cc2c3iMS.s:115    .text:00000000000000d8 $d
-     /tmp/cc2c3iMS.s:118    .text:00000000000000e0 $t
-     /tmp/cc2c3iMS.s:125    .text:00000000000000e0 ledz_destroy
-     /tmp/cc2c3iMS.s:148    .text:0000000000000100 $d
-     /tmp/cc2c3iMS.s:150    .text:0000000000000104 $t
-     /tmp/cc2c3iMS.s:157    .text:0000000000000104 ledz_set
-     /tmp/cc2c3iMS.s:217    .text:000000000000016c ledz_on
-     /tmp/cc2c3iMS.s:232    .text:0000000000000176 ledz_off
-     /tmp/cc2c3iMS.s:247    .text:0000000000000180 ledz_toggle
-     /tmp/cc2c3iMS.s:262    .text:000000000000018c ledz_blink
-     /tmp/cc2c3iMS.s:320    .text:00000000000001e2 ledz_tick
-     /tmp/cc2c3iMS.s:415    .text:00000000000002c8 $d
-     /tmp/cc2c3iMS.s:420    .data:0000000000000000 $d
-     /tmp/cc2c3iMS.s:424    .data:0000000000000000 g_leds_available
-     /tmp/cc2c3iMS.s:427    .bss:0000000000000000 $d
-     /tmp/cc2c3iMS.s:431    .bss:0000000000000000 g_leds
-     /tmp/cc2c3iMS.s:435    .bss:00000000000001f8 ledz_counter.7372
-     /tmp/cc2c3iMS.s:439    .bss:00000000000001fc counter_1ms.7431
+     /tmp/ccEn8lNP.s:13     .text:0000000000000000 $t
+     /tmp/ccEn8lNP.s:20     .text:0000000000000000 ledz_create
+     /tmp/ccEn8lNP.s:115    .text:00000000000000d8 $d
+     /tmp/ccEn8lNP.s:118    .text:00000000000000e0 $t
+     /tmp/ccEn8lNP.s:125    .text:00000000000000e0 ledz_destroy
+     /tmp/ccEn8lNP.s:148    .text:0000000000000100 $d
+     /tmp/ccEn8lNP.s:150    .text:0000000000000104 $t
+     /tmp/ccEn8lNP.s:157    .text:0000000000000104 ledz_set
+     /tmp/ccEn8lNP.s:217    .text:000000000000016c ledz_on
+     /tmp/ccEn8lNP.s:232    .text:0000000000000176 ledz_off
+     /tmp/ccEn8lNP.s:247    .text:0000000000000180 ledz_toggle
+     /tmp/ccEn8lNP.s:262    .text:000000000000018c ledz_blink
+     /tmp/ccEn8lNP.s:320    .text:00000000000001e2 ledz_tick
+     /tmp/ccEn8lNP.s:415    .text:00000000000002c8 $d
+     /tmp/ccEn8lNP.s:420    .data:0000000000000000 $d
+     /tmp/ccEn8lNP.s:424    .data:0000000000000000 g_leds_available
+     /tmp/ccEn8lNP.s:427    .bss:0000000000000000 $d
+     /tmp/ccEn8lNP.s:431    .bss:0000000000000000 g_leds
+     /tmp/ccEn8lNP.s:435    .bss:00000000000001f8 ledz_counter.7372
+     /tmp/ccEn8lNP.s:439    .bss:00000000000001fc counter_1ms.7431
 
 UNDEFINED SYMBOLS
 GPIO_SetDir

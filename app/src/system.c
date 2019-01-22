@@ -663,8 +663,8 @@ void system_master_vol_link_cb(void *arg, int event)
     
     if (event == MENU_EV_ENTER)
     {
-      //  if (master_vol_port < 2) master_vol_port++;
-        //else master_vol_port = 0;
+        if (master_vol_port < 2) master_vol_port++;
+        else master_vol_port = 0;
         
         //set_item_value(MASTER_VOL_SET_LINK_CMD, master_vol_port);
     }
@@ -1449,6 +1449,7 @@ void system_bypass_cb (void *arg, int event)
 
     if (event == MENU_EV_ENTER)  
     {
+        naveg_menu_refresh(DISPLAY_LEFT);
         naveg_settings_refresh(DISPLAY_LEFT);
         naveg_bypass_refresh(bypass[0], bypass[1], bypass[3]);    
     }

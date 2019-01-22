@@ -529,28 +529,28 @@
  555 032a 00BF     		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 lpc17xx_timer.c
-     /tmp/cc3Un6un.s:13     .text:0000000000000000 $t
-     /tmp/cc3Un6un.s:20     .text:0000000000000000 TIM_GetIntStatus
-     /tmp/cc3Un6un.s:41     .text:0000000000000016 TIM_GetIntCaptureStatus
-     /tmp/cc3Un6un.s:63     .text:000000000000002c TIM_ClearIntPending
-     /tmp/cc3Un6un.s:79     .text:0000000000000036 TIM_ClearIntCapturePending
-     /tmp/cc3Un6un.s:96     .text:0000000000000042 TIM_ConfigStructInit
-     /tmp/cc3Un6un.s:118    .text:0000000000000052 TIM_Init
-     /tmp/cc3Un6un.s:251    .text:000000000000016c $d
-     /tmp/cc3Un6un.s:256    .text:000000000000017c $t
-     /tmp/cc3Un6un.s:263    .text:000000000000017c TIM_DeInit
-     /tmp/cc3Un6un.s:305    .text:00000000000001c8 $d
-     /tmp/cc3Un6un.s:309    .text:00000000000001d4 $t
-     /tmp/cc3Un6un.s:316    .text:00000000000001d4 TIM_Cmd
-     /tmp/cc3Un6un.s:335    .text:00000000000001e6 TIM_ResetCounter
-     /tmp/cc3Un6un.s:354    .text:00000000000001f8 TIM_ConfigMatch
-     /tmp/cc3Un6un.s:363    .text:0000000000000202 $d
-     /tmp/cc3Un6un.s:367    .text:0000000000000206 $t
-     /tmp/cc3Un6un.s:454    .text:00000000000002a4 TIM_UpdateMatchValue
-     /tmp/cc3Un6un.s:462    .text:00000000000002ac $d
-     /tmp/cc3Un6un.s:466    .text:00000000000002b0 $t
-     /tmp/cc3Un6un.s:490    .text:00000000000002c2 TIM_ConfigCapture
-     /tmp/cc3Un6un.s:544    .text:0000000000000320 TIM_GetCaptureValue
+     /tmp/ccNlmSmg.s:13     .text:0000000000000000 $t
+     /tmp/ccNlmSmg.s:20     .text:0000000000000000 TIM_GetIntStatus
+     /tmp/ccNlmSmg.s:41     .text:0000000000000016 TIM_GetIntCaptureStatus
+     /tmp/ccNlmSmg.s:63     .text:000000000000002c TIM_ClearIntPending
+     /tmp/ccNlmSmg.s:79     .text:0000000000000036 TIM_ClearIntCapturePending
+     /tmp/ccNlmSmg.s:96     .text:0000000000000042 TIM_ConfigStructInit
+     /tmp/ccNlmSmg.s:118    .text:0000000000000052 TIM_Init
+     /tmp/ccNlmSmg.s:251    .text:000000000000016c $d
+     /tmp/ccNlmSmg.s:256    .text:000000000000017c $t
+     /tmp/ccNlmSmg.s:263    .text:000000000000017c TIM_DeInit
+     /tmp/ccNlmSmg.s:305    .text:00000000000001c8 $d
+     /tmp/ccNlmSmg.s:309    .text:00000000000001d4 $t
+     /tmp/ccNlmSmg.s:316    .text:00000000000001d4 TIM_Cmd
+     /tmp/ccNlmSmg.s:335    .text:00000000000001e6 TIM_ResetCounter
+     /tmp/ccNlmSmg.s:354    .text:00000000000001f8 TIM_ConfigMatch
+     /tmp/ccNlmSmg.s:363    .text:0000000000000202 $d
+     /tmp/ccNlmSmg.s:367    .text:0000000000000206 $t
+     /tmp/ccNlmSmg.s:454    .text:00000000000002a4 TIM_UpdateMatchValue
+     /tmp/ccNlmSmg.s:462    .text:00000000000002ac $d
+     /tmp/ccNlmSmg.s:466    .text:00000000000002b0 $t
+     /tmp/ccNlmSmg.s:490    .text:00000000000002c2 TIM_ConfigCapture
+     /tmp/ccNlmSmg.s:544    .text:0000000000000320 TIM_GetCaptureValue
 
 UNDEFINED SYMBOLS
 __aeabi_uldivmod

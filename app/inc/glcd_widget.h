@@ -77,7 +77,7 @@ typedef struct KNOB_T {
     uint8_t x, y;
     uint8_t color;
     uint8_t orientation;
-    int16_t min, max, value;
+    float min, max, value;
 } knob_t;
 
 typedef struct BAR_T {

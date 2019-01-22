@@ -220,7 +220,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         title.align = ALIGN_NONE_NONE;
         widget_textbox(display, &title);
 
-        //FREE(title_str_bfr);
+        FREE(title_str_bfr);
     
         //sets the value y, for both value as unit
         value.y = knob.y - 5;
@@ -268,7 +268,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         value.text = value_str_bfr;
         value.align = ALIGN_NONE_NONE;
         widget_textbox(display, &value);
-        //FREE (value_str_bfr);
+        FREE (value_str_bfr);
     }
     
     //invert the pot area

@@ -267,22 +267,22 @@
  293              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 lpc17xx_adc.c
-     /tmp/ccDNDOr8.s:13     .text:0000000000000000 $t
-     /tmp/ccDNDOr8.s:20     .text:0000000000000000 ADC_Init
-     /tmp/ccDNDOr8.s:50     .text:0000000000000034 ADC_DeInit
-     /tmp/ccDNDOr8.s:69     .text:000000000000004a ADC_GetData
-     /tmp/ccDNDOr8.s:80     .text:0000000000000058 $d
-     /tmp/ccDNDOr8.s:82     .text:000000000000005c $t
-     /tmp/ccDNDOr8.s:89     .text:000000000000005c ADC_StartCmd
-     /tmp/ccDNDOr8.s:108    .text:000000000000006e ADC_BurstCmd
-     /tmp/ccDNDOr8.s:129    .text:0000000000000082 ADC_PowerdownCmd
-     /tmp/ccDNDOr8.s:150    .text:0000000000000096 ADC_EdgeStartConfig
-     /tmp/ccDNDOr8.s:171    .text:00000000000000aa ADC_IntConfig
-     /tmp/ccDNDOr8.s:196    .text:00000000000000c6 ADC_ChannelCmd
-     /tmp/ccDNDOr8.s:223    .text:00000000000000e8 ADC_ChannelGetData
-     /tmp/ccDNDOr8.s:239    .text:00000000000000f4 ADC_ChannelGetStatus
-     /tmp/ccDNDOr8.s:263    .text:000000000000010e ADC_GlobalGetData
-     /tmp/ccDNDOr8.s:277    .text:0000000000000112 ADC_GlobalGetStatus
+     /tmp/ccM0fMf3.s:13     .text:0000000000000000 $t
+     /tmp/ccM0fMf3.s:20     .text:0000000000000000 ADC_Init
+     /tmp/ccM0fMf3.s:50     .text:0000000000000034 ADC_DeInit
+     /tmp/ccM0fMf3.s:69     .text:000000000000004a ADC_GetData
+     /tmp/ccM0fMf3.s:80     .text:0000000000000058 $d
+     /tmp/ccM0fMf3.s:82     .text:000000000000005c $t
+     /tmp/ccM0fMf3.s:89     .text:000000000000005c ADC_StartCmd
+     /tmp/ccM0fMf3.s:108    .text:000000000000006e ADC_BurstCmd
+     /tmp/ccM0fMf3.s:129    .text:0000000000000082 ADC_PowerdownCmd
+     /tmp/ccM0fMf3.s:150    .text:0000000000000096 ADC_EdgeStartConfig
+     /tmp/ccM0fMf3.s:171    .text:00000000000000aa ADC_IntConfig
+     /tmp/ccM0fMf3.s:196    .text:00000000000000c6 ADC_ChannelCmd
+     /tmp/ccM0fMf3.s:223    .text:00000000000000e8 ADC_ChannelGetData
+     /tmp/ccM0fMf3.s:239    .text:00000000000000f4 ADC_ChannelGetStatus
+     /tmp/ccM0fMf3.s:263    .text:000000000000010e ADC_GlobalGetData
+     /tmp/ccM0fMf3.s:277    .text:0000000000000112 ADC_GlobalGetStatus
 
 UNDEFINED SYMBOLS
 CLKPWR_ConfigPPWR

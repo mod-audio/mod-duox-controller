@@ -183,12 +183,12 @@
  193              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 node.c
-     /tmp/ccTlatgL.s:13     .text:0000000000000000 $t
-     /tmp/ccTlatgL.s:20     .text:0000000000000000 node_create
-     /tmp/ccTlatgL.s:47     .text:0000000000000020 node_child
-     /tmp/ccTlatgL.s:80     .text:0000000000000046 node_cut
-     /tmp/ccTlatgL.s:139    .text:0000000000000096 node_join
-     /tmp/ccTlatgL.s:172    .text:00000000000000ba node_destroy
+     /tmp/ccpsV8LK.s:13     .text:0000000000000000 $t
+     /tmp/ccpsV8LK.s:20     .text:0000000000000000 node_create
+     /tmp/ccpsV8LK.s:47     .text:0000000000000020 node_child
+     /tmp/ccpsV8LK.s:80     .text:0000000000000046 node_cut
+     /tmp/ccpsV8LK.s:139    .text:0000000000000096 node_join
+     /tmp/ccpsV8LK.s:172    .text:00000000000000ba node_destroy
 
 UNDEFINED SYMBOLS
 pvPortMalloc

@@ -331,30 +331,30 @@
  352              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 heap_5.c
-     /tmp/ccEeobfH.s:13     .text:0000000000000000 $t
-     /tmp/ccEeobfH.s:19     .text:0000000000000000 prvInsertBlockIntoFreeList
-     /tmp/ccEeobfH.s:72     .text:0000000000000050 $d
-     /tmp/ccEeobfH.s:74     .text:0000000000000054 $t
-     /tmp/ccEeobfH.s:81     .text:0000000000000054 pvPortMalloc
-     /tmp/ccEeobfH.s:172    .text:0000000000000100 $d
-     /tmp/ccEeobfH.s:174    .text:0000000000000104 $t
-     /tmp/ccEeobfH.s:181    .text:0000000000000104 vPortFree
-     /tmp/ccEeobfH.s:214    .text:0000000000000148 $d
-     /tmp/ccEeobfH.s:216    .text:000000000000014c $t
-     /tmp/ccEeobfH.s:223    .text:000000000000014c xPortGetFreeHeapSize
-     /tmp/ccEeobfH.s:233    .text:0000000000000154 $d
-     /tmp/ccEeobfH.s:235    .text:0000000000000158 $t
-     /tmp/ccEeobfH.s:242    .text:0000000000000158 xPortGetMinimumEverFreeHeapSize
-     /tmp/ccEeobfH.s:252    .text:0000000000000160 $d
-     /tmp/ccEeobfH.s:254    .text:0000000000000164 $t
-     /tmp/ccEeobfH.s:261    .text:0000000000000164 vPortDefineHeapRegions
-     /tmp/ccEeobfH.s:327    .text:00000000000001e4 $d
-     /tmp/ccEeobfH.s:330    .bss:0000000000000000 $d
-     /tmp/ccEeobfH.s:334    .bss:0000000000000000 xStart
-     /tmp/ccEeobfH.s:338    .bss:0000000000000008 pxEnd
-     /tmp/ccEeobfH.s:342    .bss:000000000000000c xBlockAllocatedBit
-     /tmp/ccEeobfH.s:346    .bss:0000000000000010 xFreeBytesRemaining
-     /tmp/ccEeobfH.s:350    .bss:0000000000000014 xMinimumEverFreeBytesRemaining
+     /tmp/ccq9W8Xz.s:13     .text:0000000000000000 $t
+     /tmp/ccq9W8Xz.s:19     .text:0000000000000000 prvInsertBlockIntoFreeList
+     /tmp/ccq9W8Xz.s:72     .text:0000000000000050 $d
+     /tmp/ccq9W8Xz.s:74     .text:0000000000000054 $t
+     /tmp/ccq9W8Xz.s:81     .text:0000000000000054 pvPortMalloc
+     /tmp/ccq9W8Xz.s:172    .text:0000000000000100 $d
+     /tmp/ccq9W8Xz.s:174    .text:0000000000000104 $t
+     /tmp/ccq9W8Xz.s:181    .text:0000000000000104 vPortFree
+     /tmp/ccq9W8Xz.s:214    .text:0000000000000148 $d
+     /tmp/ccq9W8Xz.s:216    .text:000000000000014c $t
+     /tmp/ccq9W8Xz.s:223    .text:000000000000014c xPortGetFreeHeapSize
+     /tmp/ccq9W8Xz.s:233    .text:0000000000000154 $d
+     /tmp/ccq9W8Xz.s:235    .text:0000000000000158 $t
+     /tmp/ccq9W8Xz.s:242    .text:0000000000000158 xPortGetMinimumEverFreeHeapSize
+     /tmp/ccq9W8Xz.s:252    .text:0000000000000160 $d
+     /tmp/ccq9W8Xz.s:254    .text:0000000000000164 $t
+     /tmp/ccq9W8Xz.s:261    .text:0000000000000164 vPortDefineHeapRegions
+     /tmp/ccq9W8Xz.s:327    .text:00000000000001e4 $d
+     /tmp/ccq9W8Xz.s:330    .bss:0000000000000000 $d
+     /tmp/ccq9W8Xz.s:334    .bss:0000000000000000 xStart
+     /tmp/ccq9W8Xz.s:338    .bss:0000000000000008 pxEnd
+     /tmp/ccq9W8Xz.s:342    .bss:000000000000000c xBlockAllocatedBit
+     /tmp/ccq9W8Xz.s:346    .bss:0000000000000010 xFreeBytesRemaining
+     /tmp/ccq9W8Xz.s:350    .bss:0000000000000014 xMinimumEverFreeBytesRemaining
 
 UNDEFINED SYMBOLS
 vTaskSuspendAll

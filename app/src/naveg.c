@@ -1850,11 +1850,11 @@ void naveg_pot_change(uint8_t pot)
     if (g_pots[pot] == NULL) return;
 
     //set the new value
-    //uint16_t tmp_value = MAP(hardware_get_pot_value(pot), 0, 4095, 4095, 0) ;
-    //if (tmp_value < 300) tmp_value = 1;
-    //else if (tmp_value > 3895) tmp_value = 4094;
+    uint16_t tmp_value = MAP(hardware_get_pot_value(pot), 0, 4095, 4095, 0) ;
+    if (tmp_value < 120) tmp_value = 0;
+    else if (tmp_value > 4000) tmp_value = 4095;
 
-    g_pots[pot]->value = (((hardware_get_pot_value(pot)) * (g_pots[pot]->maximum - g_pots[pot]->minimum)) / 4095) + g_pots[pot]->minimum; 
+    g_pots[pot]->value = ((tmp_value * (g_pots[pot]->maximum - g_pots[pot]->minimum)) / 4095) + g_pots[pot]->minimum; 
     g_pots[pot]->step = ((g_pots[pot]->value *  g_pots[pot]->steps) / (g_pots[pot]->maximum - g_pots[pot]->minimum));
 
     // send the foot value

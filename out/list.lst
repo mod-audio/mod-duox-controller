@@ -133,11 +133,11 @@
  143              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 list.c
-     /tmp/cc98YsOW.s:13     .text:0000000000000000 $t
-     /tmp/cc98YsOW.s:20     .text:0000000000000000 vListInitialise
-     /tmp/cc98YsOW.s:41     .text:0000000000000016 vListInitialiseItem
-     /tmp/cc98YsOW.s:56     .text:000000000000001c vListInsertEnd
-     /tmp/cc98YsOW.s:80     .text:0000000000000034 vListInsert
-     /tmp/cc98YsOW.s:120    .text:0000000000000068 uxListRemove
+     /tmp/ccnIVuuT.s:13     .text:0000000000000000 $t
+     /tmp/ccnIVuuT.s:20     .text:0000000000000000 vListInitialise
+     /tmp/ccnIVuuT.s:41     .text:0000000000000016 vListInitialiseItem
+     /tmp/ccnIVuuT.s:56     .text:000000000000001c vListInsertEnd
+     /tmp/ccnIVuuT.s:80     .text:0000000000000034 vListInsert
+     /tmp/ccnIVuuT.s:120    .text:0000000000000068 uxListRemove
 
 NO UNDEFINED SYMBOLS

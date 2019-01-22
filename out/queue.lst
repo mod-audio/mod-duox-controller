@@ -869,32 +869,32 @@
  909              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 queue.c
-     /tmp/ccHWHt7K.s:13     .text:0000000000000000 $t
-     /tmp/ccHWHt7K.s:19     .text:0000000000000000 prvCopyDataToQueue
-     /tmp/ccHWHt7K.s:78     .text:000000000000005e prvCopyDataFromQueue
-     /tmp/ccHWHt7K.s:106    .text:0000000000000082 prvUnlockQueue
-     /tmp/ccHWHt7K.s:178    .text:0000000000000104 xQueueGenericReset
-     /tmp/ccHWHt7K.s:228    .text:0000000000000162 xQueueGenericCreate
-     /tmp/ccHWHt7K.s:272    .text:00000000000001a4 xQueueCreateCountingSemaphore
-     /tmp/ccHWHt7K.s:294    .text:00000000000001ba xQueueGenericSend
-     /tmp/ccHWHt7K.s:405    .text:00000000000002a4 xQueueGenericSendFromISR
-     /tmp/ccHWHt7K.s:468    .text:0000000000000314 xQueueGiveFromISR
-     /tmp/ccHWHt7K.s:525    .text:000000000000036e xQueueGenericReceive
-     /tmp/ccHWHt7K.s:643    .text:0000000000000468 xQueueReceiveFromISR
-     /tmp/ccHWHt7K.s:702    .text:00000000000004c8 xQueuePeekFromISR
-     /tmp/ccHWHt7K.s:734    .text:00000000000004f4 uxQueueMessagesWaiting
-     /tmp/ccHWHt7K.s:752    .text:0000000000000506 uxQueueSpacesAvailable
-     /tmp/ccHWHt7K.s:772    .text:000000000000051c uxQueueMessagesWaitingFromISR
-     /tmp/ccHWHt7K.s:786    .text:0000000000000520 xQueueIsQueueEmptyFromISR
-     /tmp/ccHWHt7K.s:802    .text:000000000000052a xQueueIsQueueFullFromISR
-     /tmp/ccHWHt7K.s:821    .text:0000000000000538 vQueueAddToRegistry
-     /tmp/ccHWHt7K.s:851    .text:0000000000000564 $d
+     /tmp/ccN10WqI.s:13     .text:0000000000000000 $t
+     /tmp/ccN10WqI.s:19     .text:0000000000000000 prvCopyDataToQueue
+     /tmp/ccN10WqI.s:78     .text:000000000000005e prvCopyDataFromQueue
+     /tmp/ccN10WqI.s:106    .text:0000000000000082 prvUnlockQueue
+     /tmp/ccN10WqI.s:178    .text:0000000000000104 xQueueGenericReset
+     /tmp/ccN10WqI.s:228    .text:0000000000000162 xQueueGenericCreate
+     /tmp/ccN10WqI.s:272    .text:00000000000001a4 xQueueCreateCountingSemaphore
+     /tmp/ccN10WqI.s:294    .text:00000000000001ba xQueueGenericSend
+     /tmp/ccN10WqI.s:405    .text:00000000000002a4 xQueueGenericSendFromISR
+     /tmp/ccN10WqI.s:468    .text:0000000000000314 xQueueGiveFromISR
+     /tmp/ccN10WqI.s:525    .text:000000000000036e xQueueGenericReceive
+     /tmp/ccN10WqI.s:643    .text:0000000000000468 xQueueReceiveFromISR
+     /tmp/ccN10WqI.s:702    .text:00000000000004c8 xQueuePeekFromISR
+     /tmp/ccN10WqI.s:734    .text:00000000000004f4 uxQueueMessagesWaiting
+     /tmp/ccN10WqI.s:752    .text:0000000000000506 uxQueueSpacesAvailable
+     /tmp/ccN10WqI.s:772    .text:000000000000051c uxQueueMessagesWaitingFromISR
+     /tmp/ccN10WqI.s:786    .text:0000000000000520 xQueueIsQueueEmptyFromISR
+     /tmp/ccN10WqI.s:802    .text:000000000000052a xQueueIsQueueFullFromISR
+     /tmp/ccN10WqI.s:821    .text:0000000000000538 vQueueAddToRegistry
+     /tmp/ccN10WqI.s:851    .text:0000000000000564 $d
                             *COM*:0000000000000050 xQueueRegistry
-     /tmp/ccHWHt7K.s:853    .text:0000000000000568 $t
-     /tmp/ccHWHt7K.s:860    .text:0000000000000568 vQueueUnregisterQueue
-     /tmp/ccHWHt7K.s:889    .text:0000000000000590 $d
-     /tmp/ccHWHt7K.s:891    .text:0000000000000594 $t
-     /tmp/ccHWHt7K.s:898    .text:0000000000000594 vQueueDelete
+     /tmp/ccN10WqI.s:853    .text:0000000000000568 $t
+     /tmp/ccN10WqI.s:860    .text:0000000000000568 vQueueUnregisterQueue
+     /tmp/ccN10WqI.s:889    .text:0000000000000590 $d
+     /tmp/ccN10WqI.s:891    .text:0000000000000594 $t
+     /tmp/ccN10WqI.s:898    .text:0000000000000594 vQueueDelete
 
 UNDEFINED SYMBOLS
 memcpy

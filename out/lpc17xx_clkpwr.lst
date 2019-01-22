@@ -254,30 +254,30 @@
  270              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 lpc17xx_clkpwr.c
-     /tmp/cc0l0P82.s:13     .text:0000000000000000 $t
-     /tmp/cc0l0P82.s:20     .text:0000000000000000 CLKPWR_SetPCLKDiv
-     /tmp/cc0l0P82.s:56     .text:0000000000000050 $d
-     /tmp/cc0l0P82.s:58     .text:0000000000000054 $t
-     /tmp/cc0l0P82.s:65     .text:0000000000000054 CLKPWR_GetPCLKSEL
-     /tmp/cc0l0P82.s:85     .text:0000000000000074 $d
-     /tmp/cc0l0P82.s:87     .text:0000000000000078 $t
-     /tmp/cc0l0P82.s:94     .text:0000000000000078 CLKPWR_GetPCLK
-     /tmp/cc0l0P82.s:116    .text:0000000000000098 $d
-     /tmp/cc0l0P82.s:118    .text:000000000000009c $t
-     /tmp/cc0l0P82.s:125    .text:000000000000009c CLKPWR_ConfigPPWR
-     /tmp/cc0l0P82.s:151    .text:00000000000000c8 $d
-     /tmp/cc0l0P82.s:154    .text:00000000000000d0 $t
-     /tmp/cc0l0P82.s:161    .text:00000000000000d0 CLKPWR_Sleep
-     /tmp/cc0l0P82.s:178    .text:00000000000000dc $d
-     /tmp/cc0l0P82.s:180    .text:00000000000000e0 $t
-     /tmp/cc0l0P82.s:187    .text:00000000000000e0 CLKPWR_DeepSleep
-     /tmp/cc0l0P82.s:207    .text:00000000000000f4 $d
-     /tmp/cc0l0P82.s:210    .text:00000000000000fc $t
-     /tmp/cc0l0P82.s:217    .text:00000000000000fc CLKPWR_PowerDown
-     /tmp/cc0l0P82.s:237    .text:0000000000000110 $d
-     /tmp/cc0l0P82.s:240    .text:0000000000000118 $t
-     /tmp/cc0l0P82.s:247    .text:0000000000000118 CLKPWR_DeepPowerDown
-     /tmp/cc0l0P82.s:267    .text:000000000000012c $d
+     /tmp/cccYO8a0.s:13     .text:0000000000000000 $t
+     /tmp/cccYO8a0.s:20     .text:0000000000000000 CLKPWR_SetPCLKDiv
+     /tmp/cccYO8a0.s:56     .text:0000000000000050 $d
+     /tmp/cccYO8a0.s:58     .text:0000000000000054 $t
+     /tmp/cccYO8a0.s:65     .text:0000000000000054 CLKPWR_GetPCLKSEL
+     /tmp/cccYO8a0.s:85     .text:0000000000000074 $d
+     /tmp/cccYO8a0.s:87     .text:0000000000000078 $t
+     /tmp/cccYO8a0.s:94     .text:0000000000000078 CLKPWR_GetPCLK
+     /tmp/cccYO8a0.s:116    .text:0000000000000098 $d
+     /tmp/cccYO8a0.s:118    .text:000000000000009c $t
+     /tmp/cccYO8a0.s:125    .text:000000000000009c CLKPWR_ConfigPPWR
+     /tmp/cccYO8a0.s:151    .text:00000000000000c8 $d
+     /tmp/cccYO8a0.s:154    .text:00000000000000d0 $t
+     /tmp/cccYO8a0.s:161    .text:00000000000000d0 CLKPWR_Sleep
+     /tmp/cccYO8a0.s:178    .text:00000000000000dc $d
+     /tmp/cccYO8a0.s:180    .text:00000000000000e0 $t
+     /tmp/cccYO8a0.s:187    .text:00000000000000e0 CLKPWR_DeepSleep
+     /tmp/cccYO8a0.s:207    .text:00000000000000f4 $d
+     /tmp/cccYO8a0.s:210    .text:00000000000000fc $t
+     /tmp/cccYO8a0.s:217    .text:00000000000000fc CLKPWR_PowerDown
+     /tmp/cccYO8a0.s:237    .text:0000000000000110 $d
+     /tmp/cccYO8a0.s:240    .text:0000000000000118 $t
+     /tmp/cccYO8a0.s:247    .text:0000000000000118 CLKPWR_DeepPowerDown
+     /tmp/cccYO8a0.s:267    .text:000000000000012c $d
 
 UNDEFINED SYMBOLS
 SystemCoreClock

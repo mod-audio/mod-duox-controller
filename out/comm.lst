@@ -222,31 +222,31 @@
  246              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 comm.c
-     /tmp/ccl7nKw1.s:13     .text:0000000000000000 $t
-     /tmp/ccl7nKw1.s:19     .text:0000000000000000 webgui_rx_cb
-     /tmp/ccl7nKw1.s:68     .text:000000000000005c $d
-     /tmp/ccl7nKw1.s:71     .text:0000000000000064 $t
-     /tmp/ccl7nKw1.s:78     .text:0000000000000064 comm_init
-     /tmp/ccl7nKw1.s:97     .text:0000000000000088 $d
-     /tmp/ccl7nKw1.s:100    .text:0000000000000090 $t
-     /tmp/ccl7nKw1.s:107    .text:0000000000000090 comm_webgui_send
-     /tmp/ccl7nKw1.s:124    .text:000000000000009e comm_webgui_read
-     /tmp/ccl7nKw1.s:143    .text:00000000000000bc $d
-     /tmp/ccl7nKw1.s:145    .text:00000000000000c0 $t
-     /tmp/ccl7nKw1.s:152    .text:00000000000000c0 comm_webgui_set_response_cb
-     /tmp/ccl7nKw1.s:163    .text:00000000000000c8 $d
-     /tmp/ccl7nKw1.s:165    .text:00000000000000cc $t
-     /tmp/ccl7nKw1.s:172    .text:00000000000000cc comm_webgui_response_cb
-     /tmp/ccl7nKw1.s:196    .text:00000000000000f0 $d
-     /tmp/ccl7nKw1.s:198    .text:00000000000000f4 $t
-     /tmp/ccl7nKw1.s:205    .text:00000000000000f4 comm_webgui_wait_response
-     /tmp/ccl7nKw1.s:221    .text:0000000000000104 $d
-     /tmp/ccl7nKw1.s:224    .bss:0000000000000000 $d
-     /tmp/ccl7nKw1.s:228    .bss:0000000000000000 g_webgui_rx_rb
-     /tmp/ccl7nKw1.s:232    .bss:0000000000000004 g_webgui_sem
-     /tmp/ccl7nKw1.s:236    .bss:0000000000000008 g_current_item
-     /tmp/ccl7nKw1.s:240    .bss:000000000000000c g_webgui_response_cb
-     /tmp/ccl7nKw1.s:244    .bss:0000000000000010 g_webgui_blocked
+     /tmp/ccbVKDqX.s:13     .text:0000000000000000 $t
+     /tmp/ccbVKDqX.s:19     .text:0000000000000000 webgui_rx_cb
+     /tmp/ccbVKDqX.s:68     .text:000000000000005c $d
+     /tmp/ccbVKDqX.s:71     .text:0000000000000064 $t
+     /tmp/ccbVKDqX.s:78     .text:0000000000000064 comm_init
+     /tmp/ccbVKDqX.s:97     .text:0000000000000088 $d
+     /tmp/ccbVKDqX.s:100    .text:0000000000000090 $t
+     /tmp/ccbVKDqX.s:107    .text:0000000000000090 comm_webgui_send
+     /tmp/ccbVKDqX.s:124    .text:000000000000009e comm_webgui_read
+     /tmp/ccbVKDqX.s:143    .text:00000000000000bc $d
+     /tmp/ccbVKDqX.s:145    .text:00000000000000c0 $t
+     /tmp/ccbVKDqX.s:152    .text:00000000000000c0 comm_webgui_set_response_cb
+     /tmp/ccbVKDqX.s:163    .text:00000000000000c8 $d
+     /tmp/ccbVKDqX.s:165    .text:00000000000000cc $t
+     /tmp/ccbVKDqX.s:172    .text:00000000000000cc comm_webgui_response_cb
+     /tmp/ccbVKDqX.s:196    .text:00000000000000f0 $d
+     /tmp/ccbVKDqX.s:198    .text:00000000000000f4 $t
+     /tmp/ccbVKDqX.s:205    .text:00000000000000f4 comm_webgui_wait_response
+     /tmp/ccbVKDqX.s:221    .text:0000000000000104 $d
+     /tmp/ccbVKDqX.s:224    .bss:0000000000000000 $d
+     /tmp/ccbVKDqX.s:228    .bss:0000000000000000 g_webgui_rx_rb
+     /tmp/ccbVKDqX.s:232    .bss:0000000000000004 g_webgui_sem
+     /tmp/ccbVKDqX.s:236    .bss:0000000000000008 g_current_item
+     /tmp/ccbVKDqX.s:240    .bss:000000000000000c g_webgui_response_cb
+     /tmp/ccbVKDqX.s:244    .bss:0000000000000010 g_webgui_blocked
 
 UNDEFINED SYMBOLS
 serial_read

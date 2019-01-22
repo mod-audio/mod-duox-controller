@@ -421,7 +421,8 @@ void widget_bar_indicator(glcd_t *display, bar_t *bar)
 
 void widget_knob(glcd_t *display, knob_t *knob)
 {
-    int16_t knob_possistion, NewValue;
+    float NewValue;
+    uint8_t knob_possistion;
 
     NewValue = MAP(knob->value, knob->min, knob->max, 1, 16);
     knob_possistion = ROUND(NewValue);

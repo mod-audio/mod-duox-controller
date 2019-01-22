@@ -619,30 +619,30 @@
  653              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 lpc17xx_ssp.c
-     /tmp/ccU4xxAB.s:13     .text:0000000000000000 $t
-     /tmp/ccU4xxAB.s:20     .text:0000000000000000 SSP_Init
-     /tmp/ccU4xxAB.s:113    .text:00000000000000b4 $d
-     /tmp/ccU4xxAB.s:116    .text:00000000000000bc $t
-     /tmp/ccU4xxAB.s:123    .text:00000000000000bc SSP_DeInit
-     /tmp/ccU4xxAB.s:148    .text:00000000000000e4 $d
-     /tmp/ccU4xxAB.s:151    .text:00000000000000ec $t
-     /tmp/ccU4xxAB.s:158    .text:00000000000000ec SSP_GetDataSize
-     /tmp/ccU4xxAB.s:173    .text:00000000000000f4 SSP_ConfigStructInit
-     /tmp/ccU4xxAB.s:190    .text:0000000000000108 $d
-     /tmp/ccU4xxAB.s:192    .text:000000000000010c $t
-     /tmp/ccU4xxAB.s:199    .text:000000000000010c SSP_Cmd
-     /tmp/ccU4xxAB.s:218    .text:000000000000011e SSP_LoopBackCmd
-     /tmp/ccU4xxAB.s:237    .text:0000000000000130 SSP_SlaveOutputCmd
-     /tmp/ccU4xxAB.s:256    .text:0000000000000142 SSP_SendData
-     /tmp/ccU4xxAB.s:270    .text:0000000000000146 SSP_ReceiveData
-     /tmp/ccU4xxAB.s:285    .text:000000000000014c SSP_ReadWrite
-     /tmp/ccU4xxAB.s:536    .text:0000000000000320 SSP_GetStatus
-     /tmp/ccU4xxAB.s:554    .text:000000000000032c SSP_IntConfig
-     /tmp/ccU4xxAB.s:575    .text:0000000000000340 SSP_GetRawIntStatus
-     /tmp/ccU4xxAB.s:593    .text:000000000000034c SSP_GetRawIntStatusReg
-     /tmp/ccU4xxAB.s:607    .text:0000000000000350 SSP_GetIntStatus
-     /tmp/ccU4xxAB.s:625    .text:000000000000035c SSP_ClearIntPending
-     /tmp/ccU4xxAB.s:639    .text:0000000000000360 SSP_DMACmd
+     /tmp/cc11Guuu.s:13     .text:0000000000000000 $t
+     /tmp/cc11Guuu.s:20     .text:0000000000000000 SSP_Init
+     /tmp/cc11Guuu.s:113    .text:00000000000000b4 $d
+     /tmp/cc11Guuu.s:116    .text:00000000000000bc $t
+     /tmp/cc11Guuu.s:123    .text:00000000000000bc SSP_DeInit
+     /tmp/cc11Guuu.s:148    .text:00000000000000e4 $d
+     /tmp/cc11Guuu.s:151    .text:00000000000000ec $t
+     /tmp/cc11Guuu.s:158    .text:00000000000000ec SSP_GetDataSize
+     /tmp/cc11Guuu.s:173    .text:00000000000000f4 SSP_ConfigStructInit
+     /tmp/cc11Guuu.s:190    .text:0000000000000108 $d
+     /tmp/cc11Guuu.s:192    .text:000000000000010c $t
+     /tmp/cc11Guuu.s:199    .text:000000000000010c SSP_Cmd
+     /tmp/cc11Guuu.s:218    .text:000000000000011e SSP_LoopBackCmd
+     /tmp/cc11Guuu.s:237    .text:0000000000000130 SSP_SlaveOutputCmd
+     /tmp/cc11Guuu.s:256    .text:0000000000000142 SSP_SendData
+     /tmp/cc11Guuu.s:270    .text:0000000000000146 SSP_ReceiveData
+     /tmp/cc11Guuu.s:285    .text:000000000000014c SSP_ReadWrite
+     /tmp/cc11Guuu.s:536    .text:0000000000000320 SSP_GetStatus
+     /tmp/cc11Guuu.s:554    .text:000000000000032c SSP_IntConfig
+     /tmp/cc11Guuu.s:575    .text:0000000000000340 SSP_GetRawIntStatus
+     /tmp/cc11Guuu.s:593    .text:000000000000034c SSP_GetRawIntStatusReg
+     /tmp/cc11Guuu.s:607    .text:0000000000000350 SSP_GetIntStatus
+     /tmp/cc11Guuu.s:625    .text:000000000000035c SSP_ClearIntPending
+     /tmp/cc11Guuu.s:639    .text:0000000000000360 SSP_DMACmd
 
 UNDEFINED SYMBOLS
 CLKPWR_ConfigPPWR

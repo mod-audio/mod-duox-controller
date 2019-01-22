@@ -358,25 +358,25 @@
  354              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 protocol.c
-     /tmp/ccRVo5mX.s:13     .text:0000000000000000 $t
-     /tmp/ccRVo5mX.s:20     .text:0000000000000000 protocol_parse
-     /tmp/ccRVo5mX.s:193    .text:0000000000000160 $d
-     /tmp/ccRVo5mX.s:198    .text:0000000000000170 $t
-     /tmp/ccRVo5mX.s:205    .text:0000000000000170 protocol_add_command
-     /tmp/ccRVo5mX.s:238    .text:00000000000001b0 $d
-     /tmp/ccRVo5mX.s:240    .text:00000000000001b4 $t
-     /tmp/ccRVo5mX.s:247    .text:00000000000001b4 protocol_response
-     /tmp/ccRVo5mX.s:274    .text:00000000000001e8 $d
-     /tmp/ccRVo5mX.s:277    .text:00000000000001f0 $t
-     /tmp/ccRVo5mX.s:284    .text:00000000000001f0 protocol_remove_commands
-     /tmp/ccRVo5mX.s:310    .text:0000000000000218 $d
-     /tmp/ccRVo5mX.s:319    .data:0000000000000000 g_error_messages
-     /tmp/ccRVo5mX.s:315    .data:0000000000000000 $d
-     /tmp/ccRVo5mX.s:325    .bss:0000000000000000 $d
-     /tmp/ccRVo5mX.s:329    .bss:0000000000000000 g_command_count
-     /tmp/ccRVo5mX.s:333    .bss:0000000000000004 g_commands
-     /tmp/ccRVo5mX.s:337    .bss:0000000000000144 response_buffer.7774
-     /tmp/ccRVo5mX.s:340    .rodata.str1.4:0000000000000000 $d
+     /tmp/ccrjF5wX.s:13     .text:0000000000000000 $t
+     /tmp/ccrjF5wX.s:20     .text:0000000000000000 protocol_parse
+     /tmp/ccrjF5wX.s:193    .text:0000000000000160 $d
+     /tmp/ccrjF5wX.s:198    .text:0000000000000170 $t
+     /tmp/ccrjF5wX.s:205    .text:0000000000000170 protocol_add_command
+     /tmp/ccrjF5wX.s:238    .text:00000000000001b0 $d
+     /tmp/ccrjF5wX.s:240    .text:00000000000001b4 $t
+     /tmp/ccrjF5wX.s:247    .text:00000000000001b4 protocol_response
+     /tmp/ccrjF5wX.s:274    .text:00000000000001e8 $d
+     /tmp/ccrjF5wX.s:277    .text:00000000000001f0 $t
+     /tmp/ccrjF5wX.s:284    .text:00000000000001f0 protocol_remove_commands
+     /tmp/ccrjF5wX.s:310    .text:0000000000000218 $d
+     /tmp/ccrjF5wX.s:319    .data:0000000000000000 g_error_messages
+     /tmp/ccrjF5wX.s:315    .data:0000000000000000 $d
+     /tmp/ccrjF5wX.s:325    .bss:0000000000000000 $d
+     /tmp/ccrjF5wX.s:329    .bss:0000000000000000 g_command_count
+     /tmp/ccrjF5wX.s:333    .bss:0000000000000004 g_commands
+     /tmp/ccrjF5wX.s:337    .bss:0000000000000144 response_buffer.7774
+     /tmp/ccrjF5wX.s:340    .rodata.str1.4:0000000000000000 $d
 
 UNDEFINED SYMBOLS
 strarr_split

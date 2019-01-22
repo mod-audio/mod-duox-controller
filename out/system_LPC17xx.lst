@@ -216,17 +216,17 @@
  222              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 system_LPC17xx.c
-     /tmp/ccNf76c0.s:13     .text:0000000000000000 $t
-     /tmp/ccNf76c0.s:20     .text:0000000000000000 SystemCoreClockUpdate
-     /tmp/ccNf76c0.s:36     .text:0000000000000020 $d
-     /tmp/ccNf76c0.s:40     .text:0000000000000024 $t
-     /tmp/ccNf76c0.s:49     .text:0000000000000036 $d
-     /tmp/ccNf76c0.s:53     .text:000000000000003a $t
-     /tmp/ccNf76c0.s:139    .text:000000000000010c $d
-     /tmp/ccNf76c0.s:146    .text:0000000000000124 $t
-     /tmp/ccNf76c0.s:153    .text:0000000000000124 SystemInit
-     /tmp/ccNf76c0.s:212    .text:00000000000001b8 $d
-     /tmp/ccNf76c0.s:220    .data:0000000000000000 SystemCoreClock
-     /tmp/ccNf76c0.s:216    .data:0000000000000000 $d
+     /tmp/cchAxCIU.s:13     .text:0000000000000000 $t
+     /tmp/cchAxCIU.s:20     .text:0000000000000000 SystemCoreClockUpdate
+     /tmp/cchAxCIU.s:36     .text:0000000000000020 $d
+     /tmp/cchAxCIU.s:40     .text:0000000000000024 $t
+     /tmp/cchAxCIU.s:49     .text:0000000000000036 $d
+     /tmp/cchAxCIU.s:53     .text:000000000000003a $t
+     /tmp/cchAxCIU.s:139    .text:000000000000010c $d
+     /tmp/cchAxCIU.s:146    .text:0000000000000124 $t
+     /tmp/cchAxCIU.s:153    .text:0000000000000124 SystemInit
+     /tmp/cchAxCIU.s:212    .text:00000000000001b8 $d
+     /tmp/cchAxCIU.s:220    .data:0000000000000000 SystemCoreClock
+     /tmp/cchAxCIU.s:216    .data:0000000000000000 $d
 
 NO UNDEFINED SYMBOLS

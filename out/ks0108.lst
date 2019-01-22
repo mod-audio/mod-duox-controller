@@ -1752,29 +1752,29 @@
  1786              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 ks0108.c
-     /tmp/ccBMvugH.s:13     .text:0000000000000000 $t
-     /tmp/ccBMvugH.s:19     .text:0000000000000000 chip_select
-     /tmp/ccBMvugH.s:58     .text:0000000000000044 write_instruction
-     /tmp/ccBMvugH.s:137    .text:00000000000000d6 ks0108_backlight
-     /tmp/ccBMvugH.s:164    .text:00000000000000f6 ks0108_set_pixel
-     /tmp/ccBMvugH.s:200    .text:0000000000000134 ks0108_hline
-     /tmp/ccBMvugH.s:246    .text:0000000000000182 ks0108_vline
-     /tmp/ccBMvugH.s:292    .text:00000000000001d0 ks0108_line
-     /tmp/ccBMvugH.s:436    .text:00000000000002e6 ks0108_rect
-     /tmp/ccBMvugH.s:482    .text:000000000000033c ks0108_rect_fill
-     /tmp/ccBMvugH.s:532    .text:0000000000000392 ks0108_clear
-     /tmp/ccBMvugH.s:555    .text:00000000000003ac ks0108_rect_invert
-     /tmp/ccBMvugH.s:668    .text:00000000000004b2 ks0108_draw_image
-     /tmp/ccBMvugH.s:719    .text:0000000000000514 ks0108_text
-     /tmp/ccBMvugH.s:1033   .text:00000000000007b4 $d
-     /tmp/ccBMvugH.s:1035   .text:00000000000007b8 $t
-     /tmp/ccBMvugH.s:1042   .text:00000000000007b8 ks0108_update
-     /tmp/ccBMvugH.s:1153   .text:00000000000008ae ks0108_init
-     /tmp/ccBMvugH.s:1286   .text:00000000000009f8 $d
-     /tmp/ccBMvugH.s:1289   .rodata:0000000000000000 $d
-     /tmp/ccBMvugH.s:1293   .rodata:0000000000000000 System5x7
-     /tmp/ccBMvugH.s:1784   .bss:0000000000000000 g_id
-     /tmp/ccBMvugH.s:1785   .bss:0000000000000000 $d
+     /tmp/cctB4RSD.s:13     .text:0000000000000000 $t
+     /tmp/cctB4RSD.s:19     .text:0000000000000000 chip_select
+     /tmp/cctB4RSD.s:58     .text:0000000000000044 write_instruction
+     /tmp/cctB4RSD.s:137    .text:00000000000000d6 ks0108_backlight
+     /tmp/cctB4RSD.s:164    .text:00000000000000f6 ks0108_set_pixel
+     /tmp/cctB4RSD.s:200    .text:0000000000000134 ks0108_hline
+     /tmp/cctB4RSD.s:246    .text:0000000000000182 ks0108_vline
+     /tmp/cctB4RSD.s:292    .text:00000000000001d0 ks0108_line
+     /tmp/cctB4RSD.s:436    .text:00000000000002e6 ks0108_rect
+     /tmp/cctB4RSD.s:482    .text:000000000000033c ks0108_rect_fill
+     /tmp/cctB4RSD.s:532    .text:0000000000000392 ks0108_clear
+     /tmp/cctB4RSD.s:555    .text:00000000000003ac ks0108_rect_invert
+     /tmp/cctB4RSD.s:668    .text:00000000000004b2 ks0108_draw_image
+     /tmp/cctB4RSD.s:719    .text:0000000000000514 ks0108_text
+     /tmp/cctB4RSD.s:1033   .text:00000000000007b4 $d
+     /tmp/cctB4RSD.s:1035   .text:00000000000007b8 $t
+     /tmp/cctB4RSD.s:1042   .text:00000000000007b8 ks0108_update
+     /tmp/cctB4RSD.s:1153   .text:00000000000008ae ks0108_init
+     /tmp/cctB4RSD.s:1286   .text:00000000000009f8 $d
+     /tmp/cctB4RSD.s:1289   .rodata:0000000000000000 $d
+     /tmp/cctB4RSD.s:1293   .rodata:0000000000000000 System5x7
+     /tmp/cctB4RSD.s:1784   .bss:0000000000000000 g_id
+     /tmp/cctB4RSD.s:1785   .bss:0000000000000000 $d
 
 UNDEFINED SYMBOLS
 GPIO_SetValue

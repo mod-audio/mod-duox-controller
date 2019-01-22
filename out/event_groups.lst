@@ -326,16 +326,16 @@
  344              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 event_groups.c
-     /tmp/cc5KJF8X.s:13     .text:0000000000000000 $t
-     /tmp/cc5KJF8X.s:20     .text:0000000000000000 xEventGroupCreate
-     /tmp/cc5KJF8X.s:42     .text:000000000000001a xEventGroupWaitBits
-     /tmp/cc5KJF8X.s:133    .text:00000000000000ca xEventGroupClearBits
-     /tmp/cc5KJF8X.s:154    .text:00000000000000e4 xEventGroupGetBitsFromISR
-     /tmp/cc5KJF8X.s:172    .text:00000000000000f6 xEventGroupSetBits
-     /tmp/cc5KJF8X.s:230    .text:000000000000015c xEventGroupSync
-     /tmp/cc5KJF8X.s:294    .text:00000000000001dc vEventGroupDelete
-     /tmp/cc5KJF8X.s:323    .text:0000000000000206 vEventGroupSetBitsCallback
-     /tmp/cc5KJF8X.s:337    .text:000000000000020e vEventGroupClearBitsCallback
+     /tmp/ccLvGCOV.s:13     .text:0000000000000000 $t
+     /tmp/ccLvGCOV.s:20     .text:0000000000000000 xEventGroupCreate
+     /tmp/ccLvGCOV.s:42     .text:000000000000001a xEventGroupWaitBits
+     /tmp/ccLvGCOV.s:133    .text:00000000000000ca xEventGroupClearBits
+     /tmp/ccLvGCOV.s:154    .text:00000000000000e4 xEventGroupGetBitsFromISR
+     /tmp/ccLvGCOV.s:172    .text:00000000000000f6 xEventGroupSetBits
+     /tmp/ccLvGCOV.s:230    .text:000000000000015c xEventGroupSync
+     /tmp/ccLvGCOV.s:294    .text:00000000000001dc vEventGroupDelete
+     /tmp/ccLvGCOV.s:323    .text:0000000000000206 vEventGroupSetBitsCallback
+     /tmp/ccLvGCOV.s:337    .text:000000000000020e vEventGroupClearBitsCallback
 
 UNDEFINED SYMBOLS
 pvPortMalloc

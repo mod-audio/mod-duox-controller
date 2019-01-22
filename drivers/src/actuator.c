@@ -608,8 +608,8 @@ void actuators_clock(void)
                     //get value
                     uint16_t tmp = ADC_ChannelGetData(LPC_ADC, pot->channel);
                     current_value[pot->id] = k * tmp + (1.0 - k) * current_value[pot->id];
-                    uint16_t val = MAP(current_value[pot->id], 0, 4095, 4095, 0);
-
+                    //uint16_t val = MAP(current_value[pot->id], 0, 4095, 4095, 0);
+                    uint16_t val = current_value[pot->id];
                     //if turned and difference is suficiant 
                     if ((val > pot->value) ? ((val - pot->value) > POT_THRESHOLD) : ((pot->value - val) > POT_THRESHOLD))
                     {
