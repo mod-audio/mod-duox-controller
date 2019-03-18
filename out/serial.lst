@@ -1,0 +1,778 @@
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 2
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"serial.c"
+  12              		.text
+  13              		.align	1
+  14              		.p2align 2,,3
+  15              		.syntax unified
+  16              		.thumb
+  17              		.thumb_func
+  18              		.fpu softvfp
+  20              	uart_transmit:
+  21              		@ args = 0, pretend = 0, frame = 16
+  22              		@ frame_needed = 0, uses_anonymous_args = 0
+  23 0000 30B5     		push	{r4, r5, lr}
+  24 0002 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+  25 0004 85B0     		sub	sp, sp, #20
+  26 0006 0546     		mov	r5, r0
+  27 0008 43B1     		cbz	r3, .L10
+  28 000a 012B     		cmp	r3, #1
+  29 000c 49D0     		beq	.L11
+  30 000e 022B     		cmp	r3, #2
+  31 0010 55D0     		beq	.L12
+  32 0012 032B     		cmp	r3, #3
+  33 0014 2B4C     		ldr	r4, .L37
+  34 0016 18BF     		it	ne
+  35 0018 0024     		movne	r4, #0
+  36 001a 00E0     		b	.L2
+  37              	.L10:
+  38 001c 2A4C     		ldr	r4, .L37+4
+  39              	.L2:
+  40 001e 0022     		movs	r2, #0
+  41 0020 0121     		movs	r1, #1
+  42 0022 2046     		mov	r0, r4
+  43 0024 FFF7FEFF 		bl	UART_IntConfig
+  44              	.L3:
+  45 0028 2046     		mov	r0, r4
+  46 002a FFF7FEFF 		bl	UART_CheckBusy
+  47 002e 0128     		cmp	r0, #1
+  48 0030 FAD0     		beq	.L3
+  49 0032 6B7A     		ldrb	r3, [r5, #9]	@ zero_extendqisi2
+  50 0034 23B1     		cbz	r3, .L4
+  51 0036 95F82830 		ldrb	r3, [r5, #40]	@ zero_extendqisi2
+  52 003a A3BB     		cbnz	r3, .L33
+  53              	.L5:
+  54 003c 0023     		movs	r3, #0
+  55 003e 6B72     		strb	r3, [r5, #9]
+  56              	.L4:
+  57 0040 6946     		mov	r1, sp
+  58 0042 1022     		movs	r2, #16
+  59 0044 286A     		ldr	r0, [r5, #32]
+  60 0046 FFF7FEFF 		bl	ringbuff_read
+  61 004a C0B9     		cbnz	r0, .L34
+  62 004c 286A     		ldr	r0, [r5, #32]
+  63 004e FFF7FEFF 		bl	ringbuff_is_empty
+  64 0052 F8B1     		cbz	r0, .L35
+  65              	.L7:
+  66 0054 2046     		mov	r0, r4
+  67 0056 FFF7FEFF 		bl	UART_CheckBusy
+  68 005a 0128     		cmp	r0, #1
+  69 005c FAD0     		beq	.L7
+  70 005e 95F82830 		ldrb	r3, [r5, #40]	@ zero_extendqisi2
+  71 0062 1BB9     		cbnz	r3, .L36
+  72              	.L9:
+  73 0064 0123     		movs	r3, #1
+  74 0066 6B72     		strb	r3, [r5, #9]
+  75 0068 05B0     		add	sp, sp, #20
+  76              		@ sp needed
+  77 006a 30BD     		pop	{r4, r5, pc}
+  78              	.L36:
+  79 006c 0121     		movs	r1, #1
+  80 006e 95F82A30 		ldrb	r3, [r5, #42]	@ zero_extendqisi2
+  81 0072 95F82900 		ldrb	r0, [r5, #41]	@ zero_extendqisi2
+  82 0076 9940     		lsls	r1, r1, r3
+  83 0078 FFF7FEFF 		bl	GPIO_ClearValue
+  84 007c F2E7     		b	.L9
+  85              	.L34:
+  86 007e 0246     		mov	r2, r0
+  87 0080 6946     		mov	r1, sp
+  88 0082 0023     		movs	r3, #0
+  89 0084 2046     		mov	r0, r4
+  90 0086 FFF7FEFF 		bl	UART_Send
+  91 008a 286A     		ldr	r0, [r5, #32]
+  92 008c FFF7FEFF 		bl	ringbuff_is_empty
+  93 0090 0028     		cmp	r0, #0
+  94 0092 DFD1     		bne	.L7
+  95              	.L35:
+  96 0094 0122     		movs	r2, #1
+  97 0096 2046     		mov	r0, r4
+  98 0098 1146     		mov	r1, r2
+  99 009a FFF7FEFF 		bl	UART_IntConfig
+ 100 009e 05B0     		add	sp, sp, #20
+ 101              		@ sp needed
+ 102 00a0 30BD     		pop	{r4, r5, pc}
+ 103              	.L11:
+ 104 00a2 0A4C     		ldr	r4, .L37+8
+ 105 00a4 BBE7     		b	.L2
+ 106              	.L33:
+ 107 00a6 0121     		movs	r1, #1
+ 108 00a8 95F82A30 		ldrb	r3, [r5, #42]	@ zero_extendqisi2
+ 109 00ac 95F82900 		ldrb	r0, [r5, #41]	@ zero_extendqisi2
+ 110 00b0 9940     		lsls	r1, r1, r3
+ 111 00b2 FFF7FEFF 		bl	GPIO_SetValue
+ 112 00b6 3220     		movs	r0, #50
+ 113 00b8 FFF7FEFF 		bl	delay_us
+ 114 00bc BEE7     		b	.L5
+ 115              	.L12:
+ 116 00be 044C     		ldr	r4, .L37+12
+ 117 00c0 ADE7     		b	.L2
+ 118              	.L38:
+ 119 00c2 00BF     		.align	2
+ 120              	.L37:
+ 121 00c4 00C00940 		.word	1074380800
+ 122 00c8 00C00040 		.word	1073790976
+ 123 00cc 00000140 		.word	1073807360
+ 124 00d0 00800940 		.word	1074364416
+ 126              		.align	1
+ 127              		.p2align 2,,3
+ 128              		.syntax unified
+ 129              		.thumb
+ 130              		.thumb_func
+ 131              		.fpu softvfp
+ 133              	uart_handler:
+ 134              		@ args = 0, pretend = 0, frame = 16
+ 135              		@ frame_needed = 0, uses_anonymous_args = 0
+ 136 00d4 0028     		cmp	r0, #0
+ 137 00d6 5CD0     		beq	.L73
+ 138 00d8 F0B5     		push	{r4, r5, r6, r7, lr}
+ 139 00da 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 140 00dc 85B0     		sub	sp, sp, #20
+ 141 00de 83B9     		cbnz	r3, .L76
+ 142 00e0 3B4D     		ldr	r5, .L82
+ 143              	.L42:
+ 144 00e2 0446     		mov	r4, r0
+ 145 00e4 2846     		mov	r0, r5
+ 146 00e6 FFF7FEFF 		bl	UART_GetIntId
+ 147 00ea 00F00E07 		and	r7, r0, #14
+ 148 00ee 062F     		cmp	r7, #6
+ 149 00f0 17D0     		beq	.L77
+ 150              	.L43:
+ 151 00f2 00F00600 		and	r0, r0, #6
+ 152 00f6 0428     		cmp	r0, #4
+ 153 00f8 21D0     		beq	.L78
+ 154              	.L46:
+ 155 00fa 022F     		cmp	r7, #2
+ 156 00fc 55D0     		beq	.L79
+ 157              	.L39:
+ 158 00fe 05B0     		add	sp, sp, #20
+ 159              		@ sp needed
+ 160 0100 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 161              	.L76:
+ 162 0102 012B     		cmp	r3, #1
+ 163 0104 56D0     		beq	.L52
+ 164 0106 022B     		cmp	r3, #2
+ 165 0108 4DD0     		beq	.L53
+ 166 010a 032B     		cmp	r3, #3
+ 167 010c 314D     		ldr	r5, .L82+4
+ 168 010e 18BF     		it	ne
+ 169 0110 0025     		movne	r5, #0
+ 170 0112 0446     		mov	r4, r0
+ 171 0114 2846     		mov	r0, r5
+ 172 0116 FFF7FEFF 		bl	UART_GetIntId
+ 173 011a 00F00E07 		and	r7, r0, #14
+ 174 011e 062F     		cmp	r7, #6
+ 175 0120 E7D1     		bne	.L43
+ 176              	.L77:
+ 177 0122 2846     		mov	r0, r5
+ 178 0124 FFF7FEFF 		bl	UART_GetLineStatus
+ 179 0128 10F09E06 		ands	r6, r0, #158
+ 180 012c E7D0     		beq	.L39
+ 181 012e 10F0880F 		tst	r0, #136
+ 182 0132 43D1     		bne	.L80
+ 183              	.L45:
+ 184 0134 3146     		mov	r1, r6
+ 185 0136 2078     		ldrb	r0, [r4]	@ zero_extendqisi2
+ 186 0138 FFF7FEFF 		bl	serial_error
+ 187 013c DFE7     		b	.L39
+ 188              	.L78:
+ 189 013e 0022     		movs	r2, #0
+ 190 0140 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 191 0142 A272     		strb	r2, [r4, #10]
+ 192 0144 33BB     		cbnz	r3, .L81
+ 193 0146 2248     		ldr	r0, .L82
+ 194              	.L47:
+ 195 0148 6946     		mov	r1, sp
+ 196 014a 0023     		movs	r3, #0
+ 197 014c 0722     		movs	r2, #7
+ 198 014e FFF7FEFF 		bl	UART_Receive
+ 199 0152 6946     		mov	r1, sp
+ 200 0154 0646     		mov	r6, r0
+ 201 0156 0246     		mov	r2, r0
+ 202 0158 E069     		ldr	r0, [r4, #28]
+ 203 015a FFF7FEFF 		bl	ringbuff_write
+ 204 015e 8642     		cmp	r6, r0
+ 205 0160 0546     		mov	r5, r0
+ 206 0162 0CD9     		bls	.L48
+ 207              	.L50:
+ 208 0164 636A     		ldr	r3, [r4, #36]
+ 209 0166 0BB1     		cbz	r3, .L49
+ 210 0168 2046     		mov	r0, r4
+ 211 016a 9847     		blx	r3
+ 212              	.L49:
+ 213 016c 721B     		subs	r2, r6, r5
+ 214 016e 0DEB0501 		add	r1, sp, r5
+ 215 0172 E069     		ldr	r0, [r4, #28]
+ 216 0174 FFF7FEFF 		bl	ringbuff_write
+ 217 0178 0544     		add	r5, r5, r0
+ 218 017a AE42     		cmp	r6, r5
+ 219 017c F2D8     		bhi	.L50
+ 220              	.L48:
+ 221 017e 0C2F     		cmp	r7, #12
+ 222 0180 BBD1     		bne	.L46
+ 223 0182 0122     		movs	r2, #1
+ 224 0184 636A     		ldr	r3, [r4, #36]
+ 225 0186 A272     		strb	r2, [r4, #10]
+ 226 0188 002B     		cmp	r3, #0
+ 227 018a B8D0     		beq	.L39
+ 228 018c 2046     		mov	r0, r4
+ 229 018e 9847     		blx	r3
+ 230 0190 B5E7     		b	.L39
+ 231              	.L73:
+ 232 0192 7047     		bx	lr
+ 233              	.L81:
+ 234 0194 012B     		cmp	r3, #1
+ 235 0196 0FD0     		beq	.L56
+ 236 0198 022B     		cmp	r3, #2
+ 237 019a 16D0     		beq	.L57
+ 238 019c 032B     		cmp	r3, #3
+ 239 019e 0D48     		ldr	r0, .L82+4
+ 240 01a0 18BF     		it	ne
+ 241 01a2 1046     		movne	r0, r2
+ 242 01a4 D0E7     		b	.L47
+ 243              	.L53:
+ 244 01a6 0C4D     		ldr	r5, .L82+8
+ 245 01a8 9BE7     		b	.L42
+ 246              	.L79:
+ 247 01aa 2046     		mov	r0, r4
+ 248 01ac FFF728FF 		bl	uart_transmit
+ 249 01b0 05B0     		add	sp, sp, #20
+ 250              		@ sp needed
+ 251 01b2 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 252              	.L52:
+ 253 01b4 094D     		ldr	r5, .L82+12
+ 254 01b6 94E7     		b	.L42
+ 255              	.L56:
+ 256 01b8 0848     		ldr	r0, .L82+12
+ 257 01ba C5E7     		b	.L47
+ 258              	.L80:
+ 259 01bc 2846     		mov	r0, r5
+ 260 01be 0023     		movs	r3, #0
+ 261 01c0 1022     		movs	r2, #16
+ 262 01c2 6946     		mov	r1, sp
+ 263 01c4 FFF7FEFF 		bl	UART_Receive
+ 264 01c8 B4E7     		b	.L45
+ 265              	.L57:
+ 266 01ca 0348     		ldr	r0, .L82+8
+ 267 01cc BCE7     		b	.L47
+ 268              	.L83:
+ 269 01ce 00BF     		.align	2
+ 270              	.L82:
+ 271 01d0 00C00040 		.word	1073790976
+ 272 01d4 00C00940 		.word	1074380800
+ 273 01d8 00800940 		.word	1074364416
+ 274 01dc 00000140 		.word	1073807360
+ 276              		.align	1
+ 277              		.p2align 2,,3
+ 278              		.global	serial_init
+ 279              		.syntax unified
+ 280              		.thumb
+ 281              		.thumb_func
+ 282              		.fpu softvfp
+ 284              	serial_init:
+ 285              		@ args = 0, pretend = 0, frame = 16
+ 286              		@ frame_needed = 0, uses_anonymous_args = 0
+ 287 01e0 2DE9F043 		push	{r4, r5, r6, r7, r8, r9, lr}
+ 288 01e4 414D     		ldr	r5, .L96
+ 289 01e6 85B0     		sub	sp, sp, #20
+ 290 01e8 2B78     		ldrb	r3, [r5]	@ zero_extendqisi2
+ 291 01ea 0446     		mov	r4, r0
+ 292 01ec 2BB9     		cbnz	r3, .L85
+ 293 01ee 0122     		movs	r2, #1
+ 294 01f0 C5E90133 		strd	r3, r3, [r5, #4]
+ 295 01f4 C5E90333 		strd	r3, r3, [r5, #12]
+ 296 01f8 2A70     		strb	r2, [r5]
+ 297              	.L85:
+ 298 01fa 627B     		ldrb	r2, [r4, #13]	@ zero_extendqisi2
+ 299 01fc 217B     		ldrb	r1, [r4, #12]	@ zero_extendqisi2
+ 300 01fe E07A     		ldrb	r0, [r4, #11]	@ zero_extendqisi2
+ 301 0200 FFF7FEFF 		bl	PINSEL_SetPinFunc
+ 302 0204 227C     		ldrb	r2, [r4, #16]	@ zero_extendqisi2
+ 303 0206 E17B     		ldrb	r1, [r4, #15]	@ zero_extendqisi2
+ 304 0208 A07B     		ldrb	r0, [r4, #14]	@ zero_extendqisi2
+ 305 020a FFF7FEFF 		bl	PINSEL_SetPinFunc
+ 306 020e 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 307 0210 013B     		subs	r3, r3, #1
+ 308 0212 DBB2     		uxtb	r3, r3
+ 309 0214 022B     		cmp	r3, #2
+ 310 0216 4DD8     		bhi	.L90
+ 311 0218 4FF00108 		mov	r8, #1
+ 312 021c 344A     		ldr	r2, .L96+4
+ 313 021e D118     		adds	r1, r2, r3
+ 314 0220 91F90C70 		ldrsb	r7, [r1, #12]
+ 315 0224 52F82360 		ldr	r6, [r2, r3, lsl #2]
+ 316 0228 08FA07F8 		lsl	r8, r8, r7
+ 317              	.L86:
+ 318 022c 4FF00209 		mov	r9, #2
+ 319 0230 02A8     		add	r0, sp, #8
+ 320 0232 FFF7FEFF 		bl	UART_ConfigStructInit
+ 321 0236 6368     		ldr	r3, [r4, #4]
+ 322 0238 02A9     		add	r1, sp, #8
+ 323 023a 3046     		mov	r0, r6
+ 324 023c 0293     		str	r3, [sp, #8]
+ 325 023e FFF7FEFF 		bl	UART_Init
+ 326 0242 01A8     		add	r0, sp, #4
+ 327 0244 FFF7FEFF 		bl	UART_FIFOConfigStructInit
+ 328 0248 3046     		mov	r0, r6
+ 329 024a 01A9     		add	r1, sp, #4
+ 330 024c 8DF80790 		strb	r9, [sp, #7]
+ 331 0250 FFF7FEFF 		bl	UART_FIFOConfig
+ 332 0254 3046     		mov	r0, r6
+ 333 0256 0121     		movs	r1, #1
+ 334 0258 FFF7FEFF 		bl	UART_TxCmd
+ 335 025c 3046     		mov	r0, r6
+ 336 025e 0122     		movs	r2, #1
+ 337 0260 0021     		movs	r1, #0
+ 338 0262 FFF7FEFF 		bl	UART_IntConfig
+ 339 0266 3046     		mov	r0, r6
+ 340 0268 0126     		movs	r6, #1
+ 341 026a 4946     		mov	r1, r9
+ 342 026c 0122     		movs	r2, #1
+ 343 026e FFF7FEFF 		bl	UART_IntConfig
+ 344 0272 237A     		ldrb	r3, [r4, #8]	@ zero_extendqisi2
+ 345 0274 1F4A     		ldr	r2, .L96+8
+ 346 0276 DB00     		lsls	r3, r3, #3
+ 347 0278 1744     		add	r7, r7, r2
+ 348 027a DBB2     		uxtb	r3, r3
+ 349 027c 87F80033 		strb	r3, [r7, #768]
+ 350 0280 C2F80080 		str	r8, [r2]
+ 351 0284 6069     		ldr	r0, [r4, #20]
+ 352 0286 3044     		add	r0, r0, r6
+ 353 0288 FFF7FEFF 		bl	ringbuff_create
+ 354 028c A369     		ldr	r3, [r4, #24]
+ 355 028e E061     		str	r0, [r4, #28]
+ 356 0290 9819     		adds	r0, r3, r6
+ 357 0292 FFF7FEFF 		bl	ringbuff_create
+ 358 0296 0023     		movs	r3, #0
+ 359 0298 94F82820 		ldrb	r2, [r4, #40]	@ zero_extendqisi2
+ 360 029c C4E90803 		strd	r0, r3, [r4, #32]
+ 361 02a0 A372     		strb	r3, [r4, #10]
+ 362 02a2 6672     		strb	r6, [r4, #9]
+ 363 02a4 5AB9     		cbnz	r2, .L95
+ 364              	.L88:
+ 365 02a6 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 366 02a8 05EB8305 		add	r5, r5, r3, lsl #2
+ 367 02ac 6C60     		str	r4, [r5, #4]
+ 368 02ae 05B0     		add	sp, sp, #20
+ 369              		@ sp needed
+ 370 02b0 BDE8F083 		pop	{r4, r5, r6, r7, r8, r9, pc}
+ 371              	.L90:
+ 372 02b4 0527     		movs	r7, #5
+ 373 02b6 4FF02008 		mov	r8, #32
+ 374 02ba 0F4E     		ldr	r6, .L96+12
+ 375 02bc B6E7     		b	.L86
+ 376              	.L95:
+ 377 02be 94F82A10 		ldrb	r1, [r4, #42]	@ zero_extendqisi2
+ 378 02c2 3246     		mov	r2, r6
+ 379 02c4 06FA01F1 		lsl	r1, r6, r1
+ 380 02c8 94F82900 		ldrb	r0, [r4, #41]	@ zero_extendqisi2
+ 381 02cc FFF7FEFF 		bl	GPIO_SetDir
+ 382 02d0 94F82830 		ldrb	r3, [r4, #40]	@ zero_extendqisi2
+ 383 02d4 002B     		cmp	r3, #0
+ 384 02d6 E6D0     		beq	.L88
+ 385 02d8 94F82A10 		ldrb	r1, [r4, #42]	@ zero_extendqisi2
+ 386 02dc 94F82900 		ldrb	r0, [r4, #41]	@ zero_extendqisi2
+ 387 02e0 06FA01F1 		lsl	r1, r6, r1
+ 388 02e4 FFF7FEFF 		bl	GPIO_ClearValue
+ 389 02e8 DDE7     		b	.L88
+ 390              	.L97:
+ 391 02ea 00BF     		.align	2
+ 392              	.L96:
+ 393 02ec 00000000 		.word	.LANCHOR0
+ 394 02f0 00000000 		.word	.LANCHOR1
+ 395 02f4 00E100E0 		.word	-536813312
+ 396 02f8 00C00040 		.word	1073790976
+ 398              		.align	1
+ 399              		.p2align 2,,3
+ 400              		.global	serial_send
+ 401              		.syntax unified
+ 402              		.thumb
+ 403              		.thumb_func
+ 404              		.fpu softvfp
+ 406              	serial_send:
+ 407              		@ args = 0, pretend = 0, frame = 0
+ 408              		@ frame_needed = 0, uses_anonymous_args = 0
+ 409 02fc 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 410 0300 78B1     		cbz	r0, .L103
+ 411 0302 0128     		cmp	r0, #1
+ 412 0304 35D0     		beq	.L104
+ 413 0306 0228     		cmp	r0, #2
+ 414 0308 35D0     		beq	.L105
+ 415 030a 1D4B     		ldr	r3, .L113
+ 416 030c 0328     		cmp	r0, #3
+ 417 030e 03EB8003 		add	r3, r3, r0, lsl #2
+ 418 0312 5C68     		ldr	r4, [r3, #4]
+ 419 0314 1B4E     		ldr	r6, .L113+4
+ 420 0316 18BF     		it	ne
+ 421 0318 0026     		movne	r6, #0
+ 422 031a 4CB9     		cbnz	r4, .L111
+ 423              	.L107:
+ 424 031c 2046     		mov	r0, r4
+ 425              	.L98:
+ 426 031e BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 427              	.L103:
+ 428 0322 194E     		ldr	r6, .L113+8
+ 429              	.L99:
+ 430 0324 164B     		ldr	r3, .L113
+ 431 0326 03EB8003 		add	r3, r3, r0, lsl #2
+ 432 032a 5C68     		ldr	r4, [r3, #4]
+ 433 032c 002C     		cmp	r4, #0
+ 434 032e F5D0     		beq	.L107
+ 435              	.L111:
+ 436 0330 1546     		mov	r5, r2
+ 437 0332 0F46     		mov	r7, r1
+ 438 0334 3046     		mov	r0, r6
+ 439 0336 0022     		movs	r2, #0
+ 440 0338 0121     		movs	r1, #1
+ 441 033a FFF7FEFF 		bl	UART_IntConfig
+ 442 033e 2A46     		mov	r2, r5
+ 443 0340 3946     		mov	r1, r7
+ 444 0342 206A     		ldr	r0, [r4, #32]
+ 445 0344 FFF7FEFF 		bl	ringbuff_write
+ 446 0348 8046     		mov	r8, r0
+ 447 034a 2046     		mov	r0, r4
+ 448 034c A5EB0806 		sub	r6, r5, r8
+ 449 0350 FFF756FE 		bl	uart_transmit
+ 450              	.L101:
+ 451 0354 8EB1     		cbz	r6, .L112
+ 452              	.L102:
+ 453 0356 206A     		ldr	r0, [r4, #32]
+ 454 0358 FFF7FEFF 		bl	ringbuff_is_full
+ 455 035c 0028     		cmp	r0, #0
+ 456 035e FAD1     		bne	.L102
+ 457 0360 3246     		mov	r2, r6
+ 458 0362 07EB0801 		add	r1, r7, r8
+ 459 0366 206A     		ldr	r0, [r4, #32]
+ 460 0368 FFF7FEFF 		bl	ringbuff_write
+ 461 036c 361A     		subs	r6, r6, r0
+ 462 036e 8044     		add	r8, r8, r0
+ 463 0370 F0E7     		b	.L101
+ 464              	.L104:
+ 465 0372 064E     		ldr	r6, .L113+12
+ 466 0374 D6E7     		b	.L99
+ 467              	.L105:
+ 468 0376 064E     		ldr	r6, .L113+16
+ 469 0378 D4E7     		b	.L99
+ 470              	.L112:
+ 471 037a 2846     		mov	r0, r5
+ 472 037c CFE7     		b	.L98
+ 473              	.L114:
+ 474 037e 00BF     		.align	2
+ 475              	.L113:
+ 476 0380 00000000 		.word	.LANCHOR0
+ 477 0384 00C00940 		.word	1074380800
+ 478 0388 00C00040 		.word	1073790976
+ 479 038c 00000140 		.word	1073807360
+ 480 0390 00800940 		.word	1074364416
+ 482              		.align	1
+ 483              		.p2align 2,,3
+ 484              		.global	serial_read
+ 485              		.syntax unified
+ 486              		.thumb
+ 487              		.thumb_func
+ 488              		.fpu softvfp
+ 490              	serial_read:
+ 491              		@ args = 0, pretend = 0, frame = 0
+ 492              		@ frame_needed = 0, uses_anonymous_args = 0
+ 493 0394 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 494 0396 40B1     		cbz	r0, .L118
+ 495 0398 0128     		cmp	r0, #1
+ 496 039a 20D0     		beq	.L119
+ 497 039c 0228     		cmp	r0, #2
+ 498 039e 20D0     		beq	.L120
+ 499 03a0 0328     		cmp	r0, #3
+ 500 03a2 114E     		ldr	r6, .L124
+ 501 03a4 18BF     		it	ne
+ 502 03a6 0026     		movne	r6, #0
+ 503 03a8 00E0     		b	.L116
+ 504              	.L118:
+ 505 03aa 104E     		ldr	r6, .L124+4
+ 506              	.L116:
+ 507 03ac 104B     		ldr	r3, .L124+8
+ 508 03ae 03EB8000 		add	r0, r3, r0, lsl #2
+ 509 03b2 4468     		ldr	r4, [r0, #4]
+ 510 03b4 8CB1     		cbz	r4, .L115
+ 511 03b6 1746     		mov	r7, r2
+ 512 03b8 0022     		movs	r2, #0
+ 513 03ba 0D46     		mov	r5, r1
+ 514 03bc 3046     		mov	r0, r6
+ 515 03be 1146     		mov	r1, r2
+ 516 03c0 FFF7FEFF 		bl	UART_IntConfig
+ 517 03c4 3A46     		mov	r2, r7
+ 518 03c6 2946     		mov	r1, r5
+ 519 03c8 E069     		ldr	r0, [r4, #28]
+ 520 03ca FFF7FEFF 		bl	ringbuff_read
+ 521 03ce 0122     		movs	r2, #1
+ 522 03d0 0446     		mov	r4, r0
+ 523 03d2 0021     		movs	r1, #0
+ 524 03d4 3046     		mov	r0, r6
+ 525 03d6 FFF7FEFF 		bl	UART_IntConfig
+ 526              	.L115:
+ 527 03da 2046     		mov	r0, r4
+ 528 03dc F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 529              	.L119:
+ 530 03de 054E     		ldr	r6, .L124+12
+ 531 03e0 E4E7     		b	.L116
+ 532              	.L120:
+ 533 03e2 054E     		ldr	r6, .L124+16
+ 534 03e4 E2E7     		b	.L116
+ 535              	.L125:
+ 536 03e6 00BF     		.align	2
+ 537              	.L124:
+ 538 03e8 00C00940 		.word	1074380800
+ 539 03ec 00C00040 		.word	1073790976
+ 540 03f0 00000000 		.word	.LANCHOR0
+ 541 03f4 00000140 		.word	1073807360
+ 542 03f8 00800940 		.word	1074364416
+ 544              		.align	1
+ 545              		.p2align 2,,3
+ 546              		.global	serial_read_until
+ 547              		.syntax unified
+ 548              		.thumb
+ 549              		.thumb_func
+ 550              		.fpu softvfp
+ 552              	serial_read_until:
+ 553              		@ args = 0, pretend = 0, frame = 0
+ 554              		@ frame_needed = 0, uses_anonymous_args = 0
+ 555 03fc 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 556 0400 40B1     		cbz	r0, .L129
+ 557 0402 0128     		cmp	r0, #1
+ 558 0404 23D0     		beq	.L130
+ 559 0406 0228     		cmp	r0, #2
+ 560 0408 23D0     		beq	.L131
+ 561 040a 0328     		cmp	r0, #3
+ 562 040c 124E     		ldr	r6, .L135
+ 563 040e 18BF     		it	ne
+ 564 0410 0026     		movne	r6, #0
+ 565 0412 00E0     		b	.L127
+ 566              	.L129:
+ 567 0414 114E     		ldr	r6, .L135+4
+ 568              	.L127:
+ 569 0416 124C     		ldr	r4, .L135+8
+ 570 0418 04EB8000 		add	r0, r4, r0, lsl #2
+ 571 041c 4468     		ldr	r4, [r0, #4]
+ 572 041e 9CB1     		cbz	r4, .L126
+ 573 0420 1746     		mov	r7, r2
+ 574 0422 0022     		movs	r2, #0
+ 575 0424 9846     		mov	r8, r3
+ 576 0426 0D46     		mov	r5, r1
+ 577 0428 3046     		mov	r0, r6
+ 578 042a 1146     		mov	r1, r2
+ 579 042c FFF7FEFF 		bl	UART_IntConfig
+ 580 0430 3A46     		mov	r2, r7
+ 581 0432 2946     		mov	r1, r5
+ 582 0434 E069     		ldr	r0, [r4, #28]
+ 583 0436 4346     		mov	r3, r8
+ 584 0438 FFF7FEFF 		bl	ringbuff_read_until
+ 585 043c 0122     		movs	r2, #1
+ 586 043e 0446     		mov	r4, r0
+ 587 0440 0021     		movs	r1, #0
+ 588 0442 3046     		mov	r0, r6
+ 589 0444 FFF7FEFF 		bl	UART_IntConfig
+ 590              	.L126:
+ 591 0448 2046     		mov	r0, r4
+ 592 044a BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 593              	.L130:
+ 594 044e 054E     		ldr	r6, .L135+12
+ 595 0450 E1E7     		b	.L127
+ 596              	.L131:
+ 597 0452 054E     		ldr	r6, .L135+16
+ 598 0454 DFE7     		b	.L127
+ 599              	.L136:
+ 600 0456 00BF     		.align	2
+ 601              	.L135:
+ 602 0458 00C00940 		.word	1074380800
+ 603 045c 00C00040 		.word	1073790976
+ 604 0460 00000000 		.word	.LANCHOR0
+ 605 0464 00000140 		.word	1073807360
+ 606 0468 00800940 		.word	1074364416
+ 608              		.align	1
+ 609              		.p2align 2,,3
+ 610              		.global	serial_set_callback
+ 611              		.syntax unified
+ 612              		.thumb
+ 613              		.thumb_func
+ 614              		.fpu softvfp
+ 616              	serial_set_callback:
+ 617              		@ args = 0, pretend = 0, frame = 0
+ 618              		@ frame_needed = 0, uses_anonymous_args = 0
+ 619              		@ link register save eliminated.
+ 620 046c 034B     		ldr	r3, .L142
+ 621 046e 03EB8000 		add	r0, r3, r0, lsl #2
+ 622 0472 4368     		ldr	r3, [r0, #4]
+ 623 0474 03B1     		cbz	r3, .L137
+ 624 0476 5962     		str	r1, [r3, #36]
+ 625              	.L137:
+ 626 0478 7047     		bx	lr
+ 627              	.L143:
+ 628 047a 00BF     		.align	2
+ 629              	.L142:
+ 630 047c 00000000 		.word	.LANCHOR0
+ 632              		.align	1
+ 633              		.p2align 2,,3
+ 634              		.global	UART0_IRQHandler
+ 635              		.syntax unified
+ 636              		.thumb
+ 637              		.thumb_func
+ 638              		.fpu softvfp
+ 640              	UART0_IRQHandler:
+ 641              		@ args = 0, pretend = 0, frame = 0
+ 642              		@ frame_needed = 0, uses_anonymous_args = 0
+ 643              		@ link register save eliminated.
+ 644 0480 014B     		ldr	r3, .L145
+ 645 0482 5868     		ldr	r0, [r3, #4]
+ 646 0484 26E6     		b	uart_handler
+ 647              	.L146:
+ 648 0486 00BF     		.align	2
+ 649              	.L145:
+ 650 0488 00000000 		.word	.LANCHOR0
+ 652              		.align	1
+ 653              		.p2align 2,,3
+ 654              		.global	UART1_IRQHandler
+ 655              		.syntax unified
+ 656              		.thumb
+ 657              		.thumb_func
+ 658              		.fpu softvfp
+ 660              	UART1_IRQHandler:
+ 661              		@ args = 0, pretend = 0, frame = 0
+ 662              		@ frame_needed = 0, uses_anonymous_args = 0
+ 663              		@ link register save eliminated.
+ 664 048c 014B     		ldr	r3, .L148
+ 665 048e 9868     		ldr	r0, [r3, #8]
+ 666 0490 20E6     		b	uart_handler
+ 667              	.L149:
+ 668 0492 00BF     		.align	2
+ 669              	.L148:
+ 670 0494 00000000 		.word	.LANCHOR0
+ 672              		.align	1
+ 673              		.p2align 2,,3
+ 674              		.global	UART2_IRQHandler
+ 675              		.syntax unified
+ 676              		.thumb
+ 677              		.thumb_func
+ 678              		.fpu softvfp
+ 680              	UART2_IRQHandler:
+ 681              		@ args = 0, pretend = 0, frame = 0
+ 682              		@ frame_needed = 0, uses_anonymous_args = 0
+ 683              		@ link register save eliminated.
+ 684 0498 014B     		ldr	r3, .L151
+ 685 049a D868     		ldr	r0, [r3, #12]
+ 686 049c 1AE6     		b	uart_handler
+ 687              	.L152:
+ 688 049e 00BF     		.align	2
+ 689              	.L151:
+ 690 04a0 00000000 		.word	.LANCHOR0
+ 692              		.align	1
+ 693              		.p2align 2,,3
+ 694              		.global	UART3_IRQHandler
+ 695              		.syntax unified
+ 696              		.thumb
+ 697              		.thumb_func
+ 698              		.fpu softvfp
+ 700              	UART3_IRQHandler:
+ 701              		@ args = 0, pretend = 0, frame = 0
+ 702              		@ frame_needed = 0, uses_anonymous_args = 0
+ 703              		@ link register save eliminated.
+ 704 04a4 014B     		ldr	r3, .L154
+ 705 04a6 1869     		ldr	r0, [r3, #16]
+ 706 04a8 14E6     		b	uart_handler
+ 707              	.L155:
+ 708 04aa 00BF     		.align	2
+ 709              	.L154:
+ 710 04ac 00000000 		.word	.LANCHOR0
+ 712              		.section	.rodata
+ 713              		.align	2
+ 714              		.set	.LANCHOR1,. + 0
+ 717              	CSWTCH.34:
+ 718 0000 00000140 		.word	1073807360
+ 719 0004 00800940 		.word	1074364416
+ 720 0008 00C00940 		.word	1074380800
+ 723              	CSWTCH.35:
+ 724 000c 06       		.byte	6
+ 725 000d 07       		.byte	7
+ 726 000e 08       		.byte	8
+ 727              		.bss
+ 728              		.align	2
+ 729              		.set	.LANCHOR0,. + 0
+ 732              	g_init_instances:
+ 733 0000 00       		.space	1
+ 734 0001 000000   		.space	3
+ 737              	g_serial_instances:
+ 738 0004 00000000 		.space	16
+ 738      00000000 
+ 738      00000000 
+ 738      00000000 
+ 739              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 serial.c
+     /tmp/cc3kGDAR.s:13     .text:0000000000000000 $t
+     /tmp/cc3kGDAR.s:20     .text:0000000000000000 uart_transmit
+     /tmp/cc3kGDAR.s:121    .text:00000000000000c4 $d
+     /tmp/cc3kGDAR.s:126    .text:00000000000000d4 $t
+     /tmp/cc3kGDAR.s:133    .text:00000000000000d4 uart_handler
+     /tmp/cc3kGDAR.s:271    .text:00000000000001d0 $d
+     /tmp/cc3kGDAR.s:276    .text:00000000000001e0 $t
+     /tmp/cc3kGDAR.s:284    .text:00000000000001e0 serial_init
+     /tmp/cc3kGDAR.s:393    .text:00000000000002ec $d
+     /tmp/cc3kGDAR.s:398    .text:00000000000002fc $t
+     /tmp/cc3kGDAR.s:406    .text:00000000000002fc serial_send
+     /tmp/cc3kGDAR.s:476    .text:0000000000000380 $d
+     /tmp/cc3kGDAR.s:482    .text:0000000000000394 $t
+     /tmp/cc3kGDAR.s:490    .text:0000000000000394 serial_read
+     /tmp/cc3kGDAR.s:538    .text:00000000000003e8 $d
+     /tmp/cc3kGDAR.s:544    .text:00000000000003fc $t
+     /tmp/cc3kGDAR.s:552    .text:00000000000003fc serial_read_until
+     /tmp/cc3kGDAR.s:602    .text:0000000000000458 $d
+     /tmp/cc3kGDAR.s:608    .text:000000000000046c $t
+     /tmp/cc3kGDAR.s:616    .text:000000000000046c serial_set_callback
+     /tmp/cc3kGDAR.s:630    .text:000000000000047c $d
+     /tmp/cc3kGDAR.s:632    .text:0000000000000480 $t
+     /tmp/cc3kGDAR.s:640    .text:0000000000000480 UART0_IRQHandler
+     /tmp/cc3kGDAR.s:650    .text:0000000000000488 $d
+     /tmp/cc3kGDAR.s:652    .text:000000000000048c $t
+     /tmp/cc3kGDAR.s:660    .text:000000000000048c UART1_IRQHandler
+     /tmp/cc3kGDAR.s:670    .text:0000000000000494 $d
+     /tmp/cc3kGDAR.s:672    .text:0000000000000498 $t
+     /tmp/cc3kGDAR.s:680    .text:0000000000000498 UART2_IRQHandler
+     /tmp/cc3kGDAR.s:690    .text:00000000000004a0 $d
+     /tmp/cc3kGDAR.s:692    .text:00000000000004a4 $t
+     /tmp/cc3kGDAR.s:700    .text:00000000000004a4 UART3_IRQHandler
+     /tmp/cc3kGDAR.s:710    .text:00000000000004ac $d
+     /tmp/cc3kGDAR.s:713    .rodata:0000000000000000 $d
+     /tmp/cc3kGDAR.s:717    .rodata:0000000000000000 CSWTCH.34
+     /tmp/cc3kGDAR.s:723    .rodata:000000000000000c CSWTCH.35
+     /tmp/cc3kGDAR.s:728    .bss:0000000000000000 $d
+     /tmp/cc3kGDAR.s:732    .bss:0000000000000000 g_init_instances
+     /tmp/cc3kGDAR.s:737    .bss:0000000000000004 g_serial_instances
+
+UNDEFINED SYMBOLS
+UART_IntConfig
+UART_CheckBusy
+ringbuff_read
+ringbuff_is_empty
+GPIO_ClearValue
+UART_Send
+GPIO_SetValue
+delay_us
+UART_GetIntId
+UART_GetLineStatus
+serial_error
+UART_Receive
+ringbuff_write
+PINSEL_SetPinFunc
+UART_ConfigStructInit
+UART_Init
+UART_FIFOConfigStructInit
+UART_FIFOConfig
+UART_TxCmd
+ringbuff_create
+GPIO_SetDir
+ringbuff_is_full
+ringbuff_read_until
