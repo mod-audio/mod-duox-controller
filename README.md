@@ -4,9 +4,12 @@ Files for the Duo X controller firmware
 
 Not ready for a stable release yet, though good for testing.
 
+This branch will only work with the latest revision of the MOD DuoX controller board (Rev 5, March 2019).
+The board features a 12Mhz crystal (main CLK of 120Mhz) on the LPC1777 
+
 Known bugs:
--Banks menu can crash the HMI because of an indexing issue 
--The control_set callback is not implemented (also not on the MOD-UI side)
+- Banks menu can crash the HMI because of an indexing issue 
+- The control_set callback is not implemented (also not on the MOD-UI side)
 
 missing features:
 - Pages callback
