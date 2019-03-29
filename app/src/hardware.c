@@ -307,7 +307,7 @@ void hardware_setup(void)
     adc_initalisation();
 
     // default glcd brightness
-    g_brightness = 1;
+    g_brightness = MAX_BRIGHTNESS;
 
     ////////////////////////////////////////////////////////////////
     // Timer 0 configuration

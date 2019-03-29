@@ -300,6 +300,8 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define MASTER_VOL_SET_LINK_CMD     "get_master_volume_channel_mode"
 //get master volume link channel
 #define MASTER_VOL_GET_LINK_CMD     "set_master_volume_channel_mode %i"
+//refresh the pedalboard name
+#define PB_NAME_REFRESH_CMD         "pedalboard_name_refresh"
 
 //// Control propertires definitions
 #define CONTROL_PROP_LINEAR         0
@@ -469,13 +471,13 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"DNSMASQ:",                        MENU_NONE,      SERVICES_ID+5,      SERVICES_ID,    NULL                       , 0},  \
     {"VERSIONS",                        MENU_LIST,      VERSIONS_ID,        INFO_ID,        system_versions_cb         , 0},  \
     {"< BACK TO INFO",                  MENU_RETURN,    VERSIONS_ID+1,      VERSIONS_ID,    NULL                       , 0},  \
-    {"VERSION:",                        MENU_OK,        VERSIONS_ID+2,      VERSIONS_ID,    system_release_cb          , 0},  \
+    {"VERSION:",                        MENU_NONE,      VERSIONS_ID+2,      VERSIONS_ID,    system_release_cb          , 0},  \
     {"RESTORE:",                        MENU_NONE,      VERSIONS_ID+3,      VERSIONS_ID,    NULL                       , 0},  \
     {"SYSTEM:",                         MENU_NONE,      VERSIONS_ID+4,      VERSIONS_ID,    NULL                       , 0},  \
     {"CONTROLLER:",                     MENU_NONE,      VERSIONS_ID+5,      VERSIONS_ID,    NULL                       , 0},  \
     {"DEVICE",                          MENU_LIST,      DEVICE_ID,          INFO_ID,        system_device_cb           , 0},  \
     {"< BACK TO INFO",                  MENU_RETURN,    DEVICE_ID+1,        DEVICE_ID,      NULL                       , 0},  \
-    {"SERIAL NUMBER:",                  MENU_OK,        DEVICE_ID+2,        DEVICE_ID,      system_tag_cb              , 0},  \
+    {"SERIAL NUMBER:",                  MENU_NONE,      DEVICE_ID+2,        DEVICE_ID,      system_tag_cb              , 0},  \
     {"SYSTEM UPGRADE",                  MENU_CONFIRM,   UPGRADE_ID,         SYSTEM_ID,      system_upgrade_cb          , 0},  \
 
 //POPUP DEFINES

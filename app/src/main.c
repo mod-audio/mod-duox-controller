@@ -59,8 +59,9 @@
 
 #define UNUSED_PARAM(var)   do { (void)(var); } while (0)
 #define TASK_NAME(name)     ((const char * const) (name))
+#define ACTUATOR_TYPE(act)  (((button_t *)(act))->type)
 
-#define ACTUATORS_QUEUE_SIZE    5
+#define ACTUATORS_QUEUE_SIZE    10
 
 
 /*
@@ -107,6 +108,7 @@ static void bank_config_cb(proto_t *proto);
 static void tuner_cb(proto_t *proto);
 static void resp_cb(proto_t *proto);
 static void restore_cb(proto_t *proto);
+static void refresh_pb_name_cb(proto_t *proto);
 
 /*
 ************************************************************************************************************************
@@ -174,7 +176,11 @@ static void actuators_cb(void *actuator)
 
     // queue actuator info
     portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
-    xQueueSendFromISR(g_actuators_queue, &actuator_info, &xHigherPriorityTaskWoken);
+    //we want the buttons and encoders to always be handled, the pots can cluther the qeue.
+    //the encoder and buttons are in this sense prioritized over the potentiometer events. 
+    //for reference: https://www.freertos.org/xQueueOverwrite.html
+    if ((ACTUATOR_TYPE(actuator) == BUTTON) || (ACTUATOR_TYPE(actuator) == ROTARY_ENCODER)) xQueueOverwrite(g_actuators_queue, &actuator_info);
+    else xQueueSendFromISR(g_actuators_queue, &actuator_info, &xHigherPriorityTaskWoken);
 
     portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }
@@ -391,6 +397,7 @@ static void setup_task(void *pvParameters)
     protocol_add_command(TUNER_CMD, tuner_cb);
     protocol_add_command(RESPONSE_CMD, resp_cb);
     protocol_add_command(RESTORE_CMD, restore_cb);
+    protocol_add_command(PB_NAME_REFRESH_CMD, refresh_pb_name_cb);
 
     // init the navigation
     naveg_init();
@@ -496,7 +503,7 @@ static void control_rm_cb(proto_t *proto)
 
 static void control_set_cb(proto_t *proto)
 {
-    //naveg_set_control(atoi(proto->list[1]), proto->list[2], atof(proto->list[3]));
+    naveg_set_control(atoi(proto->list[1]), proto->list[2], atof(proto->list[3]));
     protocol_response("resp 0", proto);
 }
 
@@ -548,6 +555,11 @@ static void restore_cb(proto_t *proto)
     protocol_response("resp 0", proto);
 }
 
+static void refresh_pb_name_cb(proto_t *proto)
+{
+    naveg_print_pb_name(DISPLAY_LEFT);
+    protocol_response("resp 0", proto);
+}
 
 /*
 ************************************************************************************************************************

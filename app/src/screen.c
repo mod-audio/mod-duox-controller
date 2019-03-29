@@ -480,8 +480,8 @@ void screen_footer(uint8_t id, const char *name, const char *value)
         return;
     }
 
-    ///checks if its toggle or pwm
-    else if((value[1] == 'F')||(value[1] == 'N'))
+    ///checks if its toggle or a value
+    else if((value[1] == 'F')||(value[1] == 'N')||(strcmp(value, "") == 0))
     {
         // draws the name field
         char *title_str_bfr = (char *) MALLOC(16 * sizeof(char));
@@ -507,8 +507,8 @@ void screen_footer(uint8_t id, const char *name, const char *value)
         {
             if (align) glcd_rect_invert(display, 66, 57, 62, 7);
             else glcd_rect_invert(display, 0, 57, 63, 7);
-            return;
         }
+        return;
     }
     //other footers 
     else
@@ -786,7 +786,7 @@ void screen_system_menu(menu_item_t *item)
             list.count = item->data.list_count;
             list.list = item->data.list;
             widget_listbox(display, &list);
-            last_item = item;
+            if (last_item->desc->id != TEMPO_ID) last_item = item;
             break;
 
         case MENU_CONFIRM:
@@ -864,6 +864,7 @@ void screen_master_vol(int8_t volume_val)
 {
     char str_buf[8];
     char name[40] = "MASTER VOLUME: ";
+    if (volume_val < 0) volume_val = 0;
     int_to_str(((volume_val)), str_buf, sizeof(str_buf), 1);
     strcat(name, str_buf);
 

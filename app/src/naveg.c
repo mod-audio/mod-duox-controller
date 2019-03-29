@@ -741,17 +741,6 @@ static void control_set(uint8_t id, control_t *control)
     comm_webgui_send(buffer, i);
 }
 
-static void print_pb_name(uint8_t display)
-{
-    (void) display;
-
-    // sets the response callback
-    comm_webgui_set_response_cb(screen_top_info, NULL);
-
-    // sends the data to GUI
-    comm_webgui_send(PB_NAME_GET_CMD, strlen(PB_NAME_GET_CMD));
-}
-
 static void parse_banks_list(void *data, menu_item_t *item)
 {
     (void) item;
@@ -845,13 +834,13 @@ static void send_load_pedalboard(uint8_t bank_id, const char *pedalboard_uid)
 
     // sets the response callback
     comm_webgui_set_response_cb(NULL, NULL);
-    /*
+    
     // send the data to GUI
     comm_webgui_send(buffer, i);
 
     // waits the pedalboard loaded message to be received
     comm_webgui_wait_response();
-    */
+    
 }
 
 static void bp_enter(void)
@@ -1711,7 +1700,7 @@ void naveg_remove_control(int32_t effect_instance, const char *symbol)
     display_pot_rm(effect_instance, symbol);
 
     //updates pedalboard info area
-    if (!display_has_tool_enabled(0)) print_pb_name(0);
+    if (!display_has_tool_enabled(0)) naveg_print_pb_name(0);
     if (!display_has_tool_enabled(1)) 
     {    //get master vol value
         naveg_master_volume(0);
@@ -2006,7 +1995,7 @@ void naveg_toggle_tool(uint8_t tool, uint8_t display)
         screen_encoder(display, control);
 
         //display pb info
-        print_pb_name(display);
+        naveg_print_pb_name(display);
 
         //draws the pots
         draw_all_pots(display);
@@ -2075,6 +2064,17 @@ void naveg_master_volume(uint8_t set)
     int8_t screen_val =  MAP(master_vol_value , -60, -0, 0, 100);
     screen_master_vol(screen_val);
     
+}
+
+void naveg_print_pb_name(uint8_t display)
+{
+    (void) display;
+
+    // sets the response callback
+    comm_webgui_set_response_cb(screen_top_info, NULL);
+
+    // sends the data to GUI
+    comm_webgui_send(PB_NAME_GET_CMD, strlen(PB_NAME_GET_CMD));
 }
 
 void naveg_set_master_volume(uint8_t set)

@@ -414,6 +414,9 @@ void widget_bar_indicator(glcd_t *display, bar_t *bar)
     //draw the square
     glcd_rect(display, bar->x, bar->y, bar->width, bar->height, GLCD_BLACK);
 
+    //prevent it from trippin 
+    if (bar_possistion < 1) bar_possistion = 1;
+
     //color in the position area
     glcd_rect_fill(display, (bar->x+1), (bar->y+1), bar_possistion, (bar->height - 2), GLCD_BLACK);
 }

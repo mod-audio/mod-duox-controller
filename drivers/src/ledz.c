@@ -39,9 +39,9 @@
 
 // calculate (rounded) how many ticks are need to reach a period of 1ms
 //new define (HARDWARE DEPENDENT), finetuned by experimentation:
-#define TICKS_TO_1ms        (10000 / ((LEDZ_TICK_PERIOD * 2) + 0.5) / 10)
+//#define TICKS_TO_1ms        (10000 / ((LEDZ_TICK_PERIOD * 2) + 0.5) / 10)
 //original LEDZ definition:
-//#define TICKS_TO_1ms        (10000 / LEDZ_TICK_PERIOD + 5 )/ 10
+#define TICKS_TO_1ms        (10000 / LEDZ_TICK_PERIOD + 5 )/ 200
 
 // invert led value if user has defined LEDZ_TURN_ON_VALUE as zero
 #define LED_VALUE(val)      (!(LEDZ_TURN_ON_VALUE ^ (val)))

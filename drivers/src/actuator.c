@@ -350,7 +350,7 @@ void actuators_clock(void)
     button_t *button;
     encoder_t *encoder;
     pot_t *pot;
-    uint8_t i, button_on;
+    uint8_t i, button_on = 0;
 
     for (i = 0; i < g_actuators_count; i++)
     {
@@ -618,6 +618,7 @@ void actuators_clock(void)
                             SET_FLAG(pot->status, EV_POT_TURNED);
                             event(pot, EV_POT_TURNED);
                     }
+                    else CLR_FLAG(pot->status, EV_POT_TURNED);
                 }
             
             break;

@@ -488,6 +488,7 @@ void system_device_cb(void *arg, int event)
 
 void system_tag_cb(void *arg, int event)
 {
+    ledz_on(hardware_leds(4), RED);
     menu_item_t *item = arg;
 
     if (event == MENU_EV_ENTER)
@@ -495,10 +496,13 @@ void system_tag_cb(void *arg, int event)
         const char *response;
         char *txt = "The serial number of your     device is:                    ";
         response =  cli_command("cat /var/cache/mod/tag", CLI_RETRIEVE_RESPONSE);
+        ledz_on(hardware_leds(5), RED);
         char * bfr = (char *) MALLOC(1 + strlen(txt)+ strlen(response));
         strcpy(bfr, txt);
+        ledz_on(hardware_leds(5), BLUE);
         strcat(bfr, response);
         item->data.popup_content = bfr;
+        ledz_on(hardware_leds(5), GREEN);
     }
 }
 

@@ -131,6 +131,8 @@ void naveg_update_gain(uint8_t display_id, uint8_t update_id, float value);
 void naveg_bypass_refresh(uint8_t bypass_1, uint8_t bypass_2, uint8_t quick_bypass);
 
 void naveg_set_acceleration(uint8_t display_id);
+
+void naveg_print_pb_name(uint8_t display);
 /*
 ************************************************************************************************************************
 *           CONFIGURATION ERRORS
