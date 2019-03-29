@@ -24,7 +24,7 @@ Things to check:
 -There seems to be some kind of bug whith the pedalboard name. the second word is not being displayed for some reason, not sure if the HMI or MOD-UI is to blame here, we need to check the message.
 -The send_load_pedalboard command does not work, it also crashes the HMI at some point, we need to check the message.
 
-missing features:
+## missing features:
 - Pages callback
 - Instant snapshots
 - Gain stages control combined with PGA gain control
