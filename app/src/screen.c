@@ -335,8 +335,118 @@ void screen_encoder(uint8_t display_id, control_t *control)
         return;
     }
 
+    //liniar/logaritmic control type, Bar graphic
+    if (control->properties == CONTROL_PROP_LINEAR ||
+        control->properties == CONTROL_PROP_LOGARITHMIC)
+    {
+        textbox_t value, title;
+
+        //convert title
+        char *title_str_bfr = (char *) MALLOC(25 * sizeof(char));
+        strncpy(title_str_bfr, control->label, 24);
+        title_str_bfr[24] = '\0';
+
+        //convert value
+        //value_str is our temporary value which we use for what kind of value representation we need
+        //value_str_bfr is the value that gets printed
+        char value_str[10];
+        char *value_str_bfr = (char *) MALLOC(6 * sizeof(char));
+
+
+        //if the value becomes bigger then 9999 (4 characters), then switch to another view 10999 becomes 10.9K
+        if (control->value > 9999)
+        {
+            int_to_str(control->value/1000, value_str, sizeof(value_str), 0);
+            strcat(value_str, "K");
+        }  
+        //else if we have a value bigger then 100, we dont display decimals anymore
+        else if (control->value > 99.9) int_to_str(control->value, value_str, sizeof(value_str), 0);
+        //else if we have a value bigger then 10 we display just one decimal
+        else if (control->value > 9.9) float_to_str((control->value), value_str, sizeof(value_str), 1);
+        //if the value becomes less then 0 we change to 1 or 0 decimals 
+        else if (control->value < 0)
+        {
+            if (control->value > -99.9) 
+            {
+                float_to_str(control->value, value_str, sizeof(value_str), 1);
+            }
+            else if (control->value < -9999.9) 
+            {
+                int_to_str((control->value/1000), value_str, sizeof(value_str), 0);
+                strcat(value_str, "K");
+            }
+            else int_to_str(control->value, value_str, sizeof(value_str), 0);
+        }
+        //for values between 0 and 10 display 2 decimals
+        else float_to_str(control->value, value_str, sizeof(value_str), 2);
+        //copy to value_str_bfr, the first 5 char
+        strncpy(value_str_bfr, value_str, 5);
+        //terminate the text with line ending
+        value_str_bfr[6] ='\0';
+
+        //convert unit
+        const char *unit_str;
+        unit_str = (strcmp(control->unit, "") == 0 ? NULL : control->unit); 
+
+        //title:
+        title.color = GLCD_BLACK;
+        title.mode = TEXT_SINGLE_LINE;
+        title.font = SMfont;
+        title.x = 3;
+        title.y = 10;
+        title.height = 0;
+        title.width = 0;
+        title.top_margin = 0;
+        title.bottom_margin = 0;
+        title.left_margin = 2;
+        title.right_margin = 0;
+        title.text = title_str_bfr;
+        title.align = ALIGN_LEFT_NONE;
+        widget_textbox(display, &title);
+
+        FREE(title_str_bfr);
+    
+        
+        //adds the unit to the value
+        if (unit_str != NULL)
+        {
+            char *str_bfr = (char *) MALLOC(sizeof(value_str_bfr)+sizeof(value_str_bfr));
+            strncpy(str_bfr, value_str_bfr, 5);
+            strcat(str_bfr, " ");
+            strcat(str_bfr, unit_str);
+            value.text = str_bfr;
+        }
+        else value.text = value_str_bfr;
+
+        //value
+        value.color = GLCD_BLACK;
+        value.mode = TEXT_SINGLE_LINE;
+        value.font = SMfont;
+        value.x = 100;
+        value.y = 10;
+        value.height = 0;
+        value.width = 0;
+        value.top_margin = 0;
+        value.bottom_margin = 0;
+        value.left_margin = 0;
+        value.right_margin = 2;
+        value.align = ALIGN_RIGHT_NONE;
+        widget_textbox(display, &value);
+        FREE (value_str_bfr);
+    
+
+        bar_t volume_bar;
+        volume_bar.x = 0;
+        volume_bar.y = 17;
+        volume_bar.width = 128;
+        volume_bar.height = 5;
+        volume_bar.step = control->step;
+        volume_bar.steps = control->steps - 1;
+        widget_bar_indicator(display, &volume_bar); 
+    }
+
     // integer type control
-    if (control->properties == CONTROL_PROP_INTEGER)
+    else if (control->properties == CONTROL_PROP_INTEGER)
     {
 
         textbox_t title;

@@ -274,6 +274,25 @@ static void display_encoder_add(control_t *control)
     // calculates initial step
     switch (control->properties)
     {  
+        case CONTROL_PROP_LINEAR:
+            control->step =
+                (control->value - control->minimum) / ((control->maximum - control->minimum) / control->steps);
+            break;
+
+        case CONTROL_PROP_LOGARITHMIC:
+            if (control->minimum == 0.0)
+                control->minimum = FLT_MIN;
+
+            if (control->maximum == 0.0)
+                control->maximum = FLT_MIN;
+
+            if (control->value == 0.0)
+                control->value = FLT_MIN;
+
+            control->step =
+                (control->steps - 1) * log(control->value / control->minimum) / log(control->maximum / control->minimum);
+            break;
+            
         case CONTROL_PROP_ENUMERATION:
         case CONTROL_PROP_SCALE_POINTS:
             control->step = 0;
@@ -2209,7 +2228,7 @@ bp_list_t *naveg_get_pedalboards(void)
 
 void naveg_enter(uint8_t display)
 {
-    if (!g_initialized) return;
+    if ((!g_initialized)&&(g_update_cb)) return;
 
     if (display_has_tool_enabled(display))
     {
