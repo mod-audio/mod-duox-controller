@@ -31,11 +31,11 @@ Things to check:
 
 ## Build dependencies
 
-A ARM compiler. E.g. on Arch Linux install
+A ARM compiler. E.g. on Arch Linux install:
 ```
 pacman -S arm-none-eabi-gcc
 ```
-A  compiler. E.g. on Debian Linux install
+Or on Debian Linux install:
 ```
 add-apt-repository ppa:team-gcc-arm-embedded/ppa
 apt-get install gcc-arm-embedded
