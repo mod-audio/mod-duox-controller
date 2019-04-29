@@ -302,6 +302,13 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define MASTER_VOL_GET_LINK_CMD     "set_master_volume_channel_mode %i"
 //refresh the pedalboard name
 #define PB_NAME_REFRESH_CMD         "pedalboard_name_refresh"
+//request the next page
+#define NEXT_PAGE_COMMAND        "load_page %i"
+//save a snapshot
+#define SAVE_SNAPSHOT_COMMAND     "snapshot_save %i"
+//load a snapshot
+#define LOAD_SNAPSHOT_COMMAND     "snapshot_load %i"
+
 
 //// Control propertires definitions
 #define CONTROL_PROP_LINEAR         0
@@ -507,14 +514,19 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {HP_CV_OUTP+1, "Set output to CV", "You are about to set the      stereo output port to control voltage mode. To prevent      damaging your equipment,      please make sure that there   are no headphones connected.  Would you like to continue?"}, \
 
 //// Foot functions leds colors
-#define TOGGLED_COLOR           GREEN
-#define TRIGGER_COLOR           GREEN
-#define TAP_TEMPO_COLOR         GREEN
-#define ENUMERATED_COLOR        GREEN
+//// Foot functions leds colors
+#define TOGGLED_COLOR           RED
+#define TRIGGER_COLOR           WHITE
+#define TAP_TEMPO_COLOR         WHITE
+#define ENUMERATED_COLOR        WHITE
 #define BYPASS_COLOR            RED
-#define TRUE_BYPASS_COLOR       WHITE
-#define PEDALBOARD_NEXT_COLOR   WHITE
-#define PEDALBOARD_PREV_COLOR   WHITE
+#define TRUE_BYPASS_COLOR       CYAN
+#define PEDALBOARD_NEXT_COLOR   CYAN
+#define PEDALBOARD_PREV_COLOR   CYAN
+#define PAGES1_COLOR            RED
+#define PAGES2_COLOR            YELLOW
+#define PAGES3_COLOR            CYAN
+#define SNAPSHOT_COLOR          WHITE
 
 //// Tap Tempo
 // defines the time that the led will stay turned on (in milliseconds)

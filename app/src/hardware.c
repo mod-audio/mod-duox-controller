@@ -295,6 +295,9 @@ void hardware_setup(void)
         // Buttons initialization
         actuator_create(BUTTON, i, hardware_actuators(FOOTSWITCH0 + i));
         actuator_set_pins(hardware_actuators(FOOTSWITCH0 + i), FOOTSWITCH_PINS[i]);
+
+        if ((i > 3) && (i != 5)) actuator_set_prop(hardware_actuators(FOOTSWITCH0 + i), BUTTON_HOLD_TIME, (TOOL_MODE_TIME));
+        else actuator_set_prop(hardware_actuators(FOOTSWITCH0 + i), BUTTON_HOLD_TIME, (TOOL_MODE_TIME * 10));
     }
     for (i = 0; i < POTS_COUNT; i++)
     {

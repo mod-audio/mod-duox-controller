@@ -446,62 +446,174 @@ void widget_knob(glcd_t *display, knob_t *knob)
     switch (knob_possistion)
     {   
         case 1:
+            //if (knob->lock) glcd_rect_fill(display, (knob->x - 1) , (knob->y + 2), 1, 3, knob->color);
+            //else 
             glcd_rect_fill(display, (knob->x - 1) , (knob->y + 2), 1, 2, knob->color);
         break;
         case 2:
+           /* if (knob->lock)
+            {
+                glcd_rect_fill(display, (knob->x - 2) , (knob->y + 2), 2, 1, knob->color);
+                glcd_rect_fill(display, (knob->x - 3) , (knob->y + 3), 3, 1, knob->color);
+                glcd_rect_fill(display, (knob->x - 2) , (knob->y + 4), 1, 1, knob->color);
+            }
+            else
+            {
+                glcd_rect_fill(display, (knob->x - 2) , (knob->y + 2), 2, 1, knob->color);
+                glcd_rect_fill(display, (knob->x - 1) , (knob->y + 3), 1, 1, knob->color);
+            }*/
             glcd_rect_fill(display, (knob->x - 2) , (knob->y + 2), 2, 1, knob->color);
             glcd_rect_fill(display, (knob->x - 1) , (knob->y + 3), 1, 1, knob->color);
         break;
         case 3:
+            /*if (knob->lock)
+            {
+                glcd_rect_fill(display, (knob->x - 3) , (knob->y + 1), 2, 1, knob->color);
+                glcd_rect_fill(display, (knob->x - 4) , (knob->y + 2), 3, 1, knob->color);
+                glcd_rect_fill(display, (knob->x - 3) , (knob->y + 3), 1, 1, knob->color);
+            }
+            else
+            {
+                glcd_rect_fill(display, (knob->x - 3) , (knob->y + 1), 2, 1, knob->color);
+                glcd_rect_fill(display, (knob->x - 2) , (knob->y + 2), 1, 1, knob->color);  
+            }*/
             glcd_rect_fill(display, (knob->x - 3) , (knob->y + 1), 2, 1, knob->color);
-            glcd_rect_fill(display, (knob->x - 2) , (knob->y + 2), 1, 1, knob->color);
+            glcd_rect_fill(display, (knob->x - 2) , (knob->y + 2), 1, 1, knob->color);  
         break;
         case 4:
+            //if (knob->lock) glcd_rect_fill(display, (knob->x - 4) , (knob->y), 2, 2, knob->color);
+            //else 
             glcd_rect_fill(display, (knob->x - 3) , (knob->y), 1, 2, knob->color);
         break;
         case 5:
+            //if (knob->lock) glcd_rect_fill(display, (knob->x - 4) , (knob->y - 1), 2, 2, knob->color);
+            //else 
             glcd_rect_fill(display, (knob->x - 3) , (knob->y - 1), 1, 2, knob->color);
         break;
         case 6:
+            /*if (knob->lock)
+            {
+                glcd_rect_fill(display, (knob->x - 3) , (knob->y - 1), 2, 1, knob->color);
+                glcd_rect_fill(display, (knob->x - 4) , (knob->y - 2), 3, 1, knob->color);
+                glcd_rect_fill(display, (knob->x - 3) , (knob->y - 3), 1, 1, knob->color);
+            }
+            else 
+            {
+                glcd_rect_fill(display, (knob->x - 3) , (knob->y - 1), 2, 1, knob->color);
+                glcd_rect_fill(display, (knob->x - 2) , (knob->y - 2), 1, 1, knob->color);                
+            }*/
             glcd_rect_fill(display, (knob->x - 3) , (knob->y - 1), 2, 1, knob->color);
-            glcd_rect_fill(display, (knob->x - 2) , (knob->y - 2), 1, 1, knob->color);
+            glcd_rect_fill(display, (knob->x - 2) , (knob->y - 2), 1, 1, knob->color);  
         break;
         case 7:
+            /*if (knob->lock)
+            {
+                glcd_rect_fill(display, (knob->x - 2) , (knob->y - 2), 2, 1, knob->color);
+                glcd_rect_fill(display, (knob->x - 3) , (knob->y - 3), 3, 1, knob->color);
+                glcd_rect_fill(display, (knob->x - 2) , (knob->y - 4), 1, 1, knob->color);
+            }
+            else 
+            {
+                glcd_rect_fill(display, (knob->x - 2) , (knob->y - 2), 2, 1, knob->color);
+                glcd_rect_fill(display, (knob->x - 1) , (knob->y - 3), 1, 1, knob->color);                
+            }*/
             glcd_rect_fill(display, (knob->x - 2) , (knob->y - 2), 2, 1, knob->color);
-            glcd_rect_fill(display, (knob->x - 1) , (knob->y - 3), 1, 1, knob->color);
+            glcd_rect_fill(display, (knob->x - 1) , (knob->y - 3), 1, 1, knob->color); 
         break;
         case 8:
+            //if (knob->lock) glcd_rect_fill(display, (knob->x - 1) , (knob->y - 4), 2, 2, knob->color);
+            //else 
             glcd_rect_fill(display, (knob->x - 1) , (knob->y - 3), 2, 1, knob->color);
         break;
         case 9:
+            //if (knob->lock) glcd_rect_fill(display, (knob->x) , (knob->y - 4), 2, 2, knob->color);
+            //else 
             glcd_rect_fill(display, (knob->x) , (knob->y - 3), 2, 1, knob->color);
         break;
         case 10:
+            /*if (knob->lock)
+            {
+                glcd_rect_fill(display, (knob->x + 1) , (knob->y - 3), 1, 2, knob->color);
+                glcd_rect_fill(display, (knob->x + 2) , (knob->y - 4), 1, 3, knob->color);
+                glcd_rect_fill(display, (knob->x + 3) , (knob->y - 3), 1, 1, knob->color); 
+            }
+            else 
+            {
+                glcd_rect_fill(display, (knob->x + 1) , (knob->y - 3), 1, 2, knob->color);
+                glcd_rect_fill(display, (knob->x + 2) , (knob->y - 2), 1, 1, knob->color);               
+            }*/
             glcd_rect_fill(display, (knob->x + 1) , (knob->y - 3), 1, 2, knob->color);
-            glcd_rect_fill(display, (knob->x + 2) , (knob->y - 2), 1, 1, knob->color);
+            glcd_rect_fill(display, (knob->x + 2) , (knob->y - 2), 1, 1, knob->color);  
         break;
         case 11:
+            /*if (knob->lock)
+            {
+                glcd_rect_fill(display, (knob->x + 2) , (knob->y - 2), 1, 2, knob->color);
+                glcd_rect_fill(display, (knob->x + 3) , (knob->y - 3), 1, 3, knob->color);
+                glcd_rect_fill(display, (knob->x + 4) , (knob->y - 2), 1, 1, knob->color);
+            }
+            else 
+            {
+                glcd_rect_fill(display, (knob->x + 2) , (knob->y - 2), 1, 2, knob->color);
+                glcd_rect_fill(display, (knob->x + 3) , (knob->y - 1), 1, 1, knob->color);
+            }*/
             glcd_rect_fill(display, (knob->x + 2) , (knob->y - 2), 1, 2, knob->color);
             glcd_rect_fill(display, (knob->x + 3) , (knob->y - 1), 1, 1, knob->color);
         break;
         case 12:
+            //if (knob->lock) glcd_rect_fill(display, (knob->x + 3) , (knob->y - 1), 2, 2, knob->color);
+            //else 
             glcd_rect_fill(display, (knob->x + 3) , (knob->y - 1), 1, 2, knob->color);
         break;
         case 13:
+            //if (knob->lock) glcd_rect_fill(display, (knob->x + 3) , (knob->y), 2, 2, knob->color);
+            //else 
             glcd_rect_fill(display, (knob->x + 3) , (knob->y), 1, 2, knob->color);
         break;
         case 14:
+            /*if (knob->lock)
+            {
+                glcd_rect_fill(display, (knob->x + 2) , (knob->y + 1), 2, 1, knob->color);
+                glcd_rect_fill(display, (knob->x + 2) , (knob->y + 2), 3, 1, knob->color);
+                glcd_rect_fill(display, (knob->x + 3) , (knob->y + 3), 1, 1, knob->color);
+            }
+            else
+            {
+                glcd_rect_fill(display, (knob->x + 2) , (knob->y + 1), 2, 1, knob->color);
+                glcd_rect_fill(display, (knob->x + 2) , (knob->y + 2), 1, 1, knob->color);                
+            }*/
             glcd_rect_fill(display, (knob->x + 2) , (knob->y + 1), 2, 1, knob->color);
-            glcd_rect_fill(display, (knob->x + 2) , (knob->y + 2), 1, 1, knob->color);
+            glcd_rect_fill(display, (knob->x + 2) , (knob->y + 2), 1, 1, knob->color); 
         break;
         case 15:
+            /*if (knob->lock)
+            {
+                glcd_rect_fill(display, (knob->x + 1) , (knob->y + 2), 1, 2, knob->color);
+                glcd_rect_fill(display, (knob->x + 2) , (knob->y + 2), 1, 3, knob->color); 
+                glcd_rect_fill(display, (knob->x + 3) , (knob->y + 3), 1, 1, knob->color);       
+            }
+            else 
+            {
+                glcd_rect_fill(display, (knob->x + 1) , (knob->y + 2), 1, 2, knob->color);
+                glcd_rect_fill(display, (knob->x + 2) , (knob->y + 2), 1, 1, knob->color);            
+            }*/
             glcd_rect_fill(display, (knob->x + 1) , (knob->y + 2), 1, 2, knob->color);
-            glcd_rect_fill(display, (knob->x + 2) , (knob->y + 2), 1, 1, knob->color);
+            glcd_rect_fill(display, (knob->x + 2) , (knob->y + 2), 1, 1, knob->color);            
         break;
         case 16:
+           //if (knob->lock) glcd_rect_fill(display, (knob->x + 1) , (knob->y + 2), 1, 3, knob->color);
+           //else 
             glcd_rect_fill(display, (knob->x + 1) , (knob->y + 2), 1, 2, knob->color);
         break;
     }
+
+
+    if (knob->lock)
+    {
+        glcd_rect_fill(display, (knob->x - 1) , (knob->y), 3, 1, knob->color);
+        glcd_rect_fill(display, (knob->x) , (knob->y - 1), 1, 3, knob->color);
+    }
+    
 }
 
 

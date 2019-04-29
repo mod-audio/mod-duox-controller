@@ -74,7 +74,7 @@ struct TOOL_T {
 *           LOCAL MACROS
 ************************************************************************************************************************
 */
-#define MAP(x, Omin, Omax, Nmin, Nmax)      ( x - Omin ) * (Nmax -  Nmin)  / (Omax - Omin) + Nmin;
+#define MAP(x, Imin, Imax, Omin, Omax)      ( x - Imin ) * (Omax -  Omin)  / (Imax - Imin) + Omin;
 /*
 ************************************************************************************************************************
 *           LOCAL GLOBAL VARIABLES
@@ -93,6 +93,7 @@ static void (*g_update_cb)(void *data, int event);
 static void *g_update_data;
 static xSemaphoreHandle g_dialog_sem;
 static float master_vol_value;
+static uint8_t snapshot_loaded[1] = {};
 /*
 ************************************************************************************************************************
 *           LOCAL FUNCTION PROTOTYPES
@@ -368,6 +369,22 @@ static void display_pot_add(control_t *control)
 
     // assign the new control
     g_pots[id] = control;
+
+
+    //we check if the pot needs to be grabbed before. if so we raise the scroll_dir variable of the control
+    //in this case scroll_dir is used as a flag. TODO: rename scroll_dir to actuator_flag
+    uint16_t tmp_value = hardware_get_pot_value(id);
+    if (tmp_value < 50) tmp_value = 50;
+    else if (tmp_value > 3950) tmp_value = 3950;
+    //since the actuall actuator limits can scale verry differently we scale the actuator value in a range of 50 to 3950
+    //within this range the difference should be smaller then 50 before the pot starts turning
+    uint16_t pot_adc_range_value = MAP(g_pots[id]->value, g_pots[id]->minimum, g_pots[id]->maximum, 50, 3950)
+    //float new_pot_value = (tmp_value - 50) * (g_pots[id]->maximum  - g_pots[id]->minimum) / (3950 - 50) + g_pots[id]->minimum;
+    if ((tmp_value > pot_adc_range_value ? tmp_value - pot_adc_range_value : pot_adc_range_value - tmp_value) < 300)
+    {
+        g_pots[id]->scroll_dir = 0;
+    }
+    else g_pots[id]->scroll_dir = 1;
 
     // calculates initial step
     switch (control->properties)
@@ -915,7 +932,7 @@ static void bp_enter(void)
             g_bp_first=0; 
 
             // request to GUI load the pedalboard
-            send_load_pedalboard(g_banks->selected - 1, g_naveg_pedalboards->uids[g_naveg_pedalboards->selected]);
+            send_load_pedalboard(g_banks->selected , g_naveg_pedalboards->uids[g_naveg_pedalboards->selected]);
 
             // if select a pedalboard in other bank free the old pedalboards list
             if (g_current_bank != g_banks->selected)
@@ -936,7 +953,7 @@ static void bp_enter(void)
             if (g_selected_pedalboards) bank_config_footer();
         }
     }
-    //else return;
+    else return;
 
     screen_bp_list(title, bp_list);
 }
@@ -960,7 +977,7 @@ static void bp_up(void)
         bp_list = g_naveg_pedalboards;
         title = g_banks->names[g_banks->hover];
     }
-    //else return;
+    else return;
 
     screen_bp_list(title, bp_list);
 }
@@ -984,7 +1001,7 @@ static void bp_down(void)
         bp_list = g_naveg_pedalboards;
         title = g_banks->names[g_banks->hover];
     }
-    //else return;
+    else return;
 
     screen_bp_list(title, bp_list);
 }
@@ -1080,7 +1097,6 @@ static void menu_enter(uint8_t display_id)
         // adds the menu lines 
         for (node = node->first_child; node; node = node->next)
         {
-            if (g_current_main_item->desc->id == SERVICES_ID) ledz_on(hardware_leds(5), RED);
             menu_item_t *item_child = node->data;
 
             //all the menu items that have a value that needs to be updated when enterign the menu
@@ -1585,6 +1601,9 @@ void naveg_init(void)
 
     g_initialized = 1;
 
+    //turn on LED for pages
+    ledz_on(hardware_leds(5), PAGES1_COLOR);
+
     vSemaphoreCreateBinary(g_dialog_sem);
     xSemaphoreTake(g_dialog_sem, 0);
 }
@@ -1853,14 +1872,22 @@ void naveg_pot_change(uint8_t pot)
 
     //set the new value
     uint16_t tmp_value = hardware_get_pot_value(pot);
-    if (tmp_value < 50) tmp_value = 0;
-    else if (tmp_value > 3950) tmp_value = 4095;
-
-    g_pots[pot]->value = ((tmp_value * (g_pots[pot]->maximum - g_pots[pot]->minimum)) / 4095) + g_pots[pot]->minimum; 
-    g_pots[pot]->step = ((g_pots[pot]->value *  g_pots[pot]->steps) / (g_pots[pot]->maximum - g_pots[pot]->minimum));
-
-    // send the foot value
-    control_set(pot, g_pots[pot]);
+    //we check if the pot needs to be grabbed before. if so we raise the scroll_dir variable of the control
+    //in this case scroll_dir is used as a flag. TODO: rename scroll_dir to actuator_flag
+    if (tmp_value < 50) tmp_value = 50;
+    else if (tmp_value > 3950) tmp_value = 3950;
+    //since the actuall actuator limits can scale verry differently we scale the actuator value in a range of 50 to 3950
+    //within this range the difference should be smaller then 50 before the pot starts turning
+    uint16_t pot_adc_range_value = MAP(g_pots[pot]->value, g_pots[pot]->minimum, g_pots[pot]->maximum, 50, 3950)
+    //float new_pot_value = (tmp_value - 50) * (g_pots[id]->maximum  - g_pots[id]->minimum) / (3950 - 50) + g_pots[id]->minimum;
+    if ((tmp_value > pot_adc_range_value ? tmp_value - pot_adc_range_value : pot_adc_range_value - tmp_value) < 300)
+    {
+        g_pots[pot]->scroll_dir = 0;
+        g_pots[pot]->value = MAP(tmp_value, 50, 3950,  g_pots[pot]->minimum,  g_pots[pot]->maximum);
+        // send the pot value
+        control_set(pot, g_pots[pot]);
+    }
+    else g_pots[pot]->scroll_dir = 1;
 }
 
 void naveg_foot_change(uint8_t foot)
@@ -1870,8 +1897,8 @@ void naveg_foot_change(uint8_t foot)
     // checks the foot id
     if (foot >= FOOTSWITCHES_COUNT) return;
 
-    static uint8_t snapshot_loaded[1] = {};
-    static uint8_t page = 0;
+    //we initialize with page 1 so we load the right page when first pressing a button
+    static uint8_t page = 1;
 
     switch (foot)
     {
@@ -1899,41 +1926,102 @@ void naveg_foot_change(uint8_t foot)
         case 6:
             if (snapshot_loaded[(foot == 6)?1:0] == 1)
             {
-                snapshot_loaded[(foot == 6)?1:0] = 0;
                 ledz_off(hardware_leds(foot), WHITE);
-            }
-            else 
-            {
-                snapshot_loaded[(foot == 6)?1:0] = 1;
+                ledz_on(hardware_leds(foot), CYAN);
+
+                char buffer[128];
+                uint8_t i;
+
+                i = copy_command(buffer, LOAD_SNAPSHOT_COMMAND);
+
+                i += int_to_str((foot == 6)?1:0, &buffer[i], sizeof(buffer) - i, 0);
+                    
+                comm_webgui_send(buffer, i);
+
+                delay_ms(150);
+                ledz_off(hardware_leds(foot), CYAN);
                 ledz_on(hardware_leds(foot), WHITE);
             }
         break;
 
         //pagination
-        case 5:
-        //still not discussed on how we are going to handle this. 
+        case 5: 
+        ; //keeping the compiler happy
+            //char buffer[128];
+            //uint8_t i;
+
+            //i = copy_command(buffer, NEXT_PAGE_COMMAND);
             switch (page)
             {
                 case 0:
-                    ledz_on(hardware_leds(5), YELLOW);
+                    ledz_off(hardware_leds(5), PAGES3_COLOR);
+                    ledz_on(hardware_leds(5), PAGES1_COLOR);
+                    
+                    // sends the request next page command
+                    // insert the page number on buffer
+                    //i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
+                    
+                    //comm_webgui_send(buffer, i);
                     page++;
                 break;
                 case 1:
-                    ledz_off(hardware_leds(5), YELLOW);
-                    ledz_on(hardware_leds(5), MAGENTA);
+                    ledz_off(hardware_leds(5), PAGES1_COLOR);
+                    ledz_on(hardware_leds(5), PAGES2_COLOR);
+                    
+                    // sends the request next page command
+                    // insert the page number on buffer
+                    //i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
+                    
+                    //comm_webgui_send(buffer, i);
                     page++;
                 break;
                 case 2:
-                    ledz_off(hardware_leds(5), MAGENTA);
-                    ledz_on(hardware_leds(5), CYAN);
-                    page++;
-                break;
-                case 3:
-                    ledz_off(hardware_leds(5), CYAN);
+                    ledz_off(hardware_leds(5), PAGES2_COLOR);
+                    ledz_on(hardware_leds(5), PAGES3_COLOR);
+                    
+                    // sends the request next page command
+                    // insert the page number on buffer
+                    //i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
+                    
+                    //comm_webgui_send(buffer, i);
                     page=0;
                 break;
             }
-        break;
+    }
+}
+void naveg_save_page(uint8_t foot)
+{
+    //char buffer[128];
+    //uint8_t i;
+
+    //i = copy_command(buffer, SAVE_SNAPSHOT_COMMAND);
+    if(foot == 6)
+    {
+        ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);
+        ledz_blink(hardware_leds(foot), RED, 150, 150);
+
+        //i += int_to_str(1, &buffer[i], sizeof(buffer) - i, 0);
+                    
+        //comm_webgui_send(buffer, i);   
+
+        delay_ms(1000);
+
+        ledz_off(hardware_leds(foot), LEDZ_ALL_COLORS);
+        ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);     
+    }
+    else if (foot == 4)
+    {
+        ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);
+        ledz_blink(hardware_leds(foot), RED, 150, 150);
+
+        //i += int_to_str(0, &buffer[i], sizeof(buffer) - i, 0);
+                    
+        //comm_webgui_send(buffer, i);   
+
+        delay_ms(1000);
+
+        ledz_off(hardware_leds(foot), LEDZ_ALL_COLORS);
+        ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);  
     }
 }
 
@@ -1963,6 +2051,7 @@ void naveg_toggle_tool(uint8_t tool, uint8_t display)
                 break;
             case DISPLAY_TOOL_SYSTEM:
             	screen_clear(1);
+                tool_off(DISPLAY_TOOL_MASTER_VOL);
             	tool_on(DISPLAY_TOOL_SYSTEM_SUBMENU, 1);
         }
 

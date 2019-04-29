@@ -34,9 +34,6 @@
 ************************************************************************************************************************
 */
 
-#define MSG_QUEUE_DEPTH     5
-
-
 /*
 ************************************************************************************************************************
 *           LOCAL CONSTANTS
@@ -318,6 +315,11 @@ static void actuators_task(void *pvParameters)
                     naveg_foot_change(id);
                 }
                 
+                if (BUTTON_HOLD(status))
+                {
+                    if (id > 3) naveg_save_page(id);
+                }
+
                 glcd_update(hardware_glcds((id > 1) ? 1 : 0));
             }
         }
@@ -371,7 +373,7 @@ static void setup_task(void *pvParameters)
     for (i = 0; i < FOOTSWITCHES_COUNT; i++)
     {
         actuator_set_event(hardware_actuators(FOOTSWITCH0 + i), actuators_cb);
-        actuator_enable_event(hardware_actuators(FOOTSWITCH0 + i), EV_BUTTON_PRESSED);
+        actuator_enable_event(hardware_actuators(FOOTSWITCH0 + i), EV_ALL_BUTTON_EVENTS);
     }
     for (i = 0; i < POTS_COUNT; i++)
     {

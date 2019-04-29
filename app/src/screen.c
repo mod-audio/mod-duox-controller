@@ -205,6 +205,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
 
         //knob
         knob.color = GLCD_BLACK;
+        knob.lock = control->scroll_dir;
         knob.value = control->value;
         knob.min = control->minimum;
         knob.max = control->maximum;
@@ -406,7 +407,6 @@ void screen_encoder(uint8_t display_id, control_t *control)
 
         FREE(title_str_bfr);
     
-        
         //adds the unit to the value
         if (unit_str != NULL)
         {
@@ -436,9 +436,9 @@ void screen_encoder(uint8_t display_id, control_t *control)
     
 
         bar_t volume_bar;
-        volume_bar.x = 0;
+        volume_bar.x = 2;
         volume_bar.y = 17;
-        volume_bar.width = 128;
+        volume_bar.width = 124;
         volume_bar.height = 5;
         volume_bar.step = control->step;
         volume_bar.steps = control->steps - 1;
@@ -896,7 +896,7 @@ void screen_system_menu(menu_item_t *item)
             list.count = item->data.list_count;
             list.list = item->data.list;
             widget_listbox(display, &list);
-            if (last_item->desc->id != TEMPO_ID) last_item = item;
+            if ((last_item->desc->id != TEMPO_ID)||(item->desc->id == SYSTEM_ID)||(item->desc->id == BYPASS_ID)) last_item = item;
             break;
 
         case MENU_CONFIRM:
