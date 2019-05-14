@@ -17,7 +17,6 @@
 #include "serial.h"
 #include "protocol.h"
 #include "glcd.h"
-//#include "system.h"
 #include "ledz.h"
 #include "actuator.h"
 #include "data.h"
@@ -70,6 +69,7 @@
 static xQueueHandle g_actuators_queue;
 static uint8_t g_msg_buffer[WEBGUI_COMM_RX_BUFF_SIZE];
 static uint8_t g_ui_communication_started;
+static uint8_t g_protocol_bussy = 0;
 
 
 /*
@@ -105,7 +105,7 @@ static void bank_config_cb(proto_t *proto);
 static void tuner_cb(proto_t *proto);
 static void resp_cb(proto_t *proto);
 static void restore_cb(proto_t *proto);
-static void refresh_pb_name_cb(proto_t *proto);
+static void boot_cb(proto_t *proto);
 
 /*
 ************************************************************************************************************************
@@ -196,13 +196,15 @@ static void procotol_task(void *pvParameters)
     while (1)
     {
         uint32_t msg_size;
-
+        g_protocol_bussy = 0;
         // blocks until receive a new message
         ringbuff_t *rb = comm_webgui_read();
         msg_size = ringbuff_read_until(rb, g_msg_buffer, WEBGUI_COMM_RX_BUFF_SIZE, 0);
         // parses the message
         if (msg_size > 0)
         {
+            //if parsing messages block the actuator messages. 
+            g_protocol_bussy = 1;
             msg_t msg;
             msg.sender_id = 0;
             msg.data = (char *) g_msg_buffer;
@@ -252,6 +254,8 @@ static void actuators_task(void *pvParameters)
 
     while (1)
     {
+        if (g_protocol_bussy) return; 
+
         portBASE_TYPE xStatus;
 
         // take the actuator from queue
@@ -262,7 +266,7 @@ static void actuators_task(void *pvParameters)
             cli_restore(RESTORE_CHECK_BOOT);
 
         // checks if actuator has successfully taken
-        if (xStatus == pdPASS && cli_restore(RESTORE_STATUS) == LOGGED_ON_SYSTEM)
+        if (xStatus == pdTRUE && cli_restore(RESTORE_STATUS) == LOGGED_ON_SYSTEM)
         {
             type = actuator_info[0];
             id = actuator_info[1];
@@ -358,7 +362,7 @@ static void setup_task(void *pvParameters)
     g_actuators_queue = xQueueCreate(ACTUATORS_QUEUE_SIZE, sizeof(uint8_t *));
 
     // create the tasks
-    xTaskCreate(procotol_task, TASK_NAME("pro"), 256, NULL, 4, NULL);
+    xTaskCreate(procotol_task, TASK_NAME("pro"), 512, NULL, 4, NULL);
     xTaskCreate(actuators_task, TASK_NAME("act"), 256, NULL, 3, NULL);
     xTaskCreate(cli_task, TASK_NAME("cli"), 128, NULL, 2, NULL);
     xTaskCreate(displays_task, TASK_NAME("disp"), 128, NULL, 1, NULL);
@@ -399,7 +403,7 @@ static void setup_task(void *pvParameters)
     protocol_add_command(TUNER_CMD, tuner_cb);
     protocol_add_command(RESPONSE_CMD, resp_cb);
     protocol_add_command(RESTORE_CMD, restore_cb);
-    protocol_add_command(PB_NAME_REFRESH_CMD, refresh_pb_name_cb);
+    protocol_add_command(BOOT_HMI_CMD, boot_cb);
 
     // init the navigation
     naveg_init();
@@ -499,20 +503,32 @@ static void control_add_cb(proto_t *proto)
 static void control_rm_cb(proto_t *proto)
 {
     g_ui_communication_started = 1;
-    naveg_remove_control(atoi(proto->list[1]), proto->list[2]);
+    
+    naveg_remove_control(atoi(proto->list[1]));
+
+    uint8_t i;
+    for (i = 2; i < TOTAL_ACTUATORS + 1; i++)
+    {
+        if (atoi(proto->list[i]) != 0)
+        {
+            naveg_remove_control(atoi(proto->list[i]));
+        }
+        else break;
+    }
+    
     protocol_response("resp 0", proto);
 }
 
 static void control_set_cb(proto_t *proto)
 {
-    naveg_set_control(atoi(proto->list[1]), proto->list[2], atof(proto->list[3]));
+    naveg_set_control(atoi(proto->list[1]), atof(proto->list[2]));
     protocol_response("resp 0", proto);
 }
 
 static void control_get_cb(proto_t *proto)
 {
     float value;
-    value = naveg_get_control(atoi(proto->list[1]), proto->list[2]);
+    value = naveg_get_control(atoi(proto->list[1]));
 
     char resp[32];
     strcpy(resp, "resp 0 ");
@@ -531,11 +547,8 @@ static void initial_state_cb(proto_t *proto)
 static void bank_config_cb(proto_t *proto)
 {
     bank_config_t bank_func;
-    bank_func.hardware_type = atoi(proto->list[1]);
-    bank_func.hardware_id = atoi(proto->list[2]);
-    bank_func.actuator_type = atoi(proto->list[3]);
-    bank_func.actuator_id = atoi(proto->list[4]);
-    bank_func.function = atoi(proto->list[5]);
+    bank_func.hw_id = atoi(proto->list[1]);
+    bank_func.function = atoi(proto->list[2]);
     naveg_bank_config(&bank_func);
     protocol_response("resp 0", proto);
 }
@@ -557,9 +570,11 @@ static void restore_cb(proto_t *proto)
     protocol_response("resp 0", proto);
 }
 
-static void refresh_pb_name_cb(proto_t *proto)
+static void boot_cb(proto_t *proto)
 {
+    ledz_on(hardware_leds(5), PAGES1_COLOR);
     naveg_print_pb_name(DISPLAY_LEFT);
+    naveg_master_volume(0);
     protocol_response("resp 0", proto);
 }
 

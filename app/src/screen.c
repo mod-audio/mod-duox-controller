@@ -14,6 +14,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "ledz.h"
+
 /*
 ************************************************************************************************************************
 *           LOCAL DEFINES
@@ -534,6 +536,12 @@ void screen_footer(uint8_t id, const char *name, const char *value)
 {
     glcd_t *display = hardware_glcds((id < 2)?0:1);
     
+    //if (strlen(value) == 0) ledz_on(hardware_leds(4), RED);
+    
+    //if (value == NULL) ledz_on(hardware_leds(4), BLUE);
+    
+    //if (!value[0]) ledz_on(hardware_leds(4), GREEN);
+
     uint8_t align = 0;
     switch (id)
     {
@@ -591,7 +599,7 @@ void screen_footer(uint8_t id, const char *name, const char *value)
     }
 
     ///checks if its toggle or a value
-    else if((value[1] == 'F')||(value[1] == 'N')||(strcmp(value, "") == 0))
+    else if((value[1] == 'F') || (value[1] == 'N') || (value == NULL))
     {
         // draws the name field
         char *title_str_bfr = (char *) MALLOC(16 * sizeof(char));

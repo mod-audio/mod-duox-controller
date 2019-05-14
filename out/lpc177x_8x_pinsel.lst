@@ -1,0 +1,645 @@
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 2
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"lpc177x_8x_pinsel.c"
+  12              		.text
+  13              		.align	1
+  14              		.p2align 2,,3
+  15              		.global	PINSEL_GetPinType
+  16              		.syntax unified
+  17              		.thumb
+  18              		.thumb_func
+  19              		.fpu softvfp
+  21              	PINSEL_GetPinType:
+  22              		@ args = 0, pretend = 0, frame = 0
+  23              		@ frame_needed = 0, uses_anonymous_args = 0
+  24              		@ link register save eliminated.
+  25 0000 0528     		cmp	r0, #5
+  26 0002 31D8     		bhi	.L2
+  27 0004 DFE800F0 		tbb	[pc, r0]
+  28              	.L4:
+  29 0008 07       		.byte	(.L3-.L4)/2
+  30 0009 03       		.byte	(.L5-.L4)/2
+  31 000a 05       		.byte	(.L19-.L4)/2
+  32 000b 05       		.byte	(.L19-.L4)/2
+  33 000c 05       		.byte	(.L19-.L4)/2
+  34 000d 1F       		.byte	(.L7-.L4)/2
+  35              		.p2align 1
+  36              	.L5:
+  37 000e 1D29     		cmp	r1, #29
+  38 0010 2CD8     		bhi	.L23
+  39              	.L19:
+  40 0012 0020     		movs	r0, #0
+  41 0014 7047     		bx	lr
+  42              	.L3:
+  43 0016 1629     		cmp	r1, #22
+  44 0018 1FD9     		bls	.L24
+  45              	.L8:
+  46 001a A1F10C03 		sub	r3, r1, #12
+  47 001e 012B     		cmp	r3, #1
+  48 0020 2AD9     		bls	.L12
+  49 0022 A1F11703 		sub	r3, r1, #23
+  50 0026 032B     		cmp	r3, #3
+  51 0028 26D9     		bls	.L12
+  52 002a A1F11D03 		sub	r3, r1, #29
+  53 002e 022B     		cmp	r3, #2
+  54 0030 24D9     		bls	.L13
+  55 0032 A1F11B03 		sub	r3, r1, #27
+  56 0036 012B     		cmp	r3, #1
+  57 0038 22D9     		bls	.L14
+  58 003a 0739     		subs	r1, r1, #7
+  59 003c 0229     		cmp	r1, #2
+  60 003e 8CBF     		ite	hi
+  61 0040 0520     		movhi	r0, #5
+  62 0042 0420     		movls	r0, #4
+  63 0044 7047     		bx	lr
+  64              	.L7:
+  65 0046 0129     		cmp	r1, #1
+  66 0048 E3D9     		bls	.L19
+  67 004a 0429     		cmp	r1, #4
+  68 004c E1D0     		beq	.L19
+  69 004e 0239     		subs	r1, r1, #2
+  70 0050 0129     		cmp	r1, #1
+  71 0052 8CBF     		ite	hi
+  72 0054 0520     		movhi	r0, #5
+  73 0056 0320     		movls	r0, #3
+  74 0058 7047     		bx	lr
+  75              	.L24:
+  76 005a 0A48     		ldr	r0, .L25
+  77 005c C840     		lsrs	r0, r0, r1
+  78 005e C043     		mvns	r0, r0
+  79 0060 10F00100 		ands	r0, r0, #1
+  80 0064 D9D1     		bne	.L8
+  81 0066 7047     		bx	lr
+  82              	.L2:
+  83 0068 0520     		movs	r0, #5
+  84 006a 7047     		bx	lr
+  85              	.L23:
+  86 006c 1E39     		subs	r1, r1, #30
+  87 006e 0129     		cmp	r1, #1
+  88 0070 8CBF     		ite	hi
+  89 0072 0520     		movhi	r0, #5
+  90 0074 0120     		movls	r0, #1
+  91 0076 7047     		bx	lr
+  92              	.L12:
+  93 0078 0120     		movs	r0, #1
+  94 007a 7047     		bx	lr
+  95              	.L13:
+  96 007c 0220     		movs	r0, #2
+  97 007e 7047     		bx	lr
+  98              	.L14:
+  99 0080 0320     		movs	r0, #3
+ 100 0082 7047     		bx	lr
+ 101              	.L26:
+ 102              		.align	2
+ 103              	.L25:
+ 104 0084 7FCC7F00 		.word	8375423
+ 106              		.align	1
+ 107              		.p2align 2,,3
+ 108              		.global	PINSEL_SetPinFunc
+ 109              		.syntax unified
+ 110              		.thumb
+ 111              		.thumb_func
+ 112              		.fpu softvfp
+ 114              	PINSEL_SetPinFunc:
+ 115              		@ args = 0, pretend = 0, frame = 0
+ 116              		@ frame_needed = 0, uses_anonymous_args = 0
+ 117 0088 38B5     		push	{r3, r4, r5, lr}
+ 118 008a 0546     		mov	r5, r0
+ 119 008c 0C46     		mov	r4, r1
+ 120 008e FFF7FEFF 		bl	PINSEL_GetPinType
+ 121 0092 0528     		cmp	r0, #5
+ 122 0094 0FD0     		beq	.L29
+ 123 0096 04EB4511 		add	r1, r4, r5, lsl #5
+ 124 009a 01F18051 		add	r1, r1, #268435456
+ 125 009e 01F53041 		add	r1, r1, #45056
+ 126 00a2 8900     		lsls	r1, r1, #2
+ 127 00a4 0B68     		ldr	r3, [r1]
+ 128 00a6 02F00702 		and	r2, r2, #7
+ 129 00aa 23F00703 		bic	r3, r3, #7
+ 130 00ae 1343     		orrs	r3, r3, r2
+ 131 00b0 0B60     		str	r3, [r1]
+ 132 00b2 0020     		movs	r0, #0
+ 133 00b4 38BD     		pop	{r3, r4, r5, pc}
+ 134              	.L29:
+ 135 00b6 0148     		ldr	r0, .L31
+ 136 00b8 38BD     		pop	{r3, r4, r5, pc}
+ 137              	.L32:
+ 138 00ba 00BF     		.align	2
+ 139              	.L31:
+ 140 00bc 01000010 		.word	268435457
+ 142              		.align	1
+ 143              		.p2align 2,,3
+ 144              		.global	PINSEL_SetPinMode
+ 145              		.syntax unified
+ 146              		.thumb
+ 147              		.thumb_func
+ 148              		.fpu softvfp
+ 150              	PINSEL_SetPinMode:
+ 151              		@ args = 0, pretend = 0, frame = 0
+ 152              		@ frame_needed = 0, uses_anonymous_args = 0
+ 153 00c0 38B5     		push	{r3, r4, r5, lr}
+ 154 00c2 0546     		mov	r5, r0
+ 155 00c4 0C46     		mov	r4, r1
+ 156 00c6 FFF7FEFF 		bl	PINSEL_GetPinType
+ 157 00ca 0528     		cmp	r0, #5
+ 158 00cc 16D0     		beq	.L36
+ 159 00ce 0128     		cmp	r0, #1
+ 160 00d0 01D9     		bls	.L35
+ 161 00d2 0428     		cmp	r0, #4
+ 162 00d4 10D1     		bne	.L37
+ 163              	.L35:
+ 164 00d6 04EB4511 		add	r1, r4, r5, lsl #5
+ 165 00da 01F18051 		add	r1, r1, #268435456
+ 166 00de 01F53041 		add	r1, r1, #45056
+ 167 00e2 8900     		lsls	r1, r1, #2
+ 168 00e4 0B68     		ldr	r3, [r1]
+ 169 00e6 D200     		lsls	r2, r2, #3
+ 170 00e8 23F01803 		bic	r3, r3, #24
+ 171 00ec 02F01802 		and	r2, r2, #24
+ 172 00f0 1A43     		orrs	r2, r2, r3
+ 173 00f2 0A60     		str	r2, [r1]
+ 174 00f4 0020     		movs	r0, #0
+ 175 00f6 38BD     		pop	{r3, r4, r5, pc}
+ 176              	.L37:
+ 177 00f8 0148     		ldr	r0, .L39
+ 178 00fa 38BD     		pop	{r3, r4, r5, pc}
+ 179              	.L36:
+ 180 00fc 0148     		ldr	r0, .L39+4
+ 181 00fe 38BD     		pop	{r3, r4, r5, pc}
+ 182              	.L40:
+ 183              		.align	2
+ 184              	.L39:
+ 185 0100 02000010 		.word	268435458
+ 186 0104 01000010 		.word	268435457
+ 188              		.align	1
+ 189              		.p2align 2,,3
+ 190              		.global	PINSEL_SetHysMode
+ 191              		.syntax unified
+ 192              		.thumb
+ 193              		.thumb_func
+ 194              		.fpu softvfp
+ 196              	PINSEL_SetHysMode:
+ 197              		@ args = 0, pretend = 0, frame = 0
+ 198              		@ frame_needed = 0, uses_anonymous_args = 0
+ 199 0108 38B5     		push	{r3, r4, r5, lr}
+ 200 010a 0546     		mov	r5, r0
+ 201 010c 0C46     		mov	r4, r1
+ 202 010e FFF7FEFF 		bl	PINSEL_GetPinType
+ 203 0112 0528     		cmp	r0, #5
+ 204 0114 16D0     		beq	.L44
+ 205 0116 10F0FB00 		ands	r0, r0, #251
+ 206 011a 01D0     		beq	.L47
+ 207 011c 0A48     		ldr	r0, .L49
+ 208 011e 38BD     		pop	{r3, r4, r5, pc}
+ 209              	.L47:
+ 210 0120 04EB4511 		add	r1, r4, r5, lsl #5
+ 211 0124 01F18051 		add	r1, r1, #268435456
+ 212 0128 01F53041 		add	r1, r1, #45056
+ 213 012c 8900     		lsls	r1, r1, #2
+ 214 012e 0B68     		ldr	r3, [r1]
+ 215 0130 1AB1     		cbz	r2, .L48
+ 216 0132 43F02003 		orr	r3, r3, #32
+ 217 0136 0B60     		str	r3, [r1]
+ 218 0138 38BD     		pop	{r3, r4, r5, pc}
+ 219              	.L48:
+ 220 013a 23F02003 		bic	r3, r3, #32
+ 221 013e 0B60     		str	r3, [r1]
+ 222 0140 1046     		mov	r0, r2
+ 223 0142 38BD     		pop	{r3, r4, r5, pc}
+ 224              	.L44:
+ 225 0144 0148     		ldr	r0, .L49+4
+ 226 0146 38BD     		pop	{r3, r4, r5, pc}
+ 227              	.L50:
+ 228              		.align	2
+ 229              	.L49:
+ 230 0148 02000010 		.word	268435458
+ 231 014c 01000010 		.word	268435457
+ 233              		.align	1
+ 234              		.p2align 2,,3
+ 235              		.global	PINSEL_SetInvertInput
+ 236              		.syntax unified
+ 237              		.thumb
+ 238              		.thumb_func
+ 239              		.fpu softvfp
+ 241              	PINSEL_SetInvertInput:
+ 242              		@ args = 0, pretend = 0, frame = 0
+ 243              		@ frame_needed = 0, uses_anonymous_args = 0
+ 244 0150 38B5     		push	{r3, r4, r5, lr}
+ 245 0152 0546     		mov	r5, r0
+ 246 0154 0C46     		mov	r4, r1
+ 247 0156 FFF7FEFF 		bl	PINSEL_GetPinType
+ 248 015a 0528     		cmp	r0, #5
+ 249 015c 14D0     		beq	.L54
+ 250 015e 0228     		cmp	r0, #2
+ 251 0160 14D0     		beq	.L55
+ 252 0162 04EB4511 		add	r1, r4, r5, lsl #5
+ 253 0166 01F18051 		add	r1, r1, #268435456
+ 254 016a 01F53041 		add	r1, r1, #45056
+ 255 016e 8900     		lsls	r1, r1, #2
+ 256 0170 0B68     		ldr	r3, [r1]
+ 257 0172 22B1     		cbz	r2, .L57
+ 258 0174 43F04003 		orr	r3, r3, #64
+ 259 0178 0B60     		str	r3, [r1]
+ 260 017a 0020     		movs	r0, #0
+ 261 017c 38BD     		pop	{r3, r4, r5, pc}
+ 262              	.L57:
+ 263 017e 23F04003 		bic	r3, r3, #64
+ 264 0182 0B60     		str	r3, [r1]
+ 265 0184 1046     		mov	r0, r2
+ 266 0186 38BD     		pop	{r3, r4, r5, pc}
+ 267              	.L54:
+ 268 0188 0148     		ldr	r0, .L58
+ 269 018a 38BD     		pop	{r3, r4, r5, pc}
+ 270              	.L55:
+ 271 018c 0148     		ldr	r0, .L58+4
+ 272 018e 38BD     		pop	{r3, r4, r5, pc}
+ 273              	.L59:
+ 274              		.align	2
+ 275              	.L58:
+ 276 0190 01000010 		.word	268435457
+ 277 0194 02000010 		.word	268435458
+ 279              		.align	1
+ 280              		.p2align 2,,3
+ 281              		.global	PINSEL_SetSlewMode
+ 282              		.syntax unified
+ 283              		.thumb
+ 284              		.thumb_func
+ 285              		.fpu softvfp
+ 287              	PINSEL_SetSlewMode:
+ 288              		@ args = 0, pretend = 0, frame = 0
+ 289              		@ frame_needed = 0, uses_anonymous_args = 0
+ 290 0198 38B5     		push	{r3, r4, r5, lr}
+ 291 019a 0546     		mov	r5, r0
+ 292 019c 0C46     		mov	r4, r1
+ 293 019e FFF7FEFF 		bl	PINSEL_GetPinType
+ 294 01a2 0528     		cmp	r0, #5
+ 295 01a4 16D0     		beq	.L63
+ 296 01a6 10F0FB00 		ands	r0, r0, #251
+ 297 01aa 01D0     		beq	.L66
+ 298 01ac 0A48     		ldr	r0, .L68
+ 299 01ae 38BD     		pop	{r3, r4, r5, pc}
+ 300              	.L66:
+ 301 01b0 04EB4511 		add	r1, r4, r5, lsl #5
+ 302 01b4 01F18051 		add	r1, r1, #268435456
+ 303 01b8 01F53041 		add	r1, r1, #45056
+ 304 01bc 8900     		lsls	r1, r1, #2
+ 305 01be 0B68     		ldr	r3, [r1]
+ 306 01c0 1AB1     		cbz	r2, .L67
+ 307 01c2 43F40073 		orr	r3, r3, #512
+ 308 01c6 0B60     		str	r3, [r1]
+ 309 01c8 38BD     		pop	{r3, r4, r5, pc}
+ 310              	.L67:
+ 311 01ca 23F40073 		bic	r3, r3, #512
+ 312 01ce 0B60     		str	r3, [r1]
+ 313 01d0 1046     		mov	r0, r2
+ 314 01d2 38BD     		pop	{r3, r4, r5, pc}
+ 315              	.L63:
+ 316 01d4 0148     		ldr	r0, .L68+4
+ 317 01d6 38BD     		pop	{r3, r4, r5, pc}
+ 318              	.L69:
+ 319              		.align	2
+ 320              	.L68:
+ 321 01d8 02000010 		.word	268435458
+ 322 01dc 01000010 		.word	268435457
+ 324              		.align	1
+ 325              		.p2align 2,,3
+ 326              		.global	PINSEL_SetOpenDrainMode
+ 327              		.syntax unified
+ 328              		.thumb
+ 329              		.thumb_func
+ 330              		.fpu softvfp
+ 332              	PINSEL_SetOpenDrainMode:
+ 333              		@ args = 0, pretend = 0, frame = 0
+ 334              		@ frame_needed = 0, uses_anonymous_args = 0
+ 335 01e0 38B5     		push	{r3, r4, r5, lr}
+ 336 01e2 0546     		mov	r5, r0
+ 337 01e4 0C46     		mov	r4, r1
+ 338 01e6 FFF7FEFF 		bl	PINSEL_GetPinType
+ 339 01ea 0528     		cmp	r0, #5
+ 340 01ec 18D0     		beq	.L74
+ 341 01ee 0128     		cmp	r0, #1
+ 342 01f0 01D9     		bls	.L72
+ 343 01f2 0428     		cmp	r0, #4
+ 344 01f4 12D1     		bne	.L75
+ 345              	.L72:
+ 346 01f6 04EB4511 		add	r1, r4, r5, lsl #5
+ 347 01fa 01F18051 		add	r1, r1, #268435456
+ 348 01fe 01F53041 		add	r1, r1, #45056
+ 349 0202 8900     		lsls	r1, r1, #2
+ 350 0204 0B68     		ldr	r3, [r1]
+ 351 0206 22B1     		cbz	r2, .L77
+ 352 0208 43F48063 		orr	r3, r3, #1024
+ 353 020c 0B60     		str	r3, [r1]
+ 354 020e 0020     		movs	r0, #0
+ 355 0210 38BD     		pop	{r3, r4, r5, pc}
+ 356              	.L77:
+ 357 0212 23F48063 		bic	r3, r3, #1024
+ 358 0216 0B60     		str	r3, [r1]
+ 359 0218 1046     		mov	r0, r2
+ 360 021a 38BD     		pop	{r3, r4, r5, pc}
+ 361              	.L75:
+ 362 021c 0148     		ldr	r0, .L78
+ 363 021e 38BD     		pop	{r3, r4, r5, pc}
+ 364              	.L74:
+ 365 0220 0148     		ldr	r0, .L78+4
+ 366 0222 38BD     		pop	{r3, r4, r5, pc}
+ 367              	.L79:
+ 368              		.align	2
+ 369              	.L78:
+ 370 0224 02000010 		.word	268435458
+ 371 0228 01000010 		.word	268435457
+ 373              		.align	1
+ 374              		.p2align 2,,3
+ 375              		.global	PINSEL_SetAnalogPinMode
+ 376              		.syntax unified
+ 377              		.thumb
+ 378              		.thumb_func
+ 379              		.fpu softvfp
+ 381              	PINSEL_SetAnalogPinMode:
+ 382              		@ args = 0, pretend = 0, frame = 0
+ 383              		@ frame_needed = 0, uses_anonymous_args = 0
+ 384 022c 38B5     		push	{r3, r4, r5, lr}
+ 385 022e 0546     		mov	r5, r0
+ 386 0230 0C46     		mov	r4, r1
+ 387 0232 FFF7FEFF 		bl	PINSEL_GetPinType
+ 388 0236 0528     		cmp	r0, #5
+ 389 0238 16D0     		beq	.L83
+ 390 023a 0128     		cmp	r0, #1
+ 391 023c 0DD1     		bne	.L84
+ 392 023e 04EB4511 		add	r1, r4, r5, lsl #5
+ 393 0242 01F18051 		add	r1, r1, #268435456
+ 394 0246 01F53041 		add	r1, r1, #45056
+ 395 024a 8900     		lsls	r1, r1, #2
+ 396 024c 0B68     		ldr	r3, [r1]
+ 397 024e 32B9     		cbnz	r2, .L86
+ 398 0250 43F08003 		orr	r3, r3, #128
+ 399 0254 0B60     		str	r3, [r1]
+ 400 0256 1046     		mov	r0, r2
+ 401 0258 38BD     		pop	{r3, r4, r5, pc}
+ 402              	.L84:
+ 403 025a 0448     		ldr	r0, .L87
+ 404 025c 38BD     		pop	{r3, r4, r5, pc}
+ 405              	.L86:
+ 406 025e 23F08003 		bic	r3, r3, #128
+ 407 0262 0B60     		str	r3, [r1]
+ 408 0264 0020     		movs	r0, #0
+ 409 0266 38BD     		pop	{r3, r4, r5, pc}
+ 410              	.L83:
+ 411 0268 0148     		ldr	r0, .L87+4
+ 412 026a 38BD     		pop	{r3, r4, r5, pc}
+ 413              	.L88:
+ 414              		.align	2
+ 415              	.L87:
+ 416 026c 02000010 		.word	268435458
+ 417 0270 01000010 		.word	268435457
+ 419              		.align	1
+ 420              		.p2align 2,,3
+ 421              		.global	PINSEL_DacEnable
+ 422              		.syntax unified
+ 423              		.thumb
+ 424              		.thumb_func
+ 425              		.fpu softvfp
+ 427              	PINSEL_DacEnable:
+ 428              		@ args = 0, pretend = 0, frame = 0
+ 429              		@ frame_needed = 0, uses_anonymous_args = 0
+ 430 0274 38B5     		push	{r3, r4, r5, lr}
+ 431 0276 0446     		mov	r4, r0
+ 432 0278 0D46     		mov	r5, r1
+ 433 027a FFF7FEFF 		bl	PINSEL_GetPinType
+ 434 027e 0528     		cmp	r0, #5
+ 435 0280 11D0     		beq	.L92
+ 436 0282 4CB9     		cbnz	r4, .L94
+ 437 0284 1A2D     		cmp	r5, #26
+ 438 0286 07D1     		bne	.L94
+ 439 0288 0849     		ldr	r1, .L97
+ 440 028a 0B68     		ldr	r3, [r1]
+ 441 028c 32B9     		cbnz	r2, .L96
+ 442 028e 23F48033 		bic	r3, r3, #65536
+ 443 0292 0B60     		str	r3, [r1]
+ 444 0294 1046     		mov	r0, r2
+ 445 0296 38BD     		pop	{r3, r4, r5, pc}
+ 446              	.L94:
+ 447 0298 0548     		ldr	r0, .L97+4
+ 448 029a 38BD     		pop	{r3, r4, r5, pc}
+ 449              	.L96:
+ 450 029c 43F48033 		orr	r3, r3, #65536
+ 451 02a0 0B60     		str	r3, [r1]
+ 452 02a2 2046     		mov	r0, r4
+ 453 02a4 38BD     		pop	{r3, r4, r5, pc}
+ 454              	.L92:
+ 455 02a6 0348     		ldr	r0, .L97+8
+ 456 02a8 38BD     		pop	{r3, r4, r5, pc}
+ 457              	.L98:
+ 458 02aa 00BF     		.align	2
+ 459              	.L97:
+ 460 02ac 68C00240 		.word	1073922152
+ 461 02b0 02000010 		.word	268435458
+ 462 02b4 01000010 		.word	268435457
+ 464              		.align	1
+ 465              		.p2align 2,,3
+ 466              		.global	PINSEL_SetFilter
+ 467              		.syntax unified
+ 468              		.thumb
+ 469              		.thumb_func
+ 470              		.fpu softvfp
+ 472              	PINSEL_SetFilter:
+ 473              		@ args = 0, pretend = 0, frame = 0
+ 474              		@ frame_needed = 0, uses_anonymous_args = 0
+ 475 02b8 38B5     		push	{r3, r4, r5, lr}
+ 476 02ba 0546     		mov	r5, r0
+ 477 02bc 0C46     		mov	r4, r1
+ 478 02be FFF7FEFF 		bl	PINSEL_GetPinType
+ 479 02c2 0528     		cmp	r0, #5
+ 480 02c4 18D0     		beq	.L103
+ 481 02c6 0128     		cmp	r0, #1
+ 482 02c8 01D0     		beq	.L101
+ 483 02ca 0428     		cmp	r0, #4
+ 484 02cc 12D1     		bne	.L104
+ 485              	.L101:
+ 486 02ce 04EB4511 		add	r1, r4, r5, lsl #5
+ 487 02d2 01F18051 		add	r1, r1, #268435456
+ 488 02d6 01F53041 		add	r1, r1, #45056
+ 489 02da 8900     		lsls	r1, r1, #2
+ 490 02dc 0B68     		ldr	r3, [r1]
+ 491 02de 22B9     		cbnz	r2, .L109
+ 492 02e0 43F48073 		orr	r3, r3, #256
+ 493 02e4 0B60     		str	r3, [r1]
+ 494 02e6 1046     		mov	r0, r2
+ 495 02e8 38BD     		pop	{r3, r4, r5, pc}
+ 496              	.L109:
+ 497 02ea 23F48073 		bic	r3, r3, #256
+ 498 02ee 0B60     		str	r3, [r1]
+ 499 02f0 0020     		movs	r0, #0
+ 500 02f2 38BD     		pop	{r3, r4, r5, pc}
+ 501              	.L104:
+ 502 02f4 0148     		ldr	r0, .L110
+ 503 02f6 38BD     		pop	{r3, r4, r5, pc}
+ 504              	.L103:
+ 505 02f8 0148     		ldr	r0, .L110+4
+ 506 02fa 38BD     		pop	{r3, r4, r5, pc}
+ 507              	.L111:
+ 508              		.align	2
+ 509              	.L110:
+ 510 02fc 02000010 		.word	268435458
+ 511 0300 01000010 		.word	268435457
+ 513              		.align	1
+ 514              		.p2align 2,,3
+ 515              		.global	PINSEL_SetI2CFilter
+ 516              		.syntax unified
+ 517              		.thumb
+ 518              		.thumb_func
+ 519              		.fpu softvfp
+ 521              	PINSEL_SetI2CFilter:
+ 522              		@ args = 0, pretend = 0, frame = 0
+ 523              		@ frame_needed = 0, uses_anonymous_args = 0
+ 524 0304 38B5     		push	{r3, r4, r5, lr}
+ 525 0306 0546     		mov	r5, r0
+ 526 0308 0C46     		mov	r4, r1
+ 527 030a FFF7FEFF 		bl	PINSEL_GetPinType
+ 528 030e 0528     		cmp	r0, #5
+ 529 0310 16D0     		beq	.L115
+ 530 0312 0328     		cmp	r0, #3
+ 531 0314 0DD1     		bne	.L116
+ 532 0316 04EB4511 		add	r1, r4, r5, lsl #5
+ 533 031a 01F18051 		add	r1, r1, #268435456
+ 534 031e 01F53041 		add	r1, r1, #45056
+ 535 0322 8900     		lsls	r1, r1, #2
+ 536 0324 0B68     		ldr	r3, [r1]
+ 537 0326 32B9     		cbnz	r2, .L118
+ 538 0328 43F48073 		orr	r3, r3, #256
+ 539 032c 0B60     		str	r3, [r1]
+ 540 032e 1046     		mov	r0, r2
+ 541 0330 38BD     		pop	{r3, r4, r5, pc}
+ 542              	.L116:
+ 543 0332 0448     		ldr	r0, .L119
+ 544 0334 38BD     		pop	{r3, r4, r5, pc}
+ 545              	.L118:
+ 546 0336 23F48073 		bic	r3, r3, #256
+ 547 033a 0B60     		str	r3, [r1]
+ 548 033c 0020     		movs	r0, #0
+ 549 033e 38BD     		pop	{r3, r4, r5, pc}
+ 550              	.L115:
+ 551 0340 0148     		ldr	r0, .L119+4
+ 552 0342 38BD     		pop	{r3, r4, r5, pc}
+ 553              	.L120:
+ 554              		.align	2
+ 555              	.L119:
+ 556 0344 02000010 		.word	268435458
+ 557 0348 01000010 		.word	268435457
+ 559              		.align	1
+ 560              		.p2align 2,,3
+ 561              		.global	PINSEL_SetI2CMode
+ 562              		.syntax unified
+ 563              		.thumb
+ 564              		.thumb_func
+ 565              		.fpu softvfp
+ 567              	PINSEL_SetI2CMode:
+ 568              		@ args = 0, pretend = 0, frame = 0
+ 569              		@ frame_needed = 0, uses_anonymous_args = 0
+ 570 034c 70B5     		push	{r4, r5, r6, lr}
+ 571 034e 0546     		mov	r5, r0
+ 572 0350 0E46     		mov	r6, r1
+ 573 0352 FFF7FEFF 		bl	PINSEL_GetPinType
+ 574 0356 0528     		cmp	r0, #5
+ 575 0358 1ED0     		beq	.L126
+ 576 035a 0328     		cmp	r0, #3
+ 577 035c 17D1     		bne	.L127
+ 578 035e 06EB4513 		add	r3, r6, r5, lsl #5
+ 579 0362 03F18053 		add	r3, r3, #268435456
+ 580 0366 03F53043 		add	r3, r3, #45056
+ 581 036a 012A     		cmp	r2, #1
+ 582 036c 4FEA8304 		lsl	r4, r3, #2
+ 583 0370 1FD0     		beq	.L123
+ 584 0372 13D3     		bcc	.L124
+ 585 0374 022A     		cmp	r2, #2
+ 586 0376 0CD1     		bne	.L132
+ 587 0378 3146     		mov	r1, r6
+ 588 037a 2846     		mov	r0, r5
+ 589 037c 0122     		movs	r2, #1
+ 590 037e FFF7FEFF 		bl	PINSEL_SetI2CFilter
+ 591 0382 2368     		ldr	r3, [r4]
+ 592 0384 0020     		movs	r0, #0
+ 593 0386 43F40073 		orr	r3, r3, #512
+ 594 038a 2360     		str	r3, [r4]
+ 595 038c 70BD     		pop	{r4, r5, r6, pc}
+ 596              	.L127:
+ 597 038e 0B48     		ldr	r0, .L133
+ 598 0390 70BD     		pop	{r4, r5, r6, pc}
+ 599              	.L132:
+ 600 0392 4FF0FF30 		mov	r0, #-1
+ 601 0396 70BD     		pop	{r4, r5, r6, pc}
+ 602              	.L126:
+ 603 0398 0948     		ldr	r0, .L133+4
+ 604 039a 70BD     		pop	{r4, r5, r6, pc}
+ 605              	.L124:
+ 606 039c 3146     		mov	r1, r6
+ 607 039e 2846     		mov	r0, r5
+ 608 03a0 0122     		movs	r2, #1
+ 609              	.L131:
+ 610 03a2 FFF7FEFF 		bl	PINSEL_SetI2CFilter
+ 611 03a6 2368     		ldr	r3, [r4]
+ 612 03a8 0020     		movs	r0, #0
+ 613 03aa 23F40073 		bic	r3, r3, #512
+ 614 03ae 2360     		str	r3, [r4]
+ 615 03b0 70BD     		pop	{r4, r5, r6, pc}
+ 616              	.L123:
+ 617 03b2 3146     		mov	r1, r6
+ 618 03b4 2846     		mov	r0, r5
+ 619 03b6 0022     		movs	r2, #0
+ 620 03b8 F3E7     		b	.L131
+ 621              	.L134:
+ 622 03ba 00BF     		.align	2
+ 623              	.L133:
+ 624 03bc 02000010 		.word	268435458
+ 625 03c0 01000010 		.word	268435457
+ 627              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 lpc177x_8x_pinsel.c
+     /tmp/ccFNMexD.s:13     .text:0000000000000000 $t
+     /tmp/ccFNMexD.s:21     .text:0000000000000000 PINSEL_GetPinType
+     /tmp/ccFNMexD.s:29     .text:0000000000000008 $d
+     /tmp/ccFNMexD.s:35     .text:000000000000000e $t
+     /tmp/ccFNMexD.s:104    .text:0000000000000084 $d
+     /tmp/ccFNMexD.s:106    .text:0000000000000088 $t
+     /tmp/ccFNMexD.s:114    .text:0000000000000088 PINSEL_SetPinFunc
+     /tmp/ccFNMexD.s:140    .text:00000000000000bc $d
+     /tmp/ccFNMexD.s:142    .text:00000000000000c0 $t
+     /tmp/ccFNMexD.s:150    .text:00000000000000c0 PINSEL_SetPinMode
+     /tmp/ccFNMexD.s:185    .text:0000000000000100 $d
+     /tmp/ccFNMexD.s:188    .text:0000000000000108 $t
+     /tmp/ccFNMexD.s:196    .text:0000000000000108 PINSEL_SetHysMode
+     /tmp/ccFNMexD.s:230    .text:0000000000000148 $d
+     /tmp/ccFNMexD.s:233    .text:0000000000000150 $t
+     /tmp/ccFNMexD.s:241    .text:0000000000000150 PINSEL_SetInvertInput
+     /tmp/ccFNMexD.s:276    .text:0000000000000190 $d
+     /tmp/ccFNMexD.s:279    .text:0000000000000198 $t
+     /tmp/ccFNMexD.s:287    .text:0000000000000198 PINSEL_SetSlewMode
+     /tmp/ccFNMexD.s:321    .text:00000000000001d8 $d
+     /tmp/ccFNMexD.s:324    .text:00000000000001e0 $t
+     /tmp/ccFNMexD.s:332    .text:00000000000001e0 PINSEL_SetOpenDrainMode
+     /tmp/ccFNMexD.s:370    .text:0000000000000224 $d
+     /tmp/ccFNMexD.s:373    .text:000000000000022c $t
+     /tmp/ccFNMexD.s:381    .text:000000000000022c PINSEL_SetAnalogPinMode
+     /tmp/ccFNMexD.s:416    .text:000000000000026c $d
+     /tmp/ccFNMexD.s:419    .text:0000000000000274 $t
+     /tmp/ccFNMexD.s:427    .text:0000000000000274 PINSEL_DacEnable
+     /tmp/ccFNMexD.s:460    .text:00000000000002ac $d
+     /tmp/ccFNMexD.s:464    .text:00000000000002b8 $t
+     /tmp/ccFNMexD.s:472    .text:00000000000002b8 PINSEL_SetFilter
+     /tmp/ccFNMexD.s:510    .text:00000000000002fc $d
+     /tmp/ccFNMexD.s:513    .text:0000000000000304 $t
+     /tmp/ccFNMexD.s:521    .text:0000000000000304 PINSEL_SetI2CFilter
+     /tmp/ccFNMexD.s:556    .text:0000000000000344 $d
+     /tmp/ccFNMexD.s:559    .text:000000000000034c $t
+     /tmp/ccFNMexD.s:567    .text:000000000000034c PINSEL_SetI2CMode
+     /tmp/ccFNMexD.s:624    .text:00000000000003bc $d
+
+NO UNDEFINED SYMBOLS

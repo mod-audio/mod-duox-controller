@@ -1,0 +1,1053 @@
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 2
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"hardware.c"
+  12              		.text
+  13              		.align	1
+  14              		.p2align 2,,3
+  15              		.global	adc_initalisation
+  16              		.syntax unified
+  17              		.thumb
+  18              		.thumb_func
+  19              		.fpu softvfp
+  21              	adc_initalisation:
+  22              		@ args = 0, pretend = 0, frame = 0
+  23              		@ frame_needed = 0, uses_anonymous_args = 0
+  24 0000 4FF48073 		mov	r3, #256
+  25 0004 70B5     		push	{r4, r5, r6, lr}
+  26 0006 4F4A     		ldr	r2, .L4
+  27 0008 4F48     		ldr	r0, .L4+4
+  28 000a 5049     		ldr	r1, .L4+8
+  29 000c 504D     		ldr	r5, .L4+12
+  30 000e 0360     		str	r3, [r0]
+  31 0010 504E     		ldr	r6, .L4+16
+  32 0012 0B60     		str	r3, [r1]
+  33 0014 504C     		ldr	r4, .L4+20
+  34 0016 1360     		str	r3, [r2]
+  35 0018 2B60     		str	r3, [r5]
+  36 001a 504D     		ldr	r5, .L4+24
+  37 001c 2360     		str	r3, [r4]
+  38 001e 40F82C3C 		str	r3, [r0, #-44]
+  39 0022 41F8903C 		str	r3, [r1, #-144]
+  40 0026 2846     		mov	r0, r5
+  41 0028 42F82C3C 		str	r3, [r2, #-44]
+  42 002c 3146     		mov	r1, r6
+  43 002e FFF7FEFF 		bl	actuator_set_pins
+  44 0032 311D     		adds	r1, r6, #4
+  45 0034 05F11400 		add	r0, r5, #20
+  46 0038 FFF7FEFF 		bl	actuator_set_pins
+  47 003c 06F10801 		add	r1, r6, #8
+  48 0040 05F12800 		add	r0, r5, #40
+  49 0044 FFF7FEFF 		bl	actuator_set_pins
+  50 0048 06F10C01 		add	r1, r6, #12
+  51 004c 05F13C00 		add	r0, r5, #60
+  52 0050 FFF7FEFF 		bl	actuator_set_pins
+  53 0054 06F11001 		add	r1, r6, #16
+  54 0058 05F15000 		add	r0, r5, #80
+  55 005c FFF7FEFF 		bl	actuator_set_pins
+  56 0060 06F11401 		add	r1, r6, #20
+  57 0064 05F16400 		add	r0, r5, #100
+  58 0068 3D4C     		ldr	r4, .L4+28
+  59 006a FFF7FEFF 		bl	actuator_set_pins
+  60 006e 06F11801 		add	r1, r6, #24
+  61 0072 05F17800 		add	r0, r5, #120
+  62 0076 FFF7FEFF 		bl	actuator_set_pins
+  63 007a 06F11C01 		add	r1, r6, #28
+  64 007e 05F18C00 		add	r0, r5, #140
+  65 0082 FFF7FEFF 		bl	actuator_set_pins
+  66 0086 2046     		mov	r0, r4
+  67 0088 3649     		ldr	r1, .L4+32
+  68 008a FFF7FEFF 		bl	ADC_Init
+  69 008e 0022     		movs	r2, #0
+  70 0090 2046     		mov	r0, r4
+  71 0092 1146     		mov	r1, r2
+  72 0094 FFF7FEFF 		bl	ADC_IntConfig
+  73 0098 2046     		mov	r0, r4
+  74 009a 0022     		movs	r2, #0
+  75 009c 0121     		movs	r1, #1
+  76 009e FFF7FEFF 		bl	ADC_IntConfig
+  77 00a2 2046     		mov	r0, r4
+  78 00a4 0022     		movs	r2, #0
+  79 00a6 0221     		movs	r1, #2
+  80 00a8 FFF7FEFF 		bl	ADC_IntConfig
+  81 00ac 2046     		mov	r0, r4
+  82 00ae 0022     		movs	r2, #0
+  83 00b0 0321     		movs	r1, #3
+  84 00b2 FFF7FEFF 		bl	ADC_IntConfig
+  85 00b6 2046     		mov	r0, r4
+  86 00b8 0022     		movs	r2, #0
+  87 00ba 0421     		movs	r1, #4
+  88 00bc FFF7FEFF 		bl	ADC_IntConfig
+  89 00c0 2046     		mov	r0, r4
+  90 00c2 0022     		movs	r2, #0
+  91 00c4 0521     		movs	r1, #5
+  92 00c6 FFF7FEFF 		bl	ADC_IntConfig
+  93 00ca 2046     		mov	r0, r4
+  94 00cc 0022     		movs	r2, #0
+  95 00ce 0621     		movs	r1, #6
+  96 00d0 FFF7FEFF 		bl	ADC_IntConfig
+  97 00d4 2046     		mov	r0, r4
+  98 00d6 0022     		movs	r2, #0
+  99 00d8 0721     		movs	r1, #7
+ 100 00da FFF7FEFF 		bl	ADC_IntConfig
+ 101 00de 2046     		mov	r0, r4
+ 102 00e0 0122     		movs	r2, #1
+ 103 00e2 0021     		movs	r1, #0
+ 104 00e4 FFF7FEFF 		bl	ADC_ChannelCmd
+ 105 00e8 0122     		movs	r2, #1
+ 106 00ea 2046     		mov	r0, r4
+ 107 00ec 1146     		mov	r1, r2
+ 108 00ee FFF7FEFF 		bl	ADC_ChannelCmd
+ 109 00f2 2046     		mov	r0, r4
+ 110 00f4 0122     		movs	r2, #1
+ 111 00f6 0221     		movs	r1, #2
+ 112 00f8 FFF7FEFF 		bl	ADC_ChannelCmd
+ 113 00fc 2046     		mov	r0, r4
+ 114 00fe 0122     		movs	r2, #1
+ 115 0100 0321     		movs	r1, #3
+ 116 0102 FFF7FEFF 		bl	ADC_ChannelCmd
+ 117 0106 2046     		mov	r0, r4
+ 118 0108 0122     		movs	r2, #1
+ 119 010a 0421     		movs	r1, #4
+ 120 010c FFF7FEFF 		bl	ADC_ChannelCmd
+ 121 0110 2046     		mov	r0, r4
+ 122 0112 0122     		movs	r2, #1
+ 123 0114 0521     		movs	r1, #5
+ 124 0116 FFF7FEFF 		bl	ADC_ChannelCmd
+ 125 011a 2046     		mov	r0, r4
+ 126 011c 0122     		movs	r2, #1
+ 127 011e 0621     		movs	r1, #6
+ 128 0120 FFF7FEFF 		bl	ADC_ChannelCmd
+ 129 0124 2046     		mov	r0, r4
+ 130 0126 0122     		movs	r2, #1
+ 131 0128 0721     		movs	r1, #7
+ 132 012a FFF7FEFF 		bl	ADC_ChannelCmd
+ 133 012e 2046     		mov	r0, r4
+ 134 0130 0021     		movs	r1, #0
+ 135 0132 FFF7FEFF 		bl	ADC_StartCmd
+ 136 0136 2046     		mov	r0, r4
+ 137 0138 BDE87040 		pop	{r4, r5, r6, lr}
+ 138 013c 0121     		movs	r1, #1
+ 139 013e FFF7FEBF 		b	ADC_BurstCmd
+ 140              	.L5:
+ 141 0142 00BF     		.align	2
+ 142              	.L4:
+ 143 0144 60C00240 		.word	1073922144
+ 144 0148 5CC00240 		.word	1073922140
+ 145 014c F8C00240 		.word	1073922296
+ 146 0150 FCC00240 		.word	1073922300
+ 147 0154 00000000 		.word	.LANCHOR0
+ 148 0158 64C00240 		.word	1073922148
+ 149 015c 00000000 		.word	.LANCHOR1
+ 150 0160 00400340 		.word	1073954816
+ 151 0164 801A0600 		.word	400000
+ 153              		.align	1
+ 154              		.p2align 2,,3
+ 155              		.global	hardware_glcds
+ 156              		.syntax unified
+ 157              		.thumb
+ 158              		.thumb_func
+ 159              		.fpu softvfp
+ 161              	hardware_glcds:
+ 162              		@ args = 0, pretend = 0, frame = 0
+ 163              		@ frame_needed = 0, uses_anonymous_args = 0
+ 164              		@ link register save eliminated.
+ 165 0168 0128     		cmp	r0, #1
+ 166 016a 9DBF     		ittte	ls
+ 167 016c 4FF48362 		movls	r2, #1048
+ 168 0170 024B     		ldrls	r3, .L9
+ 169 0172 02FB0030 		mlals	r0, r2, r0, r3
+ 170 0176 0020     		movhi	r0, #0
+ 171 0178 7047     		bx	lr
+ 172              	.L10:
+ 173 017a 00BF     		.align	2
+ 174              	.L9:
+ 175 017c 00000000 		.word	.LANCHOR2
+ 177              		.align	1
+ 178              		.p2align 2,,3
+ 179              		.global	hardware_glcd_brightness
+ 180              		.syntax unified
+ 181              		.thumb
+ 182              		.thumb_func
+ 183              		.fpu softvfp
+ 185              	hardware_glcd_brightness:
+ 186              		@ args = 0, pretend = 0, frame = 0
+ 187              		@ frame_needed = 0, uses_anonymous_args = 0
+ 188              		@ link register save eliminated.
+ 189 0180 014B     		ldr	r3, .L12
+ 190 0182 C3F8A000 		str	r0, [r3, #160]
+ 191 0186 7047     		bx	lr
+ 192              	.L13:
+ 193              		.align	2
+ 194              	.L12:
+ 195 0188 00000000 		.word	.LANCHOR1
+ 197              		.align	1
+ 198              		.p2align 2,,3
+ 199              		.global	hardware_leds
+ 200              		.syntax unified
+ 201              		.thumb
+ 202              		.thumb_func
+ 203              		.fpu softvfp
+ 205              	hardware_leds:
+ 206              		@ args = 0, pretend = 0, frame = 0
+ 207              		@ frame_needed = 0, uses_anonymous_args = 0
+ 208              		@ link register save eliminated.
+ 209 018c 0628     		cmp	r0, #6
+ 210 018e 9DBF     		ittte	ls
+ 211 0190 034B     		ldrls	r3, .L17
+ 212 0192 03EB8000 		addls	r0, r3, r0, lsl #2
+ 213 0196 D0F8A400 		ldrls	r0, [r0, #164]
+ 214 019a 0020     		movhi	r0, #0
+ 215 019c 7047     		bx	lr
+ 216              	.L18:
+ 217 019e 00BF     		.align	2
+ 218              	.L17:
+ 219 01a0 00000000 		.word	.LANCHOR1
+ 221              		.align	1
+ 222              		.p2align 2,,3
+ 223              		.global	hardware_actuators
+ 224              		.syntax unified
+ 225              		.thumb
+ 226              		.thumb_func
+ 227              		.fpu softvfp
+ 229              	hardware_actuators:
+ 230              		@ args = 0, pretend = 0, frame = 0
+ 231              		@ frame_needed = 0, uses_anonymous_args = 0
+ 232              		@ link register save eliminated.
+ 233 01a4 0128     		cmp	r0, #1
+ 234 01a6 14D9     		bls	.L24
+ 235 01a8 831E     		subs	r3, r0, #2
+ 236 01aa DAB2     		uxtb	r2, r3
+ 237 01ac 062A     		cmp	r2, #6
+ 238 01ae 0AD9     		bls	.L25
+ 239 01b0 0938     		subs	r0, r0, #9
+ 240 01b2 C3B2     		uxtb	r3, r0
+ 241 01b4 072B     		cmp	r3, #7
+ 242 01b6 9DBF     		ittte	ls
+ 243 01b8 094B     		ldrls	r3, .L26
+ 244 01ba 00EB8000 		addls	r0, r0, r0, lsl #2
+ 245 01be 03EB8000 		addls	r0, r3, r0, lsl #2
+ 246 01c2 0020     		movhi	r0, #0
+ 247 01c4 7047     		bx	lr
+ 248              	.L25:
+ 249 01c6 0748     		ldr	r0, .L26+4
+ 250 01c8 03EB8303 		add	r3, r3, r3, lsl #2
+ 251 01cc 00EB8300 		add	r0, r0, r3, lsl #2
+ 252 01d0 7047     		bx	lr
+ 253              	.L24:
+ 254 01d2 054B     		ldr	r3, .L26+8
+ 255 01d4 C0EBC000 		rsb	r0, r0, r0, lsl #3
+ 256 01d8 03EB8000 		add	r0, r3, r0, lsl #2
+ 257 01dc 7047     		bx	lr
+ 258              	.L27:
+ 259 01de 00BF     		.align	2
+ 260              	.L26:
+ 261 01e0 00000000 		.word	.LANCHOR1
+ 262 01e4 F8000000 		.word	.LANCHOR1+248
+ 263 01e8 C0000000 		.word	.LANCHOR1+192
+ 265              		.align	1
+ 266              		.p2align 2,,3
+ 267              		.global	hardware_setup
+ 268              		.syntax unified
+ 269              		.thumb
+ 270              		.thumb_func
+ 271              		.fpu softvfp
+ 273              	hardware_setup:
+ 274              		@ args = 0, pretend = 0, frame = 24
+ 275              		@ frame_needed = 0, uses_anonymous_args = 0
+ 276 01ec 2DE9F043 		push	{r4, r5, r6, r7, r8, r9, lr}
+ 277 01f0 984D     		ldr	r5, .L44
+ 278 01f2 87B0     		sub	sp, sp, #28
+ 279 01f4 FFF7FEFF 		bl	SystemCoreClockUpdate
+ 280 01f8 0121     		movs	r1, #1
+ 281 01fa 9748     		ldr	r0, .L44+4
+ 282 01fc FFF7FEFF 		bl	CLKPWR_ConfigPPWR
+ 283 0200 05F13C00 		add	r0, r5, #60
+ 284 0204 FFF7FEFF 		bl	vPortDefineHeapRegions
+ 285 0208 0122     		movs	r2, #1
+ 286 020a 4FF40011 		mov	r1, #2097152
+ 287 020e 0320     		movs	r0, #3
+ 288 0210 FFF7FEFF 		bl	GPIO_SetDir
+ 289 0214 4FF40011 		mov	r1, #2097152
+ 290 0218 0320     		movs	r0, #3
+ 291 021a FFF7FEFF 		bl	GPIO_ClearValue
+ 292 021e 6B6D     		ldr	r3, [r5, #84]
+ 293 0220 8E4C     		ldr	r4, .L44+8
+ 294 0222 1A0C     		lsrs	r2, r3, #16
+ 295 0224 8DF80220 		strb	r2, [sp, #2]
+ 296 0228 05F15C06 		add	r6, r5, #92
+ 297 022c 05F12002 		add	r2, r5, #32
+ 298 0230 ADF80030 		strh	r3, [sp]	@ movhi
+ 299 0234 04F11C05 		add	r5, r4, #28
+ 300 0238 01E0     		b	.L30
+ 301              	.L41:
+ 302 023a 56F8042B 		ldr	r2, [r6], #4
+ 303              	.L30:
+ 304 023e 6946     		mov	r1, sp
+ 305 0240 0320     		movs	r0, #3
+ 306 0242 FFF7FEFF 		bl	ledz_create
+ 307 0246 44F8040F 		str	r0, [r4, #4]!
+ 308 024a AC42     		cmp	r4, r5
+ 309 024c F5D1     		bne	.L41
+ 310 024e 8448     		ldr	r0, .L44+12
+ 311 0250 FFF7FEFF 		bl	uc1701_init
+ 312 0254 0020     		movs	r0, #0
+ 313 0256 FFF7FEFF 		bl	hardware_actuators
+ 314 025a 0446     		mov	r4, r0
+ 315 025c 0246     		mov	r2, r0
+ 316 025e 0021     		movs	r1, #0
+ 317 0260 0120     		movs	r0, #1
+ 318 0262 FFF7FEFF 		bl	actuator_create
+ 319 0266 2046     		mov	r0, r4
+ 320 0268 7E49     		ldr	r1, .L44+16
+ 321 026a FFF7FEFF 		bl	actuator_set_pins
+ 322 026e 2046     		mov	r0, r4
+ 323 0270 0322     		movs	r2, #3
+ 324 0272 0121     		movs	r1, #1
+ 325 0274 FFF7FEFF 		bl	actuator_set_prop
+ 326 0278 4FF4FA72 		mov	r2, #500
+ 327 027c 0021     		movs	r1, #0
+ 328 027e 2046     		mov	r0, r4
+ 329 0280 FFF7FEFF 		bl	actuator_set_prop
+ 330 0284 7848     		ldr	r0, .L44+20
+ 331 0286 FFF7FEFF 		bl	uc1701_init
+ 332 028a 0120     		movs	r0, #1
+ 333 028c FFF7FEFF 		bl	hardware_actuators
+ 334 0290 0121     		movs	r1, #1
+ 335 0292 0446     		mov	r4, r0
+ 336 0294 0246     		mov	r2, r0
+ 337 0296 0846     		mov	r0, r1
+ 338 0298 FFF7FEFF 		bl	actuator_create
+ 339 029c 2046     		mov	r0, r4
+ 340 029e 7349     		ldr	r1, .L44+24
+ 341 02a0 FFF7FEFF 		bl	actuator_set_pins
+ 342 02a4 DFF8DC81 		ldr	r8, .L44+48
+ 343 02a8 2046     		mov	r0, r4
+ 344 02aa 0322     		movs	r2, #3
+ 345 02ac 0121     		movs	r1, #1
+ 346 02ae FFF7FEFF 		bl	actuator_set_prop
+ 347 02b2 2046     		mov	r0, r4
+ 348 02b4 3222     		movs	r2, #50
+ 349 02b6 0021     		movs	r1, #0
+ 350 02b8 FFF7FEFF 		bl	actuator_set_prop
+ 351 02bc 0024     		movs	r4, #0
+ 352 02be A8F15007 		sub	r7, r8, #80
+ 353 02c2 09E0     		b	.L35
+ 354              	.L31:
+ 355 02c4 41F28832 		movw	r2, #5000
+ 356 02c8 0021     		movs	r1, #0
+ 357 02ca 0134     		adds	r4, r4, #1
+ 358 02cc FFF7FEFF 		bl	actuator_set_prop
+ 359 02d0 072C     		cmp	r4, #7
+ 360 02d2 1DD0     		beq	.L42
+ 361              	.L33:
+ 362 02d4 58F8047B 		ldr	r7, [r8], #4
+ 363              	.L35:
+ 364 02d8 E6B2     		uxtb	r6, r4
+ 365 02da B01C     		adds	r0, r6, #2
+ 366 02dc C0B2     		uxtb	r0, r0
+ 367 02de FFF7FEFF 		bl	hardware_actuators
+ 368 02e2 0546     		mov	r5, r0
+ 369 02e4 0246     		mov	r2, r0
+ 370 02e6 3146     		mov	r1, r6
+ 371 02e8 0020     		movs	r0, #0
+ 372 02ea FFF7FEFF 		bl	actuator_create
+ 373 02ee 2846     		mov	r0, r5
+ 374 02f0 3946     		mov	r1, r7
+ 375 02f2 FFF7FEFF 		bl	actuator_set_pins
+ 376 02f6 032C     		cmp	r4, #3
+ 377 02f8 2846     		mov	r0, r5
+ 378 02fa E3D9     		bls	.L31
+ 379 02fc 052E     		cmp	r6, #5
+ 380 02fe E1D0     		beq	.L31
+ 381 0300 4FF4FA72 		mov	r2, #500
+ 382 0304 0021     		movs	r1, #0
+ 383 0306 0134     		adds	r4, r4, #1
+ 384 0308 FFF7FEFF 		bl	actuator_set_prop
+ 385 030c 072C     		cmp	r4, #7
+ 386 030e E1D1     		bne	.L33
+ 387              	.L42:
+ 388 0310 574F     		ldr	r7, .L44+28
+ 389 0312 0024     		movs	r4, #0
+ 390 0314 A7F1A406 		sub	r6, r7, #164
+ 391 0318 01E0     		b	.L34
+ 392              	.L43:
+ 393 031a 57F8046B 		ldr	r6, [r7], #4
+ 394              	.L34:
+ 395 031e E1B2     		uxtb	r1, r4
+ 396 0320 01F10900 		add	r0, r1, #9
+ 397 0324 C0B2     		uxtb	r0, r0
+ 398 0326 FFF7FEFF 		bl	hardware_actuators
+ 399 032a 0546     		mov	r5, r0
+ 400 032c 0246     		mov	r2, r0
+ 401 032e 0220     		movs	r0, #2
+ 402 0330 FFF7FEFF 		bl	actuator_create
+ 403 0334 0134     		adds	r4, r4, #1
+ 404 0336 3146     		mov	r1, r6
+ 405 0338 2846     		mov	r0, r5
+ 406 033a FFF7FEFF 		bl	actuator_set_pins
+ 407 033e 082C     		cmp	r4, #8
+ 408 0340 EBD1     		bne	.L43
+ 409 0342 4FF00409 		mov	r9, #4
+ 410 0346 FFF7FEFF 		bl	adc_initalisation
+ 411 034a 0127     		movs	r7, #1
+ 412 034c 4FF00123 		mov	r3, #16777472
+ 413 0350 6426     		movs	r6, #100
+ 414 0352 484D     		ldr	r5, .L44+32
+ 415 0354 0DEB0902 		add	r2, sp, r9
+ 416 0358 0021     		movs	r1, #0
+ 417 035a 4FF04020 		mov	r0, #1073758208
+ 418 035e CDE90263 		strd	r6, r3, [sp, #8]
+ 419 0362 C5F8A090 		str	r9, [r5, #160]
+ 420 0366 8DF80470 		strb	r7, [sp, #4]
+ 421 036a 0597     		str	r7, [sp, #20]
+ 422 036c FFF7FEFF 		bl	TIM_Init
+ 423 0370 03A9     		add	r1, sp, #12
+ 424 0372 4FF04020 		mov	r0, #1073758208
+ 425 0376 0226     		movs	r6, #2
+ 426 0378 FFF7FEFF 		bl	TIM_ConfigMatch
+ 427 037c 1823     		movs	r3, #24
+ 428 037e DFF80881 		ldr	r8, .L44+52
+ 429 0382 3946     		mov	r1, r7
+ 430 0384 88F80133 		strb	r3, [r8, #769]
+ 431 0388 4FF04020 		mov	r0, #1073758208
+ 432 038c C8F80060 		str	r6, [r8]
+ 433 0390 FFF7FEFF 		bl	TIM_Cmd
+ 434 0394 4FF4FA70 		mov	r0, #500
+ 435 0398 374B     		ldr	r3, .L44+36
+ 436 039a 0DEB0902 		add	r2, sp, r9
+ 437 039e 0290     		str	r0, [sp, #8]
+ 438 03a0 0021     		movs	r1, #0
+ 439 03a2 3648     		ldr	r0, .L44+40
+ 440 03a4 0393     		str	r3, [sp, #12]
+ 441 03a6 8DF80470 		strb	r7, [sp, #4]
+ 442 03aa 0597     		str	r7, [sp, #20]
+ 443 03ac FFF7FEFF 		bl	TIM_Init
+ 444 03b0 03A9     		add	r1, sp, #12
+ 445 03b2 3248     		ldr	r0, .L44+40
+ 446 03b4 FFF7FEFF 		bl	TIM_ConfigMatch
+ 447 03b8 1023     		movs	r3, #16
+ 448 03ba 3946     		mov	r1, r7
+ 449 03bc 88F80233 		strb	r3, [r8, #770]
+ 450 03c0 2E48     		ldr	r0, .L44+40
+ 451 03c2 C8F80090 		str	r9, [r8]
+ 452 03c6 FFF7FEFF 		bl	TIM_Cmd
+ 453 03ca 4FF00008 		mov	r8, #0
+ 454 03ce 4023     		movs	r3, #64
+ 455 03d0 4FF4E131 		mov	r1, #115200
+ 456 03d4 0922     		movs	r2, #9
+ 457 03d6 05F5EE70 		add	r0, r5, #476
+ 458 03da C5F8E011 		str	r1, [r5, #480]
+ 459 03de 85F8E821 		strb	r2, [r5, #488]
+ 460 03e2 C5F8F031 		str	r3, [r5, #496]
+ 461 03e6 C5F8F431 		str	r3, [r5, #500]
+ 462 03ea 85F8DC61 		strb	r6, [r5, #476]
+ 463 03ee 85F8E461 		strb	r6, [r5, #484]
+ 464 03f2 85F8E761 		strb	r6, [r5, #487]
+ 465 03f6 85F8E961 		strb	r6, [r5, #489]
+ 466 03fa 85F8EA61 		strb	r6, [r5, #490]
+ 467 03fe 85F8EB41 		strb	r4, [r5, #491]
+ 468 0402 85F8EC61 		strb	r6, [r5, #492]
+ 469 0406 85F80482 		strb	r8, [r5, #516]
+ 470 040a FFF7FEFF 		bl	serial_init
+ 471 040e 0322     		movs	r2, #3
+ 472 0410 2023     		movs	r3, #32
+ 473 0412 1B49     		ldr	r1, .L44+44
+ 474 0414 05F50270 		add	r0, r5, #520
+ 475 0418 85F81072 		strb	r7, [r5, #528]
+ 476 041c 85F81382 		strb	r8, [r5, #531]
+ 477 0420 85F81562 		strb	r6, [r5, #533]
+ 478 0424 85F81682 		strb	r8, [r5, #534]
+ 479 0428 85F81762 		strb	r6, [r5, #535]
+ 480 042c 85F81862 		strb	r6, [r5, #536]
+ 481 0430 85F83082 		strb	r8, [r5, #560]
+ 482 0434 C5F80C12 		str	r1, [r5, #524]
+ 483 0438 85F80822 		strb	r2, [r5, #520]
+ 484 043c 85F81422 		strb	r2, [r5, #532]
+ 485 0440 C5F81C32 		str	r3, [r5, #540]
+ 486 0444 C5F82032 		str	r3, [r5, #544]
+ 487 0448 FFF7FEFF 		bl	serial_init
+ 488 044c 07B0     		add	sp, sp, #28
+ 489              		@ sp needed
+ 490 044e BDE8F083 		pop	{r4, r5, r6, r7, r8, r9, pc}
+ 491              	.L45:
+ 492 0452 00BF     		.align	2
+ 493              	.L44:
+ 494 0454 00000000 		.word	.LANCHOR0
+ 495 0458 0E902003 		.word	52465678
+ 496 045c A0000000 		.word	.LANCHOR1+160
+ 497 0460 00000000 		.word	.LANCHOR2
+ 498 0464 74000000 		.word	.LANCHOR0+116
+ 499 0468 18040000 		.word	.LANCHOR2+1048
+ 500 046c 7C000000 		.word	.LANCHOR0+124
+ 501 0470 A4000000 		.word	.LANCHOR0+164
+ 502 0474 00000000 		.word	.LANCHOR1
+ 503 0478 01010001 		.word	16777473
+ 504 047c 00800040 		.word	1073774592
+ 505 0480 60E31600 		.word	1500000
+ 506 0484 88000000 		.word	.LANCHOR0+136
+ 507 0488 00E100E0 		.word	-536813312
+ 509              		.align	1
+ 510              		.p2align 2,,3
+ 511              		.global	hardware_timestamp
+ 512              		.syntax unified
+ 513              		.thumb
+ 514              		.thumb_func
+ 515              		.fpu softvfp
+ 517              	hardware_timestamp:
+ 518              		@ args = 0, pretend = 0, frame = 0
+ 519              		@ frame_needed = 0, uses_anonymous_args = 0
+ 520              		@ link register save eliminated.
+ 521 048c 014B     		ldr	r3, .L47
+ 522 048e D3F83402 		ldr	r0, [r3, #564]
+ 523 0492 7047     		bx	lr
+ 524              	.L48:
+ 525              		.align	2
+ 526              	.L47:
+ 527 0494 00000000 		.word	.LANCHOR1
+ 529              		.align	1
+ 530              		.p2align 2,,3
+ 531              		.global	hardware_get_acceleration
+ 532              		.syntax unified
+ 533              		.thumb
+ 534              		.thumb_func
+ 535              		.fpu softvfp
+ 537              	hardware_get_acceleration:
+ 538              		@ args = 0, pretend = 0, frame = 0
+ 539              		@ frame_needed = 0, uses_anonymous_args = 0
+ 540              		@ link register save eliminated.
+ 541 0498 FFF7FEBF 		b	actuator_get_acceleration
+ 543              		.align	1
+ 544              		.p2align 2,,3
+ 545              		.global	hardware_get_pot_value
+ 546              		.syntax unified
+ 547              		.thumb
+ 548              		.thumb_func
+ 549              		.fpu softvfp
+ 551              	hardware_get_pot_value:
+ 552              		@ args = 0, pretend = 0, frame = 0
+ 553              		@ frame_needed = 0, uses_anonymous_args = 0
+ 554              		@ link register save eliminated.
+ 555 049c FFF7FEBF 		b	actuator_pot_value
+ 557              		.align	1
+ 558              		.p2align 2,,3
+ 559              		.global	hardware_coreboard_power
+ 560              		.syntax unified
+ 561              		.thumb
+ 562              		.thumb_func
+ 563              		.fpu softvfp
+ 565              	hardware_coreboard_power:
+ 566              		@ args = 0, pretend = 0, frame = 0
+ 567              		@ frame_needed = 0, uses_anonymous_args = 0
+ 568 04a0 08B5     		push	{r3, lr}
+ 569 04a2 20B1     		cbz	r0, .L57
+ 570 04a4 0228     		cmp	r0, #2
+ 571 04a6 15D0     		beq	.L58
+ 572 04a8 0128     		cmp	r0, #1
+ 573 04aa 0BD0     		beq	.L59
+ 574 04ac 08BD     		pop	{r3, pc}
+ 575              	.L57:
+ 576 04ae 4FF47A70 		mov	r0, #1000
+ 577              	.L56:
+ 578 04b2 FFF7FEFF 		bl	vTaskDelay
+ 579 04b6 BDE80840 		pop	{r3, lr}
+ 580 04ba 4FF40011 		mov	r1, #2097152
+ 581 04be 0320     		movs	r0, #3
+ 582 04c0 FFF7FEBF 		b	GPIO_SetValue
+ 583              	.L59:
+ 584 04c4 0320     		movs	r0, #3
+ 585 04c6 4FF40011 		mov	r1, #2097152
+ 586 04ca FFF7FEFF 		bl	GPIO_ClearValue
+ 587 04ce 41F28830 		movw	r0, #5000
+ 588 04d2 EEE7     		b	.L56
+ 589              	.L58:
+ 590 04d4 0320     		movs	r0, #3
+ 591 04d6 4FF40011 		mov	r1, #2097152
+ 592 04da FFF7FEFF 		bl	GPIO_ClearValue
+ 593 04de 4FF4FA60 		mov	r0, #2000
+ 594 04e2 E6E7     		b	.L56
+ 596              		.align	1
+ 597              		.p2align 2,,3
+ 598              		.global	TIMER0_IRQHandler
+ 599              		.syntax unified
+ 600              		.thumb
+ 601              		.thumb_func
+ 602              		.fpu softvfp
+ 604              	TIMER0_IRQHandler:
+ 605              		@ args = 0, pretend = 0, frame = 0
+ 606              		@ frame_needed = 0, uses_anonymous_args = 0
+ 607 04e4 38B5     		push	{r3, r4, r5, lr}
+ 608 04e6 0021     		movs	r1, #0
+ 609 04e8 4FF04020 		mov	r0, #1073758208
+ 610 04ec FFF7FEFF 		bl	TIM_GetIntStatus
+ 611 04f0 0128     		cmp	r0, #1
+ 612 04f2 06D0     		beq	.L73
+ 613              	.L62:
+ 614 04f4 BDE83840 		pop	{r3, r4, r5, lr}
+ 615 04f8 0021     		movs	r1, #0
+ 616 04fa 4FF04020 		mov	r0, #1073758208
+ 617 04fe FFF7FEBF 		b	TIM_ClearIntPending
+ 618              	.L73:
+ 619 0502 204D     		ldr	r5, .L75
+ 620 0504 0446     		mov	r4, r0
+ 621 0506 FFF7FEFF 		bl	ledz_tick
+ 622 050a D5F8A030 		ldr	r3, [r5, #160]
+ 623 050e DBB9     		cbnz	r3, .L63
+ 624 0510 1D4A     		ldr	r2, .L75+4
+ 625 0512 C5F83842 		str	r4, [r5, #568]
+ 626              	.L64:
+ 627 0516 C3F10403 		rsb	r3, r3, #4
+ 628 051a 0021     		movs	r1, #0
+ 629 051c 1A48     		ldr	r0, .L75+4
+ 630 051e C2F83038 		str	r3, [r2, #2096]
+ 631 0522 FFF7FEFF 		bl	uc1701_backlight
+ 632 0526 0021     		movs	r1, #0
+ 633 0528 1848     		ldr	r0, .L75+8
+ 634 052a FFF7FEFF 		bl	uc1701_backlight
+ 635              	.L68:
+ 636 052e D5F83832 		ldr	r3, [r5, #568]
+ 637 0532 0021     		movs	r1, #0
+ 638 0534 83F00103 		eor	r3, r3, #1
+ 639 0538 C5F83832 		str	r3, [r5, #568]
+ 640 053c 4FF04020 		mov	r0, #1073758208
+ 641 0540 BDE83840 		pop	{r3, r4, r5, lr}
+ 642 0544 FFF7FEBF 		b	TIM_ClearIntPending
+ 643              	.L63:
+ 644 0548 042B     		cmp	r3, #4
+ 645 054a 0CD0     		beq	.L74
+ 646 054c 0E4A     		ldr	r2, .L75+4
+ 647 054e D2F83018 		ldr	r1, [r2, #2096]
+ 648 0552 0139     		subs	r1, r1, #1
+ 649 0554 C2F83018 		str	r1, [r2, #2096]
+ 650 0558 0029     		cmp	r1, #0
+ 651 055a CBD1     		bne	.L62
+ 652 055c D5F83812 		ldr	r1, [r5, #568]
+ 653 0560 0029     		cmp	r1, #0
+ 654 0562 D8D1     		bne	.L64
+ 655 0564 03E0     		b	.L66
+ 656              	.L74:
+ 657 0566 0021     		movs	r1, #0
+ 658 0568 074A     		ldr	r2, .L75+4
+ 659 056a C5F83812 		str	r1, [r5, #568]
+ 660              	.L66:
+ 661 056e 0121     		movs	r1, #1
+ 662 0570 0548     		ldr	r0, .L75+4
+ 663 0572 C2F83038 		str	r3, [r2, #2096]
+ 664 0576 FFF7FEFF 		bl	uc1701_backlight
+ 665 057a 0121     		movs	r1, #1
+ 666 057c 0348     		ldr	r0, .L75+8
+ 667 057e FFF7FEFF 		bl	uc1701_backlight
+ 668 0582 D4E7     		b	.L68
+ 669              	.L76:
+ 670              		.align	2
+ 671              	.L75:
+ 672 0584 00000000 		.word	.LANCHOR1
+ 673 0588 00000000 		.word	.LANCHOR2
+ 674 058c 18040000 		.word	.LANCHOR2+1048
+ 676              		.align	1
+ 677              		.p2align 2,,3
+ 678              		.global	TIMER1_IRQHandler
+ 679              		.syntax unified
+ 680              		.thumb
+ 681              		.thumb_func
+ 682              		.fpu softvfp
+ 684              	TIMER1_IRQHandler:
+ 685              		@ args = 0, pretend = 0, frame = 0
+ 686              		@ frame_needed = 0, uses_anonymous_args = 0
+ 687 0590 08B5     		push	{r3, lr}
+ 688 0592 0121     		movs	r1, #1
+ 689 0594 0C48     		ldr	r0, .L81
+ 690 0596 FFF7FEFF 		bl	TIM_GetIntStatus
+ 691 059a 0128     		cmp	r0, #1
+ 692 059c 05D0     		beq	.L80
+ 693 059e BDE80840 		pop	{r3, lr}
+ 694 05a2 0121     		movs	r1, #1
+ 695 05a4 0848     		ldr	r0, .L81
+ 696 05a6 FFF7FEBF 		b	TIM_ClearIntPending
+ 697              	.L80:
+ 698 05aa FFF7FEFF 		bl	actuators_clock
+ 699 05ae 074A     		ldr	r2, .L81+4
+ 700 05b0 0121     		movs	r1, #1
+ 701 05b2 D2F83432 		ldr	r3, [r2, #564]
+ 702 05b6 0448     		ldr	r0, .L81
+ 703 05b8 0133     		adds	r3, r3, #1
+ 704 05ba C2F83432 		str	r3, [r2, #564]
+ 705 05be BDE80840 		pop	{r3, lr}
+ 706 05c2 FFF7FEBF 		b	TIM_ClearIntPending
+ 707              	.L82:
+ 708 05c6 00BF     		.align	2
+ 709              	.L81:
+ 710 05c8 00800040 		.word	1073774592
+ 711 05cc 00000000 		.word	.LANCHOR1
+ 713              		.global	xHeapRegions
+ 714              		.section	.rodata
+ 715              		.align	2
+ 716              		.set	.LANCHOR0,. + 0
+ 719              	__compound_literal.16:
+ 720 0000 00       		.byte	0
+ 721 0001 17       		.byte	23
+ 722 0002 01       		.byte	1
+ 723 0003 00       		.byte	0
+ 726              	__compound_literal.17:
+ 727 0004 01       		.byte	1
+ 728 0005 1E       		.byte	30
+ 729 0006 03       		.byte	3
+ 730 0007 04       		.byte	4
+ 733              	__compound_literal.18:
+ 734 0008 00       		.byte	0
+ 735 0009 18       		.byte	24
+ 736 000a 01       		.byte	1
+ 737 000b 01       		.byte	1
+ 740              	__compound_literal.19:
+ 741 000c 01       		.byte	1
+ 742 000d 1F       		.byte	31
+ 743 000e 03       		.byte	3
+ 744 000f 05       		.byte	5
+ 747              	__compound_literal.20:
+ 748 0010 00       		.byte	0
+ 749 0011 19       		.byte	25
+ 750 0012 01       		.byte	1
+ 751 0013 02       		.byte	2
+ 754              	__compound_literal.21:
+ 755 0014 00       		.byte	0
+ 756 0015 0C       		.byte	12
+ 757 0016 03       		.byte	3
+ 758 0017 06       		.byte	6
+ 761              	__compound_literal.22:
+ 762 0018 00       		.byte	0
+ 763 0019 1A       		.byte	26
+ 764 001a 01       		.byte	1
+ 765 001b 03       		.byte	3
+ 768              	__compound_literal.23:
+ 769 001c 00       		.byte	0
+ 770 001d 0D       		.byte	13
+ 771 001e 03       		.byte	3
+ 772 001f 07       		.byte	7
+ 775              	__compound_literal.0:
+ 776 0020 00000000 		.word	0
+ 777 0024 0A000000 		.word	10
+ 778 0028 02000000 		.word	2
+ 779 002c 0F000000 		.word	15
+ 780 0030 00000000 		.word	0
+ 781 0034 0B000000 		.word	11
+ 784              	__compound_literal.9:
+ 785 0038 04       		.byte	4
+ 786 0039 10       		.byte	16
+ 787 003a 0000     		.space	2
+ 790              	xHeapRegions:
+ 791 003c 00300010 		.word	268447744
+ 792 0040 00500000 		.word	20480
+ 793 0044 00000020 		.word	536870912
+ 794 0048 00800000 		.word	32768
+ 795 004c 00000000 		.word	0
+ 796 0050 00000000 		.word	0
+ 797              	.LC0:
+ 798 0054 01       		.byte	1
+ 799 0055 02       		.byte	2
+ 800 0056 04       		.byte	4
+ 801 0057 00       		.space	1
+ 804              	LED_PINS:
+ 805 0058 20000000 		.word	__compound_literal.0
+ 806 005c 50010000 		.word	__compound_literal.1
+ 807 0060 38010000 		.word	__compound_literal.2
+ 808 0064 20010000 		.word	__compound_literal.3
+ 809 0068 08010000 		.word	__compound_literal.4
+ 810 006c F0000000 		.word	__compound_literal.5
+ 811 0070 D8000000 		.word	__compound_literal.6
+ 814              	__compound_literal.7:
+ 815 0074 04       		.byte	4
+ 816 0075 0F       		.byte	15
+ 817 0076 04       		.byte	4
+ 818 0077 1C       		.byte	28
+ 819 0078 01       		.byte	1
+ 820 0079 06       		.byte	6
+ 821 007a 0000     		.space	2
+ 824              	__compound_literal.8:
+ 825 007c 01       		.byte	1
+ 826 007d 0B       		.byte	11
+ 827 007e 03       		.byte	3
+ 828 007f 13       		.byte	19
+ 829 0080 00       		.byte	0
+ 830 0081 07       		.byte	7
+ 831 0082 0000     		.space	2
+ 834              	FOOTSWITCH_PINS:
+ 835 0084 38000000 		.word	__compound_literal.9
+ 836 0088 D4000000 		.word	__compound_literal.10
+ 837 008c D0000000 		.word	__compound_literal.11
+ 838 0090 CC000000 		.word	__compound_literal.12
+ 839 0094 C8000000 		.word	__compound_literal.13
+ 840 0098 C4000000 		.word	__compound_literal.14
+ 841 009c C0000000 		.word	__compound_literal.15
+ 844              	POT_PINS:
+ 845 00a0 00000000 		.word	__compound_literal.16
+ 846 00a4 04000000 		.word	__compound_literal.17
+ 847 00a8 08000000 		.word	__compound_literal.18
+ 848 00ac 0C000000 		.word	__compound_literal.19
+ 849 00b0 10000000 		.word	__compound_literal.20
+ 850 00b4 14000000 		.word	__compound_literal.21
+ 851 00b8 18000000 		.word	__compound_literal.22
+ 852 00bc 1C000000 		.word	__compound_literal.23
+ 855              	__compound_literal.15:
+ 856 00c0 04       		.byte	4
+ 857 00c1 02       		.byte	2
+ 858 00c2 0000     		.space	2
+ 861              	__compound_literal.14:
+ 862 00c4 02       		.byte	2
+ 863 00c5 15       		.byte	21
+ 864 00c6 0000     		.space	2
+ 867              	__compound_literal.13:
+ 868 00c8 03       		.byte	3
+ 869 00c9 19       		.byte	25
+ 870 00ca 0000     		.space	2
+ 873              	__compound_literal.12:
+ 874 00cc 00       		.byte	0
+ 875 00cd 08       		.byte	8
+ 876 00ce 0000     		.space	2
+ 879              	__compound_literal.11:
+ 880 00d0 04       		.byte	4
+ 881 00d1 1B       		.byte	27
+ 882 00d2 0000     		.space	2
+ 885              	__compound_literal.10:
+ 886 00d4 04       		.byte	4
+ 887 00d5 0A       		.byte	10
+ 888 00d6 0000     		.space	2
+ 891              	__compound_literal.6:
+ 892 00d8 02000000 		.word	2
+ 893 00dc 0E000000 		.word	14
+ 894 00e0 01000000 		.word	1
+ 895 00e4 1D000000 		.word	29
+ 896 00e8 04000000 		.word	4
+ 897 00ec 03000000 		.word	3
+ 900              	__compound_literal.5:
+ 901 00f0 01000000 		.word	1
+ 902 00f4 18000000 		.word	24
+ 903 00f8 04000000 		.word	4
+ 904 00fc 01000000 		.word	1
+ 905 0100 01000000 		.word	1
+ 906 0104 19000000 		.word	25
+ 909              	__compound_literal.4:
+ 910 0108 02000000 		.word	2
+ 911 010c 18000000 		.word	24
+ 912 0110 02000000 		.word	2
+ 913 0114 19000000 		.word	25
+ 914 0118 03000000 		.word	3
+ 915 011c 1A000000 		.word	26
+ 918              	__compound_literal.3:
+ 919 0120 01000000 		.word	1
+ 920 0124 0C000000 		.word	12
+ 921 0128 00000000 		.word	0
+ 922 012c 09000000 		.word	9
+ 923 0130 04000000 		.word	4
+ 924 0134 0E000000 		.word	14
+ 927              	__compound_literal.2:
+ 928 0138 02000000 		.word	2
+ 929 013c 07000000 		.word	7
+ 930 0140 03000000 		.word	3
+ 931 0144 10000000 		.word	16
+ 932 0148 02000000 		.word	2
+ 933 014c 06000000 		.word	6
+ 936              	__compound_literal.1:
+ 937 0150 02000000 		.word	2
+ 938 0154 0D000000 		.word	13
+ 939 0158 04000000 		.word	4
+ 940 015c 04000000 		.word	4
+ 941 0160 04000000 		.word	4
+ 942 0164 11000000 		.word	17
+ 943              		.data
+ 944              		.align	2
+ 945              		.set	.LANCHOR2,. + 0
+ 948              	g_glcd:
+ 949 0000 00800840 		.word	1074298880
+ 950 0004 40420F00 		.word	1000000
+ 951 0008 00       		.byte	0
+ 952 0009 0F       		.byte	15
+ 953 000a 02       		.byte	2
+ 954 000b 00       		.byte	0
+ 955 000c 12       		.byte	18
+ 956 000d 02       		.byte	2
+ 957 000e 04       		.byte	4
+ 958 000f 17       		.byte	23
+ 959 0010 04       		.byte	4
+ 960 0011 14       		.byte	20
+ 961 0012 04       		.byte	4
+ 962 0013 08       		.byte	8
+ 963 0014 02       		.byte	2
+ 964 0015 0B       		.byte	11
+ 965 0016 00000000 		.space	1026
+ 965      00000000 
+ 965      00000000 
+ 965      00000000 
+ 965      00000000 
+ 966 0418 00800840 		.word	1074298880
+ 967 041c 40420F00 		.word	1000000
+ 968 0420 00       		.byte	0
+ 969 0421 0F       		.byte	15
+ 970 0422 02       		.byte	2
+ 971 0423 00       		.byte	0
+ 972 0424 12       		.byte	18
+ 973 0425 02       		.byte	2
+ 974 0426 02       		.byte	2
+ 975 0427 0C       		.byte	12
+ 976 0428 04       		.byte	4
+ 977 0429 14       		.byte	20
+ 978 042a 04       		.byte	4
+ 979 042b 05       		.byte	5
+ 980 042c 04       		.byte	4
+ 981 042d 12       		.byte	18
+ 982 042e 00000000 		.space	1026
+ 982      00000000 
+ 982      00000000 
+ 982      00000000 
+ 982      00000000 
+ 985              	count.8593:
+ 986 0830 01000000 		.word	1
+ 987              		.bss
+ 988              		.align	2
+ 989              		.set	.LANCHOR1,. + 0
+ 992              	g_potentiometer:
+ 993 0000 00000000 		.space	160
+ 993      00000000 
+ 993      00000000 
+ 993      00000000 
+ 993      00000000 
+ 996              	g_brightness:
+ 997 00a0 00000000 		.space	4
+ 1000              	g_leds:
+ 1001 00a4 00000000 		.space	28
+ 1001      00000000 
+ 1001      00000000 
+ 1001      00000000 
+ 1001      00000000 
+ 1004              	g_encoders:
+ 1005 00c0 00000000 		.space	56
+ 1005      00000000 
+ 1005      00000000 
+ 1005      00000000 
+ 1005      00000000 
+ 1008              	g_footswitches:
+ 1009 00f8 00000000 		.space	140
+ 1009      00000000 
+ 1009      00000000 
+ 1009      00000000 
+ 1009      00000000 
+ 1012              	g_serial:
+ 1013 0184 00000000 		.space	176
+ 1013      00000000 
+ 1013      00000000 
+ 1013      00000000 
+ 1013      00000000 
+ 1016              	g_counter:
+ 1017 0234 00000000 		.space	4
+ 1020              	state.8594:
+ 1021 0238 00000000 		.space	4
+ 1022              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 hardware.c
+     /tmp/ccYyXwzV.s:13     .text:0000000000000000 $t
+     /tmp/ccYyXwzV.s:21     .text:0000000000000000 adc_initalisation
+     /tmp/ccYyXwzV.s:143    .text:0000000000000144 $d
+     /tmp/ccYyXwzV.s:153    .text:0000000000000168 $t
+     /tmp/ccYyXwzV.s:161    .text:0000000000000168 hardware_glcds
+     /tmp/ccYyXwzV.s:175    .text:000000000000017c $d
+     /tmp/ccYyXwzV.s:177    .text:0000000000000180 $t
+     /tmp/ccYyXwzV.s:185    .text:0000000000000180 hardware_glcd_brightness
+     /tmp/ccYyXwzV.s:195    .text:0000000000000188 $d
+     /tmp/ccYyXwzV.s:197    .text:000000000000018c $t
+     /tmp/ccYyXwzV.s:205    .text:000000000000018c hardware_leds
+     /tmp/ccYyXwzV.s:219    .text:00000000000001a0 $d
+     /tmp/ccYyXwzV.s:221    .text:00000000000001a4 $t
+     /tmp/ccYyXwzV.s:229    .text:00000000000001a4 hardware_actuators
+     /tmp/ccYyXwzV.s:261    .text:00000000000001e0 $d
+     /tmp/ccYyXwzV.s:265    .text:00000000000001ec $t
+     /tmp/ccYyXwzV.s:273    .text:00000000000001ec hardware_setup
+     /tmp/ccYyXwzV.s:494    .text:0000000000000454 $d
+     /tmp/ccYyXwzV.s:509    .text:000000000000048c $t
+     /tmp/ccYyXwzV.s:517    .text:000000000000048c hardware_timestamp
+     /tmp/ccYyXwzV.s:527    .text:0000000000000494 $d
+     /tmp/ccYyXwzV.s:529    .text:0000000000000498 $t
+     /tmp/ccYyXwzV.s:537    .text:0000000000000498 hardware_get_acceleration
+     /tmp/ccYyXwzV.s:551    .text:000000000000049c hardware_get_pot_value
+     /tmp/ccYyXwzV.s:565    .text:00000000000004a0 hardware_coreboard_power
+     /tmp/ccYyXwzV.s:604    .text:00000000000004e4 TIMER0_IRQHandler
+     /tmp/ccYyXwzV.s:672    .text:0000000000000584 $d
+     /tmp/ccYyXwzV.s:676    .text:0000000000000590 $t
+     /tmp/ccYyXwzV.s:684    .text:0000000000000590 TIMER1_IRQHandler
+     /tmp/ccYyXwzV.s:710    .text:00000000000005c8 $d
+     /tmp/ccYyXwzV.s:790    .rodata:000000000000003c xHeapRegions
+     /tmp/ccYyXwzV.s:715    .rodata:0000000000000000 $d
+     /tmp/ccYyXwzV.s:719    .rodata:0000000000000000 __compound_literal.16
+     /tmp/ccYyXwzV.s:726    .rodata:0000000000000004 __compound_literal.17
+     /tmp/ccYyXwzV.s:733    .rodata:0000000000000008 __compound_literal.18
+     /tmp/ccYyXwzV.s:740    .rodata:000000000000000c __compound_literal.19
+     /tmp/ccYyXwzV.s:747    .rodata:0000000000000010 __compound_literal.20
+     /tmp/ccYyXwzV.s:754    .rodata:0000000000000014 __compound_literal.21
+     /tmp/ccYyXwzV.s:761    .rodata:0000000000000018 __compound_literal.22
+     /tmp/ccYyXwzV.s:768    .rodata:000000000000001c __compound_literal.23
+     /tmp/ccYyXwzV.s:775    .rodata:0000000000000020 __compound_literal.0
+     /tmp/ccYyXwzV.s:784    .rodata:0000000000000038 __compound_literal.9
+     /tmp/ccYyXwzV.s:804    .rodata:0000000000000058 LED_PINS
+     /tmp/ccYyXwzV.s:936    .rodata:0000000000000150 __compound_literal.1
+     /tmp/ccYyXwzV.s:927    .rodata:0000000000000138 __compound_literal.2
+     /tmp/ccYyXwzV.s:918    .rodata:0000000000000120 __compound_literal.3
+     /tmp/ccYyXwzV.s:909    .rodata:0000000000000108 __compound_literal.4
+     /tmp/ccYyXwzV.s:900    .rodata:00000000000000f0 __compound_literal.5
+     /tmp/ccYyXwzV.s:891    .rodata:00000000000000d8 __compound_literal.6
+     /tmp/ccYyXwzV.s:814    .rodata:0000000000000074 __compound_literal.7
+     /tmp/ccYyXwzV.s:824    .rodata:000000000000007c __compound_literal.8
+     /tmp/ccYyXwzV.s:834    .rodata:0000000000000084 FOOTSWITCH_PINS
+     /tmp/ccYyXwzV.s:885    .rodata:00000000000000d4 __compound_literal.10
+     /tmp/ccYyXwzV.s:879    .rodata:00000000000000d0 __compound_literal.11
+     /tmp/ccYyXwzV.s:873    .rodata:00000000000000cc __compound_literal.12
+     /tmp/ccYyXwzV.s:867    .rodata:00000000000000c8 __compound_literal.13
+     /tmp/ccYyXwzV.s:861    .rodata:00000000000000c4 __compound_literal.14
+     /tmp/ccYyXwzV.s:855    .rodata:00000000000000c0 __compound_literal.15
+     /tmp/ccYyXwzV.s:844    .rodata:00000000000000a0 POT_PINS
+     /tmp/ccYyXwzV.s:944    .data:0000000000000000 $d
+     /tmp/ccYyXwzV.s:948    .data:0000000000000000 g_glcd
+     /tmp/ccYyXwzV.s:985    .data:0000000000000830 count.8593
+     /tmp/ccYyXwzV.s:988    .bss:0000000000000000 $d
+     /tmp/ccYyXwzV.s:992    .bss:0000000000000000 g_potentiometer
+     /tmp/ccYyXwzV.s:996    .bss:00000000000000a0 g_brightness
+     /tmp/ccYyXwzV.s:1000   .bss:00000000000000a4 g_leds
+     /tmp/ccYyXwzV.s:1004   .bss:00000000000000c0 g_encoders
+     /tmp/ccYyXwzV.s:1008   .bss:00000000000000f8 g_footswitches
+     /tmp/ccYyXwzV.s:1012   .bss:0000000000000184 g_serial
+     /tmp/ccYyXwzV.s:1016   .bss:0000000000000234 g_counter
+     /tmp/ccYyXwzV.s:1020   .bss:0000000000000238 state.8594
+
+UNDEFINED SYMBOLS
+actuator_set_pins
+ADC_Init
+ADC_IntConfig
+ADC_ChannelCmd
+ADC_StartCmd
+ADC_BurstCmd
+SystemCoreClockUpdate
+CLKPWR_ConfigPPWR
+vPortDefineHeapRegions
+GPIO_SetDir
+GPIO_ClearValue
+ledz_create
+uc1701_init
+actuator_create
+actuator_set_prop
+TIM_Init
+TIM_ConfigMatch
+TIM_Cmd
+serial_init
+actuator_get_acceleration
+actuator_pot_value
+vTaskDelay
+GPIO_SetValue
+TIM_GetIntStatus
+TIM_ClearIntPending
+ledz_tick
+uc1701_backlight
+actuators_clock
