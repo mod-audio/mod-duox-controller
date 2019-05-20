@@ -110,7 +110,8 @@
 enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FOOTSWITCH4, FOOTSWITCH5, FOOTSWITCH6, POT0, POT1, POT2, POT3, POT4, POT5, POT6, POT7};
 
 // Amount of footswitches
-#define FOOTSWITCHES_COUNT  7
+#define FOOTSWITCHES_COUNT          7
+#define FOOTSWITCHES_ACTUATOR_COUNT 4
 
 // Footswitches ports and pins definitions
 // button definition: {BUTTON_PORT, BUTTON_PIN}
@@ -532,6 +533,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 //// Foot functions leds colors
 #define TOGGLED_COLOR           RED
 #define TRIGGER_COLOR           WHITE
+#define TRIGGER_PRESSED_COLOR   RED
 #define TAP_TEMPO_COLOR         WHITE
 #define ENUMERATED_COLOR        WHITE
 #define BYPASS_COLOR            RED
@@ -542,6 +544,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define PAGES2_COLOR            YELLOW
 #define PAGES3_COLOR            CYAN
 #define SNAPSHOT_COLOR          WHITE
+#define SNAPSHOT_LOAD_COLOR     CYAN
 
 //// Tap Tempo
 // defines the time that the led will stay turned on (in milliseconds)

@@ -77,6 +77,9 @@ extern "C"
 // tick period in us
 #define LEDZ_TICK_PERIOD        10
 
+//always blink value
+#define LED_BLINK_INFINIT		-1
+
 
 /*
 ****************************************************************************************************
@@ -218,7 +221,7 @@ void ledz_set(ledz_t* led, ledz_color_t color, int value);
  * @param[in] time_on the time in milliseconds which the LED will be on
  * @param[in] time_off the time in milliseconds which the LED will be off
  */
-void ledz_blink(ledz_t* led, ledz_color_t color, uint16_t time_on, uint16_t time_off);
+void ledz_blink(ledz_t* led, ledz_color_t color, uint16_t time_on, uint16_t time_off, int8_t amount_of_blinks);
 
 /**
  * Set LED brightness

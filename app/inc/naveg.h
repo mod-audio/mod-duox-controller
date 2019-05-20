@@ -84,7 +84,7 @@ void naveg_set_control(uint8_t hw_id, float value);
 // gets the control value
 float naveg_get_control(uint8_t hw_id);
 // change the foot value
-void naveg_foot_change(uint8_t foot);
+void naveg_foot_change(uint8_t foot, uint8_t pressed);
 void naveg_pot_change(uint8_t pot);
 // toggle between control and tool
 void naveg_toggle_tool(uint8_t tool, uint8_t display);

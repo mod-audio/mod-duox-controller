@@ -62,7 +62,7 @@ static const menu_popup_t g_menu_popups[] = {
 struct TAP_TEMPO_T {
     uint32_t time, max;
     uint8_t state;
-} g_tap_tempo[FOOTSWITCHES_COUNT];
+} g_tap_tempo[FOOTSWITCHES_ACTUATOR_COUNT];
 
 struct TOOL_T {
     uint8_t state, display;
@@ -81,7 +81,7 @@ struct TOOL_T {
 ************************************************************************************************************************
 */
 
-static control_t *g_encoders[ENCODERS_COUNT], *g_foots[FOOTSWITCHES_COUNT], *g_pots[POTS_COUNT];
+static control_t *g_encoders[ENCODERS_COUNT], *g_foots[FOOTSWITCHES_ACTUATOR_COUNT], *g_pots[POTS_COUNT];
 static bp_list_t *g_banks, *g_naveg_pedalboards, *g_selected_pedalboards;
 static uint8_t g_bp_state, g_current_bank, g_current_pedalboard, g_bp_first;
 static node_t *g_menu, *g_current_menu, *g_current_main_menu;
@@ -93,7 +93,7 @@ static void (*g_update_cb)(void *data, int event);
 static void *g_update_data;
 static xSemaphoreHandle g_dialog_sem;
 static float master_vol_value;
-static uint8_t snapshot_loaded[1] = {};
+static uint8_t snapshot_loaded[2] = {};
 /*
 ************************************************************************************************************************
 *           LOCAL FUNCTION PROTOTYPES
@@ -363,7 +363,7 @@ static void display_encoder_rm(uint8_t hw_id)
 // control assigned to display
 static void display_pot_add(control_t *control)
 {
-    uint8_t id = control->hw_id - ENCODERS_COUNT - FOOTSWITCHES_COUNT;
+    uint8_t id = control->hw_id - ENCODERS_COUNT - FOOTSWITCHES_ACTUATOR_COUNT;
 
     // checks if is already a control assigned in this display and remove it
     if (g_pots[id]) data_free_control(g_pots[id]);
@@ -450,7 +450,7 @@ static void foot_control_add(control_t *control)
     uint8_t i;
 
     // checks the actuator id
-    if (control->hw_id >= FOOTSWITCHES_COUNT + ENCODERS_COUNT) return;
+    if (control->hw_id >= FOOTSWITCHES_ACTUATOR_COUNT + ENCODERS_COUNT) return;
 
     // checks if the actuator is used like bank function
     if (bank_config_check(control->hw_id))
@@ -489,8 +489,22 @@ static void foot_control_add(control_t *control)
 
         // trigger specification: http://lv2plug.in/ns/ext/port-props/#trigger
         case CONTROL_PROP_TRIGGER:
+        	// updates the led
+        	//check if its assigned to a trigger and if the button is released
+           	if (!control->scroll_dir)
+           	{
+           		ledz_off(hardware_leds(control->hw_id - ENCODERS_COUNT), TRIGGER_PRESSED_COLOR);
+           		ledz_on(hardware_leds(control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR); //TRIGGER_COLOR
+           		return;
+           	}
+           	else if (control->scroll_dir == 2) ledz_on(hardware_leds(control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR);
+           	else
+           	{
+           		ledz_off(hardware_leds(control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR);
+           		ledz_on(hardware_leds(control->hw_id - ENCODERS_COUNT), TRIGGER_PRESSED_COLOR);
+           	}
+
             // updates the led
-            ledz_on(hardware_leds(control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR);
 
             // if is in tool mode break
             if (display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT))) break;
@@ -508,9 +522,9 @@ static void foot_control_add(control_t *control)
 
             // setup the led blink
             if (time_ms > TAP_TEMPO_TIME_ON)
-                 ledz_blink(hardware_leds(control->hw_id - ENCODERS_COUNT),TAP_TEMPO_COLOR, TAP_TEMPO_TIME_ON, time_ms - TAP_TEMPO_TIME_ON);
+                 ledz_blink(hardware_leds(control->hw_id - ENCODERS_COUNT),TAP_TEMPO_COLOR, TAP_TEMPO_TIME_ON, time_ms - TAP_TEMPO_TIME_ON, LED_BLINK_INFINIT);
             else
-                ledz_blink(hardware_leds(control->hw_id - ENCODERS_COUNT),TAP_TEMPO_COLOR, time_ms / 2, time_ms / 2);
+                ledz_blink(hardware_leds(control->hw_id - ENCODERS_COUNT),TAP_TEMPO_COLOR, time_ms / 2, time_ms / 2, LED_BLINK_INFINIT);
 
             // calculates the maximum tap tempo value
             if (g_tap_tempo[control->hw_id - ENCODERS_COUNT].state == TT_INIT)
@@ -609,7 +623,7 @@ static void foot_control_rm(uint8_t hw_id)
 
     //if (hw_id < ENCODERS_COUNT) return; 
 
-    for (i = 0; i < FOOTSWITCHES_COUNT; i++)
+    for (i = 0; i < FOOTSWITCHES_ACTUATOR_COUNT; i++)
     {
         // if there is no controls assigned, load the default screen
         if (!g_foots[i] && ! bank_config_check(i) && !display_has_tool_enabled(i))
@@ -654,7 +668,7 @@ static void control_set(uint8_t id, control_t *control)
                 if (!display_has_tool_enabled(id))
                     screen_encoder(id, control);
             }
-            else if ( (ENCODERS_COUNT + FOOTSWITCHES_COUNT < control->hw_id) && (control->hw_id < TOTAL_ACTUATORS)) 
+            else if ( (ENCODERS_COUNT + FOOTSWITCHES_ACTUATOR_COUNT < control->hw_id) && (control->hw_id < TOTAL_ACTUATORS)) 
             {
                 if (!display_has_tool_enabled(get_display_by_id(id, POTENTIOMETER)))
                 {
@@ -671,7 +685,7 @@ static void control_set(uint8_t id, control_t *control)
                 if (!display_has_tool_enabled(id))
                     screen_encoder(id, control);
             }
-            else if ((ENCODERS_COUNT < control->hw_id) && ( control->hw_id < FOOTSWITCHES_COUNT + ENCODERS_COUNT))
+            else if ((ENCODERS_COUNT < control->hw_id) && ( control->hw_id < FOOTSWITCHES_ACTUATOR_COUNT + ENCODERS_COUNT))
             {
                 // increments the step
                 control->step++;
@@ -1522,7 +1536,7 @@ void naveg_init(void)
         // initialize the display controls pointers
         g_encoders[i] = NULL;
     }
-    for (i = 0; i < FOOTSWITCHES_COUNT; i++)
+    for (i = 0; i < FOOTSWITCHES_ACTUATOR_COUNT; i++)
     {
         // initialize the foot controls pointers
         g_foots[i] = NULL;
@@ -1693,8 +1707,9 @@ void naveg_add_control(control_t *control)
     {
         display_encoder_add(control);
     }
-    else if (control->hw_id < ENCODERS_COUNT + FOOTSWITCHES_COUNT)
+    else if (control->hw_id < (ENCODERS_COUNT + FOOTSWITCHES_ACTUATOR_COUNT))
     {
+    	control->scroll_dir = 2;
         foot_control_add(control);     
     }
     else 
@@ -1711,7 +1726,7 @@ void naveg_remove_control(uint8_t hw_id)
     {
         display_encoder_rm(hw_id);
     }
-    else if (hw_id < ENCODERS_COUNT + FOOTSWITCHES_COUNT)
+    else if (hw_id < ENCODERS_COUNT + FOOTSWITCHES_ACTUATOR_COUNT)
     {
         foot_control_rm(hw_id);   
     }
@@ -1858,17 +1873,27 @@ void naveg_pot_change(uint8_t pot)
     //within this range the difference should be smaller then 50 before the pot starts turning
     uint16_t pot_adc_range_value = MAP(g_pots[pot]->value, g_pots[pot]->minimum, g_pots[pot]->maximum, 50, 3950)
 
-    if ((tmp_value > pot_adc_range_value ? tmp_value - pot_adc_range_value : pot_adc_range_value - tmp_value) < POT_DIFF_THRESHOLD)
+    //if the actuator is still locked
+    if (g_pots[pot]->scroll_dir == 1)
     {
-        g_pots[pot]->scroll_dir = 0;
-        g_pots[pot]->value = MAP(tmp_value, 50, 3950,  g_pots[pot]->minimum,  g_pots[pot]->maximum);
-        // send the pot value
-        control_set(pot, g_pots[pot]);
+    	if ((tmp_value > pot_adc_range_value ? tmp_value - pot_adc_range_value : pot_adc_range_value - tmp_value) < POT_DIFF_THRESHOLD)
+    	{
+    	    g_pots[pot]->scroll_dir = 0;
+    	    g_pots[pot]->value = MAP(tmp_value, 50, 3950,  g_pots[pot]->minimum,  g_pots[pot]->maximum);
+    	    // send the pot value
+    	    control_set(pot, g_pots[pot]);
+    	}
+    	else g_pots[pot]->scroll_dir = 1;
     }
-    else g_pots[pot]->scroll_dir = 1;
+    else 
+    {
+    	g_pots[pot]->value = MAP(tmp_value, 50, 3950,  g_pots[pot]->minimum,  g_pots[pot]->maximum);
+    	// send the pot value
+    	control_set(pot, g_pots[pot]);
+    }
 }
 
-void naveg_foot_change(uint8_t foot)
+void naveg_foot_change(uint8_t foot, uint8_t pressed)
 {
     if (!g_initialized) return;
 
@@ -1887,7 +1912,11 @@ void naveg_foot_change(uint8_t foot)
         case 1:
         case 2:
         case 3:
-            ;// checks if the foot is used like bank function
+
+           	//detect a release action which we dont use right now for all actuator modes (only trigger)
+ 			if ((!pressed) && (g_foots[foot]->properties != CONTROL_PROP_TRIGGER)) return;
+
+            // checks if the foot is used like bank function
             uint8_t bank_func_idx = bank_config_check(foot);
             if (bank_func_idx)
             {
@@ -1898,6 +1927,8 @@ void naveg_foot_change(uint8_t foot)
             // checks if there is assigned control
             if (g_foots[foot] == NULL) return;
             
+            g_foots[foot]->scroll_dir = pressed;
+
             control_set(foot, g_foots[foot]);
         break;
         
@@ -1906,30 +1937,34 @@ void naveg_foot_change(uint8_t foot)
         case 6:
             if (snapshot_loaded[(foot == 6)?1:0] == 1)
             {
-                ledz_off(hardware_leds(foot), WHITE);
-                ledz_on(hardware_leds(foot), CYAN);
+            	if (pressed)
+            	{
+                	ledz_off(hardware_leds(foot), SNAPSHOT_COLOR);
+                	ledz_on(hardware_leds(foot), SNAPSHOT_LOAD_COLOR);
 
-                char buffer[128];
-                uint8_t i;
+                	char buffer[128];
+                	uint8_t i;
 
-                i = copy_command(buffer, LOAD_SNAPSHOT_COMMAND);
+                	i = copy_command(buffer, LOAD_SNAPSHOT_COMMAND);
 
-                i += int_to_str((foot == 6)?1:0, &buffer[i], sizeof(buffer) - i, 0);
+                	i += int_to_str((foot == 6)?1:0, &buffer[i], sizeof(buffer) - i, 0);
                     
-                comm_webgui_send(buffer, i);
-
-                delay_ms(150);
-                ledz_off(hardware_leds(foot), CYAN);
-                ledz_on(hardware_leds(foot), WHITE);
+                	comm_webgui_send(buffer, i);
+                }
+                else
+               	{ 
+                	//ledz_off(hardware_leds(foot), SNAPSHOT_LOAD_COLOR);
+                	ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);
+            	}
             }
         break;
 
         //pagination
         case 5: 
+        	if (!pressed) return;
         ; //keeping the compiler happy
             //char buffer[128];
             //uint8_t i;
-
             //i = copy_command(buffer, NEXT_PAGE_COMMAND);
             switch (page)
             {
@@ -1980,30 +2015,24 @@ void naveg_save_page(uint8_t foot)
     if(foot == 6)
     {
         ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);
-        ledz_blink(hardware_leds(foot), RED, 150, 150);
+        ledz_blink(hardware_leds(foot), RED, 75, 75, 3);
 
         //i += int_to_str(1, &buffer[i], sizeof(buffer) - i, 0);
                     
         //comm_webgui_send(buffer, i);   
-
-        delay_ms(1000);
-
-        ledz_off(hardware_leds(foot), LEDZ_ALL_COLORS);
-        ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);     
+		snapshot_loaded[1] = 1; 
     }
     else if (foot == 4)
     {
         ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);
-        ledz_blink(hardware_leds(foot), RED, 150, 150);
+        ledz_blink(hardware_leds(foot), RED, 75, 75, 3);
 
         //i += int_to_str(0, &buffer[i], sizeof(buffer) - i, 0);
                     
         //comm_webgui_send(buffer, i);   
 
-        delay_ms(1000);
-
-        ledz_off(hardware_leds(foot), LEDZ_ALL_COLORS);
-        ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);  
+        //ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);  
+        snapshot_loaded[0] = 1; 
     }
 }
 
@@ -2217,7 +2246,7 @@ void naveg_bank_config(bank_config_t *bank_conf)
     if (bank_conf->function >= BANK_FUNC_AMOUNT) return;
 
     // checks the actuator type and actuator id
-    if (bank_conf->hw_id > ENCODERS_COUNT + FOOTSWITCHES_COUNT) return;
+    if (bank_conf->hw_id > ENCODERS_COUNT + FOOTSWITCHES_ACTUATOR_COUNT) return;
 
     uint8_t i;
     for (i = 1; i < BANK_FUNC_AMOUNT; i++)

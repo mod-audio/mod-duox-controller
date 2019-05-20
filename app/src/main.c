@@ -316,9 +316,15 @@ static void actuators_task(void *pvParameters)
             {
                 if (BUTTON_PRESSED(status))
                 {
-                    naveg_foot_change(id);
+                    naveg_foot_change(id, 1);
                 }
                 
+                if (BUTTON_RELEASED(status))
+                {
+                    //trigger LED 
+                    naveg_foot_change(id, 0);
+                }
+
                 if (BUTTON_HOLD(status))
                 {
                     if (id > 3) naveg_save_page(id);
@@ -439,7 +445,7 @@ static void led_cb(proto_t *proto)
     ledz_set(led, BLUE,  atoi(proto->list[4]));
 
     if (proto->list_count == 7)
-    ledz_blink(led, WHITE, atoi(proto->list[5]), atoi(proto->list[6]));
+    ledz_blink(led, WHITE, atoi(proto->list[5]), atoi(proto->list[6]), LED_BLINK_INFINIT);
 
     protocol_response("resp 0", proto);
 }
