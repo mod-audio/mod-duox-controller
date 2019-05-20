@@ -501,29 +501,31 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 
 //POPUP DEFINES
 //PROFILE POPUP TXT
-#define PROFILE_POPUP_LOAD_TXT    "Loading a new profile may change your in-/output configuration. To prevent damage, disconnect incompatible devices. Continue?."
-#define PROFILE_POPUP_RELOAD_TXT  "Reload the active user profile? This will discard any unsaved changes."
+#define PROFILE_POPUP_LOAD_TXT    "The device is about to load a\nnew profile. To avoid damage,\ndisconnect all devices from\nthe CV/EXP and CV/HP ports.\nContinue?."
+#define PROFILE_POPUP_RELOAD_TXT  "Reload active user profile?\nThis will discard any unsaved\nchanges."
+#define EXP_CV_POPUP_TXT          "The device is about to switch\ninput modes. To avoid damage,\ndisconnect all devices from\nthe CV/EXP port. Continue?"
+#define HP_CV_POPUP_TXT           "The device is about to switch\noutput modes. To avoid damage,\ndisconnect all devices from\nthe CV/HP port. Continue?"
 // popups text content, format : {menu_id, header_content, text_content}
 #define POPUP_CONTENT   \
     {PEDALBOARD_ID, "pedalboard", "To access pedalboard options  please disconnect from the graphical interface"}, \
     {BANKS_ID, "Banks", "To access pedalboard options  please disconnect from the graphical interface"}, \
-    {PEDALBOARD_SAVE_ID, "Save state", "Save the current parameter values as the default for the active pedalboard?"},         \
-    {PEDALBOARD_RESET_ID, "Reset state", "Reset all parameter values to the last saved state for the active pedalboard?"},      \
+    {PEDALBOARD_SAVE_ID, "Save state", "Save current parameter values\nas the default for the active\npedalboard?"},         \
+    {PEDALBOARD_RESET_ID, "Reset state", "Reset all parameter values to\nthe last saved state for the\nactive pedalboard?"},      \
     {BLUETOOTH_DISCO_ID, "Enable Bluetooth", "Bluetooth discovery mode is   now enabled for 2 minutes"},  \
-    {UPGRADE_ID, "Start System Upgrade", "To start the system upgrade   process, please press and hold down the left most buttonand press yes. "}, \
+    {UPGRADE_ID, "Start System Upgrade", "To start the system upgrade\nprocess, press and hold down\nthe leftmost button and press\nyes. "}, \
     {PROFILES_ID+1, "Load user profile A", PROFILE_POPUP_LOAD_TXT}, \
     {PROFILES_ID+2, "Load user profile B", PROFILE_POPUP_LOAD_TXT}, \
     {PROFILES_ID+3, "Load user profile C", PROFILE_POPUP_LOAD_TXT}, \
     {PROFILES_ID+4, "Load user profile D", PROFILE_POPUP_LOAD_TXT}, \
-    {PROFILES_ID+5, "Overwrite user profile", "Overwrite the active user profile?"}, \
+    {PROFILES_ID+5, "Overwrite user profile", "Overwrite active user profile?"}, \
     {PROFILES_ID+6, "Reload user profile A", PROFILE_POPUP_RELOAD_TXT}, \
     {PROFILES_ID+7, "Reload user profile B", PROFILE_POPUP_RELOAD_TXT}, \
     {PROFILES_ID+8, "Reload user profile C", PROFILE_POPUP_RELOAD_TXT}, \
     {PROFILES_ID+9, "Reload user profile D", PROFILE_POPUP_RELOAD_TXT}, \
-    {EXP_CV_INP, "Set input to EXP", "You are about to switch between CV and EXP mode. To prevent damage, disconnect incompatible devices. Continue?"}, \
-    {EXP_CV_INP+1, "Set input to CV", "You are about to switch between CV and EXP mode. To prevent damage, disconnect incompatible devices. Continue?"}, \
-    {HP_CV_OUTP, "Set output to HP", "You are about to switch between CV and HP mode. To prevent damage, disconnect incompatible devices. Continue?"}, \
-    {HP_CV_OUTP+1, "Set output to CV", "You are about to switch between CV and HP mode. To prevent damage, disconnect incompatible devices. Continue?"}, \
+    {EXP_CV_INP, "Set input to EXP", EXP_CV_POPUP_TXT}, \
+    {EXP_CV_INP+1, "Set input to CV",EXP_CV_POPUP_TXT}, \
+    {HP_CV_OUTP, "Set output to HP", HP_CV_POPUP_TXT}, \
+    {HP_CV_OUTP+1, "Set output to CV", HP_CV_POPUP_TXT}, \
 
 //MENU ITEMS WE DO NOT SHOW RIGHT NOW BECAUSE WE DO NOT HAVE CV
     /*{"CV / EXP INPUT",                  MENU_TOGGLE,    EXP_CV_INP,         INP_ID,         system_cv_exp_cb           , 0},  \
