@@ -1,0 +1,452 @@
+   1              		.cpu cortex-m3
+   2              		.eabi_attribute 20, 1
+   3              		.eabi_attribute 21, 1
+   4              		.eabi_attribute 23, 3
+   5              		.eabi_attribute 24, 1
+   6              		.eabi_attribute 25, 1
+   7              		.eabi_attribute 26, 1
+   8              		.eabi_attribute 30, 2
+   9              		.eabi_attribute 34, 1
+  10              		.eabi_attribute 18, 4
+  11              		.file	"ledz.c"
+  12              		.text
+  13              		.align	1
+  14              		.p2align 2,,3
+  15              		.global	ledz_create
+  16              		.syntax unified
+  17              		.thumb
+  18              		.thumb_func
+  19              		.fpu softvfp
+  21              	ledz_create:
+  22              		@ args = 0, pretend = 0, frame = 8
+  23              		@ frame_needed = 0, uses_anonymous_args = 0
+  24 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+  25 0004 DFF8E0B0 		ldr	fp, .L18+4
+  26 0008 83B0     		sub	sp, sp, #12
+  27 000a DBF80040 		ldr	r4, [fp]
+  28 000e A042     		cmp	r0, r4
+  29 0010 62D8     		bhi	.L10
+  30 0012 451E     		subs	r5, r0, #1
+  31 0014 0028     		cmp	r0, #0
+  32 0016 5FD0     		beq	.L10
+  33 0018 4FF00009 		mov	r9, #0
+  34 001c 4FF00108 		mov	r8, #1
+  35 0020 DFF8C8A0 		ldr	r10, .L18+8
+  36 0024 0192     		str	r2, [sp, #4]
+  37 0026 0F18     		adds	r7, r1, r0
+  38 0028 02EBC506 		add	r6, r2, r5, lsl #3
+  39              	.L8:
+  40 002c DAF80030 		ldr	r3, [r10]
+  41 0030 142B     		cmp	r3, #20
+  42 0032 43D9     		bls	.L16
+  43 0034 0023     		movs	r3, #0
+  44 0036 2B4A     		ldr	r2, .L18
+  45 0038 04E0     		b	.L6
+  46              	.L5:
+  47 003a 0133     		adds	r3, r3, #1
+  48 003c 152B     		cmp	r3, #21
+  49 003e 02F11802 		add	r2, r2, #24
+  50 0042 38D0     		beq	.L17
+  51              	.L6:
+  52 0044 5168     		ldr	r1, [r2, #4]
+  53 0046 0029     		cmp	r1, #0
+  54 0048 F7D1     		bne	.L5
+  55 004a DBF80020 		ldr	r2, [fp]
+  56 004e 2549     		ldr	r1, .L18
+  57 0050 03EB4303 		add	r3, r3, r3, lsl #1
+  58 0054 013A     		subs	r2, r2, #1
+  59 0056 01EBC304 		add	r4, r1, r3, lsl #3
+  60 005a CBF80020 		str	r2, [fp]
+  61              	.L4:
+  62 005e 227A     		ldrb	r2, [r4, #8]	@ zero_extendqisi2
+  63 0060 013F     		subs	r7, r7, #1
+  64 0062 7168     		ldr	r1, [r6, #4]
+  65 0064 3878     		ldrb	r0, [r7]	@ zero_extendqisi2
+  66 0066 019B     		ldr	r3, [sp, #4]
+  67 0068 02F0FE02 		and	r2, r2, #254
+  68 006c 6FF34102 		bfc	r2, #1, #1
+  69 0070 2272     		strb	r2, [r4, #8]
+  70 0072 2070     		strb	r0, [r4]
+  71 0074 6660     		str	r6, [r4, #4]
+  72 0076 13F83500 		ldrb	r0, [r3, r5, lsl #3]	@ zero_extendqisi2
+  73 007a 08FA01F1 		lsl	r1, r8, r1
+  74 007e 0122     		movs	r2, #1
+  75 0080 FFF7FEFF 		bl	GPIO_SetDir
+  76 0084 6068     		ldr	r0, [r4, #4]
+  77 0086 0022     		movs	r2, #0
+  78 0088 0179     		ldrb	r1, [r0, #4]	@ zero_extendqisi2
+  79 008a 0078     		ldrb	r0, [r0]	@ zero_extendqisi2
+  80 008c FFF7FEFF 		bl	PINSEL_SetPinFunc
+  81 0090 6268     		ldr	r2, [r4, #4]
+  82 0092 013D     		subs	r5, r5, #1
+  83 0094 5168     		ldr	r1, [r2, #4]
+  84 0096 1078     		ldrb	r0, [r2]	@ zero_extendqisi2
+  85 0098 08FA01F1 		lsl	r1, r8, r1
+  86 009c FFF7FEFF 		bl	GPIO_ClearValue
+  87 00a0 6B1C     		adds	r3, r5, #1
+  88 00a2 C4F81490 		str	r9, [r4, #20]
+  89 00a6 A6F10806 		sub	r6, r6, #8
+  90 00aa A146     		mov	r9, r4
+  91 00ac BED1     		bne	.L8
+  92 00ae 2046     		mov	r0, r4
+  93 00b0 03B0     		add	sp, sp, #12
+  94              		@ sp needed
+  95 00b2 BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+  96              	.L17:
+  97 00b6 0023     		movs	r3, #0
+  98 00b8 1B70     		strb	r3, [r3]
+  99 00ba FFDE     		.inst	0xdeff
+ 100              	.L16:
+ 101 00bc DBF80020 		ldr	r2, [fp]
+ 102 00c0 591C     		adds	r1, r3, #1
+ 103 00c2 013A     		subs	r2, r2, #1
+ 104 00c4 CBF80020 		str	r2, [fp]
+ 105 00c8 064A     		ldr	r2, .L18
+ 106 00ca 03EB4303 		add	r3, r3, r3, lsl #1
+ 107 00ce CAF80010 		str	r1, [r10]
+ 108 00d2 02EBC304 		add	r4, r2, r3, lsl #3
+ 109 00d6 C2E7     		b	.L4
+ 110              	.L10:
+ 111 00d8 0024     		movs	r4, #0
+ 112 00da 2046     		mov	r0, r4
+ 113 00dc 03B0     		add	sp, sp, #12
+ 114              		@ sp needed
+ 115 00de BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 116              	.L19:
+ 117 00e2 00BF     		.align	2
+ 118              	.L18:
+ 119 00e4 04000000 		.word	.LANCHOR1+4
+ 120 00e8 00000000 		.word	.LANCHOR0
+ 121 00ec 00000000 		.word	.LANCHOR1
+ 123              		.align	1
+ 124              		.p2align 2,,3
+ 125              		.global	ledz_destroy
+ 126              		.syntax unified
+ 127              		.thumb
+ 128              		.thumb_func
+ 129              		.fpu softvfp
+ 131              	ledz_destroy:
+ 132              		@ args = 0, pretend = 0, frame = 0
+ 133              		@ frame_needed = 0, uses_anonymous_args = 0
+ 134 00f0 10B5     		push	{r4, lr}
+ 135 00f2 0446     		mov	r4, r0
+ 136 00f4 4069     		ldr	r0, [r0, #20]
+ 137 00f6 30B9     		cbnz	r0, .L26
+ 138              	.L21:
+ 139 00f8 0023     		movs	r3, #0
+ 140 00fa 044A     		ldr	r2, .L27
+ 141 00fc 6360     		str	r3, [r4, #4]
+ 142 00fe 1368     		ldr	r3, [r2]
+ 143 0100 0133     		adds	r3, r3, #1
+ 144 0102 1360     		str	r3, [r2]
+ 145 0104 10BD     		pop	{r4, pc}
+ 146              	.L26:
+ 147 0106 FFF7FEFF 		bl	ledz_destroy
+ 148 010a F5E7     		b	.L21
+ 149              	.L28:
+ 150              		.align	2
+ 151              	.L27:
+ 152 010c 00000000 		.word	.LANCHOR0
+ 154              		.align	1
+ 155              		.p2align 2,,3
+ 156              		.global	ledz_set
+ 157              		.syntax unified
+ 158              		.thumb
+ 159              		.thumb_func
+ 160              		.fpu softvfp
+ 162              	ledz_set:
+ 163              		@ args = 0, pretend = 0, frame = 0
+ 164              		@ frame_needed = 0, uses_anonymous_args = 0
+ 165 0110 012A     		cmp	r2, #1
+ 166 0112 A8BF     		it	ge
+ 167 0114 0122     		movge	r2, #1
+ 168 0116 20B3     		cbz	r0, .L44
+ 169 0118 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 170 011a 0F46     		mov	r7, r1
+ 171 011c 1546     		mov	r5, r2
+ 172 011e 0446     		mov	r4, r0
+ 173 0120 0126     		movs	r6, #1
+ 174              	.L35:
+ 175 0122 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+ 176 0124 1F42     		tst	r7, r3
+ 177 0126 15D0     		beq	.L31
+ 178 0128 237A     		ldrb	r3, [r4, #8]	@ zero_extendqisi2
+ 179 012a 03F00103 		and	r3, r3, #1
+ 180 012e AB42     		cmp	r3, r5
+ 181 0130 10D0     		beq	.L31
+ 182 0132 002D     		cmp	r5, #0
+ 183 0134 B8BF     		it	lt
+ 184 0136 C3F10105 		rsblt	r5, r3, #1
+ 185 013a 6368     		ldr	r3, [r4, #4]
+ 186 013c 012D     		cmp	r5, #1
+ 187 013e 5968     		ldr	r1, [r3, #4]
+ 188 0140 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 189 0142 06FA01F1 		lsl	r1, r6, r1
+ 190 0146 09D0     		beq	.L47
+ 191 0148 FFF7FEFF 		bl	GPIO_ClearValue
+ 192              	.L34:
+ 193 014c 237A     		ldrb	r3, [r4, #8]	@ zero_extendqisi2
+ 194 014e 65F30003 		bfi	r3, r5, #0, #1
+ 195 0152 2372     		strb	r3, [r4, #8]
+ 196              	.L31:
+ 197 0154 6469     		ldr	r4, [r4, #20]
+ 198 0156 002C     		cmp	r4, #0
+ 199 0158 E3D1     		bne	.L35
+ 200 015a F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 201              	.L47:
+ 202 015c FFF7FEFF 		bl	GPIO_SetValue
+ 203 0160 F4E7     		b	.L34
+ 204              	.L44:
+ 205 0162 7047     		bx	lr
+ 207              		.align	1
+ 208              		.p2align 2,,3
+ 209              		.global	ledz_on
+ 210              		.syntax unified
+ 211              		.thumb
+ 212              		.thumb_func
+ 213              		.fpu softvfp
+ 215              	ledz_on:
+ 216              		@ args = 0, pretend = 0, frame = 0
+ 217              		@ frame_needed = 0, uses_anonymous_args = 0
+ 218              		@ link register save eliminated.
+ 219 0164 0122     		movs	r2, #1
+ 220 0166 FFF7FEBF 		b	ledz_set
+ 222              		.align	1
+ 223 016a 00BF     		.p2align 2,,3
+ 224              		.global	ledz_off
+ 225              		.syntax unified
+ 226              		.thumb
+ 227              		.thumb_func
+ 228              		.fpu softvfp
+ 230              	ledz_off:
+ 231              		@ args = 0, pretend = 0, frame = 0
+ 232              		@ frame_needed = 0, uses_anonymous_args = 0
+ 233              		@ link register save eliminated.
+ 234 016c 10B4     		push	{r4}
+ 235 016e FF24     		movs	r4, #255
+ 236 0170 037A     		ldrb	r3, [r0, #8]	@ zero_extendqisi2
+ 237 0172 8474     		strb	r4, [r0, #18]
+ 238 0174 03F0FD03 		and	r3, r3, #253
+ 239 0178 6FF3C303 		bfc	r3, #3, #1
+ 240 017c 0372     		strb	r3, [r0, #8]
+ 241 017e 0022     		movs	r2, #0
+ 242 0180 10BC     		pop	{r4}
+ 243 0182 FFF7FEBF 		b	ledz_set
+ 245              		.align	1
+ 246 0186 00BF     		.p2align 2,,3
+ 247              		.global	ledz_toggle
+ 248              		.syntax unified
+ 249              		.thumb
+ 250              		.thumb_func
+ 251              		.fpu softvfp
+ 253              	ledz_toggle:
+ 254              		@ args = 0, pretend = 0, frame = 0
+ 255              		@ frame_needed = 0, uses_anonymous_args = 0
+ 256              		@ link register save eliminated.
+ 257 0188 4FF0FF32 		mov	r2, #-1
+ 258 018c FFF7FEBF 		b	ledz_set
+ 260              		.align	1
+ 261              		.p2align 2,,3
+ 262              		.global	ledz_blink
+ 263              		.syntax unified
+ 264              		.thumb
+ 265              		.thumb_func
+ 266              		.fpu softvfp
+ 268              	ledz_blink:
+ 269              		@ args = 4, pretend = 0, frame = 0
+ 270              		@ frame_needed = 0, uses_anonymous_args = 0
+ 271              		@ link register save eliminated.
+ 272 0190 F0B4     		push	{r4, r5, r6, r7}
+ 273 0192 9DF91050 		ldrsb	r5, [sp, #16]
+ 274 0196 BAB1     		cbz	r2, .L53
+ 275 0198 B3B1     		cbz	r3, .L53
+ 276              	.L72:
+ 277 019a C8B1     		cbz	r0, .L52
+ 278 019c 0478     		ldrb	r4, [r0]	@ zero_extendqisi2
+ 279 019e 2142     		tst	r1, r4
+ 280 01a0 10D0     		beq	.L57
+ 281 01a2 047A     		ldrb	r4, [r0, #8]	@ zero_extendqisi2
+ 282 01a4 8281     		strh	r2, [r0, #12]	@ movhi
+ 283 01a6 14F00106 		ands	r6, r4, #1
+ 284 01aa C381     		strh	r3, [r0, #14]	@ movhi
+ 285 01ac 44F00407 		orr	r7, r4, #4
+ 286 01b0 10D1     		bne	.L73
+ 287 01b2 66F38204 		bfi	r4, r6, #2, #1
+ 288 01b6 0472     		strb	r4, [r0, #8]
+ 289 01b8 0382     		strh	r3, [r0, #16]	@ movhi
+ 290              	.L59:
+ 291 01ba 047A     		ldrb	r4, [r0, #8]	@ zero_extendqisi2
+ 292 01bc 8574     		strb	r5, [r0, #18]
+ 293 01be 44F00204 		orr	r4, r4, #2
+ 294 01c2 0472     		strb	r4, [r0, #8]
+ 295              	.L57:
+ 296 01c4 4069     		ldr	r0, [r0, #20]
+ 297 01c6 E8E7     		b	.L72
+ 298              	.L53:
+ 299 01c8 037A     		ldrb	r3, [r0, #8]	@ zero_extendqisi2
+ 300 01ca 6FF34103 		bfc	r3, #1, #1
+ 301 01ce 0372     		strb	r3, [r0, #8]
+ 302              	.L52:
+ 303 01d0 F0BC     		pop	{r4, r5, r6, r7}
+ 304 01d2 7047     		bx	lr
+ 305              	.L73:
+ 306 01d4 0772     		strb	r7, [r0, #8]
+ 307 01d6 0282     		strh	r2, [r0, #16]	@ movhi
+ 308 01d8 EFE7     		b	.L59
+ 310              		.align	1
+ 311 01da 00BF     		.p2align 2,,3
+ 312              		.global	ledz_tick
+ 313              		.syntax unified
+ 314              		.thumb
+ 315              		.thumb_func
+ 316              		.fpu softvfp
+ 318              	ledz_tick:
+ 319              		@ args = 0, pretend = 0, frame = 8
+ 320              		@ frame_needed = 0, uses_anonymous_args = 0
+ 321 01dc 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 322 01e0 344F     		ldr	r7, .L100
+ 323 01e2 82B0     		sub	sp, sp, #8
+ 324 01e4 B7F8FC31 		ldrh	r3, [r7, #508]
+ 325 01e8 0133     		adds	r3, r3, #1
+ 326 01ea 9BB2     		uxth	r3, r3
+ 327 01ec 042B     		cmp	r3, #4
+ 328 01ee 47D8     		bhi	.L75
+ 329 01f0 0022     		movs	r2, #0
+ 330 01f2 A7F8FC31 		strh	r3, [r7, #508]	@ movhi
+ 331              	.L76:
+ 332 01f6 0024     		movs	r4, #0
+ 333 01f8 4FF00108 		mov	r8, #1
+ 334 01fc 2E4D     		ldr	r5, .L100+4
+ 335              	.L86:
+ 336 01fe 6868     		ldr	r0, [r5, #4]
+ 337 0200 58B3     		cbz	r0, .L78
+ 338 0202 6600     		lsls	r6, r4, #1
+ 339 0204 3319     		adds	r3, r6, r4
+ 340 0206 07EBC303 		add	r3, r7, r3, lsl #3
+ 341 020a 1B7B     		ldrb	r3, [r3, #12]	@ zero_extendqisi2
+ 342 020c 9907     		lsls	r1, r3, #30
+ 343 020e 24D5     		bpl	.L78
+ 344 0210 1AB3     		cbz	r2, .L78
+ 345 0212 298A     		ldrh	r1, [r5, #16]
+ 346 0214 49BB     		cbnz	r1, .L80
+ 347              	.L83:
+ 348 0216 95F91210 		ldrsb	r1, [r5, #18]
+ 349 021a 91B1     		cbz	r1, .L84
+ 350 021c 4168     		ldr	r1, [r0, #4]
+ 351 021e 5B07     		lsls	r3, r3, #29
+ 352 0220 0078     		ldrb	r0, [r0]	@ zero_extendqisi2
+ 353 0222 08FA01F1 		lsl	r1, r8, r1
+ 354 0226 0192     		str	r2, [sp, #4]
+ 355 0228 2FD5     		bpl	.L85
+ 356 022a FFF7FEFF 		bl	GPIO_ClearValue
+ 357 022e 3319     		adds	r3, r6, r4
+ 358 0230 07EBC303 		add	r3, r7, r3, lsl #3
+ 359 0234 197B     		ldrb	r1, [r3, #12]	@ zero_extendqisi2
+ 360 0236 019A     		ldr	r2, [sp, #4]
+ 361 0238 6FF30001 		bfc	r1, #0, #1
+ 362 023c 1973     		strb	r1, [r3, #12]
+ 363 023e EB89     		ldrh	r3, [r5, #14]
+ 364 0240 2B82     		strh	r3, [r5, #16]	@ movhi
+ 365              	.L84:
+ 366 0242 2644     		add	r6, r6, r4
+ 367 0244 07EBC606 		add	r6, r7, r6, lsl #3
+ 368 0248 337B     		ldrb	r3, [r6, #12]	@ zero_extendqisi2
+ 369 024a 1946     		mov	r1, r3
+ 370 024c C3F38003 		ubfx	r3, r3, #2, #1
+ 371 0250 C3F10103 		rsb	r3, r3, #1
+ 372 0254 63F38201 		bfi	r1, r3, #2, #1
+ 373 0258 3173     		strb	r1, [r6, #12]
+ 374              	.L78:
+ 375 025a 0134     		adds	r4, r4, #1
+ 376 025c 152C     		cmp	r4, #21
+ 377 025e 05F11805 		add	r5, r5, #24
+ 378 0262 CCD1     		bne	.L86
+ 379              	.L99:
+ 380 0264 02B0     		add	sp, sp, #8
+ 381              		@ sp needed
+ 382 0266 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 383              	.L80:
+ 384 026a 0139     		subs	r1, r1, #1
+ 385 026c 89B2     		uxth	r1, r1
+ 386 026e 2982     		strh	r1, [r5, #16]	@ movhi
+ 387 0270 0029     		cmp	r1, #0
+ 388 0272 D0D0     		beq	.L83
+ 389 0274 0134     		adds	r4, r4, #1
+ 390 0276 152C     		cmp	r4, #21
+ 391 0278 05F11805 		add	r5, r5, #24
+ 392 027c BFD1     		bne	.L86
+ 393 027e F1E7     		b	.L99
+ 394              	.L75:
+ 395 0280 0023     		movs	r3, #0
+ 396 0282 0122     		movs	r2, #1
+ 397 0284 A7F8FC31 		strh	r3, [r7, #508]	@ movhi
+ 398 0288 B5E7     		b	.L76
+ 399              	.L85:
+ 400 028a FFF7FEFF 		bl	GPIO_SetValue
+ 401 028e 3319     		adds	r3, r6, r4
+ 402 0290 07EBC303 		add	r3, r7, r3, lsl #3
+ 403 0294 197B     		ldrb	r1, [r3, #12]	@ zero_extendqisi2
+ 404 0296 019A     		ldr	r2, [sp, #4]
+ 405 0298 41F00101 		orr	r1, r1, #1
+ 406 029c 1973     		strb	r1, [r3, #12]
+ 407 029e 95F91230 		ldrsb	r3, [r5, #18]
+ 408 02a2 A989     		ldrh	r1, [r5, #12]
+ 409 02a4 002B     		cmp	r3, #0
+ 410 02a6 A8BF     		it	ge
+ 411 02a8 03F1FF33 		addge	r3, r3, #-1
+ 412 02ac 2982     		strh	r1, [r5, #16]	@ movhi
+ 413 02ae A8BF     		it	ge
+ 414 02b0 AB74     		strbge	r3, [r5, #18]
+ 415 02b2 C6E7     		b	.L84
+ 416              	.L101:
+ 417              		.align	2
+ 418              	.L100:
+ 419 02b4 00000000 		.word	.LANCHOR1
+ 420 02b8 04000000 		.word	.LANCHOR1+4
+ 422              		.data
+ 423              		.align	2
+ 424              		.set	.LANCHOR0,. + 0
+ 427              	g_leds_available:
+ 428 0000 15000000 		.word	21
+ 429              		.bss
+ 430              		.align	2
+ 431              		.set	.LANCHOR1,. + 0
+ 434              	ledz_counter.8150:
+ 435 0000 00000000 		.space	4
+ 438              	g_leds:
+ 439 0004 00000000 		.space	504
+ 439      00000000 
+ 439      00000000 
+ 439      00000000 
+ 439      00000000 
+ 442              	counter_1ms.8210:
+ 443 01fc 0000     		.space	2
+ 444              		.ident	"GCC: (GNU Tools for Arm Embedded Processors 7-2018-q3-update) 7.3.1 20180622 (release) [AR
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 ledz.c
+     /tmp/cc7jMME4.s:13     .text:0000000000000000 $t
+     /tmp/cc7jMME4.s:21     .text:0000000000000000 ledz_create
+     /tmp/cc7jMME4.s:119    .text:00000000000000e4 $d
+     /tmp/cc7jMME4.s:123    .text:00000000000000f0 $t
+     /tmp/cc7jMME4.s:131    .text:00000000000000f0 ledz_destroy
+     /tmp/cc7jMME4.s:152    .text:000000000000010c $d
+     /tmp/cc7jMME4.s:154    .text:0000000000000110 $t
+     /tmp/cc7jMME4.s:162    .text:0000000000000110 ledz_set
+     /tmp/cc7jMME4.s:215    .text:0000000000000164 ledz_on
+     /tmp/cc7jMME4.s:230    .text:000000000000016c ledz_off
+     /tmp/cc7jMME4.s:253    .text:0000000000000188 ledz_toggle
+     /tmp/cc7jMME4.s:268    .text:0000000000000190 ledz_blink
+     /tmp/cc7jMME4.s:318    .text:00000000000001dc ledz_tick
+     /tmp/cc7jMME4.s:419    .text:00000000000002b4 $d
+     /tmp/cc7jMME4.s:423    .data:0000000000000000 $d
+     /tmp/cc7jMME4.s:427    .data:0000000000000000 g_leds_available
+     /tmp/cc7jMME4.s:430    .bss:0000000000000000 $d
+     /tmp/cc7jMME4.s:434    .bss:0000000000000000 ledz_counter.8150
+     /tmp/cc7jMME4.s:438    .bss:0000000000000004 g_leds
+     /tmp/cc7jMME4.s:442    .bss:00000000000001fc counter_1ms.8210
+
+UNDEFINED SYMBOLS
+GPIO_SetDir
+PINSEL_SetPinFunc
+GPIO_ClearValue
+GPIO_SetValue
