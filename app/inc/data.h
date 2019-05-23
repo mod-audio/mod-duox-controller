@@ -49,18 +49,14 @@ typedef struct SCALE_POINT_T {
 } scale_point_t;
 
 typedef struct CONTROL_T {
-    uint8_t hardware_type, hardware_id;
-    uint8_t actuator_type, actuator_id;
-    char *label, *symbol, *unit;
-    int8_t effect_instance;
-    uint8_t properties_mask;
+    uint8_t hw_id;
+    char *label, *unit;
     uint8_t properties;
-    uint8_t scroll_dir;
     float value, minimum, maximum;
-    int8_t step, steps;
-    uint8_t controls_count, control_index;
+    int16_t step, steps;
     uint8_t scale_points_count;
     scale_point_t **scale_points;
+    uint8_t scroll_dir;
 } control_t;
 
 typedef struct BP_LIST_T {
@@ -69,8 +65,7 @@ typedef struct BP_LIST_T {
 } bp_list_t;
 
 typedef struct BANK_CONFIG_T {
-    uint8_t hardware_type, hardware_id;
-    uint8_t actuator_type, actuator_id;
+    uint8_t hw_id;
     uint8_t function;
 } bank_config_t;
 

@@ -488,7 +488,6 @@ void system_device_cb(void *arg, int event)
 
 void system_tag_cb(void *arg, int event)
 {
-    ledz_on(hardware_leds(4), RED);
     menu_item_t *item = arg;
 
     if (event == MENU_EV_ENTER)
@@ -496,13 +495,10 @@ void system_tag_cb(void *arg, int event)
         const char *response;
         char *txt = "The serial number of your     device is:                    ";
         response =  cli_command("cat /var/cache/mod/tag", CLI_RETRIEVE_RESPONSE);
-        ledz_on(hardware_leds(5), RED);
         char * bfr = (char *) MALLOC(1 + strlen(txt)+ strlen(response));
         strcpy(bfr, txt);
-        ledz_on(hardware_leds(5), BLUE);
         strcat(bfr, response);
         item->data.popup_content = bfr;
-        ledz_on(hardware_leds(5), GREEN);
     }
 }
 
@@ -658,9 +654,13 @@ void system_master_vol_link_cb(void *arg, int event)
         break;
         case 1:
             strcpy(str_bfr,"1");
+            //turn off stereo link and sync gains
+            //set_item_value(SL_OUT_SET_CMD, 0);
         break;
         case 2:
             strcpy(str_bfr,"2");
+            //turn off stereo link and sync gains
+            //set_item_value(SL_OUT_SET_CMD, 0);
         break;
     }
 
@@ -674,8 +674,7 @@ void system_master_vol_link_cb(void *arg, int event)
     }
     strcat(item->name, (str_bfr));
 
-    //if ((event == MENU_EV_ENTER)&&(!master_vol_port)) naveg_menu_refresh(DISPLAY_RIGHT);
-    //else if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT); 
+    //if ((event == MENU_EV_ENTER) naveg_menu_refresh(DISPLAY_RIGHT);
 }
 
 void system_save_gains_cb(void *arg, int event)
@@ -883,22 +882,26 @@ void system_cv_exp_cb (void *arg, int event)
         {
             if (item->data.value == 0) item->data.value = 1;
             else item->data.value = 0;
-            set_item_value(EXPCV_SET_CMD, item->data.value);
+            //set_item_value(EXPCV_SET_CMD, item->data.value);
         }
         else if (event == MENU_EV_NONE)
         {
-            request_item_value(EXPCV_GET_CMD, item);
+            item->data.value = 0;
+            //request_item_value(EXPCV_GET_CMD, item);
         }
 
         strcpy(item->name, item->desc->name);
         uint8_t q;
         uint8_t value_size = 3;
         uint8_t name_size = strlen(item->name);
+
         for (q = 0; q < (31 - name_size - value_size); q++)
         {
             strcat(item->name, " ");  
         }
+
         strcat(item->name, (item->data.value ? "EXP" : " CV"));
+
         if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
     }
 }
@@ -913,11 +916,12 @@ void system_cv_hp_cb (void *arg, int event)
         {
             if (item->data.value == 0) item->data.value = 1;
             else item->data.value = 0;
-            set_item_value(HPCV_SET_CMD, item->data.value);
+            //set_item_value(HPCV_SET_CMD, item->data.value);
         }
         else if (event == MENU_EV_NONE)
         {
-            request_item_value(HPCV_GET_CMD, item);
+            item->data.value = 0;
+            //request_item_value(HPCV_GET_CMD, item);
         }
 
         strcpy(item->name, item->desc->name);
@@ -1154,134 +1158,7 @@ void system_bpb_cb (void *arg, int event)
 void system_bypass_cb (void *arg, int event)
 {
     menu_item_t *item = arg;
-/*
-    //TODO TOGGLE bypass
-    if (event == MENU_EV_ENTER)
-    {   
-        switch (item->desc->id)
-        {
-            case BP1_ID:
-                if (bypass[0])
-                {
-                    if (bypass[2]) 
-                    {
-                        bypass[0] = 0;
-                        bypass[2] = 0;
-                    }
-                    else bypass[0] = 0;
-                }
-                else
-                { 
-                    bypass[0] = 1;
-                    if (bypass[1]) bypass[2] = 1;
-                }
-            break;
-            case BP2_ID:
-                if (bypass[1])
-                {
-                    if (bypass[2]) 
-                    {
-                        bypass[1] = 0;
-                        bypass[2] = 0;
-                    }
-                    else bypass[1] = 0;
-                }
-                else
-                { 
-                    bypass[1] = 1;
-                    if (bypass[0]) bypass[2] = 1;
-                }
-            break;
-            case BP12_ID:
-                if (bypass[2])
-                {
-                    bypass[0] = 0;
-                    bypass[1] = 0;
-                    bypass[2] = 0;
-                }
-                else
-                {
-                    bypass[0] = 1;
-                    bypass[1] = 1;
-                    bypass[2] = 1;
-                }
-            break;
-            case BP_SELECT_ID:
-                if (bypass[3] < 2) bypass[3]++;
-                else bypass[3] = 0;
-            break;    
-        } 
-        item->data.value = bypass[item->desc->id - (BYPASS_ID + 1)];
-        char cmd_bfr[32];
-        strcpy(cmd_bfr, BYPASS_SET_CMD);
-        char channel[8];
-        int_to_str(item->desc->id - (BYPASS_ID), channel, sizeof channel, 0);
-        strcat(cmd_bfr, channel);
-        strcat(cmd_bfr, " ");
-        set_item_value(cmd_bfr, item->data.value);
-    }
-    else if (event == MENU_EV_NONE)
-    {   
-        char cmd_bfr[32];
-        strcpy(cmd_bfr, BYPASS_GET_CMD);
-        char channel[8];
-        int_to_str(item->desc->id - (BYPASS_ID + 1), channel, sizeof channel, 0);
-        strcat(cmd_bfr, channel);
-        request_item_value(cmd_bfr, item);
-        bypass[item->desc->id - (BYPASS_ID + 1)] = item->data.value;
-    }
 
-    strcpy(item->name, item->desc->name);
-    uint8_t q;
-    uint8_t value_size = 3;
-    uint8_t name_size = strlen(item->name);
-    for (q = 0; q < (31 - name_size - value_size); q++)
-    {
-        strcat(item->name, " ");  
-    }
-    if (item->desc->id == BP_SELECT_ID)
-    {
-        char channel_value[4];
-        switch (bypass[3])
-        {
-            case 0:
-                    strcpy(channel_value, "  1");
-                break;
-            case 1:
-                    strcpy(channel_value, "  2");
-                break;
-            case 2:
-                    strcpy(channel_value, "1&2");
-                break;
-        }
-        strcat(item->name, channel_value);
-    }
-    else strcat(item->name, ((item->data.value)? "[X]" : "[ ]"));
-    ledz_on(hardware_leds(5), RED);
-    if (bypass[bypass[3]])
-    {
-        if (!q_bypass) 
-        {
-            q_bypass  = 1;
-            naveg_menu_refresh(DISPLAY_LEFT);
-            naveg_settings_refresh(DISPLAY_LEFT);
-        }
-    }
-    else if (q_bypass)
-    {
-        q_bypass  = 0;
-        naveg_menu_refresh(DISPLAY_LEFT);
-        naveg_settings_refresh(DISPLAY_LEFT);
-    }
-    ledz_on(hardware_leds(5), GREEN);
-    if (event == MENU_EV_ENTER) 
-    {
-        //naveg_menu_refresh(DISPLAY_RIGHT);
-    }
-    ledz_on(hardware_leds(5), BLUE);
-
-    naveg_settings_refresh(DISPLAY_RIGHT);  
-*/
     char cmd_bfr[32];
     char channel[8];
 
@@ -1427,50 +1304,6 @@ void system_bypass_cb (void *arg, int event)
 
 void system_quick_bypass_cb (void *arg, int event)
 {
-/*
-    menu_item_t *item = arg;
-    
-    if (event == MENU_EV_ENTER)
-    {
-        q_bypass = !q_bypass;
-
-        // "set_truebypass_value 'bypass_channel' 1"
-        bypass[bypass[3]] = q_bypass;
-        
-        if (bypass[3] == 2)
-        {
-            bypass[0] = q_bypass;
-            bypass[1] = q_bypass;
-        }
-        else if (bypass[(!bypass[3])]) bypass[2] = q_bypass;
-
-        strcpy(item->name, item->desc->name);
-        uint8_t q;
-        uint8_t value_size = 10;
-        uint8_t name_size = strlen(item->name);
-        for (q = 0; q < (31 - name_size - value_size); q++)
-        {
-            strcat(item->name, " ");  
-        }
-        strcat(item->name, (q_bypass ? "BYPASS [X]" : "BYPASS [ ]"));
-
-        naveg_settings_refresh(DISPLAY_LEFT); 
-        naveg_menu_refresh(DISPLAY_RIGHT);
-    }
-    else if (event == MENU_EV_NONE)
-    {
-        //TODO GET STATUS
-        strcpy(item->name, item->desc->name);
-        uint8_t q;
-        uint8_t value_size = 10;
-        uint8_t name_size = strlen(item->name);
-        for (q = 0; q < (31 - name_size - value_size); q++)
-        {
-            strcat(item->name, " ");  
-        }
-        strcat(item->name, (q_bypass ? "BYPASS [X]" : "BYPASS [ ]"));
-    }
-*/
     uint8_t q_bypass = 0;
     char cmd_bfr[32];
     char channel[8];
@@ -1624,3 +1457,68 @@ void system_save_pro_cb(void *arg, int event)
     }
 }
 
+void system_cv_range_cb(void *arg, int event)
+{
+    menu_item_t *item = arg;
+    
+    if (event == MENU_EV_ENTER)
+    {
+        if (item->data.value < 1) item->data.value++;
+        else item->data.value = 0;
+        //set_item_value(CV_BIAS_SET_CMD, item->data.value);
+    }
+    else if (event == MENU_EV_NONE)
+    {
+        //request_item_value(CV_BIAS_GET_CMD, item);
+        item->data.value = 0;
+    }
+
+    char str_bfr[16];
+    if (item->data.value == 0) strcpy(str_bfr,"0 to +5V");
+    else if (item->data.value == 1) strcpy(str_bfr,"-2.5 to +2.5V");
+
+    strcpy(item->name, item->desc->name);
+    uint8_t q;
+    uint8_t value_size = strlen(str_bfr);
+    uint8_t name_size = strlen(item->name);
+    for (q = 0; q < (31 - name_size - value_size); q++)
+    {
+        strcat(item->name, " ");  
+    }
+    strcat(item->name, (str_bfr));
+
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT); 
+}
+
+void system_exp_mode_cb(void *arg, int event)
+{
+    menu_item_t *item = arg;
+    
+    if (event == MENU_EV_ENTER)
+    {
+        if (item->data.value < 1) item->data.value++;
+        else item->data.value = 0;
+        //set_item_value(EXP_MODE_SET_CMD, item->data.value);
+    }
+    else if (event == MENU_EV_NONE)
+    {
+        item->data.value = 0;
+        //request_item_value(EXP_MODE_GET_CMD, item);
+    }
+
+    char str_bfr[16];
+    if (item->data.value == 0) strcpy(str_bfr,"Signal on tip");
+    else if (item->data.value == 1) strcpy(str_bfr,"Signal on ring");
+
+    strcpy(item->name, item->desc->name);
+    uint8_t q;
+    uint8_t value_size = strlen(str_bfr);
+    uint8_t name_size = strlen(item->name);
+    for (q = 0; q < (31 - name_size - value_size); q++)
+    {
+        strcat(item->name, " ");  
+    }
+    strcat(item->name, (str_bfr));
+
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT); 
+}

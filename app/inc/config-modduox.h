@@ -110,7 +110,8 @@
 enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FOOTSWITCH4, FOOTSWITCH5, FOOTSWITCH6, POT0, POT1, POT2, POT3, POT4, POT5, POT6, POT7};
 
 // Amount of footswitches
-#define FOOTSWITCHES_COUNT  7
+#define FOOTSWITCHES_COUNT          7
+#define FOOTSWITCHES_ACTUATOR_COUNT 4
 
 // Footswitches ports and pins definitions
 // button definition: {BUTTON_PORT, BUTTON_PIN}
@@ -141,6 +142,8 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 
 //the resolution of a pot
 #define POT_THRESHOLD       25  
+//the value differance at which a pot gets locked
+#define POT_DIFF_THRESHOLD  450
 
 // Potentiometers ports, pins and functions definitions
 // pot definition: {POT_PORT, POT_PIN, PIN_ADC_FUNCTION, ADC CHANNEL}
@@ -152,6 +155,10 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define POT5_PINS        {0, 12, 3, 6} //pot 5
 #define POT6_PINS        {0, 26, 1, 3} //pot 6
 #define POT7_PINS        {0, 13, 3, 7} //pot 7
+
+
+//total amount of actuators
+#define TOTAL_ACTUATORS (ENCODERS_COUNT + FOOTSWITCHES_COUNT + POTS_COUNT)
 
 #define SHUTDOWN_BUTTON_PORT    3
 #define SHUTDOWN_BUTTON_PIN     21
@@ -185,24 +192,25 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define GUI_CONNECTED_CMD       "ui_con"
 // ui_dis
 #define GUI_DISCONNECTED_CMD    "ui_dis"
-// control_add <effect_instance> <symbol> <label> <control_prop> <unit> <value> <max> <min>
-//             <steps> <hw_type> <hw_id> <actuator_type> <actuator_id> <controls_count> <control_index>
+// control_add <hw_id> <label> <control_prop> <unit> <value> <max> <min> <steps> 
 //             [scale_point_count] {[scale_point1_label] [scale_point1_value]}...
-#define CONTROL_ADD_CMD         "control_add %i %s %s %i %s %f %f %f %i %i %i %i %i %i %i ..."
-// control_rm <effect_instance> <symbol>
-#define CONTROL_REMOVE_CMD      "control_rm %i %s"
-// control_get <effect_instance> <symbol>
-#define CONTROL_GET_CMD         "control_get %i %s"
-// control_set <effect_instance> <symbol> <value>
-#define CONTROL_SET_CMD         "control_set %i %s %f"
-// control_next <hardware_type> <hardware_id> <actuator_type> <actuator_id>
-#define CONTROL_NEXT_CMD        "control_next %i %i %i %i"
+#define CONTROL_ADD_CMD         "control_add %i %s %i %s %f %f %f %i %i ..."
+// control_rm <hw_id>
+#define CONTROL_REMOVE_CMD      "control_rm %i ..."
+// control_get <hw_id> 
+#define CONTROL_GET_CMD         "control_get %i"
+// control_set <hw_id><value>
+#define CONTROL_SET_CMD         "control_set %i %f"
+// control_next <hw_id>
+#define CONTROL_NEXT_CMD        "control_next %i"
+// control_index_set <hw_id> <current_index> <total_index>
+#define CONTROL_INDEX_SET       "control_set_index %i %i %i"
 // initial_state <current_bank_uid> <current_pedalboard_uid> [current_pedalboards_list]
 #define INITIAL_STATE_CMD       "initial_state %s %s ..."
 // banks
 #define BANKS_CMD               "banks"
-// bank_config <hw_type> <hw_id> <actuator_type> <actuator_id> <function>
-#define BANK_CONFIG_CMD         "bank_config %i %i %i %i %i"
+// bank_config <hw_id> <function>
+#define BANK_CONFIG_CMD         "bank_config %i %i"
 // pedalboards <bank_uid>
 #define PEDALBOARDS_CMD         "pedalboards %s"
 // pedalboard <bank_id> <pedalboard_uid>
@@ -219,10 +227,6 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define TUNER_OFF_CMD           "tuner off"
 // tuner_input <input>
 #define TUNER_INPUT_CMD         "tuner_input %i"
-// hw_con <hw_type> <hw_id>
-#define HW_CONNECTED_CMD        "hw_con %i %i"
-// hw_dis <hw_type> <hw_id>
-#define HW_DISCONNECTED_CMD     "hw_dis %i %i"
 // resp <status> ...
 #define RESPONSE_CMD            "resp %i ..."
 // reboot in restore mode
@@ -235,17 +239,17 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 //get the current display brightness
 #define BRIGHTNESS_GET_CMD       "get_display_brightness"
 // set stereo link for the inputs 
-#define SL_IN_SET_CMD            "set_in_chan_link 0 %i"                      
+#define SL_IN_SET_CMD            "set_in_chan_link %i"                      
 // get the current stereo link value for the inputs
-#define SL_IN_GET_CMD            "Xget_in_chan_link 0" 
+#define SL_IN_GET_CMD            "get_in_chan_link" 
 // set stereo link for the inputs 
-#define SL_OUT_SET_CMD           "set_out_chan_link 0 %i"                       
+#define SL_OUT_SET_CMD           "set_out_chan_link %i"                       
 // get the current stereo link value for the inputs
-#define SL_OUT_GET_CMD           "Xget_out_chan_link 0"
+#define SL_OUT_GET_CMD           "get_out_chan_link"
  // mute the audio when tuner is on
-#define TUNER_MUTE_SET_CMD      "set_tuner_mute %i"           //not in mod-ui  
+#define TUNER_MUTE_SET_CMD      "set_tuner_mute %i"         
 // get the mute status of the tuner
-#define TUNER_MUTE_GET_CMD      "get_tuner_mute"              //not in mod-ui
+#define TUNER_MUTE_GET_CMD      "get_tuner_mute"          
 // set exp or cv input  <cv=1/exp=0>
 #define EXPCV_SET_CMD           "set_exp_cv %i"                     
 // get the current status of the cv/exp port
@@ -255,25 +259,25 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 // get the current status of the hp/cv port 
 #define HPCV_GET_CMD            "get_hp_cv"                 
 // set the quick bypass channel
-#define QBP_SET_CMD             "set_q_bypass %i"             //not in mod-ui
+#define QBP_SET_CMD             "set_q_bypass %i"     
 // get the quick bypass channel
-#define QBP_GET_CMD             "get_q_bypass"               //not in mod-ui
+#define QBP_GET_CMD             "get_q_bypass"              
 // toggle play status
-#define PLAY_SET_CMD            "set_play_status %i"        //not in mod-ui
+#define PLAY_SET_CMD            "set_play_status %i"       
 // get play status 
-#define PLAY_GET_CMD            "get_play_status"           //not in mod-ui
+#define PLAY_GET_CMD            "get_play_status"        
 // set midi clk source <internal = 0, slave = 1, link = 2>   
 #define MIDI_SRC_SET_CMD        "set_clk_src %i"                             
 // get the midi clk source channel
 #define MIDI_SRC_GET_CMD        "get_clk_src"
 //enable the midi clock <on=1/off=0>
-#define SEND_MIDI_CLK_CMD       "send_midi_clk %i"  
+#define SEND_MIDI_CLK_CMD       "set_send_midi_clk %i"  
 //enable the midi clock <on=1/off=0>
-#define GET_MIDI_CLK_ENABLE_CMD  "get_send_midi_clk"    //we need this ? not in mod-ui
+#define GET_MIDI_CLK_ENABLE_CMD  "get_send_midi_clk"   
 // set midi prog change channnel <channel>
-#define MIDI_PRGCH_SET_CMD      "set_bank_prgch %i"                          
+#define MIDI_PRGCH_SET_CMD      "set_pb_prgch %i"                          
 // get midi prog change channnel 
-#define MIDI_PRGCH_GET_CMD      "get_bank_prgch"
+#define MIDI_PRGCH_GET_CMD      "get_pb_prgch"
 // set midi snapchot change channnel <channel>
 #define MIDI_SNAPSHOT_SET_CMD   "set_snapshot_prgch %i"                                
 // get midi snapchot change channnel
@@ -295,19 +299,27 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 //store the current profile in mod-ui
 #define STORE_PROFILE_CMD        "store_profile %i"
 //get the current profile that is loaded
-#define GET_PROFILE_CMD         "get_current_profile"   //not in mod-ui
+#define GET_PROFILE_CMD         "get_current_profile" 
 //get master volume link channel
-#define MASTER_VOL_SET_LINK_CMD     "get_master_volume_channel_mode"
-//get master volume link channel
-#define MASTER_VOL_GET_LINK_CMD     "set_master_volume_channel_mode %i"
-//refresh the pedalboard name
-#define PB_NAME_REFRESH_CMD         "pedalboard_name_refresh"
-//request the next page
+#define MASTER_VOL_GET_LINK_CMD     "get_mv_channel"
+//set master volume link channel
+#define MASTER_VOL_SET_LINK_CMD     "set_mv_channel %i"
+//request the next page <page_to_load>
 #define NEXT_PAGE_COMMAND        "load_page %i"
-//save a snapshot
+//save a snapshot <snapshot_id>
 #define SAVE_SNAPSHOT_COMMAND     "snapshot_save %i"
-//load a snapshot
+//load a snapshot <snapshot_id>
 #define LOAD_SNAPSHOT_COMMAND     "snapshot_load %i"
+//the HMI is ready to boot <current_page> <display_brightness>
+#define BOOT_HMI_CMD               "boot %i %i"
+//get input cv bias
+#define CV_BIAS_GET_CMD           "get_cv_bias"
+//get input cv bias
+#define CV_BIAS_SET_CMD           "set_cv_bias %i"
+//get input EXP mode
+#define EXP_MODE_GET_CMD           "get_exp_mode"
+//get input EXP mode
+#define EXP_MODE_SET_CMD           "set_exp_mode %i"
 
 
 //// Control propertires definitions
@@ -334,9 +346,6 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 
 // time in milliseconds to enter in tool mode (hold rotary encoder button)
 #define TOOL_MODE_TIME      500
-
-// the amount of pulses from the encoder that is equal to one up/down movement in a menu
-#define SCROL_SENSITIVITY   3
 
 // which display will show which tool
 #define DISPLAY_TOOL_SYSTEM         0
@@ -404,6 +413,8 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define IN2_VOLUME          VOLUME_ID+1
 #define STEREO_LINK_INP     INP_ID+1
 #define EXP_CV_INP          INP_ID+2
+#define CV_RANGE            INP_ID+4
+#define EXP_MODE            INP_ID+5
 
 //output sub menu
 #define OUT1_VOLUME         VOLUME_ID+2
@@ -411,7 +422,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define HP_VOLUME           VOLUME_ID+4
 #define STEREO_LINK_OUTP    OUTP_ID+1
 #define HP_CV_OUTP          OUTP_ID+2
-#define MASTER_VOL_LINK     OUTP_ID+3
+#define MASTER_VOL_LINK     OUTP_ID+4
 
 //midi sub menu
 #define MIDI_CLK_SOURCE     MIDI_ID+2
@@ -420,6 +431,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define MIDI_PEDALBOARD     MIDI_ID+5
     
 #define BLUETOOTH_DISCO_ID   BLUETOOTH_ID+2
+
 
 #define SYSTEM_MENU     \
     {"SETTINGS",                        MENU_LIST,      ROOT_ID,            -1,             NULL                       , 0},  \
@@ -489,34 +501,43 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 
 //POPUP DEFINES
 //PROFILE POPUP TXT
-#define PROFILE_POPUP_LOAD_TXT    "Loading a new profile may     change your in-/output        configuration. Are you sure   you want to continue? This    will discard any changes you  have made to the current user profile since last saving it."
-#define PROFILE_POPUP_RELOAD_TXT  "Are you sure you want to      reload the active user profile? This will discard any       changes you have made to this user profile since last saving it."
+#define PROFILE_POPUP_LOAD_TXT    "The device is about to load a\nnew profile. To avoid damage,\ndisconnect all devices from\nthe CV/EXP and CV/HP ports.\nContinue?."
+#define PROFILE_POPUP_RELOAD_TXT  "Reload active user profile?\nThis will discard any unsaved\nchanges."
+#define EXP_CV_POPUP_TXT          "The device is about to switch\ninput modes. To avoid damage,\ndisconnect all devices from\nthe CV/EXP port. Continue?"
+#define HP_CV_POPUP_TXT           "The device is about to switch\noutput modes. To avoid damage,\ndisconnect all devices from\nthe CV/HP port. Continue?"
 // popups text content, format : {menu_id, header_content, text_content}
 #define POPUP_CONTENT   \
-    {PEDALBOARD_ID, "pedalboard", "To access pedalboard options  please disconnect from the    graphical interface"}, \
-    {BANKS_ID, "Banks", "To access pedalboard options  please disconnect from the    graphical interface"}, \
-    {PEDALBOARD_SAVE_ID, "Save state", "Would you like to save the    current parameter values as   the default for the active    pedalboard?"},         \
-    {PEDALBOARD_RESET_ID, "Reset state", "Would you like to reset all   parameter values to the last  saved state for the active    pedalboard?"},      \
+    {PEDALBOARD_ID, "pedalboard", "To access pedalboard options  please disconnect from the graphical interface"}, \
+    {BANKS_ID, "Banks", "To access pedalboard options  please disconnect from the graphical interface"}, \
+    {PEDALBOARD_SAVE_ID, "Save state", "Save current parameter values\nas the default for the active\npedalboard?"},         \
+    {PEDALBOARD_RESET_ID, "Reset state", "Reset all parameter values to\nthe last saved state for the\nactive pedalboard?"},      \
     {BLUETOOTH_DISCO_ID, "Enable Bluetooth", "Bluetooth discovery mode is   now enabled for 2 minutes"},  \
-    {UPGRADE_ID, "Start System Upgrade", "To start the system upgrade   process, please press and     hold down the left most buttonand press yes. "}, \
+    {UPGRADE_ID, "Start System Upgrade", "To start the system upgrade\nprocess, press and hold down\nthe leftmost button and press\nyes. "}, \
     {PROFILES_ID+1, "Load user profile A", PROFILE_POPUP_LOAD_TXT}, \
     {PROFILES_ID+2, "Load user profile B", PROFILE_POPUP_LOAD_TXT}, \
     {PROFILES_ID+3, "Load user profile C", PROFILE_POPUP_LOAD_TXT}, \
     {PROFILES_ID+4, "Load user profile D", PROFILE_POPUP_LOAD_TXT}, \
-    {PROFILES_ID+5, "Overwrite user profile", "Are you sure you want to      overwrite the active user     profile?"}, \
+    {PROFILES_ID+5, "Overwrite user profile", "Overwrite active user profile?"}, \
     {PROFILES_ID+6, "Reload user profile A", PROFILE_POPUP_RELOAD_TXT}, \
     {PROFILES_ID+7, "Reload user profile B", PROFILE_POPUP_RELOAD_TXT}, \
     {PROFILES_ID+8, "Reload user profile C", PROFILE_POPUP_RELOAD_TXT}, \
     {PROFILES_ID+9, "Reload user profile D", PROFILE_POPUP_RELOAD_TXT}, \
-    {EXP_CV_INP, "Set input to EXP", "You are about to set the      stereo input port to          expression pedal mode. To     prevent damaging your         equipment, please make sure   that there are no control     voltage devices connected.    Would you like to continue?"}, \
-    {EXP_CV_INP+1, "Set input to CV", "You are about to set the      stereo input port to control  voltage mode. Would you like  to continue?"}, \
-    {HP_CV_OUTP, "Set output to HP", "You are about to set the      stereo output port to         headphone mode. To prevent    damaging your equipment,      please make sure that there   are no control voltage devicesconnected. Would you like to  continue?"}, \
-    {HP_CV_OUTP+1, "Set output to CV", "You are about to set the      stereo output port to control voltage mode. To prevent      damaging your equipment,      please make sure that there   are no headphones connected.  Would you like to continue?"}, \
+    {EXP_CV_INP, "Set input to EXP", EXP_CV_POPUP_TXT}, \
+    {EXP_CV_INP+1, "Set input to CV",EXP_CV_POPUP_TXT}, \
+    {HP_CV_OUTP, "Set output to HP", HP_CV_POPUP_TXT}, \
+    {HP_CV_OUTP+1, "Set output to CV", HP_CV_POPUP_TXT}, \
+
+//MENU ITEMS WE DO NOT SHOW RIGHT NOW BECAUSE WE DO NOT HAVE CV
+    /*{"CV / EXP INPUT",                  MENU_TOGGLE,    EXP_CV_INP,         INP_ID,         system_cv_exp_cb           , 0},  \
+    {"CV RANGE",                        MENU_TOGGLE,    CV_RANGE,           INP_ID,         system_cv_range_cb         , 0},  \
+    {"EXP MODE",                        MENU_TOGGLE,    EXP_MODE,           INP_ID,         system_exp_mode_cb         , 0},  \
+      {"CV / HP OUTPUT",                  MENU_TOGGLE,    HP_CV_OUTP,         OUTP_ID,        system_cv_hp_cb            , 0},  \*/
 
 //// Foot functions leds colors
 //// Foot functions leds colors
 #define TOGGLED_COLOR           RED
 #define TRIGGER_COLOR           WHITE
+#define TRIGGER_PRESSED_COLOR   RED
 #define TAP_TEMPO_COLOR         WHITE
 #define ENUMERATED_COLOR        WHITE
 #define BYPASS_COLOR            RED
@@ -527,6 +548,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define PAGES2_COLOR            YELLOW
 #define PAGES3_COLOR            CYAN
 #define SNAPSHOT_COLOR          WHITE
+#define SNAPSHOT_LOAD_COLOR     CYAN
 
 //// Tap Tempo
 // defines the time that the led will stay turned on (in milliseconds)
