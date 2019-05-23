@@ -622,6 +622,12 @@ float system_master_volume_cb(float value, int event)
     return 0;
 }
 
+void system_master_volume_link(uint8_t link_value)
+{
+    master_vol_port = link_value;
+    return;
+}
+
 void system_master_vol_link_cb(void *arg, int event)
 {
     menu_item_t *item = arg;

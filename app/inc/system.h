@@ -94,6 +94,7 @@ void system_master_vol_link_cb(void *arg, int event);
 void system_cv_range_cb(void *arg, int event);
 void system_exp_mode_cb(void *arg, int event);
 float system_master_volume_cb(float value, int event);
+void system_master_volume_link(uint8_t link_value);
 
 
 /*

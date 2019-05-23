@@ -578,9 +578,16 @@ static void restore_cb(proto_t *proto)
 
 static void boot_cb(proto_t *proto)
 {
-    ledz_on(hardware_leds(5), PAGES1_COLOR);
-    naveg_print_pb_name(DISPLAY_LEFT);
-    naveg_master_volume(0);
+    //set the display brightness 
+    hardware_glcd_brightness(atoi(proto->list[1]));
+
+    //set the master volume link
+    system_master_volume_link(atoi(proto->list[2]));
+    
+    //parse the pedalboard name
+    screen_top_info(&proto->list[3] , NULL);
+
+
     protocol_response("resp 0", proto);
 }
 
