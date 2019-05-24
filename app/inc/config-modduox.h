@@ -233,7 +233,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define RESTORE_CMD             "restore"
 //new duo x protocol commands
 //get the name of the current pedalboard
-#define PB_NAME_GET_CMD          "get_pb_name"
+#define PB_NAME_SET_CMD          "set_pb_name %s ..."
 //set display brightness  <brightness>
 #define BRIGHTNESS_SET_CMD       "set_display_brightness %i"
 //get the current display brightness
@@ -311,7 +311,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 //load a snapshot <snapshot_id>
 #define LOAD_SNAPSHOT_COMMAND     "snapshot_load %i"
 //the HMI is ready to boot <current_page> <display_brightness>
-#define BOOT_HMI_CMD               "boot %i %i"
+#define BOOT_HMI_CMD               "boot %i %i %s ..."
 //get input cv bias
 #define CV_BIAS_GET_CMD           "get_cv_bias"
 //get input cv bias

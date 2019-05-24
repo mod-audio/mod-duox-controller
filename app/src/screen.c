@@ -682,20 +682,24 @@ void screen_footer(uint8_t id, const char *name, const char *value)
     } 
 }
 
-void screen_top_info(void *data, menu_item_t *item)
+void screen_top_info(void *data, uint8_t update)
 {
-    (void) item;
-    char **list = data;
+    static char pedalboard_name[32] = "default";
 
     glcd_t *display = hardware_glcds(0);
     
-    char *name_string = list[2];
-    uint8_t data_id = 3;
-    while (list[data_id])
+    if (update)
     {
-        strcat(name_string , " ");
-        strcat(name_string, list[data_id]);
-        data_id++;
+        char **list = data;
+        char *name_string = list[1];
+        uint8_t data_id = 2;
+        while (list[data_id])
+        {
+            strcat(name_string , " ");
+            strcat(name_string, list[data_id]);
+            data_id++;
+        }
+        strcpy(pedalboard_name, name_string);
     }
 
     // clear the name area
@@ -711,7 +715,7 @@ void screen_top_info(void *data, menu_item_t *item)
     title.right_margin = 0;
     title.height = 0;
     title.width = 0;
-    title.text = name_string;
+    title.text = pedalboard_name;
     title.align = ALIGN_CENTER_TOP;
     title.y = 0;
     title.x = 1;

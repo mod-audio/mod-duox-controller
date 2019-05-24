@@ -2188,12 +2188,7 @@ void naveg_master_volume(uint8_t set)
 void naveg_print_pb_name(uint8_t display)
 {
     (void) display;
-
-    // sets the response callback
-    comm_webgui_set_response_cb(screen_top_info, NULL);
-
-    // sends the data to GUI
-    comm_webgui_send(PB_NAME_GET_CMD, strlen(PB_NAME_GET_CMD));
+    screen_top_info(NULL, 0);
 }
 
 void naveg_set_master_volume(uint8_t set)

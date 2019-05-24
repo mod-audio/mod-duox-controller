@@ -106,6 +106,7 @@ static void tuner_cb(proto_t *proto);
 static void resp_cb(proto_t *proto);
 static void restore_cb(proto_t *proto);
 static void boot_cb(proto_t *proto);
+static void pedalboard_name_cb(proto_t *proto);
 
 /*
 ************************************************************************************************************************
@@ -410,6 +411,7 @@ static void setup_task(void *pvParameters)
     protocol_add_command(RESPONSE_CMD, resp_cb);
     protocol_add_command(RESTORE_CMD, restore_cb);
     protocol_add_command(BOOT_HMI_CMD, boot_cb);
+    protocol_add_command(PB_NAME_SET_CMD, pedalboard_name_cb);
 
     // init the navigation
     naveg_init();
@@ -576,6 +578,11 @@ static void restore_cb(proto_t *proto)
     protocol_response("resp 0", proto);
 }
 
+static void pedalboard_name_cb(proto_t *proto)
+{
+	screen_top_info(proto->list , 1);
+}
+
 static void boot_cb(proto_t *proto)
 {
     //set the display brightness 
@@ -585,8 +592,7 @@ static void boot_cb(proto_t *proto)
     system_master_volume_link(atoi(proto->list[2]));
     
     //parse the pedalboard name
-    screen_top_info(&proto->list[3] , NULL);
-
+    screen_top_info(&proto->list[3] , 1);
 
     protocol_response("resp 0", proto);
 }

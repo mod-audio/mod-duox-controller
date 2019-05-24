@@ -625,6 +625,7 @@ float system_master_volume_cb(float value, int event)
 void system_master_volume_link(uint8_t link_value)
 {
     master_vol_port = link_value;
+    naveg_master_volume(0);
     return;
 }
 
