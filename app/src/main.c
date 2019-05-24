@@ -580,7 +580,7 @@ static void restore_cb(proto_t *proto)
 
 static void pedalboard_name_cb(proto_t *proto)
 {
-	screen_top_info(proto->list , 1);
+	screen_top_info(&proto->list[1] , 1);
 }
 
 static void boot_cb(proto_t *proto)

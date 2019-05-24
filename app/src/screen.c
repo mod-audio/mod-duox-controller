@@ -684,7 +684,7 @@ void screen_footer(uint8_t id, const char *name, const char *value)
 
 void screen_top_info(void *data, uint8_t update)
 {
-    static char* pedalboard_name = NULL;
+   static char* pedalboard_name = NULL;
 
     glcd_t *display = hardware_glcds(0);
 
@@ -696,19 +696,18 @@ void screen_top_info(void *data, uint8_t update)
 
     if (update)
     {
-#if 0
+
         char **list = data;
         char *name_string = list[0];
         uint8_t data_id = 1;
-        while (list[data_id])
+        strncpy(pedalboard_name, name_string, 32);
+        while (list[data_id] && ((strlen(pedalboard_name) + strlen(list[data_id]) + 1) < 31))
         {
-            // FIXME appending to name_string, ouch!
-            strcat(name_string , " ");
-            strcat(name_string, list[data_id]);
+            strcat(pedalboard_name , " ");
+            strcat(pedalboard_name, list[data_id]);
             data_id++;
         }
-        strcpy(pedalboard_name, name_string);
-#endif
+        pedalboard_name[31] = '\n';
     }
 
     // clear the name area
