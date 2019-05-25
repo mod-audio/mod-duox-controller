@@ -682,7 +682,7 @@ void screen_footer(uint8_t id, const char *name, const char *value)
     } 
 }
 
-void screen_top_info(void *data, uint8_t update)
+void screen_top_info(const void *data, uint8_t update)
 {
     static char* pedalboard_name = NULL;
 
@@ -696,17 +696,21 @@ void screen_top_info(void *data, uint8_t update)
 
     if (update)
     {
+        const char **name_list = (const char**)data;
+
         // get first list name, copy it to our string buffer
-        char *name_string = ((char**)data)[0];
+        const char *name_string = *name_list;
         strncpy(pedalboard_name, name_string, 31);
         pedalboard_name[31] = 0; // strncpy might not have final null byte
 
-        ++name_string; // go to next name in list
+        // go to next name in list
+        name_string = *(++name_list);
+
         while (name_string && ((strlen(pedalboard_name) + strlen(name_string) + 1) < 31))
         {
             strcat(pedalboard_name, " ");
             strcat(pedalboard_name, name_string);
-            ++name_string;
+            name_string = *(++name_list);
         }
         pedalboard_name[31] = 0;
     }
