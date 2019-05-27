@@ -496,7 +496,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"CONTROLLER:",                     MENU_NONE,      VERSIONS_ID+5,      VERSIONS_ID,    NULL                       , 0},  \
     {"DEVICE",                          MENU_LIST,      DEVICE_ID,          INFO_ID,        system_device_cb           , 0},  \
     {"< BACK TO INFO",                  MENU_RETURN,    DEVICE_ID+1,        DEVICE_ID,      NULL                       , 0},  \
-    {"SERIAL NUMBER:",                  MENU_NONE,      DEVICE_ID+2,        DEVICE_ID,      system_tag_cb              , 0},  \
+    {"SERIAL NUMBER:",                  MENU_OK,        DEVICE_ID+2,        DEVICE_ID,      system_tag_cb              , 0},  \
     {"SYSTEM UPGRADE",                  MENU_CONFIRM,   UPGRADE_ID,         SYSTEM_ID,      system_upgrade_cb          , 0},  \
 
 //POPUP DEFINES

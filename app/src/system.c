@@ -279,12 +279,12 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
     uint8_t dir = (source[0] == 'i') ? 0 : 1;
     if ((((event == MENU_EV_UP) || (event == MENU_EV_DOWN)) && (dir ? sl_out : sl_in)) && (item->desc->id != HP_VOLUME))
     {
-        char vol_cmd[30];
+        char vol_cmd[40];
         //change volume for both
         //PGA (input)
         if (!dir)
         {
-            strcpy(vol_cmd, "amixer set 'PGA Gain' ");
+            strcpy(vol_cmd, "amixer -q -D hw:DUOX set 'PGA Gain' ");
             int cmd_gain = MAP(item->data.value, -12, 12, 0, 48)
             int_to_str(cmd_gain, value, sizeof value, 1);
             strcat(vol_cmd, value);
@@ -293,7 +293,7 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
         //DAC (output)
         else 
         {
-            strcpy(vol_cmd, "amixer set DAC ");
+            strcpy(vol_cmd, "amixer -q -D hw:DUOX set DAC ");
             int cmd_gain = MAP(item->data.value, -60, 0, 135, 255)
             int_to_str(cmd_gain, value, sizeof value, 1);
             strcat(vol_cmd, value);
