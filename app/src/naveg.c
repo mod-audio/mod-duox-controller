@@ -92,6 +92,7 @@ static uint8_t g_initialized, g_ui_connected;
 static void (*g_update_cb)(void *data, int event);
 static void *g_update_data;
 static xSemaphoreHandle g_dialog_sem;
+static uint8_t dialog_active = 0;
 static float master_vol_value;
 static uint8_t snapshot_loaded[2] = {};
 /*
@@ -1285,13 +1286,14 @@ static void menu_enter(uint8_t display_id)
     if (item->desc->type == MENU_CONFIRM2)
     {
         portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+        dialog_active = 0;
         xSemaphoreGiveFromISR(g_dialog_sem, &xHigherPriorityTaskWoken);
     }
 }
 
 static void menu_up(uint8_t display_id)
 {
-    menu_item_t *item = display_id ? g_current_item : g_current_main_item;
+    menu_item_t *item = (display_id || dialog_active) ? g_current_item : g_current_main_item;
 
     if ((item->desc->type == MENU_VOL) || (item->desc->type == MENU_SET))  
     {
@@ -1313,7 +1315,7 @@ static void menu_up(uint8_t display_id)
 
 static void menu_down(uint8_t display_id)
 {
-    menu_item_t *item = display_id ? g_current_item : g_current_main_item;
+    menu_item_t *item = (display_id || dialog_active) ? g_current_item : g_current_main_item;
 
     if ((item->desc->type == MENU_VOL) || (item->desc->type == MENU_SET))  
     {
@@ -2156,11 +2158,6 @@ void naveg_master_volume(uint8_t set)
         return;       
     } 
 
-    if (master_vol_value == 0)
-    {
-        system_save_gains_cb(NULL, MENU_EV_ENTER); 
-    }
-
     if (set == 1)
     {
         if (tool_is_on(DISPLAY_TOOL_MASTER_VOL)) 
@@ -2177,6 +2174,7 @@ void naveg_master_volume(uint8_t set)
             tool_on(DISPLAY_TOOL_MASTER_VOL, 1);
         }
     }
+
     master_vol_value = system_master_volume_cb(0, MENU_EV_NONE);
 
     //convert value for screen
@@ -2320,7 +2318,7 @@ void naveg_enter(uint8_t display)
     {
         if (display == 0)
         {
-            if (tool_is_on(DISPLAY_TOOL_TUNER))
+            if (tool_is_on(DISPLAY_TOOL_TUNER) || naveg_dialog)
             {
                 menu_enter(display);
             }
@@ -2361,7 +2359,12 @@ void naveg_up(uint8_t display)
            	}
             else if (tool_is_on(DISPLAY_TOOL_SYSTEM)) 
            	{
-           		if ((g_current_menu == g_menu) || (g_current_item->desc->id == ROOT_ID))
+                if (dialog_active)
+                {
+                    menu_up(display);
+                    return;
+                }
+           		else if ((g_current_menu == g_menu) || (g_current_item->desc->id == ROOT_ID))
            		{
            			g_current_main_menu = g_current_menu;
            			g_current_main_item = g_current_item;
@@ -2401,7 +2404,12 @@ void naveg_down(uint8_t display)
            	}
             else if (tool_is_on(DISPLAY_TOOL_SYSTEM)) 
            	{
-           		if ((g_current_menu == g_menu) || (g_current_item->desc->id == ROOT_ID))
+                if (dialog_active)
+                {
+                    menu_down(display);
+                    return;
+                }
+           		else if ((g_current_menu == g_menu) || (g_current_item->desc->id == ROOT_ID))
            		{
            			g_current_main_menu = g_current_menu;
            			g_current_main_item = g_current_item;
@@ -2461,19 +2469,21 @@ uint8_t naveg_dialog(const char *msg)
         item->data.list_count = 2;
         item->data.list = NULL;
         item->data.popup_content = msg;
+        item->data.popup_header = "selftest";
         item->desc = &desc;
         item->name = NULL;
         dummy_menu = node_create(item);
     }
 
-    tool_on(DISPLAY_TOOL_SYSTEM, 0);
+    tool_on(DISPLAY_TOOL_SYSTEM, DISPLAY_LEFT);
     g_current_menu = dummy_menu;
     g_current_item = dummy_menu->data;
     screen_system_menu(g_current_item);
 
+    dialog_active = 1;
     xSemaphoreTake(g_dialog_sem, portMAX_DELAY);
 
-    naveg_toggle_tool(DISPLAY_TOOL_SYSTEM, DISPLAY_TOOL_SYSTEM);
+    //naveg_toggle_tool(DISPLAY_TOOL_SYSTEM, DISPLAY_TOOL_SYSTEM);
     return g_current_item->data.hover;
 }
 

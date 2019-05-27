@@ -849,7 +849,7 @@ void screen_system_menu(menu_item_t *item)
     static menu_item_t *last_item;
 
     glcd_t *display;
-    if (item->desc->id == ROOT_ID)
+    if ((item->desc->id == ROOT_ID) || (item->data.selected = 0xFF))
     {    
         display = hardware_glcds(DISPLAY_TOOL_SYSTEM);
     }
@@ -910,7 +910,6 @@ void screen_system_menu(menu_item_t *item)
     popup.width = DISPLAY_WIDTH;
     popup.height = DISPLAY_HEIGHT;
     popup.font = SMfont;
-
     switch (item->desc->type)
     {
         case MENU_LIST:

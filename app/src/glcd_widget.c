@@ -81,6 +81,8 @@ static uint8_t get_text_width(const char *text, const uint8_t *font)
     uint8_t text_width = 0;
     const char *ptext = text;
 
+    if (!text) return 0;
+
     if (FONT_IS_MONO_SPACED(font))
     {
         while (*ptext)
@@ -111,9 +113,7 @@ static uint8_t get_text_width(const char *text, const uint8_t *font)
 void widget_textbox(glcd_t *display, textbox_t *textbox)
 {
     uint8_t text_width, text_height;
-
     if (textbox->text == NULL) return;
-
     if (textbox->mode == TEXT_SINGLE_LINE)
     {
         text_width = get_text_width(textbox->text, textbox->font);
@@ -124,7 +124,6 @@ void widget_textbox(glcd_t *display, textbox_t *textbox)
         text_width = textbox->width;
         text_height = textbox->height;
     }
-
     if (textbox->width == 0) textbox->width = text_width;
     else if (text_width > textbox->width) text_width = textbox->width;
 
@@ -796,7 +795,6 @@ void widget_popup(glcd_t *display, popup_t *popup)
 {
     // clears the popup area
     glcd_rect_fill(display, popup->x, popup->y, popup->width, popup->height, GLCD_WHITE);
-
     // draws the contour
     glcd_rect(display, popup->x, popup->y, popup->width, popup->height, GLCD_BLACK);
 
@@ -814,10 +812,8 @@ void widget_popup(glcd_t *display, popup_t *popup)
     title.width = DISPLAY_WIDTH;
     title.text = popup->title;
     widget_textbox(display, &title);
-
     // draws the title background
     glcd_rect_invert(display, popup->x+1, popup->y+1, popup->width-2, 6);
-
     // draws the content
     textbox_t content;
     content.color = GLCD_BLACK;
@@ -837,7 +833,6 @@ void widget_popup(glcd_t *display, popup_t *popup)
 
     uint8_t button_x, button_y, button_w, button_h;
     const char *button_text;
-
     // draws the buttons
     switch (popup->type)
     {
@@ -862,7 +857,6 @@ void widget_popup(glcd_t *display, popup_t *popup)
             button_x = popup->x + (popup->width / 4) - (button_w / 2);
             button_y = popup->y + popup->height - button_h;
             glcd_text(display, button_x + 4, button_y, button_text, popup->font, GLCD_BLACK);
-
             if (popup->button_selected == 0)
                 glcd_rect_invert(display, button_x+1, button_y-1, button_w-2, button_h);
 
@@ -872,7 +866,6 @@ void widget_popup(glcd_t *display, popup_t *popup)
             button_x = popup->x + popup->width - (popup->width / 4) - (button_w / 2);
             button_y = popup->y + popup->height - button_h;
             glcd_text(display, button_x + 4, button_y, button_text, popup->font, GLCD_BLACK);
-
             if (popup->button_selected == 1)
                 glcd_rect_invert(display, button_x+1, button_y-1, button_w-2, button_h);
             break;
