@@ -849,7 +849,7 @@ void screen_system_menu(menu_item_t *item)
     static menu_item_t *last_item;
 
     glcd_t *display;
-    if ((item->desc->id == ROOT_ID) || (item->data.selected = 0xFF))
+    if ((item->desc->id == ROOT_ID) || (item->desc->id == DIALOG_ID))
     {    
         display = hardware_glcds(DISPLAY_TOOL_SYSTEM);
     }
@@ -885,7 +885,7 @@ void screen_system_menu(menu_item_t *item)
        title_box.text = item->desc->name;
     }
     widget_textbox(display, &title_box);
-
+    
     // title line separator
     glcd_hline(display, 0, 9, DISPLAY_WIDTH, GLCD_BLACK_WHITE);
     glcd_hline(display, 0, 10, DISPLAY_WIDTH, GLCD_WHITE);

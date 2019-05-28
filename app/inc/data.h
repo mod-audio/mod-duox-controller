@@ -72,7 +72,7 @@ typedef struct BANK_CONFIG_T {
 typedef struct MENU_DESC_T {
     const char *name;
     menu_types_t type;
-    uint16_t id, parent_id;
+    int16_t id, parent_id;
     void (*action_cb) (void *data, int event);
     uint8_t need_update;
 } menu_desc_t;
@@ -80,12 +80,12 @@ typedef struct MENU_DESC_T {
 typedef struct MENU_DATA_T {
     char **list;
     uint8_t list_count;
-    uint8_t selected, hover;
+    int8_t selected, hover;
     char *popup_header;
     const char *popup_content;
 
     // FIXME: need to be improved, not all menu items should have this vars (wasting memory)
-    int16_t min, max, value, step;
+    float min, max, value, step;
 } menu_data_t;
 
 typedef struct MENU_ITEM_T {

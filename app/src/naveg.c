@@ -91,7 +91,7 @@ static bank_config_t g_bank_functions[BANK_FUNC_AMOUNT];
 static uint8_t g_initialized, g_ui_connected;
 static void (*g_update_cb)(void *data, int event);
 static void *g_update_data;
-static xSemaphoreHandle g_dialog_sem;
+static volatile xSemaphoreHandle g_dialog_sem;
 static uint8_t dialog_active = 0;
 static float master_vol_value;
 static uint8_t snapshot_loaded[2] = {};
@@ -1008,8 +1008,8 @@ static void bp_down(void)
 static void menu_enter(uint8_t display_id)
 {
     uint8_t i;
-    node_t *node = display_id ? g_current_menu : g_current_main_menu;
-    menu_item_t *item = display_id ? g_current_item : g_current_main_item;
+    node_t *node = (display_id || dialog_active) ? g_current_menu : g_current_main_menu;
+    menu_item_t *item = (display_id || dialog_active) ? g_current_item : g_current_main_item;
     
     if (item->desc->type == MENU_LIST || item->desc->type == MENU_SELECT)
     {
@@ -1300,6 +1300,7 @@ static void menu_up(uint8_t display_id)
         item->data.value -= (item->data.step * hardware_get_acceleration());
         if (item->data.value < item->data.min)
             item->data.value = item->data.min;
+
     }
     else
     {
@@ -2318,7 +2319,7 @@ void naveg_enter(uint8_t display)
     {
         if (display == 0)
         {
-            if (tool_is_on(DISPLAY_TOOL_TUNER) || naveg_dialog)
+            if (tool_is_on(DISPLAY_TOOL_TUNER) || dialog_active)
             {
                 menu_enter(display);
             }
@@ -2359,8 +2360,8 @@ void naveg_up(uint8_t display)
            	}
             else if (tool_is_on(DISPLAY_TOOL_SYSTEM)) 
            	{
-                if (dialog_active)
-                {
+                if (dialog_active) // replace with uxSemaphoreGetCount(g_dialog_sem);
+                {   
                     menu_up(display);
                     return;
                 }
@@ -2392,7 +2393,7 @@ void naveg_down(uint8_t display)
     if (display_has_tool_enabled(display))
     {
         if (display == 0)
-        {  
+        {   
         	if ( (tool_is_on(DISPLAY_TOOL_TUNER)) || (tool_is_on(DISPLAY_TOOL_NAVIG)) )
             {
            			naveg_toggle_tool((tool_is_on(DISPLAY_TOOL_TUNER) ? DISPLAY_TOOL_TUNER : DISPLAY_TOOL_NAVIG), display);
@@ -2403,7 +2404,7 @@ void naveg_down(uint8_t display)
            			menu_enter(display);
            	}
             else if (tool_is_on(DISPLAY_TOOL_SYSTEM)) 
-           	{
+           	{   
                 if (dialog_active)
                 {
                     menu_down(display);
@@ -2458,7 +2459,7 @@ void naveg_update(void)
 uint8_t naveg_dialog(const char *msg)
 {
     static node_t *dummy_menu;
-    static menu_desc_t desc = {NULL, MENU_CONFIRM2, -2, -2, NULL, 0};
+    static menu_desc_t desc = {NULL, MENU_CONFIRM2, DIALOG_ID, DIALOG_ID, NULL, 0};
 
     if (!dummy_menu)
     {
@@ -2481,9 +2482,11 @@ uint8_t naveg_dialog(const char *msg)
     screen_system_menu(g_current_item);
 
     dialog_active = 1;
+    ledz_on(hardware_leds(0), RED);
     xSemaphoreTake(g_dialog_sem, portMAX_DELAY);
+    ledz_on(hardware_leds(0), GREEN);
 
-    //naveg_toggle_tool(DISPLAY_TOOL_SYSTEM, DISPLAY_TOOL_SYSTEM);
+    naveg_toggle_tool(DISPLAY_TOOL_SYSTEM, DISPLAY_TOOL_SYSTEM);
     return g_current_item->data.hover;
 }
 
