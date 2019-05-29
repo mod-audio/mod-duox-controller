@@ -488,6 +488,7 @@ void system_device_cb(void *arg, int event)
 
 void system_tag_cb(void *arg, int event)
 {
+
     menu_item_t *item = arg;
 
     if (event == MENU_EV_ENTER)
@@ -499,6 +500,7 @@ void system_tag_cb(void *arg, int event)
         strcpy(bfr, txt);
         strcat(bfr, response);
         item->data.popup_content = bfr;
+        item->data.popup_header = "serial number";
     }
 }
 
@@ -691,8 +693,6 @@ void system_save_gains_cb(void *arg, int event)
     if (event == MENU_EV_ENTER)
     {
         cli_command("mod-amixer save", CLI_DISCARD_RESPONSE);
-
-        //TODO MAKE MOD_UI AWARE GAINS HAVE CHANGED 
     }
 }
 
@@ -709,20 +709,7 @@ void system_banks_cb(void *arg, int event)
 void system_display_cb(void *arg, int event)
 {
     menu_item_t *item = arg;
-/*
-    //get from mod-ui
-    if (event == MENU_EV_NONE)
-    {
-        request_item_value(BRIGHTNESS_GET_CMD, item);
-    }
-    else if (event == MENU_EV_ENTER)
-    {
-        //set status in mod-ui
-        if (++ item->data.value > MAX_BRIGHTNESS)
-             item->data.value = 0;
-        set_item_value(BRIGHTNESS_SET_CMD, (item->data.value* 25));
-        hardware_glcd_brightness(item->data.value);
-    }*/
+
     static int level = 2;
     
     if (event == MENU_EV_ENTER)

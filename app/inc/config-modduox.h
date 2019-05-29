@@ -432,7 +432,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     
 #define BLUETOOTH_DISCO_ID   BLUETOOTH_ID+2
 
-#define DIALOG_ID           -20 
+#define DIALOG_ID           -2
 
 #define SYSTEM_MENU     \
     {"SETTINGS",                        MENU_LIST,      ROOT_ID,            -1,             NULL                       , 0},  \

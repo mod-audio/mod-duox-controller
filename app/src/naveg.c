@@ -1004,10 +1004,11 @@ static void bp_down(void)
 
 static void menu_enter(uint8_t display_id)
 {
+
     uint8_t i;
     node_t *node = (display_id || dialog_active) ? g_current_menu : g_current_main_menu;
     menu_item_t *item = (display_id || dialog_active) ? g_current_item : g_current_main_item;
-    
+
     if (item->desc->type == MENU_LIST || item->desc->type == MENU_SELECT)
     {
         // locates the clicked item
@@ -1016,7 +1017,6 @@ static void menu_enter(uint8_t display_id)
 
         // gets the menu item
         item = node->data;
-
         // checks if is 'back to previous'
         if (item->desc->type == MENU_RETURN)
         {
@@ -1030,7 +1030,7 @@ static void menu_enter(uint8_t display_id)
         // updates the current item
        	if ((item->desc->type != MENU_TOGGLE) && (item->desc->type != MENU_NONE)) g_current_item = node->data;
        	// updates these 3 specific toggle items (toggle items with pop-ups)
-        if (item->desc->parent_id == PROFILES_ID || item->desc->id == EXP_CV_INP || item->desc->id == HP_CV_OUTP) g_current_item = node->data;        
+        if (item->desc->parent_id == PROFILES_ID || item->desc->id == EXP_CV_INP || item->desc->id == HP_CV_OUTP) g_current_item = node->data;
     }
     else if (item->desc->type == MENU_CONFIRM || item->desc->type == MENU_CANCEL || item->desc->type == MENU_OK || 
     		item->desc->parent_id == PROFILES_ID || item->desc->id == EXP_CV_INP || item->desc->id == HP_CV_OUTP)
@@ -1121,7 +1121,6 @@ static void menu_enter(uint8_t display_id)
 
         // default popup content value
         item->data.popup_content = NULL;
-
         // locates the popup menu
         i = 0;
         while (g_menu_popups[i].popup_content)
@@ -1220,7 +1219,10 @@ static void menu_enter(uint8_t display_id)
         }
 
         // calls the action callback
-        if ((item->desc->action_cb) && (item->desc->id != BANKS_ID))item->desc->action_cb(item, MENU_EV_ENTER);
+        if ((item->desc->action_cb) && (item->desc->id != BANKS_ID))
+        {
+            item->desc->action_cb(item, MENU_EV_ENTER);
+        }
     }
     else if (item->desc->type == MENU_NONE)
     {
@@ -1267,10 +1269,11 @@ static void menu_enter(uint8_t display_id)
         }
     }
 
+    if (item->desc->parent_id == DEVICE_ID) item->desc->action_cb(item, MENU_EV_ENTER);
+
     if (tool_is_on(DISPLAY_TOOL_SYSTEM) && !tool_is_on(DISPLAY_TOOL_NAVIG))
     {
         screen_system_menu(item);
-
         g_update_cb = NULL;
         g_update_data = NULL;
         if (item->desc->need_update)
