@@ -130,7 +130,7 @@ typedef struct POPUP_T {
 
 void widget_textbox(glcd_t *display, textbox_t *textbox);
 void widget_listbox(glcd_t *display, listbox_t *listbox);
-void widget_listbox3(glcd_t *display, listbox_t *listbox); 
+void widget_listbox3(glcd_t *display, listbox_t *listbox);
 void widget_peakmeter(glcd_t *display, uint8_t pkm_id, peakmeter_t *pkm);
 void widget_tuner(glcd_t *display, tuner_t *tuner);
 void widget_popup(glcd_t *display, popup_t *popup);

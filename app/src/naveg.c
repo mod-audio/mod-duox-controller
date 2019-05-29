@@ -951,7 +951,6 @@ static void bp_enter(void)
             if (g_selected_pedalboards) bank_config_footer();
         }
     }
-    else return;
 
     screen_bp_list(title, bp_list);
 }
@@ -975,7 +974,6 @@ static void bp_up(void)
         bp_list = g_naveg_pedalboards;
         title = g_banks->names[g_banks->hover];
     }
-    else return;
 
     screen_bp_list(title, bp_list);
 }
@@ -999,7 +997,6 @@ static void bp_down(void)
         bp_list = g_naveg_pedalboards;
         title = g_banks->names[g_banks->hover];
     }
-    else return;
 
     screen_bp_list(title, bp_list);
 }
@@ -1676,7 +1673,7 @@ void naveg_ui_connection(uint8_t status)
         g_selected_pedalboards = NULL;
     }
 
-
+    //why do i exist? 
     if ((tool_is_on(DISPLAY_TOOL_NAVIG)) || tool_is_on(DISPLAY_TOOL_SYSTEM))
     {
         naveg_toggle_tool(DISPLAY_TOOL_SYSTEM, 0);
@@ -2221,7 +2218,6 @@ uint8_t naveg_is_master_vol(void)
 void naveg_set_banks(bp_list_t *bp_list)
 {
     if (!g_initialized) return;
-
     g_banks = bp_list;
 }
 

@@ -160,7 +160,7 @@ void serial_error(uint8_t uart_id, uint32_t error)
 // this callback is called from a ISR
 static void actuators_cb(void *actuator)
 {
-    static uint8_t i, info[ACTUATORS_QUEUE_SIZE][4];
+    static uint8_t i, info[ACTUATORS_QUEUE_SIZE][3];
 
     // does a copy of actuator id and status
     uint8_t *actuator_info;
@@ -267,7 +267,7 @@ static void actuators_task(void *pvParameters)
             cli_restore(RESTORE_CHECK_BOOT);
 
         // checks if actuator has successfully taken
-        if (xStatus == pdTRUE && cli_restore(RESTORE_STATUS) == LOGGED_ON_SYSTEM)
+        if (xStatus == pdPASS && cli_restore(RESTORE_STATUS) == LOGGED_ON_SYSTEM)
         {
             type = actuator_info[0];
             id = actuator_info[1];

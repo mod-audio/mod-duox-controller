@@ -762,11 +762,11 @@ void screen_tool(uint8_t tool, uint8_t display_id)
             if (bp_list && bp_list->selected == 0)
                 bp_list->selected = 1;
             //if we already have a bank selected we enter that bank automaticly 
-            else {
+            /*else {
                 bp_list->hover = bp_list->selected; 
                 naveg_enter(1);
                 return;
-                 }
+                }*/
             screen_bp_list("BANKS", bp_list);
             break;
     }

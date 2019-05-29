@@ -177,7 +177,6 @@ void data_free_control(control_t *control)
     }
 
     FREE(control);
-    return;
 }
 
 bp_list_t *data_parse_banks_list(char **list_data, uint32_t list_count)
@@ -256,7 +255,6 @@ void data_free_banks_list(bp_list_t *bp_list)
     }
 
     FREE(bp_list);
-    return;
 }
 
 bp_list_t *data_parse_pedalboards_list(char **list_data, uint32_t list_count)
@@ -335,5 +333,4 @@ void data_free_pedalboards_list(bp_list_t *bp_list)
     }
 
     FREE(bp_list);
-    return;
 }

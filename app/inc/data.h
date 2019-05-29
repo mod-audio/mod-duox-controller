@@ -45,7 +45,7 @@ enum {MENU_EV_ENTER, MENU_EV_UP, MENU_EV_DOWN, MENU_EV_NONE};
 
 typedef struct SCALE_POINT_T {
     char *label;
-    int8_t value;
+    float value;
 } scale_point_t;
 
 typedef struct CONTROL_T {
@@ -53,7 +53,7 @@ typedef struct CONTROL_T {
     char *label, *unit;
     uint8_t properties;
     float value, minimum, maximum;
-    int16_t step, steps;
+    int32_t step, steps;
     uint8_t scale_points_count;
     scale_point_t **scale_points;
     uint8_t scroll_dir;
@@ -80,7 +80,7 @@ typedef struct MENU_DESC_T {
 typedef struct MENU_DATA_T {
     char **list;
     uint8_t list_count;
-    int8_t selected, hover;
+    uint8_t selected, hover;
     char *popup_header;
     const char *popup_content;
 

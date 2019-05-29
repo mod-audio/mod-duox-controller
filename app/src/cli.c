@@ -261,7 +261,10 @@ void cli_process(void)
         if (xReturn == pdFALSE)
         {
             // and booting is in pre uboot stage
-            if (g_cli.pre_uboot) return;
+            if (g_cli.pre_uboot) 
+            {
+                return;
+            }
 
             // and still in the first step ...
             if (g_cli.boot_step == 0)
