@@ -309,7 +309,7 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
             cli_command(" vol ", CLI_CACHE_ONLY);
             response = cli_command(NULL, CLI_RETRIEVE_RESPONSE);
             
-            char str[30];
+            char str[LINE_BUFFER_SIZE+1];
             strcpy(str, response);
 
             item->data.min = min;
