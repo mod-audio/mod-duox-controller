@@ -541,20 +541,37 @@ void actuators_clock(void)
 
                 switch (seq)
                 {
+                    // these ones are sent quite often during normal operation
                     case 0: case 5: case 10: case 15:
-                        break;
+                        continue;
+
+                    // 1 step up
                     case 1: case 7: case 8: case 14:
+                        if (encoder->counter > 0) // this fixes inverting direction
+                            encoder->counter = 0;
                         encoder->counter--;
                         break;
+
+                    // 1 step down
                     case 2: case 4: case 11: case 13:
+                        if (encoder->counter < 0) // this fixes inverting direction
+                            encoder->counter = 0;
                         encoder->counter++;
                         break;
+
+                    // 2 steps up
                     case 3: case 12:
                         encoder->counter -= 2;
                         break;
-                    default:
+
+                    // 2 steps down
+                    case 6: case 9:
                         encoder->counter += 2;
                         break;
+
+                    // default should never trigger (because math)
+                    default:
+                        continue;
                 }
 
                  encoder->state = (seq >> 2);
@@ -567,7 +584,7 @@ void actuators_clock(void)
                     static uint8_t ticks_count = 0;
                     firsttick = 1;
                     if (acceleration_count < 100)
-                    {   
+                    {
                         ticks_count++;
                         if (ticks_count > ENCODER_ACCEL_STEP_3) acceleration = 7;
                         else if (ticks_count > ENCODER_ACCEL_STEP_2)acceleration = 5;
