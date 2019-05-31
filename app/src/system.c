@@ -279,25 +279,22 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
     uint8_t dir = (source[0] == 'i') ? 0 : 1;
     if ((((event == MENU_EV_UP) || (event == MENU_EV_DOWN)) && (dir ? sl_out : sl_in)) && (item->desc->id != HP_VOLUME))
     {
-        char vol_cmd[40];
         //change volume for both
         //PGA (input)
         if (!dir)
         {
-            strcpy(vol_cmd, "amixer -q -D hw:DUOX set 'PGA Gain' ");
-            int cmd_gain = MAP(item->data.value, -12, 12, 0, 48)
-            int_to_str(cmd_gain, value, sizeof value, 1);
-            strcat(vol_cmd, value);
-            cli_command(vol_cmd, CLI_DISCARD_RESPONSE); 
+            int gain = MAP(item->data.value, -12, 12, 0, 48)
+            int_to_str(gain, value, sizeof value, 1);
+            cli_command("amixer -q -D hw:DUOX set 'PGA Gain' ", CLI_CACHE_ONLY);
+            cli_command(value, CLI_DISCARD_RESPONSE);
         }
         //DAC (output)
         else 
         {
-            strcpy(vol_cmd, "amixer -q -D hw:DUOX set DAC ");
-            int cmd_gain = MAP(item->data.value, -60, 0, 135, 255)
-            int_to_str(cmd_gain, value, sizeof value, 1);
-            strcat(vol_cmd, value);
-            cli_command(vol_cmd, CLI_DISCARD_RESPONSE);  
+            int gain = MAP(item->data.value, -60, 0, 135, 255)
+            int_to_str(gain, value, sizeof value, 1);
+            cli_command("amixer -q -D hw:DUOX set DAC ", CLI_CACHE_ONLY);
+            cli_command(value, CLI_DISCARD_RESPONSE);
         }
     }
     else 
@@ -337,11 +334,11 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
         }
         else if ((event == MENU_EV_UP) ||(event == MENU_EV_DOWN))
         {
+            float_to_str(item->data.value, value, sizeof value, 1);
             cli_command("mod-amixer ", CLI_CACHE_ONLY);
             cli_command(source, CLI_CACHE_ONLY);
-            cli_command(" vol ", CLI_CACHE_ONLY);
-            float_to_str(item->data.value, value, sizeof value, 1);
-            cli_command(value, CLI_DISCARD_RESPONSE);        
+            cli_command(" vol", CLI_CACHE_ONLY);
+            cli_command(value, CLI_DISCARD_RESPONSE);
         }
     }
 
@@ -588,8 +585,7 @@ float system_master_volume_cb(float value, int event)
         cli_command(source, CLI_CACHE_ONLY);
         cli_command(" vol ", CLI_CACHE_ONLY);
 
-        const char *response;
-        response = cli_command(NULL, CLI_RETRIEVE_RESPONSE);
+        const char *response = cli_command(NULL, CLI_RETRIEVE_RESPONSE);
         return atof(response);
     }
     else if ((event == MENU_EV_UP) ||(event == MENU_EV_DOWN))
@@ -597,25 +593,25 @@ float system_master_volume_cb(float value, int event)
         char value_char[8];
         switch(master_vol_port)
         {
-            case 0:;
-                char vol_cmd[20];
-                strcpy(vol_cmd, "amixer set DAC ");
-                int cmd_gain = MAP(value, -57, -3, 135, 255);
-                int_to_str(cmd_gain, value_char, sizeof value_char, 1);
-                strcat(vol_cmd, value_char);
-                cli_command(vol_cmd, CLI_DISCARD_RESPONSE);  
+            case 0: {
+                int gain = MAP(value, -57, -3, 135, 255);
+                int_to_str(gain, value_char, sizeof value_char, 1);
+
+                cli_command("amixer -q -D hw:DUOX set DAC ", CLI_CACHE_ONLY);
+                cli_command(value_char, CLI_DISCARD_RESPONSE);
             break;
+            }
         
             case 1:
-                cli_command("mod-amixer out 1 vol ", CLI_CACHE_ONLY);
                 float_to_str(value, value_char, sizeof value_char, 1);
-                cli_command(value_char, CLI_DISCARD_RESPONSE);  
-            break;    
+                cli_command("mod-amixer out 1 vol ", CLI_CACHE_ONLY);
+                cli_command(value_char, CLI_DISCARD_RESPONSE);
+            break;
         
             case 2:
                 cli_command("mod-amixer out 2 vol ", CLI_CACHE_ONLY);
                 float_to_str(value, value_char, sizeof value_char, 1);
-                cli_command(value_char, CLI_DISCARD_RESPONSE);  
+                cli_command(value_char, CLI_DISCARD_RESPONSE);
             break;
         }
         return value; 
@@ -755,13 +751,11 @@ void system_sl_in_cb (void *arg, int event)
 
         if (item->data.value == 1) 
         {
-            char vol_cmd[30];
             char value[8];
-            strcpy(vol_cmd, "amixer set 'PGA Gain' ");
-            int cmd_gain = MAP(gains_volumes[IN1_VOLUME - VOLUME_ID], -12, 12, 0, 48)
-            int_to_str(cmd_gain, value, sizeof value, 1);
-            strcat(vol_cmd, value);
-            cli_command(vol_cmd, CLI_DISCARD_RESPONSE);
+            int gain = MAP(gains_volumes[IN1_VOLUME - VOLUME_ID], -12, 12, 0, 48)
+            int_to_str(gain, value, sizeof value, 1);
+            cli_command("amixer -q -D hw:DUOX set 'PGA Gain' ", CLI_CACHE_ONLY);
+            cli_command(value, CLI_DISCARD_RESPONSE);
             naveg_update_gain(DISPLAY_RIGHT, IN2_VOLUME, gains_volumes[IN1_VOLUME - VOLUME_ID]); 
         }
     }
@@ -801,13 +795,11 @@ void system_sl_out_cb (void *arg, int event)
 
         if (item->data.value == 1) 
         {
-            char vol_cmd[30];
             char value[8];
-            strcpy(vol_cmd, "amixer set DAC ");
-            int cmd_gain = MAP(gains_volumes[OUT1_VOLUME - VOLUME_ID], -60, 0, 135, 255)
-            int_to_str(cmd_gain, value, sizeof value, 1);
-            strcat(vol_cmd, value);
-            cli_command(vol_cmd, CLI_DISCARD_RESPONSE);
+            int gain = MAP(gains_volumes[OUT1_VOLUME - VOLUME_ID], -60, 0, 135, 255)
+            int_to_str(gain, value, sizeof value, 1);
+            cli_command("amixer -q -D hw:DUOX set DAC ", CLI_CACHE_ONLY);
+            cli_command(value, CLI_DISCARD_RESPONSE);
             naveg_update_gain(DISPLAY_RIGHT, OUT2_VOLUME, gains_volumes[OUT1_VOLUME - VOLUME_ID]);  
         }
     }
