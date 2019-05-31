@@ -340,9 +340,12 @@ uint8_t actuator_get_acceleration(void)
 
 uint16_t actuator_pot_value(uint8_t pot_id)
 {
-    if (g_pot_value[pot_id] < 20) g_pot_value[pot_id] = 0;
-    else if (g_pot_value[pot_id] > 4075) g_pot_value[pot_id] = 4095;
-    return (g_pot_value[pot_id]);
+    if (g_pot_value[pot_id] < 20)
+        g_pot_value[pot_id] = 0;
+    else if (g_pot_value[pot_id] > 4075)
+        g_pot_value[pot_id] = 4095;
+
+    return g_pot_value[pot_id];
 }
 
 void actuators_clock(void)
@@ -361,8 +364,10 @@ void actuators_clock(void)
         switch (ACTUATOR_TYPE(g_actuators_pointers[i]))
         {
             case BUTTON:
-                if (READ_PIN(button->port, button->pin) == BUTTON_ACTIVATED) button_on = BUTTON_ON_FLAG;
-                else button_on = 0;
+                if (READ_PIN(button->port, button->pin) == BUTTON_ACTIVATED)
+                    button_on = BUTTON_ON_FLAG;
+                else
+                    button_on = 0;
 
                 // button on same state
                 if (button_on == (button->control & BUTTON_ON_FLAG))
@@ -446,8 +451,10 @@ void actuators_clock(void)
                 // --- button processing ---
 
                 // read button pin
-                if (READ_PIN(encoder->port, encoder->pin) == ENCODER_ACTIVATED) button_on = BUTTON_ON_FLAG;
-                else button_on = 0;
+                if (READ_PIN(encoder->port, encoder->pin) == ENCODER_ACTIVATED)
+                    button_on = BUTTON_ON_FLAG;
+                else
+                    button_on = 0;
 
                 // button on same state
                 //cheating a bit here with &&!encoder->id this removes the hold state from the second encoder
@@ -462,15 +469,15 @@ void actuators_clock(void)
                         // button hold
                         if (encoder->hold_time_counter > 0)
                         {
-                                encoder->hold_time_counter--;
-                            
-                                if (encoder->hold_time_counter == 0)
-                                {
-                                    SET_FLAG(encoder->status, EV_BUTTON_HELD);
-                                    SET_FLAG(encoder->control, CLICK_CANCEL_FLAG);
+                            encoder->hold_time_counter--;
 
-                                    event(button, EV_BUTTON_HELD);
-                                }
+                            if (encoder->hold_time_counter == 0)
+                            {
+                                SET_FLAG(encoder->status, EV_BUTTON_HELD);
+                                SET_FLAG(encoder->control, CLICK_CANCEL_FLAG);
+
+                                event(button, EV_BUTTON_HELD);
+                            }
                         }
                     }
                     // button released
@@ -576,7 +583,8 @@ void actuators_clock(void)
 
                  encoder->state = (seq >> 2);
 
-                 if (firsttick) acceleration_count++;
+                 if (firsttick)
+                     acceleration_count++;
 
                 // checks the steps
                 if (ABS(encoder->counter) >= encoder->steps)
@@ -586,12 +594,16 @@ void actuators_clock(void)
                     if (acceleration_count < 100)
                     {
                         ticks_count++;
-                        if (ticks_count > ENCODER_ACCEL_STEP_3) acceleration = 7;
-                        else if (ticks_count > ENCODER_ACCEL_STEP_2)acceleration = 5;
-                        else if (ticks_count > ENCODER_ACCEL_STEP_1)acceleration = 3;
-                        else acceleration = 1;
+                        if (ticks_count > ENCODER_ACCEL_STEP_3)
+                            acceleration = 7;
+                        else if (ticks_count > ENCODER_ACCEL_STEP_2)
+                            acceleration = 5;
+                        else if (ticks_count > ENCODER_ACCEL_STEP_1)
+                            acceleration = 3;
+                        else
+                            acceleration = 1;
                     }
-                    else 
+                    else
                     {
                         acceleration_count = 0;
                         firsttick = 0;
@@ -605,8 +617,10 @@ void actuators_clock(void)
                     SET_FLAG(encoder->status, EV_ENCODER_TURNED);
 
                     // set the direction flag
-                    if (encoder->counter > 0) SET_FLAG(encoder->status, EV_ENCODER_TURNED_CW);
-                    else SET_FLAG(encoder->status, EV_ENCODER_TURNED_ACW);
+                    if (encoder->counter > 0)
+                        SET_FLAG(encoder->status, EV_ENCODER_TURNED_CW);
+                    else
+                        SET_FLAG(encoder->status, EV_ENCODER_TURNED_ACW);
 
                     event(encoder, EV_ENCODER_TURNED | EV_ENCODER_TURNED_CW | EV_ENCODER_TURNED_ACW);
 
@@ -635,9 +649,12 @@ void actuators_clock(void)
                             SET_FLAG(pot->status, EV_POT_TURNED);
                             event(pot, EV_POT_TURNED);
                     }
-                    else CLR_FLAG(pot->status, EV_POT_TURNED);
+                    else
+                    {
+                        CLR_FLAG(pot->status, EV_POT_TURNED);
+                    }
                 }
-            
+
             break;
         }
     }
