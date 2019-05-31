@@ -364,8 +364,10 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
     //if stereo link is on we need to update the other menu item as well
     if ((((event == MENU_EV_UP) || (event == MENU_EV_DOWN)) && (dir ? sl_out : sl_in))&& (item->desc->id != HP_VOLUME))
     {
-        if (strchr(source, '1')) naveg_update_gain(DISPLAY_RIGHT, item->desc->id + 1, item->data.value);
-        else naveg_update_gain(DISPLAY_RIGHT, item->desc->id - 1, item->data.value);    
+        if (strchr(source, '1'))
+            naveg_update_gain(DISPLAY_RIGHT, item->desc->id + 1, item->data.value);
+        else
+            naveg_update_gain(DISPLAY_RIGHT, item->desc->id - 1, item->data.value);
     }
     naveg_settings_refresh(DISPLAY_RIGHT);
 }
@@ -580,9 +582,7 @@ float system_master_volume_cb(float value, int event)
 {    
     if ((event == MENU_EV_ENTER) || (event == MENU_EV_NONE))
     {
-        const char *source;
-        if (master_vol_port < 2) source = "out 1";
-        else source = "out 2";
+        const char *source = master_vol_port < 2 ? "out 1" : "out 2";
 
         cli_command("mod-amixer ", CLI_CACHE_ONLY);
         cli_command(source, CLI_CACHE_ONLY);
@@ -637,8 +637,10 @@ void system_master_vol_link_cb(void *arg, int event)
     
     if (event == MENU_EV_ENTER)
     {
-        if (master_vol_port < 2) master_vol_port++;
-        else master_vol_port = 0;
+        if (master_vol_port < 2)
+            master_vol_port++;
+        else
+            master_vol_port = 0;
         
         //set_item_value(MASTER_VOL_SET_LINK_CMD, master_vol_port);
     }
