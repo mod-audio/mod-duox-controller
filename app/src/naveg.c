@@ -951,6 +951,10 @@ static void bp_enter(void)
             if (g_selected_pedalboards) bank_config_footer();
         }
     }
+    else
+    {
+        return;
+    }
 
     screen_bp_list(title, bp_list);
 }
@@ -974,6 +978,10 @@ static void bp_up(void)
         bp_list = g_naveg_pedalboards;
         title = g_banks->names[g_banks->hover];
     }
+    else
+    {
+        return;
+    }
 
     screen_bp_list(title, bp_list);
 }
@@ -996,6 +1004,10 @@ static void bp_down(void)
         if (g_naveg_pedalboards->hover < (g_naveg_pedalboards->count - 1)) g_naveg_pedalboards->hover++;
         bp_list = g_naveg_pedalboards;
         title = g_banks->names[g_banks->hover];
+    }
+    else
+    {
+        return;
     }
 
     screen_bp_list(title, bp_list);
