@@ -133,6 +133,9 @@ void deselect_item(char *item_str);
 // converts string to hex: returns the number of elements copied to array
 uint16_t str_to_hex(const char *str, uint8_t *array, uint16_t array_size);
 
+// print message in tty (DANGER! last resort for debugging, DO NOT USE IN PRODUCTION!!)
+void echo_cli_message(const char *format, ...);
+
 
 /*
 ************************************************************************************************************************

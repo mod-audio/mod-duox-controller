@@ -6,10 +6,12 @@
 */
 
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 #include <math.h>
 
 #include "utils.h"
+#include "cli.h"
 #include "FreeRTOS.h"
 
 
@@ -780,4 +782,36 @@ uint16_t str_to_hex(const char *str, uint8_t *array, uint16_t array_size)
     }
 
     return count;
+}
+
+// ai ai ai...
+void echo_cli_message(const char *format, ...)
+{
+    static char* last_buf = NULL;
+    FREE(last_buf);
+
+    __builtin_va_list args;
+    int size;
+
+    __builtin_va_start(args, format);
+    size = __builtin_vsnprintf(NULL, 0, format, args);
+    __builtin_va_end(args);
+
+    if (size <= 0)
+    {
+        last_buf = NULL;
+        return;
+    }
+
+    last_buf = MALLOC(size + 1);
+
+    if (last_buf == NULL)
+        return;
+
+    __builtin_va_start(args, format);
+    __builtin_vsprintf(last_buf, format, args);
+    __builtin_va_end(args);
+
+    cli_command("echo ", CLI_CACHE_ONLY);
+    cli_command(last_buf, CLI_DISCARD_RESPONSE);
 }
