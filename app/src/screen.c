@@ -307,36 +307,39 @@ void screen_pot(uint8_t pot_id, control_t *control)
     }
 }
 
+static void null_screen_encoded(glcd_t *display, uint8_t display_id)
+{
+    char text[sizeof(SCREEN_ROTARY_DEFAULT_NAME) + 2];
+
+    strcpy(text, SCREEN_ROTARY_DEFAULT_NAME);
+    text[sizeof(SCREEN_ROTARY_DEFAULT_NAME)-1] = display_id + '1';
+    text[sizeof(SCREEN_ROTARY_DEFAULT_NAME)] = 0;
+
+    textbox_t blank_title;
+    blank_title.color = GLCD_BLACK;
+    blank_title.mode = TEXT_SINGLE_LINE;
+    blank_title.font = SMfont;
+    blank_title.height = 0;
+    blank_title.width = 0;
+    blank_title.top_margin = 0;
+    blank_title.bottom_margin = 0;
+    blank_title.left_margin = 0;
+    blank_title.right_margin = 0;
+    blank_title.text = text;
+    blank_title.x = ((DISPLAY_WIDTH/2) - ((strlen(text)*4)/2));
+    blank_title.y = 14;
+    blank_title.align = ALIGN_NONE_NONE;
+    widget_textbox(display, &blank_title);
+    glcd_hline(display, 0, 24, DISPLAY_WIDTH, GLCD_BLACK);
+}
+
 void screen_encoder(uint8_t display_id, control_t *control)
 {  
     glcd_t *display = hardware_glcds(display_id);
     glcd_rect_fill(display, 0, 8, DISPLAY_WIDTH, 16, GLCD_WHITE);
 
     if (!control)
-    {
-        char text[sizeof(SCREEN_ROTARY_DEFAULT_NAME) + 2];
-        strcpy(text, SCREEN_ROTARY_DEFAULT_NAME);
-        text[sizeof(SCREEN_ROTARY_DEFAULT_NAME)-1] = display_id + '1';
-        text[sizeof(SCREEN_ROTARY_DEFAULT_NAME)] = 0;
-
-        textbox_t blank_title;
-        blank_title.color = GLCD_BLACK;
-        blank_title.mode = TEXT_SINGLE_LINE;
-        blank_title.font = SMfont;
-        blank_title.height = 0;
-        blank_title.width = 0;
-        blank_title.top_margin = 0;
-        blank_title.bottom_margin = 0;
-        blank_title.left_margin = 0;
-        blank_title.right_margin = 0;
-        blank_title.text = text;
-        blank_title.x = ((DISPLAY_WIDTH/2) - ((strlen(text)*4)/2));
-        blank_title.y = 14;
-        blank_title.align = ALIGN_NONE_NONE;
-        widget_textbox(display, &blank_title);
-        glcd_hline(display, 0, 24, DISPLAY_WIDTH, GLCD_BLACK);
-        return;
-    }
+        return null_screen_encoded(display, display_id);
 
     //liniar/logaritmic control type, Bar graphic
     if (control->properties == CONTROL_PROP_LINEAR ||
@@ -354,6 +357,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
         //value_str_bfr is the value that gets printed
         char value_str[10];
         char *value_str_bfr = (char *) MALLOC(6 * sizeof(char));
+        char *unit_str_bfr = NULL;
 
 
         //if the value becomes bigger then 9999 (4 characters), then switch to another view 10999 becomes 10.9K
@@ -382,6 +386,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
         }
         //for values between 0 and 10 display 2 decimals
         else float_to_str(control->value, value_str, sizeof(value_str), 2);
+
         //copy to value_str_bfr, the first 5 char
         strncpy(value_str_bfr, value_str, 5);
         //terminate the text with line ending
@@ -412,13 +417,16 @@ void screen_encoder(uint8_t display_id, control_t *control)
         //adds the unit to the value
         if (unit_str != NULL)
         {
-            char *str_bfr = (char *) MALLOC(sizeof(value_str_bfr)+sizeof(value_str_bfr));
-            strncpy(str_bfr, value_str_bfr, 5);
-            strcat(str_bfr, " ");
-            strcat(str_bfr, unit_str);
-            value.text = str_bfr;
+            unit_str_bfr = MALLOC(strlen(value_str_bfr)+strlen(unit_str)+3);
+            strcpy(unit_str_bfr, value_str_bfr);
+            strcat(unit_str_bfr, " ");
+            strcat(unit_str_bfr, unit_str);
+            value.text = unit_str_bfr;
         }
-        else value.text = value_str_bfr;
+        else
+        {
+            value.text = value_str_bfr;
+        }
 
         //value
         value.color = GLCD_BLACK;
@@ -434,8 +442,9 @@ void screen_encoder(uint8_t display_id, control_t *control)
         value.right_margin = 2;
         value.align = ALIGN_RIGHT_NONE;
         widget_textbox(display, &value);
+
         FREE (value_str_bfr);
-    
+        FREE (unit_str_bfr);
 
         bar_t volume_bar;
         volume_bar.x = 2;
@@ -526,6 +535,10 @@ void screen_encoder(uint8_t display_id, control_t *control)
         list.text_left_margin = 1;
         list.name = control->label;
         widget_listbox3(display, &list);
+    }
+    else
+    {
+        return null_screen_encoded(display, display_id);
     }
 
     //glcd_hline(display, 0, 7, DISPLAY_WIDTH, GLCD_BLACK);
