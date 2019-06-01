@@ -550,7 +550,7 @@ void actuators_clock(void)
                 {
                     // these ones are sent quite often during normal operation
                     case 0: case 5: case 10: case 15:
-                        continue;
+                        break;
 
                     // 1 step up
                     case 1: case 7: case 8: case 14:
