@@ -262,11 +262,9 @@ static void step_to_value(control_t *control)
 // control assigned to display
 static void display_encoder_add(control_t *control)
 {
-    uint8_t display;
+    if (control->hw_id >= ENCODERS_COUNT) return;
 
-    if (control->hw_id > ENCODERS_COUNT) return;
-
-    display = control->hw_id;
+    uint8_t display = control->hw_id;
 
     // checks if is already a control assigned in this display and remove it
     if (g_encoders[display]) data_free_control(g_encoders[display]);
@@ -656,7 +654,7 @@ static void foot_control_rm(uint8_t hw_id)
 
 static void control_set(uint8_t id, control_t *control)
 {
-    uint32_t now, delta; 
+    uint32_t now, delta;
 
     switch (control->properties)
     {
@@ -951,6 +949,10 @@ static void bp_enter(void)
             if (g_selected_pedalboards) bank_config_footer();
         }
     }
+    else
+    {
+        return;
+    }
 
     screen_bp_list(title, bp_list);
 }
@@ -974,6 +976,10 @@ static void bp_up(void)
         bp_list = g_naveg_pedalboards;
         title = g_banks->names[g_banks->hover];
     }
+    else
+    {
+        return;
+    }
 
     screen_bp_list(title, bp_list);
 }
@@ -996,6 +1002,10 @@ static void bp_down(void)
         if (g_naveg_pedalboards->hover < (g_naveg_pedalboards->count - 1)) g_naveg_pedalboards->hover++;
         bp_list = g_naveg_pedalboards;
         title = g_banks->names[g_banks->hover];
+    }
+    else
+    {
+        return;
     }
 
     screen_bp_list(title, bp_list);
@@ -1712,10 +1722,10 @@ void naveg_add_control(control_t *control)
     }
     else if (control->hw_id < (ENCODERS_COUNT + FOOTSWITCHES_ACTUATOR_COUNT))
     {
-    	control->scroll_dir = 2;
-        foot_control_add(control);     
+        control->scroll_dir = 2;
+        foot_control_add(control);
     }
-    else 
+    else
     {
         display_pot_add(control);
     }
