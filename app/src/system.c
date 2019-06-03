@@ -473,25 +473,13 @@ void system_release_cb(void *arg, int event)
     }
 }
 
-void system_device_cb(void *arg, int event)
-{
-    menu_item_t *item = arg;
-
-    if (event == MENU_EV_ENTER)
-    {
-        const char *response;
-        response = cli_command("cat /var/cache/mod/tag", CLI_RETRIEVE_RESPONSE);
-        update_status(item->data.list[1], response);
-    }
-}
-
 void system_tag_cb(void *arg, int event)
 {
 
     menu_item_t *item = arg;
 
     if (event == MENU_EV_ENTER)
-    {
+    {  
         const char *response;
         char *txt = "The serial number of your     device is:                    ";
         response =  cli_command("cat /var/cache/mod/tag", CLI_RETRIEVE_RESPONSE);
