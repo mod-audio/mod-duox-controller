@@ -1036,6 +1036,10 @@ static void menu_enter(uint8_t display_id)
             node = node->parent->parent;
             item = node->data;
         }
+        else if (((item->desc->id == BANKS_ID) || (item->desc->id == PEDALBOARD_ID)) && (!naveg_ui_status()))
+        {
+            item->desc->type = ((item->desc->id == PEDALBOARD_ID) ? MENU_LIST : MENU_NONE);
+        }
 
         // updates the current item
        	if ((item->desc->type != MENU_TOGGLE) && (item->desc->type != MENU_NONE)) g_current_item = node->data;
