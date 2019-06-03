@@ -578,12 +578,6 @@ void screen_encoder(uint8_t display_id, control_t *control)
 void screen_footer(uint8_t id, const char *name, const char *value)
 {
     glcd_t *display = hardware_glcds((id < 2)?0:1);
-    
-    //if (strlen(value) == 0) ledz_on(hardware_leds(4), RED);
-    
-    //if (value == NULL) ledz_on(hardware_leds(4), BLUE);
-    
-    //if (!value[0]) ledz_on(hardware_leds(4), GREEN);
 
     uint8_t align = 0;
     switch (id)

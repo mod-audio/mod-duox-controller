@@ -707,7 +707,6 @@ static void control_set(uint8_t id, control_t *control)
             break;
 
         case CONTROL_PROP_TRIGGER:
-            control->value = 1;
 
             // to update the footer and screen
             foot_control_add(control);
@@ -1036,6 +1035,7 @@ static void menu_enter(uint8_t display_id)
             node = node->parent->parent;
             item = node->data;
         }
+        //extra check if we need to switch back to non-ui connected mode on the current-pb and banks menu
         else if (((item->desc->id == BANKS_ID) || (item->desc->id == PEDALBOARD_ID)) && (!naveg_ui_status()))
         {
             item->desc->type = ((item->desc->id == PEDALBOARD_ID) ? MENU_LIST : MENU_NONE);
@@ -1837,21 +1837,200 @@ void naveg_set_control(uint8_t hw_id, float value)
 {
     if (!g_initialized) return;
 
-    uint8_t display;
+    uint8_t id;
     control_t *control;
 
-    control = search_encoder(hw_id, &display);
+    //encoder
+    if (hw_id < ENCODERS_COUNT)
+    {
+        control = g_encoders[hw_id];
+        id = hw_id;
+    }
+    //button
+    else if (hw_id < FOOTSWITCHES_ACTUATOR_COUNT + ENCODERS_COUNT)
+    {
+        control = g_foots[hw_id - ENCODERS_COUNT];
+        id = hw_id - ENCODERS_COUNT;
+    }
+    //potentiometer
+    else 
+    {
+        control = g_pots[hw_id - FOOTSWITCHES_ACTUATOR_COUNT - ENCODERS_COUNT];
+        id = hw_id -FOOTSWITCHES_ACTUATOR_COUNT -ENCODERS_COUNT;
+    }
 
     if (control)
     {
         control->value = value;
         if (value < control->minimum) control->value = control->minimum;
-        if (value > control->maximum) control->value = control->maximum;
-        control_set(display, control);
+        if (value > control->maximum) control->value = control->maximum;        
 
         // updates the step value
         control->step =
             (control->value - control->minimum) / ((control->maximum - control->minimum) / control->steps);
+
+
+        //encoder
+        if (hw_id < ENCODERS_COUNT)
+        {
+            screen_encoder(id, control);
+        }
+        //button
+        else if (hw_id < FOOTSWITCHES_ACTUATOR_COUNT + ENCODERS_COUNT)
+        {
+            uint8_t i;
+            switch (control->properties)
+            {
+            // toggled specification: http://lv2plug.in/ns/lv2core/#toggled
+            case CONTROL_PROP_TOGGLED:
+                // updates the led
+                if (control->value <= 0)
+                    ledz_off(hardware_leds(control->hw_id - ENCODERS_COUNT), TOGGLED_COLOR);
+                else
+                    ledz_on(hardware_leds(control->hw_id - ENCODERS_COUNT), TOGGLED_COLOR);
+
+                // if is in tool mode break
+                if (display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT))) break;
+
+                // updates the footer
+                screen_footer(control->hw_id - ENCODERS_COUNT, control->label,
+                             (control->value <= 0 ? TOGGLED_OFF_FOOTER_TEXT : TOGGLED_ON_FOOTER_TEXT));
+                break;
+
+            // trigger specification: http://lv2plug.in/ns/ext/port-props/#trigger
+            case CONTROL_PROP_TRIGGER:
+                // updates the led
+                //check if its assigned to a trigger and if the button is released
+                if (!control->scroll_dir)
+                {
+                    ledz_off(hardware_leds(control->hw_id - ENCODERS_COUNT), TRIGGER_PRESSED_COLOR);
+                    ledz_on(hardware_leds(control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR); //TRIGGER_COLOR
+                    return;
+                }
+                else if (control->scroll_dir == 2) ledz_on(hardware_leds(control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR);
+                else
+                {
+                    ledz_off(hardware_leds(control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR);
+                    ledz_on(hardware_leds(control->hw_id - ENCODERS_COUNT), TRIGGER_PRESSED_COLOR);
+                }
+
+                // updates the led
+
+                // if is in tool mode break
+                if (display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT))) break;
+
+                // updates the footer (a getto fix here, the screen.c file did not regognize the NULL pointer so it did not allign the text properly, TODO fix this)
+                screen_footer(control->hw_id - ENCODERS_COUNT, control->label, BYPASS_ON_FOOTER_TEXT);
+                break;
+
+            case CONTROL_PROP_TAP_TEMPO:
+                // defines the led color
+                ledz_on(hardware_leds(control->hw_id - ENCODERS_COUNT), TAP_TEMPO_COLOR);
+    
+                // convert the time unit
+                uint16_t time_ms = (uint16_t)(convert_to_ms(control->unit, control->value) + 0.5);
+
+                // setup the led blink
+                if (time_ms > TAP_TEMPO_TIME_ON)
+                     ledz_blink(hardware_leds(control->hw_id - ENCODERS_COUNT),TAP_TEMPO_COLOR, TAP_TEMPO_TIME_ON, time_ms - TAP_TEMPO_TIME_ON, LED_BLINK_INFINIT);
+                else
+                    ledz_blink(hardware_leds(control->hw_id - ENCODERS_COUNT),TAP_TEMPO_COLOR, time_ms / 2, time_ms / 2, LED_BLINK_INFINIT);
+
+                // calculates the maximum tap tempo value
+                if (g_tap_tempo[control->hw_id - ENCODERS_COUNT].state == TT_INIT)
+                {
+                    uint32_t max;
+    
+                    // time unit (ms, s)
+                    if (strcmp(control->unit, "ms") == 0 || strcmp(control->unit, "s") == 0)
+                    {
+                        max = (uint32_t)(convert_to_ms(control->unit, control->maximum) + 0.5);
+                        //makes sure we enforce a proper timeout
+                        if (max > TAP_TEMPO_DEFAULT_TIMEOUT)
+                            max = TAP_TEMPO_DEFAULT_TIMEOUT;
+                    }
+                    // frequency unit (bpm, Hz)
+                    else
+                    {
+                        //prevent division by 0 case
+                        if (control->minimum == 0)
+                            max = TAP_TEMPO_DEFAULT_TIMEOUT;
+                        else
+                            max = (uint32_t)(convert_to_ms(control->unit, control->minimum) + 0.5);
+                        //makes sure we enforce a proper timeout
+                        if (max > TAP_TEMPO_DEFAULT_TIMEOUT)
+                            max = TAP_TEMPO_DEFAULT_TIMEOUT;
+                    }
+
+                    g_tap_tempo[control->hw_id - ENCODERS_COUNT].max = max;
+                    g_tap_tempo[control->hw_id - ENCODERS_COUNT].state = TT_COUNTING;
+                }
+
+                // if is in tool mode break
+                if (display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT))) break;
+
+                // footer text composition
+                char value_txt[32];
+                //if unit=ms or unit=bpm -> use 0 decimal points
+                if (strcasecmp(control->unit, "ms") == 0 || strcasecmp(control->unit, "bpm") == 0)
+                    i = int_to_str(control->value, value_txt, sizeof(value_txt), 0);
+                //if unit=s or unit=hz or unit=something else-> use 2 decimal points
+                else 
+                    i = float_to_str(control->value, value_txt, sizeof(value_txt), 2);
+                //add space to footer
+                value_txt[i++] = ' ';
+                strcpy(&value_txt[i], control->unit);
+
+                // updates the footer
+                screen_footer(control->hw_id - ENCODERS_COUNT, control->label, value_txt);
+                break;
+
+            case CONTROL_PROP_BYPASS:
+                // updates the led
+                if (control->value <= 0)
+                    ledz_on(hardware_leds(control->hw_id - ENCODERS_COUNT), BYPASS_COLOR);
+                else
+                    ledz_off(hardware_leds(control->hw_id - ENCODERS_COUNT), BYPASS_COLOR);
+
+                // if is in tool mode break
+                if (display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT))) break;
+
+                // updates the footer
+                screen_footer(control->hw_id - ENCODERS_COUNT, control->label,
+                             (control->value ? BYPASS_ON_FOOTER_TEXT : BYPASS_OFF_FOOTER_TEXT));
+                break;
+
+            case CONTROL_PROP_ENUMERATION:
+            case CONTROL_PROP_SCALE_POINTS:
+                // updates the led
+                ledz_on(hardware_leds(control->hw_id - ENCODERS_COUNT), ENUMERATED_COLOR);
+
+                // locates the current value
+                control->step = 0;
+                for (i = 0; i < control->scale_points_count; i++)
+                {
+                    if (control->value == control->scale_points[i]->value)
+                    {
+                        control->step = i;
+                        break;
+                    }
+                }
+                control->steps = control->scale_points_count;
+
+                // if is in tool mode break
+                if (display_has_tool_enabled(get_display_by_id(i, FOOT))) break;
+
+                // updates the footer
+                screen_footer(control->hw_id - ENCODERS_COUNT, control->label, control->scale_points[i]->label);
+                break;
+            }
+        }
+        //potentiometer
+        else 
+        {
+            screen_pot(id, control);
+        }
+
     }
 }
 
