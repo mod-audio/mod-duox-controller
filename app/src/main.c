@@ -591,6 +591,9 @@ static void boot_cb(proto_t *proto)
     //set the master volume link
     system_master_volume_link(atoi(proto->list[2]));
     
+    //enable red LED to indicate we are in page 1
+    ledz_on(hardware_leds(5), RED);
+
     //parse the pedalboard name
     screen_top_info(&proto->list[3] , 1);
 

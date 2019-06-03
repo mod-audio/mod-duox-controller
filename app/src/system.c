@@ -638,36 +638,36 @@ void system_master_vol_link_cb(void *arg, int event)
         else
             master_vol_port = 0;
         
-        //set_item_value(MASTER_VOL_SET_LINK_CMD, master_vol_port);
+        set_item_value(MASTER_VOL_SET_LINK_CMD, master_vol_port);
     }
 
-    //request_item_value(MASTER_VOL_GET_LINK_CMD, item);
+    request_item_value(MASTER_VOL_GET_LINK_CMD, item);
 
     char str_bfr[4];
     switch (master_vol_port)
     {
         case 0:
-               /* if (event == MENU_EV_ENTER)
+                if (event == MENU_EV_ENTER)
                 {
                     //turn on stereo link and sync gains
-                    //set_item_value(SL_OUT_SET_CMD, 1);
+                    set_item_value(SL_OUT_SET_CMD, 1);
                     char value[8];
                     cli_command("mod-amixer out 2 vol ", CLI_CACHE_ONLY);
                     gains_volumes[OUT2_VOLUME - VOLUME_ID] = gains_volumes[OUT1_VOLUME - VOLUME_ID];
                     float_to_str(gains_volumes[OUT2_VOLUME - VOLUME_ID], value, sizeof value, 1);
                     cli_command(value, CLI_DISCARD_RESPONSE);   
-                }*/
+                }
             strcpy(str_bfr,"1&2");
         break;
         case 1:
             strcpy(str_bfr,"1");
             //turn off stereo link and sync gains
-            //set_item_value(SL_OUT_SET_CMD, 0);
+            set_item_value(SL_OUT_SET_CMD, 0);
         break;
         case 2:
             strcpy(str_bfr,"2");
             //turn off stereo link and sync gains
-            //set_item_value(SL_OUT_SET_CMD, 0);
+            set_item_value(SL_OUT_SET_CMD, 0);
         break;
     }
 
@@ -681,7 +681,7 @@ void system_master_vol_link_cb(void *arg, int event)
     }
     strcat(item->name, (str_bfr));
 
-    //if ((event == MENU_EV_ENTER) naveg_menu_refresh(DISPLAY_RIGHT);
+    if (event == MENU_EV_ENTER) naveg_menu_refresh(DISPLAY_RIGHT);
 }
 
 void system_save_gains_cb(void *arg, int event)
@@ -761,7 +761,7 @@ void system_sl_in_cb (void *arg, int event)
     }
     else 
     {
-        //request_item_value(SL_IN_GET_CMD, item);
+        request_item_value(SL_IN_GET_CMD, item);
     }
 
     sl_in = item->data.value;
@@ -805,7 +805,7 @@ void system_sl_out_cb (void *arg, int event)
     }
     else 
     {
-        //request_item_value(SL_OUT_GET_CMD, item);
+        request_item_value(SL_OUT_GET_CMD, item);
     }
 
     sl_out = item->data.value;
@@ -870,12 +870,12 @@ void system_cv_exp_cb (void *arg, int event)
         {
             if (item->data.value == 0) item->data.value = 1;
             else item->data.value = 0;
-            //set_item_value(EXPCV_SET_CMD, item->data.value);
+            set_item_value(EXPCV_SET_CMD, item->data.value);
         }
         else if (event == MENU_EV_NONE)
         {
             item->data.value = 0;
-            //request_item_value(EXPCV_GET_CMD, item);
+            request_item_value(EXPCV_GET_CMD, item);
         }
 
         strcpy(item->name, item->desc->name);
@@ -904,12 +904,12 @@ void system_cv_hp_cb (void *arg, int event)
         {
             if (item->data.value == 0) item->data.value = 1;
             else item->data.value = 0;
-            //set_item_value(HPCV_SET_CMD, item->data.value);
+            set_item_value(HPCV_SET_CMD, item->data.value);
         }
         else if (event == MENU_EV_NONE)
         {
             item->data.value = 0;
-            //request_item_value(HPCV_GET_CMD, item);
+            request_item_value(HPCV_GET_CMD, item);
         }
 
         strcpy(item->name, item->desc->name);
@@ -1386,7 +1386,7 @@ void system_load_pro_cb(void *arg, int event)
         current_profile = item->desc->id - item->desc->parent_id;
         item->data.value = current_profile;
 
-        //set_item_value(LOAD_PROFILE_CMD, current_profile);
+        set_item_value(LOAD_PROFILE_CMD, current_profile);
 
         naveg_menu_refresh(DISPLAY_LEFT);
         naveg_menu_refresh(DISPLAY_RIGHT);
@@ -1396,7 +1396,7 @@ void system_load_pro_cb(void *arg, int event)
         //first time getting the profile, need to check with mod-ui
         if (current_profile == 5)
         {
-            //request_item_value(GET_PROFILE_CMD, item);
+            request_item_value(GET_PROFILE_CMD, item);
         }
         
         if ((item->desc->id - item->desc->parent_id) == current_profile)
@@ -1453,11 +1453,11 @@ void system_cv_range_cb(void *arg, int event)
     {
         if (item->data.value < 1) item->data.value++;
         else item->data.value = 0;
-        //set_item_value(CV_BIAS_SET_CMD, item->data.value);
+        set_item_value(CV_BIAS_SET_CMD, item->data.value);
     }
     else if (event == MENU_EV_NONE)
     {
-        //request_item_value(CV_BIAS_GET_CMD, item);
+        request_item_value(CV_BIAS_GET_CMD, item);
         item->data.value = 0;
     }
 
@@ -1486,12 +1486,12 @@ void system_exp_mode_cb(void *arg, int event)
     {
         if (item->data.value < 1) item->data.value++;
         else item->data.value = 0;
-        //set_item_value(EXP_MODE_SET_CMD, item->data.value);
+        set_item_value(EXP_MODE_SET_CMD, item->data.value);
     }
     else if (event == MENU_EV_NONE)
     {
         item->data.value = 0;
-        //request_item_value(EXP_MODE_GET_CMD, item);
+        request_item_value(EXP_MODE_GET_CMD, item);
     }
 
     char str_bfr[16];

@@ -1976,9 +1976,9 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
         case 5: 
         	if (!pressed) return;
         ; //keeping the compiler happy
-            //char buffer[128];
-            //uint8_t i;
-            //i = copy_command(buffer, NEXT_PAGE_COMMAND);
+            char buffer[128];
+            uint8_t i;
+            i = copy_command(buffer, NEXT_PAGE_COMMAND);
             switch (page)
             {
                 case 0:
@@ -1987,9 +1987,9 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                     
                     // sends the request next page command
                     // insert the page number on buffer
-                    //i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
+                    i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
                     
-                    //comm_webgui_send(buffer, i);
+                    comm_webgui_send(buffer, i);
                     page++;
                 break;
                 case 1:
@@ -1998,9 +1998,9 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                     
                     // sends the request next page command
                     // insert the page number on buffer
-                    //i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
+                    i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
                     
-                    //comm_webgui_send(buffer, i);
+                    comm_webgui_send(buffer, i);
                     page++;
                 break;
                 case 2:
@@ -2009,9 +2009,9 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                     
                     // sends the request next page command
                     // insert the page number on buffer
-                    //i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
+                    i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
                     
-                    //comm_webgui_send(buffer, i);
+                    comm_webgui_send(buffer, i);
                     page=0;
                 break;
             }
@@ -2019,20 +2019,20 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 }
 void naveg_save_page(uint8_t foot)
 {
-    //char buffer[128];
-    //uint8_t i;
+    char buffer[128];
+    uint8_t i;
 
     if (display_has_tool_enabled(DISPLAY_LEFT)) return;
 
-    //i = copy_command(buffer, SAVE_SNAPSHOT_COMMAND);
+    i = copy_command(buffer, SAVE_SNAPSHOT_COMMAND);
     if(foot == 6)
     {
         ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);
         ledz_blink(hardware_leds(foot), RED, 75, 75, 3);
 
-        //i += int_to_str(1, &buffer[i], sizeof(buffer) - i, 0);
+        i += int_to_str(1, &buffer[i], sizeof(buffer) - i, 0);
                     
-        //comm_webgui_send(buffer, i);   
+        comm_webgui_send(buffer, i);   
 		snapshot_loaded[1] = 1; 
     }
     else if (foot == 4)
@@ -2040,11 +2040,11 @@ void naveg_save_page(uint8_t foot)
         ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);
         ledz_blink(hardware_leds(foot), RED, 75, 75, 3);
 
-        //i += int_to_str(0, &buffer[i], sizeof(buffer) - i, 0);
+        i += int_to_str(0, &buffer[i], sizeof(buffer) - i, 0);
                     
-        //comm_webgui_send(buffer, i);   
+        comm_webgui_send(buffer, i);   
 
-        //ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);  
+        ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);  
         snapshot_loaded[0] = 1; 
     }
 }
