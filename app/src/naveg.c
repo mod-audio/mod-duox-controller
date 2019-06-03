@@ -2028,6 +2028,19 @@ void naveg_set_control(uint8_t hw_id, float value)
         //potentiometer
         else 
         {
+            uint16_t tmp_value = hardware_get_pot_value(id);
+            if (tmp_value < 50) tmp_value = 50;
+            else if (tmp_value > 3950) tmp_value = 3950;
+            uint16_t pot_adc_range_value = MAP(g_pots[id]->value, g_pots[id]->minimum, g_pots[id]->maximum, 50, 3950)
+
+            if ((tmp_value > pot_adc_range_value ? tmp_value - pot_adc_range_value : pot_adc_range_value - tmp_value) < POT_DIFF_THRESHOLD)
+            {
+                g_pots[id]->scroll_dir = 0;
+            }
+            else 
+            {
+                g_pots[id]->scroll_dir = 1;
+            }
             screen_pot(id, control);
         }
 
