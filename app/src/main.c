@@ -590,8 +590,14 @@ static void boot_cb(proto_t *proto)
 
     //set the master volume link
     system_master_volume_link(atoi(proto->list[2]));
-
-    screen_master_vol(atoi(proto->list[3]));
+    
+    //set the master volume value
+    float master_vol_value = atof(proto->list[3]);
+    //-60 is our 0, we dont use lower values right now (doesnt make sense because of log scale)
+    if (master_vol_value < -60) master_vol_value = -60;
+    //convert value for screen
+    uint8_t screen_val =  ( ( master_vol_value - -60 ) / (0 - -60) ) * (100 - 0) + 0;
+    screen_master_vol(screen_val);
     
     //enable red LED to indicate we are in page 1
     ledz_on(hardware_leds(5), RED);
