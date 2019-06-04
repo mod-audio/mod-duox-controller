@@ -574,6 +574,8 @@ static void resp_cb(proto_t *proto)
 
 static void restore_cb(proto_t *proto)
 {
+    screen_clear(DISPLAY_LEFT);
+    screen_clear(DISPLAY_RIGHT);
     cli_restore(RESTORE_INIT);
     protocol_response("resp 0", proto);
 }
