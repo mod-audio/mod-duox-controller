@@ -218,6 +218,8 @@ void ledz_off(ledz_t* led, ledz_color_t color)
 {
     // disable blinking and brightness control
     led->blink = 0;
+    led->time_on = 0;
+    led->time_off = 0;
     led->brightness = 0;
     led->amount_of_blinks = -1;
     
@@ -240,10 +242,12 @@ void ledz_set(ledz_t* led, ledz_color_t color, int value)
     {
         if (led->color & color)
         {
-            /*// disable blinking and brightness control
+            // disable blinking and brightness control
             led->blink = 0;
+            led->time_on = 0;
+            led->time_off = 0;
             led->brightness = 0;
-            led->amount_of_blinks = -1;*/
+            led->amount_of_blinks = -1;
             
             // skip update if value match current state
             if (led->state == value)

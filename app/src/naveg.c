@@ -512,9 +512,10 @@ static void foot_control_add(control_t *control)
             screen_footer(control->hw_id - ENCODERS_COUNT, control->label, BYPASS_ON_FOOTER_TEXT);
             break;
 
-        case CONTROL_PROP_TAP_TEMPO:
+                                    //fcking compiler
+        case CONTROL_PROP_TAP_TEMPO: ;
             // defines the led color
-            ledz_on(hardware_leds(control->hw_id - ENCODERS_COUNT), TAP_TEMPO_COLOR);
+            //ledz_on(hardware_leds(control->hw_id - ENCODERS_COUNT), TAP_TEMPO_COLOR);
 
             // convert the time unit
             uint16_t time_ms = (uint16_t)(convert_to_ms(control->unit, control->value) + 0.5);
@@ -638,12 +639,12 @@ static void foot_control_rm(uint8_t hw_id)
             data_free_control(g_foots[i]);
             g_foots[i] = NULL;
 
+            // turn off the led
+            ledz_off(hardware_leds(i), WHITE);
+
             // check if foot isn't being used to bank function
             if (! bank_config_check(i))
             {
-                // turn off the led
-                ledz_off(hardware_leds(i), WHITE);
-
                 // update the footer
                 if (!display_has_tool_enabled(i))
                     screen_footer(i, NULL, NULL);
