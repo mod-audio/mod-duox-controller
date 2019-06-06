@@ -2214,6 +2214,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
             }
     }
 }
+
 void naveg_save_page(uint8_t foot)
 {
     char buffer[128];
@@ -2222,28 +2223,14 @@ void naveg_save_page(uint8_t foot)
     if (display_has_tool_enabled(DISPLAY_LEFT)) return;
 
     i = copy_command(buffer, SAVE_SNAPSHOT_COMMAND);
-    if(foot == 6)
-    {
-        ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);
-        ledz_blink(hardware_leds(foot), RED, 75, 75, 3);
+    
+    ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);
+    ledz_blink(hardware_leds(foot), RED, 75, 75, 3);
 
-        i += int_to_str(1, &buffer[i], sizeof(buffer) - i, 0);
+    i += int_to_str((foot == 6)?1:0, &buffer[i], sizeof(buffer) - i, 0);
                     
-        comm_webgui_send(buffer, i);   
-		snapshot_loaded[1] = 1; 
-    }
-    else if (foot == 4)
-    {
-        ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);
-        ledz_blink(hardware_leds(foot), RED, 75, 75, 3);
-
-        i += int_to_str(0, &buffer[i], sizeof(buffer) - i, 0);
-                    
-        comm_webgui_send(buffer, i);   
-
-        ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);  
-        snapshot_loaded[0] = 1; 
-    }
+    comm_webgui_send(buffer, i);   
+	snapshot_loaded[(foot == 6)?1:0] = 1; 
 }
 
 void naveg_toggle_tool(uint8_t tool, uint8_t display)

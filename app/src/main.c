@@ -583,6 +583,7 @@ static void restore_cb(proto_t *proto)
 static void pedalboard_name_cb(proto_t *proto)
 {
 	screen_top_info(&proto->list[1] , 1);
+    protocol_response("resp 0", proto);
 }
 
 static void boot_cb(proto_t *proto)
