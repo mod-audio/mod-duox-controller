@@ -303,7 +303,7 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
         {
             cli_command("mod-amixer ", CLI_CACHE_ONLY);
             cli_command(source, CLI_CACHE_ONLY);
-            cli_command(" vol ", CLI_CACHE_ONLY);
+            cli_command(" vol", CLI_CACHE_ONLY);
             response = cli_command(NULL, CLI_RETRIEVE_RESPONSE);
 
             char str[LINE_BUFFER_SIZE+1];
@@ -337,7 +337,7 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
             float_to_str(item->data.value, value, sizeof value, 1);
             cli_command("mod-amixer ", CLI_CACHE_ONLY);
             cli_command(source, CLI_CACHE_ONLY);
-            cli_command(" vol", CLI_CACHE_ONLY);
+            cli_command(" vol ", CLI_CACHE_ONLY);
             cli_command(value, CLI_DISCARD_RESPONSE);
         }
     }
