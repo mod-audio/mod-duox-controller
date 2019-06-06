@@ -629,6 +629,7 @@ void actuators_clock(void)
                 break;
 
             case POT:
+                CLR_FLAG(pot->status, EV_POT_TURNED);
                 //if channel bussy we skip an actuator clock cycle
                 if (ADC_ChannelGetStatus(LPC_ADC, pot->channel, 1))
                 {
@@ -648,10 +649,6 @@ void actuators_clock(void)
                             g_pot_value[pot->id] = val;
                             SET_FLAG(pot->status, EV_POT_TURNED);
                             event(pot, EV_POT_TURNED);
-                    }
-                    else
-                    {
-                        CLR_FLAG(pot->status, EV_POT_TURNED);
                     }
                 }
 
