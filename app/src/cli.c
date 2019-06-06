@@ -415,6 +415,10 @@ uint8_t cli_restore(uint8_t action)
 {
     if (action == RESTORE_INIT)
     {
+        //clear all screens 
+        screen_clear(DISPLAY_LEFT);
+        screen_clear(DISPLAY_RIGHT);
+
         // remove all controls
         uint8_t j;
         for(j=0; j < TOTAL_ACTUATORS; j++)

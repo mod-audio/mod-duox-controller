@@ -57,7 +57,7 @@
 #define TASK_NAME(name)     ((const char * const) (name))
 #define ACTUATOR_TYPE(act)  (((button_t *)(act))->type)
 
-#define ACTUATORS_QUEUE_SIZE    10
+#define ACTUATORS_QUEUE_SIZE    20
 
 
 /*
@@ -66,7 +66,7 @@
 ************************************************************************************************************************
 */
 
-static xQueueHandle g_actuators_queue;
+static volatile xQueueHandle g_actuators_queue;
 static uint8_t g_msg_buffer[WEBGUI_COMM_RX_BUFF_SIZE];
 static uint8_t g_ui_communication_started;
 static uint8_t g_protocol_bussy = 0;
@@ -574,8 +574,10 @@ static void resp_cb(proto_t *proto)
 
 static void restore_cb(proto_t *proto)
 {
+    //clear all screens 
     screen_clear(DISPLAY_LEFT);
     screen_clear(DISPLAY_RIGHT);
+
     cli_restore(RESTORE_INIT);
     protocol_response("resp 0", proto);
 }

@@ -760,6 +760,9 @@ void screen_top_info(const void *data, uint8_t update)
         pedalboard_name[31] = 0;
     }
 
+    //we dont display inside a menu
+    if (naveg_is_tool_mode(DISPLAY_LEFT)) return;
+
     // clear the name area
     glcd_rect_fill(display, 0, 0, DISPLAY_WIDTH, 7, GLCD_WHITE);
 

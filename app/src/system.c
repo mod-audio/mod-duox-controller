@@ -506,6 +506,10 @@ void system_upgrade_cb(void *arg, int event)
             // check if footswitch is pressed down
             if (BUTTON_PRESSED(status))
             {
+                //clear all screens 
+                screen_clear(DISPLAY_LEFT);
+                screen_clear(DISPLAY_RIGHT);
+
                 // start restore
                 cli_restore(RESTORE_INIT);
             }
