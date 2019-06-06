@@ -119,7 +119,7 @@ static void update_status(char *item_to_update, const char *response)
 
 static void get_item_value(void *data, menu_item_t *item)
 {
-    //TODO, PROFILES 
+    //TODO, PROFILES
     char **list = data;
     switch (item->desc->id)
     {
@@ -263,7 +263,7 @@ void set_item_value(char *command, uint8_t value)
         p++;
     }
     buffer[i] = 0;
- 
+
     // sets the response callback
     comm_webgui_set_response_cb(NULL, NULL);
 
@@ -289,7 +289,7 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
             cli_command(value, CLI_DISCARD_RESPONSE);
         }
         //DAC (output)
-        else 
+        else
         {
             int gain = MAP(item->data.value, -60, 0, 135, 255)
             int_to_str(gain, value, sizeof value, 1);
@@ -297,38 +297,38 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
             cli_command(value, CLI_DISCARD_RESPONSE);
         }
     }
-    else 
+    else
     {
         if ((event == MENU_EV_ENTER) || (event == MENU_EV_NONE))
         {
             cli_command("mod-amixer ", CLI_CACHE_ONLY);
             cli_command(source, CLI_CACHE_ONLY);
-            cli_command(" vol ", CLI_CACHE_ONLY);
+            cli_command(" vol", CLI_CACHE_ONLY);
             response = cli_command(NULL, CLI_RETRIEVE_RESPONSE);
-            
+
             char str[LINE_BUFFER_SIZE+1];
             strcpy(str, response);
 
             item->data.min = min;
-            item->data.max = max; 
+            item->data.max = max;
             item->data.step = step;
 
-            int res = 0;  // Initialize result 
-            int sign = 1;  // Initialize sign as positive 
-            int i = 0;  // Initialize index of first digit 
-               
-            // If number is negative, then update sign 
-            if (str[0] == '-') 
-            { 
-                sign = -1;   
-                i++;  // Also update index of first digit 
-            } 
-               
-            // Iterate through all digits and update the result 
-            for (; str[i] != '.'; ++i) 
-                res = res*10 + (int)str[i] - 48; 
-             
-            // Return result with sign 
+            int res = 0;  // Initialize result
+            int sign = 1;  // Initialize sign as positive
+            int i = 0;  // Initialize index of first digit
+
+            // If number is negative, then update sign
+            if (str[0] == '-')
+            {
+                sign = -1;
+                i++;  // Also update index of first digit
+            }
+
+            // Iterate through all digits and update the result
+            for (; str[i] != '.'; ++i)
+                res = res*10 + (int)str[i] - 48;
+
+            // Return result with sign
             item->data.value = sign*res;
 
         }
@@ -337,7 +337,7 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
             float_to_str(item->data.value, value, sizeof value, 1);
             cli_command("mod-amixer ", CLI_CACHE_ONLY);
             cli_command(source, CLI_CACHE_ONLY);
-            cli_command(" vol", CLI_CACHE_ONLY);
+            cli_command(" vol ", CLI_CACHE_ONLY);
             cli_command(value, CLI_DISCARD_RESPONSE);
         }
     }
@@ -346,14 +346,14 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
     gains_volumes[item->desc->id - VOLUME_ID] = item->data.value;
 
     char str_bfr[8];
-    float_to_str(item->data.value, str_bfr, sizeof(str_bfr), 1); 
+    float_to_str(item->data.value, str_bfr, sizeof(str_bfr), 1);
     strcpy(item->name, item->desc->name);
     uint8_t q;
     uint8_t value_size = strlen(str_bfr);
     uint8_t name_size = strlen(item->name);
     for (q = 0; q < (31 - name_size - value_size - 2); q++)
     {
-        strcat(item->name, " ");  
+        strcat(item->name, " ");
     }
     strcat(item->name, str_bfr);
     strcat(item->name, "DB");
@@ -479,7 +479,7 @@ void system_tag_cb(void *arg, int event)
     menu_item_t *item = arg;
 
     if (event == MENU_EV_ENTER)
-    {  
+    {
         const char *response;
         char *txt = "The serial number of your     device is:                    ";
         response =  cli_command("cat /var/cache/mod/tag", CLI_RETRIEVE_RESPONSE);
@@ -564,7 +564,7 @@ void system_volume_cb(void *arg, int event)
 }
 
 float system_master_volume_cb(float value, int event)
-{    
+{
     if ((event == MENU_EV_ENTER) || (event == MENU_EV_NONE))
     {
         const char *source = master_vol_port < 2 ? "out 1" : "out 2";
@@ -589,20 +589,20 @@ float system_master_volume_cb(float value, int event)
                 cli_command(value_char, CLI_DISCARD_RESPONSE);
             break;
             }
-        
+
             case 1:
                 float_to_str(value, value_char, sizeof value_char, 1);
                 cli_command("mod-amixer out 1 vol ", CLI_CACHE_ONLY);
                 cli_command(value_char, CLI_DISCARD_RESPONSE);
             break;
-        
+
             case 2:
                 cli_command("mod-amixer out 2 vol ", CLI_CACHE_ONLY);
                 float_to_str(value, value_char, sizeof value_char, 1);
                 cli_command(value_char, CLI_DISCARD_RESPONSE);
             break;
         }
-        return value; 
+        return value;
     }
     //ERROR
     return 0;
@@ -617,14 +617,14 @@ void system_master_volume_link(uint8_t link_value)
 void system_master_vol_link_cb(void *arg, int event)
 {
     menu_item_t *item = arg;
-    
+
     if (event == MENU_EV_ENTER)
     {
         if (master_vol_port < 2)
             master_vol_port++;
         else
             master_vol_port = 0;
-        
+
         set_item_value(MASTER_VOL_SET_LINK_CMD, master_vol_port);
     }
 
@@ -642,7 +642,7 @@ void system_master_vol_link_cb(void *arg, int event)
                     cli_command("mod-amixer out 2 vol ", CLI_CACHE_ONLY);
                     gains_volumes[OUT2_VOLUME - VOLUME_ID] = gains_volumes[OUT1_VOLUME - VOLUME_ID];
                     float_to_str(gains_volumes[OUT2_VOLUME - VOLUME_ID], value, sizeof value, 1);
-                    cli_command(value, CLI_DISCARD_RESPONSE);   
+                    cli_command(value, CLI_DISCARD_RESPONSE);
                 }
             strcpy(str_bfr,"1&2");
         break;
@@ -664,7 +664,7 @@ void system_master_vol_link_cb(void *arg, int event)
     uint8_t name_size = strlen(item->name);
     for (q = 0; q < (31 - name_size - value_size); q++)
     {
-        strcat(item->name, " ");  
+        strcat(item->name, " ");
     }
     strcat(item->name, (str_bfr));
 
@@ -696,7 +696,7 @@ void system_display_cb(void *arg, int event)
     menu_item_t *item = arg;
 
     static int level = 2;
-    
+
     if (event == MENU_EV_ENTER)
     {
         if (++level > MAX_BRIGHTNESS)
@@ -706,23 +706,23 @@ void system_display_cb(void *arg, int event)
     }
 
     item->data.value = level;
-    
+
     char str_buf[8];
     int_to_str((item->data.value * 25), str_buf, sizeof(str_buf), 0);
 
     strcpy(item->name, item->desc->name);
-    uint8_t q;       
+    uint8_t q;
     uint8_t value_size = strlen(str_buf);
     uint8_t name_size = strlen(item->name);
     for (q = 0; q < (31 - name_size - value_size - 1); q++)
     {
-        strcat(item->name, " ");  
+        strcat(item->name, " ");
     }
     strcat(item->name, str_buf);
     strcat(item->name, "%");
 
     if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
-    
+
 }
 
 void system_sl_in_cb (void *arg, int event)
@@ -736,17 +736,17 @@ void system_sl_in_cb (void *arg, int event)
 
         set_item_value(SL_IN_SET_CMD, item->data.value);
 
-        if (item->data.value == 1) 
+        if (item->data.value == 1)
         {
             char value[8];
             int gain = MAP(gains_volumes[IN1_VOLUME - VOLUME_ID], -12, 12, 0, 48)
             int_to_str(gain, value, sizeof value, 1);
             cli_command("amixer -q -D hw:DUOX set 'PGA Gain' ", CLI_CACHE_ONLY);
             cli_command(value, CLI_DISCARD_RESPONSE);
-            naveg_update_gain(DISPLAY_RIGHT, IN2_VOLUME, gains_volumes[IN1_VOLUME - VOLUME_ID]); 
+            naveg_update_gain(DISPLAY_RIGHT, IN2_VOLUME, gains_volumes[IN1_VOLUME - VOLUME_ID]);
         }
     }
-    else 
+    else
     {
         request_item_value(SL_IN_GET_CMD, item);
     }
@@ -758,11 +758,11 @@ void system_sl_in_cb (void *arg, int event)
     uint8_t name_size = strlen(item->name);
     for (q = 0; q < (31 - name_size - value_size); q++)
     {
-        strcat(item->name, " ");  
+        strcat(item->name, " ");
     }
     strcat(item->name, (item->data.value ? " ON" : "OFF"));
 
-    if (event == MENU_EV_ENTER) 
+    if (event == MENU_EV_ENTER)
     {
         cli_command("mod-amixer save", CLI_DISCARD_RESPONSE);
         naveg_settings_refresh(DISPLAY_RIGHT);
@@ -777,20 +777,20 @@ void system_sl_out_cb (void *arg, int event)
     {
         if (item->data.value == 0) item->data.value = 1;
         else item->data.value = 0;
-        
+
         set_item_value(SL_OUT_SET_CMD, item->data.value);
 
-        if (item->data.value == 1) 
+        if (item->data.value == 1)
         {
             char value[8];
             int gain = MAP(gains_volumes[OUT1_VOLUME - VOLUME_ID], -60, 0, 135, 255)
             int_to_str(gain, value, sizeof value, 1);
             cli_command("amixer -q -D hw:DUOX set DAC ", CLI_CACHE_ONLY);
             cli_command(value, CLI_DISCARD_RESPONSE);
-            naveg_update_gain(DISPLAY_RIGHT, OUT2_VOLUME, gains_volumes[OUT1_VOLUME - VOLUME_ID]);  
+            naveg_update_gain(DISPLAY_RIGHT, OUT2_VOLUME, gains_volumes[OUT1_VOLUME - VOLUME_ID]);
         }
     }
-    else 
+    else
     {
         request_item_value(SL_OUT_GET_CMD, item);
     }
@@ -802,7 +802,7 @@ void system_sl_out_cb (void *arg, int event)
     uint8_t name_size = strlen(item->name);
     for (q = 0; q < (31 - name_size - value_size); q++)
     {
-        strcat(item->name, " ");  
+        strcat(item->name, " ");
     }
     strcat(item->name, (item->data.value ? " ON" : "OFF"));
 
@@ -820,7 +820,7 @@ void system_sl_out_cb (void *arg, int event)
 }
 
 void system_tuner_cb (void *arg, int event)
-{    
+{
     menu_item_t *item = arg;
 
     if (event == MENU_EV_ENTER)
@@ -840,11 +840,11 @@ void system_tuner_cb (void *arg, int event)
     uint8_t name_size = strlen(item->name);
     for (q = 0; q < (31 - name_size - value_size); q++)
     {
-        strcat(item->name, " ");  
+        strcat(item->name, " ");
     }
     strcat(item->name, (item->data.value ? "MUTE [X]" : "MUTE [ ]"));
 
-    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_LEFT);   
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_LEFT);
 }
 
 void system_cv_exp_cb (void *arg, int event)
@@ -872,7 +872,7 @@ void system_cv_exp_cb (void *arg, int event)
 
         for (q = 0; q < (31 - name_size - value_size); q++)
         {
-            strcat(item->name, " ");  
+            strcat(item->name, " ");
         }
 
         strcat(item->name, (item->data.value ? "EXP" : " CV"));
@@ -905,10 +905,10 @@ void system_cv_hp_cb (void *arg, int event)
         uint8_t name_size = strlen(item->name);
         for (q = 0; q < (31 - name_size - value_size); q++)
         {
-            strcat(item->name, " ");  
+            strcat(item->name, " ");
         }
         strcat(item->name, (item->data.value ? "HP" : "CV"));
-        if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT); 
+        if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
     }
 }
 
@@ -934,17 +934,17 @@ void system_play_cb (void *arg, int event)
     uint8_t name_size = strlen(item->name);
     for (q = 0; q < (31 - name_size - value_size); q++)
     {
-        strcat(item->name, " ");  
+        strcat(item->name, " ");
     }
     strcat(item->name, ( item->data.value ? "PLAY [X]" : "PLAY [ ]"));
 
-    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_LEFT);   
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_LEFT);
 }
 
 void system_midi_src_cb (void *arg, int event)
 {
     menu_item_t *item = arg;
-    
+
     if (event == MENU_EV_ENTER)
     {
         if (item->data.value < 2) item->data.value++;
@@ -967,11 +967,11 @@ void system_midi_src_cb (void *arg, int event)
     uint8_t name_size = strlen(item->name);
     for (q = 0; q < (31 - name_size - value_size); q++)
     {
-        strcat(item->name, " ");  
+        strcat(item->name, " ");
     }
     strcat(item->name, (str_bfr));
 
-    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT); 
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
 }
 
 void system_midi_send_cb (void *arg, int event)
@@ -995,11 +995,11 @@ void system_midi_send_cb (void *arg, int event)
     uint8_t name_size = strlen(item->name);
     for (q = 0; q < (31 - name_size - value_size); q++)
     {
-        strcat(item->name, " ");  
+        strcat(item->name, " ");
     }
     strcat(item->name, ( item->data.value? "[X]" : "[ ]"));
 
-    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT); 
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
 }
 
 void system_ss_prog_change_cb (void *arg, int event)
@@ -1027,11 +1027,11 @@ void system_ss_prog_change_cb (void *arg, int event)
     uint8_t name_size = strlen(item->name);
     for (q = 0; q < (31 - name_size - value_size); q++)
     {
-        strcat(item->name, " ");  
+        strcat(item->name, " ");
     }
     strcat(item->name, str_bfr);
 
-    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT); 
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
 }
 
 void system_pb_prog_change_cb (void *arg, int event)
@@ -1059,11 +1059,11 @@ void system_pb_prog_change_cb (void *arg, int event)
     uint8_t name_size = strlen(item->name);
     for (q = 0; q < (31 - name_size - value_size); q++)
     {
-        strcat(item->name, " ");  
+        strcat(item->name, " ");
     }
     strcat(item->name, str_bfr);
 
-    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT); 
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
 }
 
 void system_tempo_cb (void *arg, int event)
@@ -1090,12 +1090,12 @@ void system_tempo_cb (void *arg, int event)
     uint8_t name_size = strlen(item->name);
     for (q = 0; q < (31 - name_size - value_size - 4); q++)
     {
-        strcat(item->name, " ");  
+        strcat(item->name, " ");
     }
     strcat(item->name, str_bfr);
     strcat(item->name, " BPM");
 
-    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT); 
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
 }
 
 void system_bpb_cb (void *arg, int event)
@@ -1122,12 +1122,12 @@ void system_bpb_cb (void *arg, int event)
     uint8_t name_size = strlen(item->name);
     for (q = 0; q < (31 - name_size - value_size - 2); q++)
     {
-        strcat(item->name, " ");  
+        strcat(item->name, " ");
     }
     strcat(item->name, str_bfr);
     strcat(item->name, "/4");
 
-    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT); 
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
 }
 
 void system_bypass_cb (void *arg, int event)
@@ -1138,7 +1138,7 @@ void system_bypass_cb (void *arg, int event)
     char channel[8];
 
     if (event == MENU_EV_ENTER)
-    {   
+    {
         //toggle bypass 1 and 2
         if ((item->desc->id - (BYPASS_ID + 1)) == 2)
         {
@@ -1149,26 +1149,26 @@ void system_bypass_cb (void *arg, int event)
                 bypass[item->desc->id - (BYPASS_ID + 1)] = item->data.value;
                 bypass[0] = 0;
                 bypass[1] = 0;
-            }    
+            }
             else if (item->data.value == 0)
-            {            
+            {
                 item->data.value = 1;
                 bypass[item->desc->id - (BYPASS_ID + 1)] = item->data.value;
                 bypass[0] = 1;
                 bypass[1] = 1;
-            }    
+            }
                 //set channel 1
                 strcpy(cmd_bfr, BYPASS_SET_CMD);
                 int_to_str(0, channel, sizeof channel, 0);
                 strcat(cmd_bfr, channel);
                 strcat(cmd_bfr, " ");
-                set_item_value(cmd_bfr, item->data.value);  
+                set_item_value(cmd_bfr, item->data.value);
                 //set channel 2
                 strcpy(cmd_bfr, BYPASS_SET_CMD);
                 int_to_str(1, channel, sizeof channel, 0);
                 strcat(cmd_bfr, channel);
                 strcat(cmd_bfr, " ");
-                set_item_value(cmd_bfr, item->data.value);     
+                set_item_value(cmd_bfr, item->data.value);
         }
         //toggle quick bypass
         else if ((item->desc->id - (BYPASS_ID + 1)) == 3)
@@ -1177,17 +1177,17 @@ void system_bypass_cb (void *arg, int event)
             {
                 item->data.value = 2;
                 bypass[item->desc->id - (BYPASS_ID + 1)] = item->data.value;
-            }  
+            }
             else if (bypass[item->desc->id - (BYPASS_ID + 1)] == 2)
             {
                 item->data.value = 0;
                 bypass[item->desc->id - (BYPASS_ID + 1)] = item->data.value;
             }
             else if (bypass[item->desc->id - (BYPASS_ID + 1)] == 0)
-            {            
+            {
                 item->data.value = 1;
                 bypass[item->desc->id - (BYPASS_ID + 1)] = item->data.value;
-            }   
+            }
         }
         //toggle normal bypass
         else
@@ -1196,18 +1196,18 @@ void system_bypass_cb (void *arg, int event)
             {
                 item->data.value = 0;
                 bypass[item->desc->id - (BYPASS_ID + 1)] = item->data.value;
-            }    
+            }
             else if (bypass[item->desc->id - (BYPASS_ID + 1)] == 0)
-            {            
+            {
                 item->data.value = 1;
                 bypass[item->desc->id - (BYPASS_ID + 1)] = item->data.value;
-            }            
+            }
 
             strcpy(cmd_bfr, BYPASS_SET_CMD);
             int_to_str(item->desc->id - (BYPASS_ID), channel, sizeof channel, 0);
             strcat(cmd_bfr, channel);
             strcat(cmd_bfr, " ");
-            set_item_value(cmd_bfr, item->data.value);   
+            set_item_value(cmd_bfr, item->data.value);
         }
     }
     else if (event == MENU_EV_NONE)
@@ -1246,7 +1246,7 @@ void system_bypass_cb (void *arg, int event)
     //add spaces
     for (q = 0; q < (31 - name_size - value_size); q++)
     {
-        strcat(item->name, " ");  
+        strcat(item->name, " ");
     }
 
     //if bypass select add the channels, else add [X] or  [ ]
@@ -1269,11 +1269,11 @@ void system_bypass_cb (void *arg, int event)
     }
     else strcat(item->name, ((item->data.value)? "[X]" : "[ ]"));
 
-    if (event == MENU_EV_ENTER)  
+    if (event == MENU_EV_ENTER)
     {
         naveg_menu_refresh(DISPLAY_LEFT);
         naveg_settings_refresh(DISPLAY_LEFT);
-        naveg_bypass_refresh(bypass[0], bypass[1], bypass[3]);    
+        naveg_bypass_refresh(bypass[0], bypass[1], bypass[3]);
     }
 }
 
@@ -1284,7 +1284,7 @@ void system_quick_bypass_cb (void *arg, int event)
     char channel[8];
 
     menu_item_t *item = arg;
-    
+
     if (event == MENU_EV_ENTER)
     {
         switch(bypass[3])
@@ -1352,14 +1352,14 @@ void system_quick_bypass_cb (void *arg, int event)
     uint8_t name_size = strlen(item->name);
     for (q = 0; q < (31 - name_size - value_size); q++)
     {
-        strcat(item->name, " ");  
+        strcat(item->name, " ");
     }
     strcat(item->name, (q_bypass ? "BYPASS [X]" : "BYPASS [ ]"));
 
-    if (event == MENU_EV_ENTER)  
+    if (event == MENU_EV_ENTER)
     {
         naveg_settings_refresh(DISPLAY_LEFT);
-        naveg_bypass_refresh(bypass[0], bypass[1], bypass[3]);    
+        naveg_bypass_refresh(bypass[0], bypass[1], bypass[3]);
     }
 
 }
@@ -1385,7 +1385,7 @@ void system_load_pro_cb(void *arg, int event)
         {
             request_item_value(GET_PROFILE_CMD, item);
         }
-        
+
         if ((item->desc->id - item->desc->parent_id) == current_profile)
         {
             item->data.value = current_profile;
@@ -1395,7 +1395,7 @@ void system_load_pro_cb(void *arg, int event)
             uint8_t q;
             for (q = 0; q < (31 - name_size - value_size); q++)
             {
-                strcat(item->name, " ");  
+                strcat(item->name, " ");
             }
             strcat(item->name, "[X]");
         }
@@ -1407,7 +1407,7 @@ void system_load_pro_cb(void *arg, int event)
 void system_save_pro_cb(void *arg, int event)
 {
    menu_item_t *item = arg;
-    
+
     if (event == MENU_EV_ENTER && item->data.hover == 0)
     {
         set_item_value(STORE_PROFILE_CMD, current_profile);
@@ -1420,7 +1420,7 @@ void system_save_pro_cb(void *arg, int event)
         uint8_t q;
         for (q = 0; q < (31 - name_size - value_size); q++)
         {
-            strcat(item->name, " ");  
+            strcat(item->name, " ");
         }
         switch (current_profile)
         {
@@ -1428,14 +1428,14 @@ void system_save_pro_cb(void *arg, int event)
             case 2: strcat(item->name, ("[B]")); break;
             case 3: strcat(item->name, ("[C]")); break;
             case 4: strcat(item->name, ("[D]")); break;
-        }   
+        }
     }
 }
 
 void system_cv_range_cb(void *arg, int event)
 {
     menu_item_t *item = arg;
-    
+
     if (event == MENU_EV_ENTER)
     {
         if (item->data.value < 1) item->data.value++;
@@ -1458,17 +1458,17 @@ void system_cv_range_cb(void *arg, int event)
     uint8_t name_size = strlen(item->name);
     for (q = 0; q < (31 - name_size - value_size); q++)
     {
-        strcat(item->name, " ");  
+        strcat(item->name, " ");
     }
     strcat(item->name, (str_bfr));
 
-    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT); 
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
 }
 
 void system_exp_mode_cb(void *arg, int event)
 {
     menu_item_t *item = arg;
-    
+
     if (event == MENU_EV_ENTER)
     {
         if (item->data.value < 1) item->data.value++;
@@ -1491,9 +1491,9 @@ void system_exp_mode_cb(void *arg, int event)
     uint8_t name_size = strlen(item->name);
     for (q = 0; q < (31 - name_size - value_size); q++)
     {
-        strcat(item->name, " ");  
+        strcat(item->name, " ");
     }
     strcat(item->name, (str_bfr));
 
-    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT); 
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
 }
