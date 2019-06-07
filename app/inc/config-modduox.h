@@ -305,7 +305,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 //set master volume link channel
 #define MASTER_VOL_SET_LINK_CMD     "set_mv_channel %i"
 //request the next page <page_to_load>
-#define NEXT_PAGE_COMMAND        "load_page %i"
+#define NEXT_PAGE_COMMAND        "lp %i"
 //save a snapshot <snapshot_id>
 #define SAVE_SNAPSHOT_COMMAND     "ss %i"
 //load a snapshot <snapshot_id>
