@@ -284,17 +284,14 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
         if (!dir)
         {
             float_to_str(item->data.value, value, sizeof value, 1);
-            cli_command("mod-amixer ", CLI_CACHE_ONLY);
-            cli_command("in 0", CLI_CACHE_ONLY);
-            cli_command(" xvol ", CLI_CACHE_ONLY);
+            cli_command("mod-amixer in 0 xvol ", CLI_CACHE_ONLY);
             cli_command(value, CLI_DISCARD_RESPONSE);
         }
         //DAC (output)
         else
         {
-            int gain = MAP(item->data.value, -60, 0, 135, 255)
-            int_to_str(gain, value, sizeof value, 1);
-            cli_command("amixer -q -D hw:DUOX set DAC ", CLI_CACHE_ONLY);
+            float_to_str(item->data.value, value, sizeof value, 1);
+            cli_command("mod-amixer out 0 xvol ", CLI_CACHE_ONLY);
             cli_command(value, CLI_DISCARD_RESPONSE);
         }
     }
@@ -587,10 +584,8 @@ float system_master_volume_cb(float value, int event)
         switch(master_vol_port)
         {
             case 0:
-                int gain = MAP(value, -57, -3, 135, 255);
-                int_to_str(gain, value_char, sizeof value_char, 1);
-
-                cli_command("amixer -q -D hw:DUOX set DAC ", CLI_CACHE_ONLY);
+                float_to_str(value, value_char, sizeof value_char, 1);
+                cli_command("mod-amixer out 0 xvol ", CLI_CACHE_ONLY);
                 cli_command(value_char, CLI_DISCARD_RESPONSE); 
             break;
             
@@ -653,19 +648,9 @@ void system_master_vol_link_cb(void *arg, int event)
         break;
         case 1:
             strcpy(str_bfr,"1");
-            if (event == MENU_EV_ENTER)
-            {
-                //turn off stereo link and sync gains
-                set_item_value(SL_OUT_SET_CMD, 0);
-            }
         break;
         case 2:
             strcpy(str_bfr,"2");
-            if (event == MENU_EV_ENTER)
-            {
-                //turn off stereo link and sync gains
-                set_item_value(SL_OUT_SET_CMD, 0);
-            }
         break;
     }
 
@@ -791,13 +776,12 @@ void system_sl_out_cb (void *arg, int event)
 
         set_item_value(SL_OUT_SET_CMD, item->data.value);
 
+        char value_bfr[8];
         if (item->data.value == 1)
         {
-            char value[8];
-            int gain = MAP(gains_volumes[OUT1_VOLUME - VOLUME_ID], -60, 0, 135, 255)
-            int_to_str(gain, value, sizeof value, 1);
-            cli_command("amixer -q -D hw:DUOX set DAC ", CLI_CACHE_ONLY);
-            cli_command(value, CLI_DISCARD_RESPONSE);
+            float_to_str(item->data.value, value_bfr, sizeof value_bfr, 1);
+            cli_command("mod-amixer out 0 xvol ", CLI_CACHE_ONLY);
+            cli_command(value_bfr, CLI_DISCARD_RESPONSE);
             naveg_update_gain(DISPLAY_RIGHT, OUT2_VOLUME, gains_volumes[OUT1_VOLUME - VOLUME_ID]);
         }
     }
