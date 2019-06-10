@@ -358,11 +358,11 @@ char *str_duplicate(const char *str)
 
 void delay_us(volatile uint32_t time)
 {
+#ifndef CCC_ANALYZER
     register uint32_t _time asm ("r0");
     (void)(_time); // just to avoid warning
     _time = time;
 
-#ifndef CCC_ANALYZER
     __asm__ volatile
     (
         "1:\n\t"
@@ -377,16 +377,18 @@ void delay_us(volatile uint32_t time)
                 "b 1b\n\t"
             "4:\n\t"
     );
+#else
+    (void)(time); // just to avoid warning
 #endif
 }
 
 void delay_ms(volatile uint32_t time)
 {
+#ifndef CCC_ANALYZER
     register uint32_t _time asm ("r0");
     (void)(_time); // just to avoid warning
     _time = time;
 
-#ifndef CCC_ANALYZER
     __asm__ volatile
     (
         "1:\n\t"
@@ -401,6 +403,8 @@ void delay_ms(volatile uint32_t time)
                 "b 1b\n\t"
             "4:\n\t"
     );
+#else
+    (void)(time); // just to avoid warning
 #endif
 }
 
