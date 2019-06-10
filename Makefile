@@ -19,7 +19,7 @@ CPU_SERIE = LPC177x_8x
 endif
 
 # target configuration
-TARGET_ADDR = root@modduo.local
+TARGET_ADDR = root@modduox.local
 
 # project directories
 DEVICE_INC	= ./nxp-lpc
