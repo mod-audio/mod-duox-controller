@@ -166,7 +166,12 @@ not necessary for to use this port.  They are defined so the common demo files
 	{
 	uint8_t ucReturn;
 
+#ifndef CCC_ANALYZER
 		__asm volatile ( "clz %0, %1" : "=r" ( ucReturn ) : "r" ( ulBitmap ) );
+#else
+		// silence analyzer warning
+		ucReturn = ulBitmap;
+#endif
 		return ucReturn;
 	}
 

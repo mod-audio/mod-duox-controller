@@ -362,6 +362,7 @@ void delay_us(volatile uint32_t time)
     (void)(_time); // just to avoid warning
     _time = time;
 
+#ifndef CCC_ANALYZER
     __asm__ volatile
     (
         "1:\n\t"
@@ -376,6 +377,7 @@ void delay_us(volatile uint32_t time)
                 "b 1b\n\t"
             "4:\n\t"
     );
+#endif
 }
 
 void delay_ms(volatile uint32_t time)
@@ -384,6 +386,7 @@ void delay_ms(volatile uint32_t time)
     (void)(_time); // just to avoid warning
     _time = time;
 
+#ifndef CCC_ANALYZER
     __asm__ volatile
     (
         "1:\n\t"
@@ -398,6 +401,7 @@ void delay_ms(volatile uint32_t time)
                 "b 1b\n\t"
             "4:\n\t"
     );
+#endif
 }
 
 float convert_to_ms(const char *unit_from, float value)
