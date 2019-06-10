@@ -671,7 +671,7 @@ static void foot_control_rm(uint8_t hw_id)
     for (i = 0; i < FOOTSWITCHES_ACTUATOR_COUNT; i++)
     {
         // if there is no controls assigned, load the default screen
-        if (!g_foots[i] && ! bank_config_check(i) && !display_has_tool_enabled(i))
+        if (!g_foots[i] || (!bank_config_check(i) && !display_has_tool_enabled(i)))
         {
             screen_footer(i, NULL, NULL);
             continue;
@@ -981,8 +981,11 @@ static void bp_enter(void)
             // if select a pedalboard in other bank free the old pedalboards list
             if (g_current_bank != g_banks->selected)
             {
-                if (g_selected_pedalboards) data_free_pedalboards_list(g_selected_pedalboards);
-                g_selected_pedalboards = NULL;
+                if (g_selected_pedalboards)
+                {
+                    data_free_pedalboards_list(g_selected_pedalboards);
+                    g_selected_pedalboards = NULL;
+                }
             }
 
             // stores the current bank and pedalboard
@@ -994,7 +997,8 @@ static void bp_enter(void)
             bp_list = g_naveg_pedalboards;
 
             // if has a valid pedalboards list update the screens
-            if (g_selected_pedalboards) bank_config_footer();
+            if (g_selected_pedalboards)
+                bank_config_footer();
         }
     }
     else
@@ -1313,7 +1317,8 @@ static void menu_enter(uint8_t display_id)
         }
 
         // calls the action callback
-        if (item->desc->action_cb) item->desc->action_cb(item, MENU_EV_ENTER);
+        if (item->desc->action_cb)
+            item->desc->action_cb(item, MENU_EV_ENTER);
 
         if (display_id)
         {
@@ -1323,28 +1328,31 @@ static void menu_enter(uint8_t display_id)
     }
     else if ((item->desc->type == MENU_VOL) || (item->desc->type == MENU_SET))
     {
-    	if (display_id)
+        if (display_id)
         {
-        	static uint8_t toggle = 0;
-        	if (toggle == 0)
-        	{
-            	toggle = 1;
-            	// calls the action callback
-            	if ((item->desc->action_cb) && (item->desc->type != MENU_SET)) item->desc->action_cb(item, MENU_EV_ENTER);
-        	}
-        	else
-        	{
-            	toggle = 0;
-            	if (item->desc->type == MENU_VOL) system_save_gains_cb(item, MENU_EV_ENTER);
-                else item->desc->action_cb(item, MENU_EV_ENTER);
-            	//resets the menu node
-            	item = g_current_menu->data;
-            	g_current_item = item;
-        	}
+            static uint8_t toggle = 0;
+            if (toggle == 0)
+            {
+                toggle = 1;
+                // calls the action callback
+                if ((item->desc->action_cb) && (item->desc->type != MENU_SET))
+                    item->desc->action_cb(item, MENU_EV_ENTER);
+            }
+            else
+            {
+                toggle = 0;
+                if (item->desc->type == MENU_VOL)
+                    system_save_gains_cb(item, MENU_EV_ENTER);
+                else
+                    item->desc->action_cb(item, MENU_EV_ENTER);
+                //resets the menu node
+                item = g_current_menu->data;
+                g_current_item = item;
+            }
         }
     }
 
-    if (item->desc->parent_id == DEVICE_ID)
+    if (item->desc->parent_id == DEVICE_ID && item->desc->action_cb)
         item->desc->action_cb(item, MENU_EV_ENTER);
 
     if (tool_is_on(DISPLAY_TOOL_SYSTEM) && !tool_is_on(DISPLAY_TOOL_NAVIG))
@@ -1510,9 +1518,11 @@ static void bank_config_update(uint8_t bank_func_idx)
                 {
                     // if previous pedalboard function is not being used, does circular selection
                     // the minimum value is 1 because the option 0 is 'back to banks list'
-                    if (g_bank_functions[BANK_FUNC_PEDALBOARD_PREV].function == BANK_FUNC_NONE) g_current_pedalboard = 1;
+                    if (g_bank_functions[BANK_FUNC_PEDALBOARD_PREV].function == BANK_FUNC_NONE)
+                        g_current_pedalboard = 1;
                     // if previous pedalboard function is being used, stops on maximum value
-                    else g_current_pedalboard = g_selected_pedalboards->count - 1;
+                    else
+                        g_current_pedalboard = g_selected_pedalboards->count - 1;
                 }
 
                 g_selected_pedalboards->selected = g_current_pedalboard;
@@ -1562,7 +1572,9 @@ static void bank_config_update(uint8_t bank_func_idx)
 static void bank_config_footer(void)
 {
     uint8_t bypass;
-    char *pedalboard_name = g_selected_pedalboards ? g_selected_pedalboards->names[g_selected_pedalboards->selected] : NULL;
+    char *pedalboard_name = g_selected_pedalboards
+                          ? g_selected_pedalboards->names[g_selected_pedalboards->selected]
+                          : NULL;
 
     // updates all footer screen with bank functions
     uint8_t i;
@@ -1589,7 +1601,7 @@ static void bank_config_footer(void)
                 break;
 
             case BANK_FUNC_PEDALBOARD_NEXT:
-                if (g_current_pedalboard == (g_selected_pedalboards->count - 1))
+                if (g_selected_pedalboards && g_current_pedalboard == (g_selected_pedalboards->count - 1))
                     ledz_off(hardware_leds(bank_conf->hw_id - ENCODERS_COUNT), LEDZ_ALL_COLORS);
                 else
                     ledz_on(hardware_leds(bank_conf->hw_id - ENCODERS_COUNT), PEDALBOARD_NEXT_COLOR);
