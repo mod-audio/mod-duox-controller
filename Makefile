@@ -56,12 +56,12 @@ CFLAGS += -mcpu=$(MCU)
 else
 CFLAGS += -DCCC_ANALYZER -Wshadow -Wno-attributes
 endif
-CFLAGS += -Wall -Wextra -Wpointer-arith -Wredundant-decls 
+CFLAGS += -Wall -Wextra -Wpointer-arith -Wredundant-decls
 CFLAGS += -Wa,-adhlns=$(addprefix $(OUT_DIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
 CFLAGS += -MMD -MP -MF $(OUT_DIR)/dep/$(@F).d
 CFLAGS += -I. $(patsubst %,-I%,$(INC))
 CFLAGS += -D$(CPU_SERIE)
-CFLAGS += -O2
+CFLAGS += -Os
 
 # Linker flags
 LDFLAGS = -Wl,-Map=$(OUT_DIR)/$(PRJNAME).map,--cref
