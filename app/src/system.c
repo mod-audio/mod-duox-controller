@@ -638,16 +638,16 @@ void system_master_vol_link_cb(void *arg, int event)
     switch (master_vol_port)
     {
         case 0:
-                if (event == MENU_EV_ENTER)
-                {
-                    //turn on stereo link and sync gains
-                    set_item_value(SL_OUT_SET_CMD, 1);
-                    char value[8];
-                    cli_command("mod-amixer out 2 xvol ", CLI_CACHE_ONLY);
-                    gains_volumes[OUT2_VOLUME - VOLUME_ID] = gains_volumes[OUT1_VOLUME - VOLUME_ID];
-                    float_to_str(gains_volumes[OUT2_VOLUME - VOLUME_ID], value, sizeof value, 1);
-                    cli_command(value, CLI_DISCARD_RESPONSE);
-                }
+            if (event == MENU_EV_ENTER)
+            {
+                //turn on stereo link and sync gains
+                set_item_value(SL_OUT_SET_CMD, 1);
+                char value[8];
+                cli_command("mod-amixer out 2 xvol ", CLI_CACHE_ONLY);
+                gains_volumes[OUT2_VOLUME - VOLUME_ID] = gains_volumes[OUT1_VOLUME - VOLUME_ID];
+                float_to_str(gains_volumes[OUT2_VOLUME - VOLUME_ID], value, sizeof value, 1);
+                cli_command(value, CLI_DISCARD_RESPONSE);
+            }
             strcpy(str_bfr,"1&2");
         break;
         case 1:

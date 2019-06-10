@@ -685,7 +685,7 @@ static void control_set(uint8_t id, control_t *control)
                 if (!display_has_tool_enabled(id))
                     screen_encoder(id, control);
             }
-            else if ((ENCODERS_COUNT < control->hw_id) && ( control->hw_id < FOOTSWITCHES_ACTUATOR_COUNT + ENCODERS_COUNT))
+            else if ((ENCODERS_COUNT <= control->hw_id) && ( control->hw_id < FOOTSWITCHES_ACTUATOR_COUNT + ENCODERS_COUNT))
             {
                 // increments the step
                 control->step++;
