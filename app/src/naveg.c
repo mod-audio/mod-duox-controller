@@ -1245,7 +1245,7 @@ static void menu_enter(uint8_t display_id)
         if (g_current_item->desc->type == MENU_SELECT)
         {
             // deselects all items
-            for (i = 1; i < g_current_item->data.list_count; i++)
+            for (i = 0; i < g_current_item->data.list_count; i++)
                 deselect_item(g_current_item->data.list[i]);
 
             // selects the current item

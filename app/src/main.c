@@ -617,10 +617,11 @@ static void boot_cb(proto_t *proto)
 
 static void snapshot_clear_cb(proto_t *proto)
 {
-    (void) proto;
     //we dont care yet about which snapshot, thats why hardcoded
     naveg_clear_snapshot(6);
     naveg_clear_snapshot(4);
+
+    protocol_response("resp 0", proto);
 }
 
 /*
