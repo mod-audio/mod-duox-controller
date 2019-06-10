@@ -303,7 +303,7 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
         {
             cli_command("mod-amixer ", CLI_CACHE_ONLY);
             cli_command(source, CLI_CACHE_ONLY);
-            cli_command(" vol", CLI_CACHE_ONLY);
+            cli_command(" xvol", CLI_CACHE_ONLY);
             response = cli_command(NULL, CLI_RETRIEVE_RESPONSE);
 
             char str[LINE_BUFFER_SIZE+1];
@@ -337,7 +337,7 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
             float_to_str(item->data.value, value, sizeof value, 1);
             cli_command("mod-amixer ", CLI_CACHE_ONLY);
             cli_command(source, CLI_CACHE_ONLY);
-            cli_command(" vol ", CLI_CACHE_ONLY);
+            cli_command(" xvol ", CLI_CACHE_ONLY);
             cli_command(value, CLI_DISCARD_RESPONSE);
         }
     }
@@ -527,15 +527,15 @@ void system_volume_cb(void *arg, int event)
         {
             case IN1_VOLUME:
                 source = "in 1";
-                min = -12.0;
-                max = 12.0;
+                min = 0;
+                max = 78.0;
                 step = 1.0;
                 break;
 
             case IN2_VOLUME:
                 source = "in 2";
-                min = -12.0;
-                max = 12.0;
+                min = 0.0;
+                max = 78.0;
                 step = 1.0;
                 break;
 
@@ -575,7 +575,7 @@ float system_master_volume_cb(float value, int event)
 
         cli_command("mod-amixer ", CLI_CACHE_ONLY);
         cli_command(source, CLI_CACHE_ONLY);
-        cli_command(" vol ", CLI_CACHE_ONLY);
+        cli_command(" xvol ", CLI_CACHE_ONLY);
 
         const char *response = cli_command(NULL, CLI_RETRIEVE_RESPONSE);
         return atof(response);
@@ -596,12 +596,12 @@ float system_master_volume_cb(float value, int event)
 
             case 1:
                 float_to_str(value, value_char, sizeof value_char, 1);
-                cli_command("mod-amixer out 1 vol ", CLI_CACHE_ONLY);
+                cli_command("mod-amixer out 1 xvol ", CLI_CACHE_ONLY);
                 cli_command(value_char, CLI_DISCARD_RESPONSE);
             break;
 
             case 2:
-                cli_command("mod-amixer out 2 vol ", CLI_CACHE_ONLY);
+                cli_command("mod-amixer out 2 xvol ", CLI_CACHE_ONLY);
                 float_to_str(value, value_char, sizeof value_char, 1);
                 cli_command(value_char, CLI_DISCARD_RESPONSE);
             break;
@@ -643,7 +643,7 @@ void system_master_vol_link_cb(void *arg, int event)
                     //turn on stereo link and sync gains
                     set_item_value(SL_OUT_SET_CMD, 1);
                     char value[8];
-                    cli_command("mod-amixer out 2 vol ", CLI_CACHE_ONLY);
+                    cli_command("mod-amixer out 2 xvol ", CLI_CACHE_ONLY);
                     gains_volumes[OUT2_VOLUME - VOLUME_ID] = gains_volumes[OUT1_VOLUME - VOLUME_ID];
                     float_to_str(gains_volumes[OUT2_VOLUME - VOLUME_ID], value, sizeof value, 1);
                     cli_command(value, CLI_DISCARD_RESPONSE);
