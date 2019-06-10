@@ -211,6 +211,7 @@ static void serial_cb(serial_t *serial)
 
 static void write_msg(const char *msg)
 {
+    glcd_clear(hardware_glcds(1), GLCD_WHITE);
     glcd_clear(hardware_glcds(0), GLCD_WHITE);
     textbox_t msg_box;
     msg_box.color = GLCD_BLACK;

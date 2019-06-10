@@ -89,7 +89,9 @@ void naveg_pot_change(uint8_t pot);
 // toggle between control and tool
 void naveg_toggle_tool(uint8_t tool, uint8_t display);
 //save snapshots
-void naveg_save_page(uint8_t foot);
+void naveg_save_snapshot(uint8_t foot);
+//clear snapshots
+void naveg_clear_snapshot(uint8_t foot);
 // returns if display is in tool mode
 uint8_t naveg_is_tool_mode(uint8_t display);
 //toggle / set master volume 
