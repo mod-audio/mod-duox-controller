@@ -651,14 +651,20 @@ void system_master_vol_link_cb(void *arg, int event)
             strcpy(str_bfr,"1&2");
         break;
         case 1:
-            strcpy(str_bfr,"1");
-            //turn off stereo link and sync gains
-            set_item_value(SL_OUT_SET_CMD, 0);
+            if (event == MENU_EV_ENTER)
+            {
+                strcpy(str_bfr,"1");
+                //turn off stereo link and sync gains
+                set_item_value(SL_OUT_SET_CMD, 0);
+            }
         break;
         case 2:
-            strcpy(str_bfr,"2");
-            //turn off stereo link and sync gains
-            set_item_value(SL_OUT_SET_CMD, 0);
+            if (event == MENU_EV_ENTER)
+            {
+                strcpy(str_bfr,"2");
+                //turn off stereo link and sync gains
+                set_item_value(SL_OUT_SET_CMD, 0);
+            }
         break;
     }
 
