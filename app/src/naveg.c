@@ -1128,11 +1128,22 @@ static void menu_enter(uint8_t display_id)
     }
     else if (item->desc->type == MENU_CONFIRM ||item->desc->type == MENU_OK || item->desc->parent_id == PROFILES_ID ||  item->desc->id == EXP_CV_INP || item->desc->id == HP_CV_OUTP)
     {
-        // highlights the default button
-        item->data.hover = 1;
+        if (item->desc->type == MENU_OK)
+        {
+            // highlights the default button
+            item->data.hover = 0;
 
-        // defines the buttons count
-        item->data.list_count = 2;
+            // defines the buttons count
+            item->data.list_count = 1;
+        }
+        else 
+        {
+            // highlights the default button
+            item->data.hover = 1;
+
+            // defines the buttons count
+            item->data.list_count = 2;            
+        }
 
         // default popup content value
         item->data.popup_content = NULL;
