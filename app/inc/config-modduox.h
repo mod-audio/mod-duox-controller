@@ -177,151 +177,151 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 
 //// Protocol commands configuration
 // ping0
-#define PING_CMD                "ping"
+#define PING_CMD                      "ping"
 // say <message>
-#define SAY_CMD                 "say %s ..."
+#define SAY_CMD                       "say %s ..."
 // led <led_id> <red> <green> <blue>
-#define LED_CMD                 "led %i %i %i %i ..."
+#define LED_CMD                       "led %i %i %i %i ..."
 // glcd_text <glcd_id> <x_pos> <y_pos> <text>
-#define GLCD_TEXT_CMD           "glcd_text %i %i %i %s"
+#define GLCD_TEXT_CMD                 "glcd_text %i %i %i %s"
 // glcd_dialog <content>
-#define GLCD_DIALOG_CMD         "glcd_dialog %s"
+#define GLCD_DIALOG_CMD               "glcd_dialog %s"
 // glcd_draw <glcd_id> <x_pos> <y_pos> <data>
-#define GLCD_DRAW_CMD           "glcd_draw %i %i %i %s"
+#define GLCD_DRAW_CMD                 "glcd_draw %i %i %i %s"
 // ui_con
-#define GUI_CONNECTED_CMD       "ui_con"
+#define GUI_CONNECTED_CMD             "ui_con"
 // ui_dis
-#define GUI_DISCONNECTED_CMD    "ui_dis"
+#define GUI_DISCONNECTED_CMD          "ui_dis"
 // control_add <hw_id> <label> <control_prop> <unit> <value> <max> <min> <steps> 
 //             [scale_point_count] {[scale_point1_label] [scale_point1_value]}...
-#define CONTROL_ADD_CMD         "a %i %s %i %s %f %f %f %i %i ..."
+#define CONTROL_ADD_CMD               "a %i %s %i %s %f %f %f %i %i ..."
 // control_rm <hw_id>
-#define CONTROL_REMOVE_CMD      "rm %i ..."
+#define CONTROL_REMOVE_CMD            "rm %i ..."
 // control_get <hw_id> 
-#define CONTROL_GET_CMD         "g %i"
+#define CONTROL_GET_CMD               "g %i"
 // control_set <hw_id><value>
-#define CONTROL_SET_CMD         "s %i %f"
+#define CONTROL_SET_CMD               "s %i %f"
 // control_next <hw_id>
-#define CONTROL_NEXT_CMD        "n %i"
+#define CONTROL_NEXT_CMD              "n %i"
 // control_index_set <hw_id> <current_index> <total_index>
-#define CONTROL_INDEX_SET       "si %i %i %i"
+#define CONTROL_INDEX_SET             "si %i %i %i"
 // initial_state <current_bank_uid> <current_pedalboard_uid> [current_pedalboards_list]
-#define INITIAL_STATE_CMD       "is %s %s ..."
+#define INITIAL_STATE_CMD             "is %s %s ..."
 // banks
-#define BANKS_CMD               "banks"
+#define BANKS_CMD                     "banks"
 // bank_config <hw_id> <function>
-#define BANK_CONFIG_CMD         "bank_config %i %i"
+#define BANK_CONFIG_CMD               "bank_config %i %i"
 // pedalboards <bank_uid>
-#define PEDALBOARDS_CMD         "pedalboards %s"
+#define PEDALBOARDS_CMD               "pedalboards %s"
 // pedalboard <bank_id> <pedalboard_uid>
-#define PEDALBOARD_CMD          "pb %i %s"
+#define PEDALBOARD_CMD                "pb %i %s"
 // pedalboard_reset
-#define PEDALBOARD_RESET_CMD    "pbr"
+#define PEDALBOARD_RESET_CMD          "pbr"
 // pedalboard_save
-#define PEDALBOARD_SAVE_CMD     "pbs"
+#define PEDALBOARD_SAVE_CMD           "pbs"
 // tuner <frequency> <note> <cents>
-#define TUNER_CMD               "tu %f %s %i"
+#define TUNER_CMD                     "tu %f %s %i"
 // tuner on
-#define TUNER_ON_CMD            "tu on"
+#define TUNER_ON_CMD                  "tu on"
 // tuner off
-#define TUNER_OFF_CMD           "tu off"
+#define TUNER_OFF_CMD                 "tu off"
 // tuner_input <input>
-#define TUNER_INPUT_CMD         "tu_i %i"
+#define TUNER_INPUT_CMD               "tu_i %i"
 // resp <status> ...
-#define RESPONSE_CMD            "resp %i ..."
+#define RESPONSE_CMD                  "resp %i ..."
 // reboot in restore mode
-#define RESTORE_CMD             "restore"
+#define RESTORE_CMD                   "restore"
 //new duo x protocol commands
 //get the name of the current pedalboard
-#define PB_NAME_SET_CMD          "s_pbn %s ..."
+#define PB_NAME_SET_CMD               "s_pbn %s ..."
 //set display brightness  <brightness>
-#define BRIGHTNESS_SET_CMD       "s_br %i"
+#define BRIGHTNESS_SET_CMD            "s_br %i"
 //get the current display brightness
-#define BRIGHTNESS_GET_CMD       "g_br"
+#define BRIGHTNESS_GET_CMD            "g_br"
 // set stereo link for the inputs 
-#define SL_IN_SET_CMD            "s_il %i"                      
+#define SL_IN_SET_CMD                 "s_il %i"                      
 // get the current stereo link value for the inputs
-#define SL_IN_GET_CMD            "g_il" 
+#define SL_IN_GET_CMD                 "g_il" 
 // set stereo link for the inputs 
-#define SL_OUT_SET_CMD           "s_ol %i"                       
+#define SL_OUT_SET_CMD                "s_ol %i"                       
 // get the current stereo link value for the inputs
-#define SL_OUT_GET_CMD           "g_ol"
+#define SL_OUT_GET_CMD                "g_ol"
  // mute the audio when tuner is on
-#define TUNER_MUTE_SET_CMD      "s_tum %i"         
+#define TUNER_MUTE_SET_CMD            "s_tum %i"         
 // get the mute status of the tuner
-#define TUNER_MUTE_GET_CMD      "g_tum"          
+#define TUNER_MUTE_GET_CMD            "g_tum"          
 // set exp or cv input  <cv=1/exp=0>
-#define EXPCV_SET_CMD           "s_ex %i"                     
+#define EXPCV_SET_CMD                 "s_ex %i"                     
 // get the current status of the cv/exp port
-#define EXPCV_GET_CMD           "g_ex"
+#define EXPCV_GET_CMD                 "g_ex"
 // set headphone or cv output  <cv=1/hp=0>
-#define HPCV_SET_CMD            "s_hp %i"                     
+#define HPCV_SET_CMD                  "s_hp %i"                     
 // get the current status of the hp/cv port 
-#define HPCV_GET_CMD            "g_hp"                 
+#define HPCV_GET_CMD                  "g_hp"                 
 // set the quick bypass channel
-#define QBP_SET_CMD             "s_qbp %i"     
+#define QBP_SET_CMD                   "s_qbp %i"     
 // get the quick bypass channel
-#define QBP_GET_CMD             "g_qbp"              
+#define QBP_GET_CMD                   "g_qbp"              
 // toggle play status
-#define PLAY_SET_CMD            "s_p %i"       
+#define PLAY_SET_CMD                  "s_p %i"       
 // get play status 
-#define PLAY_GET_CMD            "g_p"        
+#define PLAY_GET_CMD                  "g_p"        
 // set midi clk source <internal = 0, slave = 1, link = 2>   
-#define MIDI_SRC_SET_CMD        "s_cls %i"                             
+#define MIDI_SRC_SET_CMD              "s_cls %i"                             
 // get the midi clk source channel
-#define MIDI_SRC_GET_CMD        "g_cls"
+#define MIDI_SRC_GET_CMD              "g_cls"
 //enable the midi clock <on=1/off=0>
-#define SEND_MIDI_CLK_CMD       "s_mclk %i"  
+#define SEND_MIDI_CLK_CMD             "s_mclk %i"  
 //enable the midi clock <on=1/off=0>
-#define GET_MIDI_CLK_ENABLE_CMD  "g_mclk"   
+#define GET_MIDI_CLK_ENABLE_CMD       "g_mclk"   
 // set midi prog change channnel <channel>
-#define MIDI_PRGCH_SET_CMD      "s_pbc %i"                          
+#define MIDI_PRGCH_SET_CMD            "s_pbc %i"                          
 // get midi prog change channnel 
-#define MIDI_PRGCH_GET_CMD      "g_pbc"
+#define MIDI_PRGCH_GET_CMD            "g_pbc"
 // set midi snapchot change channnel <channel>
-#define MIDI_SNAPSHOT_SET_CMD   "s_ssc %i"                                
+#define MIDI_SNAPSHOT_SET_CMD         "s_ssc %i"                                
 // get midi snapchot change channnel
-#define MIDI_SNAPSHOT_GET_CMD   "g_ssc"
+#define MIDI_SNAPSHOT_GET_CMD         "g_ssc"
 // toggle tempo status
-#define TEMPO_SET_CMD           "s_bpm %i"                       
+#define TEMPO_SET_CMD                 "s_bpm %i"                       
 // get tmpo status 
-#define TEMPO_GET_CMD           "g_bpm"
+#define TEMPO_GET_CMD                 "g_bpm"
 // toggle beats per bar tempo status
-#define BPB_SET_CMD             "s_bpb %i"                        
+#define BPB_SET_CMD                   "s_bpb %i"                        
 // get beats per bar tempo status 
-#define BPB_GET_CMD             "g_bpb"
+#define BPB_GET_CMD                   "g_bpb"
 // toggle bypass
-#define BYPASS_SET_CMD          "s_bp "                        
+#define BYPASS_SET_CMD                "s_bp "                        
 // get bypass status 
-#define BYPASS_GET_CMD          "g_bp "
+#define BYPASS_GET_CMD                "g_bp "
 //get profile data command <int profile>
-#define LOAD_PROFILE_CMD        "r_p %i"
+#define LOAD_PROFILE_CMD              "r_p %i"
 //store the current profile in mod-ui
-#define STORE_PROFILE_CMD        "s_p %i"
+#define STORE_PROFILE_CMD             "s_p %i"
 //get the current profile that is loaded
-#define GET_PROFILE_CMD         "g_p" 
+#define GET_PROFILE_CMD               "g_p" 
 //get master volume link channel
-#define MASTER_VOL_GET_LINK_CMD     "g_mv_c"
+#define MASTER_VOL_GET_LINK_CMD       "g_mv_c"
 //set master volume link channel
-#define MASTER_VOL_SET_LINK_CMD     "s_mv_c %i"
+#define MASTER_VOL_SET_LINK_CMD       "s_mv_c %i"
 //request the next page <page_to_load>
-#define NEXT_PAGE_COMMAND        "lp %i"
+#define NEXT_PAGE_COMMAND             "lp %i"
 //save a snapshot <snapshot_id>
-#define SAVE_SNAPSHOT_COMMAND     "ss %i"
+#define SAVE_SNAPSHOT_COMMAND         "ss %i"
 //load a snapshot <snapshot_id>
-#define LOAD_SNAPSHOT_COMMAND     "sl %i"
+#define LOAD_SNAPSHOT_COMMAND         "sl %i"
 //clear a snapshot <snapshot_id>
-#define CLEAR_SNAPSHOT_COMMAND     "ss_c"
+#define CLEAR_SNAPSHOT_COMMAND        "ss_c"
 //the HMI is ready to boot <current_page> <display_brightness>
-#define BOOT_HMI_CMD               "boot %i %i %s ..."
+#define BOOT_HMI_CMD                  "boot %i %i %s ..."
 //get input cv bias
-#define CV_BIAS_GET_CMD           "g_cvb"
+#define CV_BIAS_GET_CMD               "g_cvb"
 //get input cv bias
-#define CV_BIAS_SET_CMD           "s_cvb %i"
+#define CV_BIAS_SET_CMD               "s_cvb %i"
 //get input EXP mode
-#define EXP_MODE_GET_CMD           "g_exp_m"
+#define EXP_MODE_GET_CMD              "g_exp_m"
 //get input EXP mode
-#define EXP_MODE_SET_CMD           "s_exp_m %i"
+#define EXP_MODE_SET_CMD              "s_exp_m %i"
 
 
 //// Control propertires definitions
