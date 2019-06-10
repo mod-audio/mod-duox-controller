@@ -78,7 +78,7 @@ const char *versions_names[] = {
 */
 float gains_volumes[5] = {};
 uint8_t master_vol_port = 0;
-uint8_t q_bypass = 0;
+// uint8_t q_bypass = 0;
 uint8_t bypass[4] = {};
 //we boot with profile 5, this one doesn't (yet) exist, once there is a valid profile value here we dont need
 //to check it everytime the menu is opened since the profiles can't chang without the MHI
@@ -126,7 +126,7 @@ static void get_item_value(void *data, menu_item_t *item)
         //quick bypass on
         case BP_SELECT_ID:
             item->data.value = atoi(list[2]);
-            q_bypass = item->data.value;
+            // q_bypass = item->data.value;
         break;
         //bypass 1
         case BP1_ID:
@@ -504,7 +504,7 @@ void system_upgrade_cb(void *arg, int event)
             // check if footswitch is pressed down
             if (BUTTON_PRESSED(status))
             {
-                //clear all screens 
+                //clear all screens
                 screen_clear(DISPLAY_LEFT);
                 screen_clear(DISPLAY_RIGHT);
 
@@ -586,9 +586,9 @@ float system_master_volume_cb(float value, int event)
             case 0:
                 float_to_str(value, value_char, sizeof value_char, 1);
                 cli_command("mod-amixer out 0 xvol ", CLI_CACHE_ONLY);
-                cli_command(value_char, CLI_DISCARD_RESPONSE); 
+                cli_command(value_char, CLI_DISCARD_RESPONSE);
             break;
-            
+
 
             case 1:
                 float_to_str(value, value_char, sizeof value_char, 1);
