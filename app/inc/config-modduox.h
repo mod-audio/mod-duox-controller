@@ -194,19 +194,19 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define GUI_DISCONNECTED_CMD    "ui_dis"
 // control_add <hw_id> <label> <control_prop> <unit> <value> <max> <min> <steps> 
 //             [scale_point_count] {[scale_point1_label] [scale_point1_value]}...
-#define CONTROL_ADD_CMD         "control_add %i %s %i %s %f %f %f %i %i ..."
+#define CONTROL_ADD_CMD         "a %i %s %i %s %f %f %f %i %i ..."
 // control_rm <hw_id>
-#define CONTROL_REMOVE_CMD      "control_rm %i ..."
+#define CONTROL_REMOVE_CMD      "rm %i ..."
 // control_get <hw_id> 
-#define CONTROL_GET_CMD         "control_get %i"
+#define CONTROL_GET_CMD         "g %i"
 // control_set <hw_id><value>
-#define CONTROL_SET_CMD         "control_set %i %f"
+#define CONTROL_SET_CMD         "s %i %f"
 // control_next <hw_id>
-#define CONTROL_NEXT_CMD        "control_next %i"
+#define CONTROL_NEXT_CMD        "n %i"
 // control_index_set <hw_id> <current_index> <total_index>
-#define CONTROL_INDEX_SET       "control_set_index %i %i %i"
+#define CONTROL_INDEX_SET       "si %i %i %i"
 // initial_state <current_bank_uid> <current_pedalboard_uid> [current_pedalboards_list]
-#define INITIAL_STATE_CMD       "initial_state %s %s ..."
+#define INITIAL_STATE_CMD       "is %s %s ..."
 // banks
 #define BANKS_CMD               "banks"
 // bank_config <hw_id> <function>
@@ -305,13 +305,13 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 //set master volume link channel
 #define MASTER_VOL_SET_LINK_CMD     "set_mv_channel %i"
 //request the next page <page_to_load>
-#define NEXT_PAGE_COMMAND        "load_page %i"
+#define NEXT_PAGE_COMMAND        "lp %i"
 //save a snapshot <snapshot_id>
-#define SAVE_SNAPSHOT_COMMAND     "snapshot_save %i"
+#define SAVE_SNAPSHOT_COMMAND     "ss %i"
 //load a snapshot <snapshot_id>
-#define LOAD_SNAPSHOT_COMMAND     "snapshot_load %i"
+#define LOAD_SNAPSHOT_COMMAND     "sl %i"
 //clear a snapshot <snapshot_id>
-#define CLEAR_SNAPSHOT_COMMAND     "snapshots_clear"
+#define CLEAR_SNAPSHOT_COMMAND     "ss_c"
 //the HMI is ready to boot <current_page> <display_brightness>
 #define BOOT_HMI_CMD               "boot %i %i %s ..."
 //get input cv bias
