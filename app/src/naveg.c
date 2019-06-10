@@ -825,6 +825,9 @@ static void parse_banks_list(void *data, menu_item_t *item)
     char **list = data;
     uint32_t count = strarr_length(list) - 2;
 
+    // workaround freeze when opening menu
+    delay_ms(20);
+
     // free the current banks list
     if (g_banks)
         data_free_banks_list(g_banks);
@@ -855,6 +858,9 @@ static void parse_pedalboards_list(void *data, menu_item_t *item)
     (void) item;
     char **list = data;
     uint32_t count = strarr_length(list) - 2;
+
+    // workaround freeze when opening menu
+    delay_ms(20);
 
     // free the navigation pedalboads list
     if (g_naveg_pedalboards && (!g_selected_pedalboards || g_selected_pedalboards != g_naveg_pedalboards))
