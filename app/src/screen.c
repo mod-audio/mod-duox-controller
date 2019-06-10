@@ -128,6 +128,13 @@ void screen_pot(uint8_t pot_id, control_t *control)
             knob.orientation = 1;
             glcd_rect_fill(display, 65, knob.y -6, 63, 14 , GLCD_WHITE);
             break;
+        default:
+            // not handled, trigger no assignment
+            control = NULL;
+            knob.x = 0;
+            knob.y = 0;
+            knob.orientation = 0;
+            break;
     }
 
     //no assignment
