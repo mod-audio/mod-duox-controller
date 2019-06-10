@@ -2145,26 +2145,33 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
         //snapshot buttons
         case 4:
         case 6:
-            if (snapshot_loaded[(foot == 6)?1:0] == 1)
+            if (snapshot_loaded[(foot == 6)?1:0] > 0)
             {
-            	if (pressed)
+            	if (pressed == 1)
             	{
                 	ledz_off(hardware_leds(foot), SNAPSHOT_COLOR);
                 	ledz_on(hardware_leds(foot), SNAPSHOT_LOAD_COLOR);
-
-                	char buffer[128];
-                	uint8_t i;
-
-                	i = copy_command(buffer, LOAD_SNAPSHOT_COMMAND);
-
-                	i += int_to_str((foot == 6)?1:0, &buffer[i], sizeof(buffer) - i, 0);
-                    
-                	comm_webgui_send(buffer, i);
                 }
                 else
                	{ 
-                	//ledz_off(hardware_leds(foot), SNAPSHOT_LOAD_COLOR);
-                	ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);
+                    if ( snapshot_loaded[(foot == 6)?1:0] == 1)
+                	{
+                       //ledz_off(hardware_leds(foot), SNAPSHOT_LOAD_COLOR);
+                	   ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);
+
+                        char buffer[128];
+                        uint8_t i;
+
+                        i = copy_command(buffer, LOAD_SNAPSHOT_COMMAND);
+
+                        i += int_to_str((foot == 6)?1:0, &buffer[i], sizeof(buffer) - i, 0);
+                    
+                        comm_webgui_send(buffer, i);
+                    }
+                    else
+                    {
+                        snapshot_loaded[(foot == 6)?1:0] = 1; 
+                    }
             	}
             }
         break;
@@ -2231,7 +2238,7 @@ void naveg_save_snapshot(uint8_t foot)
     i += int_to_str((foot == 6)?1:0, &buffer[i], sizeof(buffer) - i, 0);
                     
     comm_webgui_send(buffer, i);   
-	snapshot_loaded[(foot == 6)?1:0] = 1; 
+	snapshot_loaded[(foot == 6)?1:0] = 2; 
 }
 
 void naveg_clear_snapshot(uint8_t foot)
