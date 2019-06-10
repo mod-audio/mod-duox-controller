@@ -90,7 +90,8 @@ void screen_pot(uint8_t pot_id, control_t *control)
 {
     //select display
     uint8_t display_id = 0;
-    if (pot_id >= 4) display_id = 1;
+    if (pot_id >= 4)
+        display_id = 1;
     glcd_t *display = hardware_glcds(display_id);
 
     //The knobs are all oriented from a single posistion, this posistion is the center pixel of the pot circle
@@ -137,6 +138,8 @@ void screen_pot(uint8_t pot_id, control_t *control)
         text[sizeof(SCREEN_POT_DEFAULT_NAME)-1] = pot_id + '1';
         text[sizeof(SCREEN_POT_DEFAULT_NAME)] = 0;
 
+        const uint8_t text_len = strlen(text);
+
         textbox_t blank_title;
         blank_title.color = GLCD_BLACK;
         blank_title.mode = TEXT_SINGLE_LINE;
@@ -148,7 +151,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         blank_title.left_margin = 0;
         blank_title.right_margin = 0;
         blank_title.text = text;
-        blank_title.x = knob.orientation ? (knob.x - 8 - (strlen(text)*1.5)) : (knob.x + 3 - (strlen(text)*1.5));
+        blank_title.x = knob.orientation ? (knob.x - 8 - (text_len*1.5)) : (knob.x + 3 - (text_len*1.5));
         blank_title.y = knob.y - 3;
         blank_title.align = ALIGN_NONE_NONE;
         widget_textbox(display, &blank_title);
@@ -249,39 +252,40 @@ void screen_pot(uint8_t pot_id, control_t *control)
         value.y = knob.y - 5;
 
         //draws the unit
-        if ((unit_str != NULL) && (strchr(unit_str, '%')==NULL))
+        if (unit_str != NULL)
         {
-            unit.color = GLCD_BLACK;
-            unit.mode = TEXT_SINGLE_LINE;
-            unit.font = SMfont;
-            if (knob.orientation)
-                unit.x =(knob.x + 8);
-            else
-                unit.x = (knob.x - 6 - (strlen(unit_str)*4));
-            unit.y = knob.y + 1;
-            unit.height = 0;
-            unit.width = 0;
-            unit.top_margin = 0;
-            unit.bottom_margin = 0;
-            unit.left_margin = 0;
-            unit.right_margin = 0;
-            unit.text = unit_str;
-            unit.align = ALIGN_NONE_NONE;
-            widget_textbox(display, &unit);
+            if (strchr(unit_str, '%') == NULL)
+            {
+                unit.color = GLCD_BLACK;
+                unit.mode = TEXT_SINGLE_LINE;
+                unit.font = SMfont;
+                if (knob.orientation)
+                    unit.x =(knob.x + 8);
+                else
+                    unit.x = (knob.x - 6 - (strlen(unit_str)*4));
+                unit.y = knob.y + 1;
+                unit.height = 0;
+                unit.width = 0;
+                unit.top_margin = 0;
+                unit.bottom_margin = 0;
+                unit.left_margin = 0;
+                unit.right_margin = 0;
+                unit.text = unit_str;
+                unit.align = ALIGN_NONE_NONE;
+                widget_textbox(display, &unit);
 
-            //writing text clears up to 3 pixels below it (for some add reason TODO)
-            //thats why when there is a unit on one of the bottom pots we need to redraw the devision line
-            // horizontal footer line
-            if (pot_id == 1 || pot_id == 3 || pot_id == 5 || pot_id == 7)
-                glcd_hline(display, 0, 55, DISPLAY_WIDTH, GLCD_BLACK);
-        }
-        //no unit or %, change value posistion
-        else
-        {
-            value.y += 3;
+                //writing text clears up to 3 pixels below it (for some add reason TODO)
+                //thats why when there is a unit on one of the bottom pots we need to redraw the devision line
+                // horizontal footer line
+                if (pot_id == 1 || pot_id == 3 || pot_id == 5 || pot_id == 7)
+                    glcd_hline(display, 0, 55, DISPLAY_WIDTH, GLCD_BLACK);
+            }
             //if unit = %, add it to the value string (if its one of the pots on the left add 4 pixels (1 char))
-            if (strchr(unit_str, '%'))
+            else
+            {
+                value.y += 3;
                 strcat(value_str_bfr, unit_str);
+            }
         }
 
         //value
@@ -610,7 +614,7 @@ void screen_footer(uint8_t id, const char *name, const char *value)
     //vertival footer line
     glcd_vline(display, 64, 56, 8, GLCD_BLACK);
 
-    if (name == NULL && value == NULL)
+    if (name == NULL || value == NULL)
     {
         char text[sizeof(SCREEN_FOOT_DEFAULT_NAME) + 2];
         strcpy(text, SCREEN_FOOT_DEFAULT_NAME);
@@ -893,17 +897,20 @@ void screen_system_menu(menu_item_t *item)
     if (!naveg_is_tool_mode(DISPLAY_TOOL_SYSTEM))
         return;
 
-    static menu_item_t *last_item;
+    static menu_item_t *last_item = NULL;
 
     glcd_t *display;
     if ((item->desc->id == ROOT_ID) || (item->desc->id == DIALOG_ID))
     {
         display = hardware_glcds(DISPLAY_TOOL_SYSTEM);
     }
-    else if (item->desc->id == TUNER_ID) return;
+    else if (item->desc->id == TUNER_ID)
+    {
+        return;
+    }
     else
     {
-      display = hardware_glcds(1);
+        display = hardware_glcds(1);
     }
 
     // clear screen
@@ -922,14 +929,19 @@ void screen_system_menu(menu_item_t *item)
     title_box.width = 0;
     title_box.align = ALIGN_CENTER_TOP;
     title_box.text = item->name;
+
     if ((item->desc->type == MENU_NONE) || (item->desc->type == MENU_TOGGLE))
     {
-        title_box.text = last_item->name;
-        if (title_box.text[strlen(item->name) - 1] == ']') title_box.text = last_item->desc->name;
+        if (last_item)
+        {
+            title_box.text = last_item->name;
+            if (title_box.text[strlen(item->name) - 1] == ']')
+                title_box.text = last_item->desc->name;
+        }
     }
     else if (title_box.text[strlen(item->name) - 1] == ']')
     {
-       title_box.text = item->desc->name;
+        title_box.text = item->desc->name;
     }
     widget_textbox(display, &title_box);
 
@@ -961,22 +973,25 @@ void screen_system_menu(menu_item_t *item)
     {
         case MENU_LIST:
         case MENU_SELECT:
-
             list.hover = item->data.hover;
             list.selected = item->data.selected;
             list.count = item->data.list_count;
             list.list = item->data.list;
             widget_listbox(display, &list);
-            if ((last_item->desc->id != TEMPO_ID)||(item->desc->id == SYSTEM_ID)||(item->desc->id == BYPASS_ID)) last_item = item;
+            if ((last_item && last_item->desc->id != TEMPO_ID) || item->desc->id == SYSTEM_ID || item->desc->id == BYPASS_ID)
+                last_item = item;
             break;
 
         case MENU_CONFIRM:
         case MENU_CONFIRM2:
         case MENU_CANCEL:
         case MENU_OK:
-            if (item->desc->type == MENU_CANCEL) popup.type = CANCEL_ONLY;
-            else if (item->desc->type == MENU_OK) popup.type = OK_ONLY;
-            else popup.type = YES_NO;
+            if (item->desc->type == MENU_CANCEL)
+                popup.type = CANCEL_ONLY;
+            else if (item->desc->type == MENU_OK)
+                popup.type = OK_ONLY;
+            else
+                popup.type = YES_NO;
             popup.title = item->data.popup_header;
             popup.content = item->data.popup_content;
             popup.button_selected = item->data.hover;
@@ -992,7 +1007,7 @@ void screen_system_menu(menu_item_t *item)
                 popup.button_selected = item->data.hover;
                 widget_popup(display, &popup);
             }
-            else
+            else if (last_item)
             {
                 list.hover = last_item->data.hover;
                 list.selected = last_item->data.selected;
@@ -1006,11 +1021,14 @@ void screen_system_menu(menu_item_t *item)
         case MENU_SET:
         case MENU_NONE:
         case MENU_RETURN:
-            list.hover = last_item->data.hover;
-            list.selected = last_item->data.selected;
-            list.count = last_item->data.list_count;
-            list.list = last_item->data.list;
-            widget_listbox(display, &list);
+            if (last_item)
+            {
+                list.hover = last_item->data.hover;
+                list.selected = last_item->data.selected;
+                list.count = last_item->data.list_count;
+                list.list = last_item->data.list;
+                widget_listbox(display, &list);
+            }
             break;
     }
 }
