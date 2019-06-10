@@ -617,7 +617,10 @@ static void boot_cb(proto_t *proto)
 
 static void snapshot_clear_cb(proto_t *proto)
 {
-    naveg_clear_snapshot((atoi(proto->list[1]))?6:4);
+    (void) proto;
+    //we dont care yet about which snapshot, thats why hardcoded
+    naveg_clear_snapshot(6);
+    naveg_clear_snapshot(4);
 }
 
 /*

@@ -311,7 +311,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 //load a snapshot <snapshot_id>
 #define LOAD_SNAPSHOT_COMMAND     "snapshot_load %i"
 //clear a snapshot <snapshot_id>
-#define CLEAR_SNAPSHOT_COMMAND     "snapshot_clear %i"
+#define CLEAR_SNAPSHOT_COMMAND     "snapshots_clear"
 //the HMI is ready to boot <current_page> <display_brightness>
 #define BOOT_HMI_CMD               "boot %i %i %s ..."
 //get input cv bias
