@@ -767,7 +767,7 @@ uint16_t str_to_hex(const char *str, uint8_t *array, uint16_t array_size)
 {
     if (!str || !array) return 0;
 
-    uint8_t i, num[2];
+    uint8_t i, num[2] = { 0, 0 };
     uint16_t count = 0;
     const char *pstr = str;
 
@@ -777,8 +777,10 @@ uint16_t str_to_hex(const char *str, uint8_t *array, uint16_t array_size)
         {
             num[i] = *pstr | 0x20;
 
-            if (num[i] >= '0' && num[i] <= '9') num[i] = (num[i] - '0');
-            else if (num[i] >= 'a' && num[i] <= 'f') num[i] = (num[i] + 10 - 'a');
+            if (num[i] >= '0' && num[i] <= '9')
+                num[i] = (num[i] - '0');
+            else if (num[i] >= 'a' && num[i] <= 'f')
+                num[i] = (num[i] + 10 - 'a');
         }
 
         array[count++] = (num[0] << 4) + num[1];
