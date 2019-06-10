@@ -2215,11 +2215,12 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
     }
 }
 
-void naveg_save_page(uint8_t foot)
+void naveg_save_snapshot(uint8_t foot)
 {
     char buffer[128];
     uint8_t i;
 
+    //if in menu return
     if (display_has_tool_enabled(DISPLAY_LEFT)) return;
 
     i = copy_command(buffer, SAVE_SNAPSHOT_COMMAND);
@@ -2232,6 +2233,13 @@ void naveg_save_page(uint8_t foot)
     comm_webgui_send(buffer, i);   
 	snapshot_loaded[(foot == 6)?1:0] = 1; 
 }
+
+void naveg_clear_snapshot(uint8_t foot)
+{
+    snapshot_loaded[(foot == 6)?1:0] = 0; 
+    ledz_off(hardware_leds(foot), LEDZ_ALL_COLORS);
+}
+
 
 void naveg_toggle_tool(uint8_t tool, uint8_t display)
 {

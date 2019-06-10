@@ -510,6 +510,9 @@ void system_upgrade_cb(void *arg, int event)
                 screen_clear(DISPLAY_LEFT);
                 screen_clear(DISPLAY_RIGHT);
 
+                //we use the value as a flag to not update the screens after this 
+                item->data.value =1;
+
                 // start restore
                 cli_restore(RESTORE_INIT);
             }
