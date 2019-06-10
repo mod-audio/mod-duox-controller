@@ -84,26 +84,28 @@ control_t *data_parse_control(char **data)
     uint8_t properties_mask = 0;
 
     // checks if all data was received
-    if (len >= min_params)
-    {
-        control = (control_t *) MALLOC(sizeof(control_t));
-        if (!control) goto error;
+    if (len < min_params)
+        return NULL;
 
-        // fills the control struct
-        control->hw_id = atoi(data[1]);
-        control->label = str_duplicate(data[2]);
-        properties_mask = atoi(data[3]);
-        control->unit = str_duplicate(data[4]);
-        control->value = atof(data[5]);
-        control->maximum = atof(data[6]);
-        control->minimum = atof(data[7]);
-        control->steps = atoi(data[8]);
-        control->scale_points_count = 0;
-        control->scale_points = NULL;
+    control = (control_t *) MALLOC(sizeof(control_t));
+    if (!control)
+        goto error;
 
-        // checks the memory allocation 
-        if (!control->label || !control->unit) goto error;
-    }
+    // fills the control struct
+    control->hw_id = atoi(data[1]);
+    control->label = str_duplicate(data[2]);
+    properties_mask = atoi(data[3]);
+    control->unit = str_duplicate(data[4]);
+    control->value = atof(data[5]);
+    control->maximum = atof(data[6]);
+    control->minimum = atof(data[7]);
+    control->steps = atoi(data[8]);
+    control->scale_points_count = 0;
+    control->scale_points = NULL;
+
+    // checks the memory allocation
+    if (!control->label || !control->unit)
+        goto error;
 
     control->properties = 0;
     if (CONTROL_PROP_ENUMERATION & properties_mask)
