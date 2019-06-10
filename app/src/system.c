@@ -283,9 +283,10 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
         //PGA (input)
         if (!dir)
         {
-            int gain = MAP(item->data.value, -12, 12, 0, 48)
-            int_to_str(gain, value, sizeof value, 1);
-            cli_command("amixer -q -D hw:DUOX set 'PGA Gain' ", CLI_CACHE_ONLY);
+            float_to_str(item->data.value, value, sizeof value, 1);
+            cli_command("mod-amixer ", CLI_CACHE_ONLY);
+            cli_command("in 0", CLI_CACHE_ONLY);
+            cli_command(" xvol ", CLI_CACHE_ONLY);
             cli_command(value, CLI_DISCARD_RESPONSE);
         }
         //DAC (output)
@@ -585,14 +586,14 @@ float system_master_volume_cb(float value, int event)
         char value_char[8];
         switch(master_vol_port)
         {
-            case 0: {
+            case 0:
                 int gain = MAP(value, -57, -3, 135, 255);
                 int_to_str(gain, value_char, sizeof value_char, 1);
 
                 cli_command("amixer -q -D hw:DUOX set DAC ", CLI_CACHE_ONLY);
-                cli_command(value_char, CLI_DISCARD_RESPONSE);
+                cli_command(value_char, CLI_DISCARD_RESPONSE); 
             break;
-            }
+            
 
             case 1:
                 float_to_str(value, value_char, sizeof value_char, 1);
