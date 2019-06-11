@@ -344,25 +344,25 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
     gains_volumes[item->desc->id - VOLUME_ID] = item->data.value;
 
     char str_bfr[8];
-    float_to_str(item->data.value, str_bfr, sizeof(str_bfr), 1);
+    float value_bfr = MAP(item->data.value, min, max, 0, 100);
+    int_to_str(value_bfr, str_bfr, sizeof(str_bfr), 0);
     strcpy(item->name, item->desc->name);
     uint8_t q;
     uint8_t value_size = strlen(str_bfr);
     uint8_t name_size = strlen(item->name);
-    for (q = 0; q < (31 - name_size - value_size - 2); q++)
+    for (q = 0; q < (31 - name_size - value_size); q++)
     {
         strcat(item->name, " ");
     }
     strcat(item->name, str_bfr);
-    strcat(item->name, "DB");
 
     //if stereo link is on we need to update the other menu item as well
     if ((((event == MENU_EV_UP) || (event == MENU_EV_DOWN)) && (dir ? sl_out : sl_in))&& (item->desc->id != HP_VOLUME))
     {
         if (strchr(source, '1'))
-            naveg_update_gain(DISPLAY_RIGHT, item->desc->id + 1, item->data.value);
+            naveg_update_gain(DISPLAY_RIGHT, item->desc->id + 1, item->data.value, min, max);
         else
-            naveg_update_gain(DISPLAY_RIGHT, item->desc->id - 1, item->data.value);
+            naveg_update_gain(DISPLAY_RIGHT, item->desc->id - 1, item->data.value, min, max);
     }
     naveg_settings_refresh(DISPLAY_RIGHT);
 }
@@ -739,7 +739,7 @@ void system_sl_in_cb (void *arg, int event)
             int_to_str(gain, value, sizeof value, 1);
             cli_command("amixer -q -D hw:DUOX set 'PGA Gain' ", CLI_CACHE_ONLY);
             cli_command(value, CLI_DISCARD_RESPONSE);
-            naveg_update_gain(DISPLAY_RIGHT, IN2_VOLUME, gains_volumes[IN1_VOLUME - VOLUME_ID]);
+            naveg_update_gain(DISPLAY_RIGHT, IN2_VOLUME, gains_volumes[IN1_VOLUME - VOLUME_ID], 0, 78);
         }
     }
     else
@@ -782,7 +782,7 @@ void system_sl_out_cb (void *arg, int event)
             float_to_str(item->data.value, value_bfr, sizeof value_bfr, 1);
             cli_command("mod-amixer out 0 xvol ", CLI_CACHE_ONLY);
             cli_command(value_bfr, CLI_DISCARD_RESPONSE);
-            naveg_update_gain(DISPLAY_RIGHT, OUT2_VOLUME, gains_volumes[OUT1_VOLUME - VOLUME_ID]);
+            naveg_update_gain(DISPLAY_RIGHT, OUT2_VOLUME, gains_volumes[OUT1_VOLUME - VOLUME_ID], -60, 0);
         }
     }
     else

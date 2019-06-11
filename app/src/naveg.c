@@ -1384,7 +1384,7 @@ static void menu_enter(uint8_t display_id)
 
 static void menu_up(uint8_t display_id)
 {
-    menu_item_t *item = (display_id || dialog_active) ? g_current_item : g_current_main_item;
+    menu_item_t *item = (display_id) ? g_current_item : g_current_main_item;
 
     if ((item->desc->type == MENU_VOL) || (item->desc->type == MENU_SET))
     {
@@ -1408,7 +1408,7 @@ static void menu_up(uint8_t display_id)
 
 static void menu_down(uint8_t display_id)
 {
-    menu_item_t *item = (display_id || dialog_active) ? g_current_item : g_current_main_item;
+    menu_item_t *item = (display_id) ? g_current_item : g_current_main_item;
 
     if ((item->desc->type == MENU_VOL) || (item->desc->type == MENU_SET))
     {
@@ -2687,18 +2687,14 @@ void naveg_up(uint8_t display)
            	}
             else if (tool_is_on(DISPLAY_TOOL_SYSTEM))
            	{
-                if (dialog_active) // replace with uxSemaphoreGetCount(g_dialog_sem);
-                {
-                    menu_up(display);
-                    return;
-                }
-           		else if ((g_current_menu == g_menu) || (g_current_item->desc->id == ROOT_ID))
+
+           		if (((g_current_menu == g_menu) || (g_current_item->desc->id == ROOT_ID)) && (dialog_active != 1))
            		{
            			g_current_main_menu = g_current_menu;
            			g_current_main_item = g_current_item;
            		}
            		menu_up(display);
-           		menu_enter(display);
+           		if (dialog_active != 1) menu_enter(display);
            	}
         }
         else if (display == 1)
@@ -2732,18 +2728,13 @@ void naveg_down(uint8_t display)
            	}
             else if (tool_is_on(DISPLAY_TOOL_SYSTEM))
            	{
-                if (dialog_active)
-                {
-                    menu_down(display);
-                    return;
-                }
-           		else if ((g_current_menu == g_menu) || (g_current_item->desc->id == ROOT_ID))
+           		if (((g_current_menu == g_menu) || (g_current_item->desc->id == ROOT_ID)) && (dialog_active != 1))
            		{
            			g_current_main_menu = g_current_menu;
            			g_current_main_item = g_current_item;
            		}
            		menu_down(display);
-           		menu_enter(display);
+           		if (dialog_active != 1) menu_enter(display);
            	}
         }
         else if (display == 1)
@@ -2786,7 +2777,7 @@ void naveg_update(void)
 uint8_t naveg_dialog(const char *msg)
 {
     static node_t *dummy_menu;
-    static menu_desc_t desc = {NULL, MENU_CONFIRM2, DIALOG_ID, DIALOG_ID, NULL, 0};
+    static menu_desc_t desc = {"dialog", MENU_CONFIRM2, DIALOG_ID, DIALOG_ID, NULL, 0};
 
     if (!dummy_menu)
     {
@@ -2795,18 +2786,20 @@ uint8_t naveg_dialog(const char *msg)
         item->data.hover = 0;
         item->data.selected = 0xFF;
         item->data.list_count = 2;
-        item->data.list = NULL;
+        item->data.list = 0;
         item->data.popup_content = msg;
         item->data.popup_header = "selftest";
         item->desc = &desc;
-        item->name = NULL;
+        item->name = "dialog";
         dummy_menu = node_create(item);
     }
 
+
+    display_disable_all_tools(DISPLAY_LEFT);
     tool_on(DISPLAY_TOOL_SYSTEM, DISPLAY_LEFT);
-    g_current_menu = dummy_menu;
-    g_current_item = dummy_menu->data;
-    screen_system_menu(g_current_item);
+    g_current_main_menu = dummy_menu;
+    g_current_main_item = dummy_menu->data;
+    screen_system_menu(g_current_main_item);
 
     dialog_active = 1;
     ledz_on(hardware_leds(0), RED);
@@ -2850,7 +2843,7 @@ void naveg_menu_refresh(uint8_t display_id)
 }
 
 //the menu refresh is to slow for the gains so this one is added that only updates the set value.
-void naveg_update_gain(uint8_t display_id, uint8_t update_id, float value)
+void naveg_update_gain(uint8_t display_id, uint8_t update_id, float value, float min, float max)
 {
     node_t *node = display_id ? g_current_menu : g_current_main_menu;
 
@@ -2866,17 +2859,17 @@ void naveg_update_gain(uint8_t display_id, uint8_t update_id, float value)
             item->data.value = value;
 
             char str_buf[8];
-            float_to_str(value, str_buf, sizeof(str_buf), 1);
+            float value_bfr = MAP(value, min, max, 0, 100);
+            int_to_str(value_bfr, str_buf, sizeof(str_buf), 0);
             strcpy(item->name, item->desc->name);
             uint8_t q;
             uint8_t value_size = strlen(str_buf);
             uint8_t name_size = strlen(item->name);
-            for (q = 0; q < (31 - name_size - value_size - 2); q++)
+            for (q = 0; q < (31 - name_size - value_size); q++)
             {
                 strcat(item->name, " ");
             }
             strcat(item->name, str_buf);
-            strcat(item->name, "DB");
         }
     }
 }
