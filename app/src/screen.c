@@ -587,7 +587,10 @@ void screen_encoder(uint8_t display_id, control_t *control)
 
 void screen_footer(uint8_t id, const char *name, const char *value)
 {
-    glcd_t *display = hardware_glcds((id < 2)?0:1);
+    glcd_t *display = hardware_glcds((id < 2)?DISPLAY_LEFT:DISPLAY_RIGHT);
+
+    //we dont display foots when in fool mode
+    if (naveg_is_tool_mode((id < 2)?DISPLAY_LEFT:DISPLAY_RIGHT)) return;
 
     uint8_t align = 0;
     switch (id)
