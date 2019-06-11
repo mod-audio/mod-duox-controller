@@ -5,9 +5,11 @@ PRJNAME = mod-duox-controller
 # toolchain configuration
 TOOLCHAIN_PREFIX = arm-none-eabi-
 
+ifeq ($(CCC_ANALYZER_OUTPUT_FORMAT),)
 # cpu configuration
 THUMB = -mthumb
 MCU = cortex-m3
+endif
 
 # build configuration
 mod=$(MAKECMDGOALS)
@@ -17,7 +19,7 @@ CPU_SERIE = LPC177x_8x
 endif
 
 # target configuration
-TARGET_ADDR = root@modduo.local
+TARGET_ADDR = root@modduox.local
 
 # project directories
 DEVICE_INC	= ./nxp-lpc
@@ -49,18 +51,26 @@ ALL_OBJ = `find -name "*.o"`
 INC = $(DEVICE_INC) $(CMSIS_INC) $(CDL_INC) $(RTOS_INC) $(DRIVERS_INC) $(APP_INC) $(USB_INC)
 
 # C flags
+ifeq ($(CCC_ANALYZER_OUTPUT_FORMAT),)
 CFLAGS += -mcpu=$(MCU)
-CFLAGS += -Wall -Wextra -Wpointer-arith -Wredundant-decls 
+else
+CFLAGS += -DCCC_ANALYZER -Wshadow -Wno-attributes
+endif
+CFLAGS += -Wall -Wextra -Wpointer-arith -Wredundant-decls
 CFLAGS += -Wa,-adhlns=$(addprefix $(OUT_DIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
 CFLAGS += -MMD -MP -MF $(OUT_DIR)/dep/$(@F).d
 CFLAGS += -I. $(patsubst %,-I%,$(INC))
 CFLAGS += -D$(CPU_SERIE)
-CFLAGS += -O2
+CFLAGS += -Os
 
 # Linker flags
 LDFLAGS = -Wl,-Map=$(OUT_DIR)/$(PRJNAME).map,--cref
+ifeq ($(CCC_ANALYZER_OUTPUT_FORMAT),)
 LDFLAGS += -specs=rdimon.specs
 LDFLAGS += -Wl,--start-group -lgcc -lc -lm -lrdimon -Wl,--end-group
+else
+LDFLAGS += -lm
+endif
 LDFLAGS += -T./link/LPC.ld
 
 # Define programs and commands.
@@ -92,7 +102,11 @@ endif
 #modduo: all
 modduox: all
 
+ifeq ($(CCC_ANALYZER_OUTPUT_FORMAT),)
 build: elf lss sym hex bin
+else
+build: elf
+endif
 
 # output files
 elf: $(OUT_DIR)/$(PRJNAME).elf

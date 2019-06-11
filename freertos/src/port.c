@@ -243,6 +243,7 @@ static void prvTaskExitError( void )
 
 void vPortSVCHandler( void )
 {
+#ifndef CCC_ANALYZER
 	__asm volatile (
 					"	ldr	r3, pxCurrentTCBConst2		\n" /* Restore the context. */
 					"	ldr r1, [r3]					\n" /* Use pxCurrentTCBConst to get the pxCurrentTCB address. */
@@ -258,11 +259,13 @@ void vPortSVCHandler( void )
 					"	.align 2						\n"
 					"pxCurrentTCBConst2: .word pxCurrentTCB				\n"
 				);
+#endif
 }
 /*-----------------------------------------------------------*/
 
 static void prvPortStartFirstTask( void )
 {
+#ifndef CCC_ANALYZER
 	__asm volatile(
 					" ldr r0, =0xE000ED08 	\n" /* Use the NVIC offset register to locate the stack. */
 					" ldr r0, [r0] 			\n"
@@ -275,6 +278,7 @@ static void prvPortStartFirstTask( void )
 					" svc 0					\n" /* System call to start first task. */
 					" nop					\n"
 				);
+#endif
 }
 /*-----------------------------------------------------------*/
 
@@ -369,10 +373,12 @@ void vPortYield( void )
 	/* Set a PendSV to request a context switch. */
 	portNVIC_INT_CTRL_REG = portNVIC_PENDSVSET_BIT;
 
+#ifndef CCC_ANALYZER
 	/* Barriers are normally not required but do ensure the code is completely
 	within the specified behaviour for the architecture. */
 	__asm volatile( "dsb" );
 	__asm volatile( "isb" );
+#endif
 }
 /*-----------------------------------------------------------*/
 
@@ -380,8 +386,10 @@ void vPortEnterCritical( void )
 {
 	portDISABLE_INTERRUPTS();
 	uxCriticalNesting++;
+#ifndef CCC_ANALYZER
 	__asm volatile( "dsb" );
 	__asm volatile( "isb" );
+#endif
 	
 	/* This is not the interrupt safe version of the enter critical function so
 	assert() if it is being called from an interrupt context.  Only API 
@@ -408,6 +416,7 @@ void vPortExitCritical( void )
 
 __attribute__(( naked )) uint32_t ulPortSetInterruptMask( void )
 {
+#ifndef CCC_ANALYZER
 	__asm volatile														\
 	(																	\
 		"	mrs r0, basepri											\n" \
@@ -416,6 +425,7 @@ __attribute__(( naked )) uint32_t ulPortSetInterruptMask( void )
 		"	bx lr													\n" \
 		:: "i" ( configMAX_SYSCALL_INTERRUPT_PRIORITY ) : "r0", "r1"	\
 	);
+#endif
 
 	/* This return will not be reached but is necessary to prevent compiler
 	warnings. */
@@ -425,12 +435,14 @@ __attribute__(( naked )) uint32_t ulPortSetInterruptMask( void )
 
 __attribute__(( naked )) void vPortClearInterruptMask( uint32_t ulNewMaskValue )
 {
+#ifndef CCC_ANALYZER
 	__asm volatile													\
 	(																\
 		"	msr basepri, r0										\n"	\
 		"	bx lr												\n" \
 		:::"r0"														\
 	);
+#endif
 
 	/* Just to avoid compiler warnings. */
 	( void ) ulNewMaskValue;
@@ -441,6 +453,7 @@ void xPortPendSVHandler( void )
 {
 	/* This is a naked function. */
 
+#ifndef CCC_ANALYZER
 	__asm volatile
 	(
 	"	mrs r0, psp							\n"
@@ -471,6 +484,7 @@ void xPortPendSVHandler( void )
 	"pxCurrentTCBConst: .word pxCurrentTCB	\n"
 	::"i"(configMAX_SYSCALL_INTERRUPT_PRIORITY)
 	);
+#endif
 }
 /*-----------------------------------------------------------*/
 

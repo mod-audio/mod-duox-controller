@@ -87,48 +87,56 @@ void screen_clear(uint8_t display_id)
 }
 
 void screen_pot(uint8_t pot_id, control_t *control)
-{   
+{
     //select display
     uint8_t display_id = 0;
-    if (pot_id >= 4) display_id = 1;
+    if (pot_id >= 4)
+        display_id = 1;
     glcd_t *display = hardware_glcds(display_id);
 
     //The knobs are all oriented from a single posistion, this posistion is the center pixel of the pot circle
-    //the knob posistion is used to know if the knob is oriented to the left or right of the screen. 
+    //the knob posistion is used to know if the knob is oriented to the left or right of the screen.
     //The left knobs clear one more pixel in the X posistion that does not get inverted, this is our white middle line in the display
     knob_t knob;
     switch(pot_id)
     {
         case 0:
         case 4:
-            knob.x = 29;              
-            knob.y = 32; 
+            knob.x = 29;
+            knob.y = 32;
             knob.orientation = 0;
             glcd_rect_fill(display, 0, knob.y -7, 65, 16, GLCD_WHITE);
-            break;  
+            break;
         case 1:
         case 5:
-            knob.x = 29;             
+            knob.x = 29;
             knob.y = 47;
             knob.orientation = 0;
             glcd_rect_fill(display, 0, knob.y -6, 65, 14, GLCD_WHITE);
             break;
         case 2:
         case 6:
-            knob.x = 100;            
+            knob.x = 100;
             knob.y = 32;
             knob.orientation = 1;
             glcd_rect_fill(display, 65, knob.y -7, 63, 16 , GLCD_WHITE);
             break;
         case 3:
         case 7:
-            knob.x = 100;             
-            knob.y = 47; 
+            knob.x = 100;
+            knob.y = 47;
             knob.orientation = 1;
             glcd_rect_fill(display, 65, knob.y -6, 63, 14 , GLCD_WHITE);
             break;
+        default:
+            // not handled, trigger no assignment
+            control = NULL;
+            knob.x = 0;
+            knob.y = 0;
+            knob.orientation = 0;
+            break;
     }
-    
+
     //no assignment
     if (!control)
     {
@@ -136,6 +144,8 @@ void screen_pot(uint8_t pot_id, control_t *control)
         strcpy(text, SCREEN_POT_DEFAULT_NAME);
         text[sizeof(SCREEN_POT_DEFAULT_NAME)-1] = pot_id + '1';
         text[sizeof(SCREEN_POT_DEFAULT_NAME)] = 0;
+
+        const uint8_t text_len = strlen(text);
 
         textbox_t blank_title;
         blank_title.color = GLCD_BLACK;
@@ -148,7 +158,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         blank_title.left_margin = 0;
         blank_title.right_margin = 0;
         blank_title.text = text;
-        blank_title.x = knob.orientation ? (knob.x - 8 - (strlen(text)*1.5)) : (knob.x + 3 - (strlen(text)*1.5));
+        blank_title.x = knob.orientation ? (knob.x - 8 - (text_len*1.5)) : (knob.x + 3 - (text_len*1.5));
         blank_title.y = knob.y - 3;
         blank_title.align = ALIGN_NONE_NONE;
         widget_textbox(display, &blank_title);
@@ -184,14 +194,14 @@ void screen_pot(uint8_t pot_id, control_t *control)
         {
             float_to_str((control->value), value_str, sizeof(value_str), 1);
         }
-        //if the value becomes less then 0 we change to 1 or 0 decimals 
+        //if the value becomes less then 0 we change to 1 or 0 decimals
         else if (control->value < 0)
         {
-            if (control->value > -99.9) 
+            if (control->value > -99.9)
             {
                 float_to_str(control->value, value_str, sizeof(value_str), 1);
             }
-            else if (control->value < -9999.9) 
+            else if (control->value < -9999.9)
             {
                 int_to_str((control->value/1000), value_str, sizeof(value_str), 0);
                 strcat(value_str, "K");
@@ -214,7 +224,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
 
         //convert unit
         const char *unit_str;
-        unit_str = (strcmp(control->unit, "") == 0 ? NULL : control->unit); 
+        unit_str = (strcmp(control->unit, "") == 0 ? NULL : control->unit);
 
         //knob
         knob.color = GLCD_BLACK;
@@ -244,44 +254,45 @@ void screen_pot(uint8_t pot_id, control_t *control)
         widget_textbox(display, &title);
 
         FREE(title_str_bfr);
-    
+
         //sets the value y, for both value as unit
         value.y = knob.y - 5;
-        
-        //draws the unit
-        if ((unit_str != NULL) && (strchr(unit_str, '%')==NULL))
-        {
-            unit.color = GLCD_BLACK;
-            unit.mode = TEXT_SINGLE_LINE;
-            unit.font = SMfont;
-            if (knob.orientation)
-                unit.x =(knob.x + 8);
-            else
-                unit.x = (knob.x - 6 - (strlen(unit_str)*4));
-            unit.y = knob.y + 1;
-            unit.height = 0;
-            unit.width = 0;
-            unit.top_margin = 0;
-            unit.bottom_margin = 0;
-            unit.left_margin = 0;
-            unit.right_margin = 0;
-            unit.text = unit_str;
-            unit.align = ALIGN_NONE_NONE;
-            widget_textbox(display, &unit);
 
-            //writing text clears up to 3 pixels below it (for some add reason TODO)
-            //thats why when there is a unit on one of the bottom pots we need to redraw the devision line
-            // horizontal footer line
-            if (pot_id == 1 || pot_id == 3 || pot_id == 5 || pot_id == 7)
-                glcd_hline(display, 0, 55, DISPLAY_WIDTH, GLCD_BLACK);
-        }
-        //no unit or %, change value posistion
-        else 
+        //draws the unit
+        if (unit_str != NULL)
         {
-            value.y += 3; 
-            //if unit = %, add it to the value string (if its one of the pots on the left add 4 pixels (1 char)) 
-            if (strchr(unit_str, '%'))
+            if (strchr(unit_str, '%') == NULL)
+            {
+                unit.color = GLCD_BLACK;
+                unit.mode = TEXT_SINGLE_LINE;
+                unit.font = SMfont;
+                if (knob.orientation)
+                    unit.x =(knob.x + 8);
+                else
+                    unit.x = (knob.x - 6 - (strlen(unit_str)*4));
+                unit.y = knob.y + 1;
+                unit.height = 0;
+                unit.width = 0;
+                unit.top_margin = 0;
+                unit.bottom_margin = 0;
+                unit.left_margin = 0;
+                unit.right_margin = 0;
+                unit.text = unit_str;
+                unit.align = ALIGN_NONE_NONE;
+                widget_textbox(display, &unit);
+
+                //writing text clears up to 3 pixels below it (for some add reason TODO)
+                //thats why when there is a unit on one of the bottom pots we need to redraw the devision line
+                // horizontal footer line
+                if (pot_id == 1 || pot_id == 3 || pot_id == 5 || pot_id == 7)
+                    glcd_hline(display, 0, 55, DISPLAY_WIDTH, GLCD_BLACK);
+            }
+            //if unit = %, add it to the value string (if its one of the pots on the left add 4 pixels (1 char))
+            else
+            {
+                value.y += 3;
                 strcat(value_str_bfr, unit_str);
+            }
         }
 
         //value
@@ -303,7 +314,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         widget_textbox(display, &value);
         FREE (value_str_bfr);
     }
-    
+
     //invert the pot area
     switch(pot_id)
     {
@@ -353,7 +364,7 @@ static void null_screen_encoded(glcd_t *display, uint8_t display_id)
 }
 
 void screen_encoder(uint8_t display_id, control_t *control)
-{  
+{
     glcd_t *display = hardware_glcds(display_id);
     glcd_rect_fill(display, 0, 8, DISPLAY_WIDTH, 16, GLCD_WHITE);
 
@@ -397,11 +408,11 @@ void screen_encoder(uint8_t display_id, control_t *control)
         //if the value becomes less then 0 we change to 1 or 0 decimals
         else if (control->value < 0)
         {
-            if (control->value > -99.9) 
+            if (control->value > -99.9)
             {
                 float_to_str(control->value, value_str, sizeof(value_str), 1);
             }
-            else if (control->value < -9999.9) 
+            else if (control->value < -9999.9)
             {
                 int_to_str((control->value/1000), value_str, sizeof(value_str), 0);
                 strcat(value_str, "K");
@@ -421,7 +432,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
 
         //convert unit
         const char *unit_str;
-        unit_str = (strcmp(control->unit, "") == 0 ? NULL : control->unit); 
+        unit_str = (strcmp(control->unit, "") == 0 ? NULL : control->unit);
 
         //title:
         title.color = GLCD_BLACK;
@@ -440,7 +451,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
         widget_textbox(display, &title);
 
         FREE(title_str_bfr);
-    
+
         //adds the unit to the value
         if (unit_str != NULL)
         {
@@ -480,7 +491,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
         volume_bar.height = 5;
         volume_bar.step = control->step;
         volume_bar.steps = control->steps - 1;
-        widget_bar_indicator(display, &volume_bar); 
+        widget_bar_indicator(display, &volume_bar);
     }
 
     // integer type control
@@ -610,13 +621,13 @@ void screen_footer(uint8_t id, const char *name, const char *value)
     //vertival footer line
     glcd_vline(display, 64, 56, 8, GLCD_BLACK);
 
-    if (name == NULL && value == NULL)
+    if (name == NULL || value == NULL)
     {
         char text[sizeof(SCREEN_FOOT_DEFAULT_NAME) + 2];
         strcpy(text, SCREEN_FOOT_DEFAULT_NAME);
         text[sizeof(SCREEN_FOOT_DEFAULT_NAME)-1] = (id + '1');
         text[sizeof(SCREEN_FOOT_DEFAULT_NAME)] = 0;
-     
+
         textbox_t title;
         title.color = GLCD_BLACK;
         title.mode = TEXT_SINGLE_LINE;
@@ -654,7 +665,7 @@ void screen_footer(uint8_t id, const char *name, const char *value)
         footer.text = title_str_bfr;
         footer.y = 0;
         footer.align = align ? ALIGN_RCENTER_BOTTOM : ALIGN_LCENTER_BOTTOM;
-        widget_textbox(display, &footer);  
+        widget_textbox(display, &footer);
         FREE(title_str_bfr);
 
         if (value[1] == 'N')
@@ -666,7 +677,7 @@ void screen_footer(uint8_t id, const char *name, const char *value)
         }
         return;
     }
-    //other footers 
+    //other footers
     else
     {
         uint8_t char_cnt_name = strlen(name);
@@ -711,7 +722,7 @@ void screen_footer(uint8_t id, const char *name, const char *value)
         footer.text = title_str_bfr;
         footer.y = 0;
         footer.align = align ? ALIGN_RLEFT_BOTTOM : ALIGN_LEFT_BOTTOM;
-        widget_textbox(display, &footer);  
+        widget_textbox(display, &footer);
         FREE(title_str_bfr);
 
         // draws the value field
@@ -721,9 +732,9 @@ void screen_footer(uint8_t id, const char *name, const char *value)
         value_str_bfr[char_cnt_value] =  '\0';
         footer.text = value_str_bfr;
         footer.align = align ? ALIGN_RIGHT_BOTTOM : ALIGN_LRIGHT_BOTTOM;
-        widget_textbox(display, &footer); 
+        widget_textbox(display, &footer);
         FREE(value_str_bfr);
-    } 
+    }
 }
 
 void screen_top_info(const void *data, uint8_t update)
@@ -806,11 +817,16 @@ void screen_tool(uint8_t tool, uint8_t display_id)
 
         case DISPLAY_TOOL_NAVIG:
             bp_list = naveg_get_banks();
+            /*
             if (bp_list && bp_list->selected == 0)
+            {
                 bp_list->selected = 1;
-            //if we already have a bank selected we enter that bank automaticly 
+                bp_list->hover = 1;
+            }
+            */
+            //if we already have a bank selected we enter that bank automaticly
             /*else {
-                bp_list->hover = bp_list->selected; 
+                bp_list->hover = bp_list->selected;
                 naveg_enter(1);
                 return;
                 }*/
@@ -893,22 +909,25 @@ void screen_system_menu(menu_item_t *item)
     if (!naveg_is_tool_mode(DISPLAY_TOOL_SYSTEM))
         return;
 
-    static menu_item_t *last_item;
+    static menu_item_t *last_item = NULL;
 
     glcd_t *display;
     if ((item->desc->id == ROOT_ID) || (item->desc->id == DIALOG_ID))
-    {    
+    {
         display = hardware_glcds(DISPLAY_TOOL_SYSTEM);
     }
-    else if (item->desc->id == TUNER_ID) return;
+    else if (item->desc->id == TUNER_ID)
+    {
+        return;
+    }
     else
     {
-      display = hardware_glcds(1);  
+        display = hardware_glcds(1);
     }
 
     // clear screen
     glcd_clear(display, GLCD_WHITE);
-  
+
     // draws the title
     textbox_t title_box;
     title_box.color = GLCD_BLACK;
@@ -922,17 +941,22 @@ void screen_system_menu(menu_item_t *item)
     title_box.width = 0;
     title_box.align = ALIGN_CENTER_TOP;
     title_box.text = item->name;
+
     if ((item->desc->type == MENU_NONE) || (item->desc->type == MENU_TOGGLE))
     {
-        title_box.text = last_item->name;
-        if (title_box.text[strlen(item->name) - 1] == ']') title_box.text = last_item->desc->name; 
+        if (last_item)
+        {
+            title_box.text = last_item->name;
+            if (title_box.text[strlen(item->name) - 1] == ']')
+                title_box.text = last_item->desc->name;
+        }
     }
     else if (title_box.text[strlen(item->name) - 1] == ']')
-    {   
-       title_box.text = item->desc->name;
+    {
+        title_box.text = item->desc->name;
     }
     widget_textbox(display, &title_box);
-    
+
     // title line separator
     glcd_hline(display, 0, 9, DISPLAY_WIDTH, GLCD_BLACK_WHITE);
     glcd_hline(display, 0, 10, DISPLAY_WIDTH, GLCD_WHITE);
@@ -961,22 +985,25 @@ void screen_system_menu(menu_item_t *item)
     {
         case MENU_LIST:
         case MENU_SELECT:
-       
             list.hover = item->data.hover;
             list.selected = item->data.selected;
             list.count = item->data.list_count;
             list.list = item->data.list;
             widget_listbox(display, &list);
-            if ((last_item->desc->id != TEMPO_ID)||(item->desc->id == SYSTEM_ID)||(item->desc->id == BYPASS_ID)) last_item = item;
+            if ((last_item && last_item->desc->id != TEMPO_ID) || item->desc->id == SYSTEM_ID || item->desc->id == BYPASS_ID)
+                last_item = item;
             break;
 
         case MENU_CONFIRM:
         case MENU_CONFIRM2:
         case MENU_CANCEL:
         case MENU_OK:
-            if (item->desc->type == MENU_CANCEL) popup.type = CANCEL_ONLY;
-            else if (item->desc->type == MENU_OK) popup.type = OK_ONLY;
-            else popup.type = YES_NO;
+            if (item->desc->type == MENU_CANCEL)
+                popup.type = CANCEL_ONLY;
+            else if (item->desc->type == MENU_OK)
+                popup.type = OK_ONLY;
+            else
+                popup.type = YES_NO;
             popup.title = item->data.popup_header;
             popup.content = item->data.popup_content;
             popup.button_selected = item->data.hover;
@@ -985,14 +1012,14 @@ void screen_system_menu(menu_item_t *item)
 
         case MENU_TOGGLE:
             if (item->desc->parent_id == PROFILES_ID ||  item->desc->id == EXP_CV_INP || item->desc->id == HP_CV_OUTP)
-            {    
+            {
                 popup.type = YES_NO;
                 popup.title = item->data.popup_header;
                 popup.content = item->data.popup_content;
                 popup.button_selected = item->data.hover;
                 widget_popup(display, &popup);
             }
-            else 
+            else if (last_item)
             {
                 list.hover = last_item->data.hover;
                 list.selected = last_item->data.selected;
@@ -1006,11 +1033,14 @@ void screen_system_menu(menu_item_t *item)
         case MENU_SET:
         case MENU_NONE:
         case MENU_RETURN:
-            list.hover = last_item->data.hover;
-            list.selected = last_item->data.selected;
-            list.count = last_item->data.list_count;
-            list.list = last_item->data.list;
-            widget_listbox(display, &list);
+            if (last_item)
+            {
+                list.hover = last_item->data.hover;
+                list.selected = last_item->data.selected;
+                list.count = last_item->data.list_count;
+                list.list = last_item->data.list;
+                widget_listbox(display, &list);
+            }
             break;
     }
 }
@@ -1050,7 +1080,7 @@ void screen_master_vol(int8_t volume_val)
     strcat(name, str_buf);
 
     glcd_t *display = hardware_glcds(1);
-    
+
     // clear the name area
     glcd_rect_fill(display, 0, 0, DISPLAY_WIDTH, 7, GLCD_WHITE);
 
@@ -1077,7 +1107,7 @@ void screen_master_vol(int8_t volume_val)
     volume_bar.height = 5;
     volume_bar.step = volume_val;
     volume_bar.steps = 100;
-    widget_bar_indicator(display, &volume_bar); 
+    widget_bar_indicator(display, &volume_bar);
 
     // horizontal line
     glcd_hline(display, 0, 7, DISPLAY_WIDTH, GLCD_BLACK);

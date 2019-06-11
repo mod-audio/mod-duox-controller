@@ -286,20 +286,20 @@ void actuator_enable_event(void *actuator, uint8_t events_flags)
 }
 
 
-void actuator_set_event(void *actuator, void (*event)(void *actuator))
+void actuator_set_event(void *actuator, void (*act_event)(void *actuator))
 {
     switch (ACTUATOR_TYPE(actuator))
     {
         case BUTTON:
-            ((button_t *)actuator)->event = event;
+            ((button_t *)actuator)->event = act_event;
             break;
 
         case ROTARY_ENCODER:
-            ((encoder_t *)actuator)->event = event;
+            ((encoder_t *)actuator)->event = act_event;
             break;
 
         case POT:
-            ((pot_t *)actuator)->event = event;
+            ((pot_t *)actuator)->event = act_event;
             break;
     }
 }
@@ -642,7 +642,7 @@ void actuators_clock(void)
                     current_value[pot->id] = k * tmp + (1.0 - k) * current_value[pot->id];
                     uint16_t val = current_value[pot->id];
 
-                    //if turned and difference is suficiant 
+                    //if turned and difference is suficiant
                     if ((val > pot->value) ? ((val - pot->value) > POT_THRESHOLD) : ((pot->value - val) > POT_THRESHOLD))
                     {
                             pot->value = val;
