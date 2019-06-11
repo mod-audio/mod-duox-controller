@@ -81,7 +81,7 @@ uint8_t master_vol_port = 0;
 // uint8_t q_bypass = 0;
 uint8_t bypass[4] = {};
 //we boot with profile 5, this one doesn't (yet) exist, once there is a valid profile value here we dont need
-//to check it everytime the menu is opened since the profiles can't chang without the MHI
+//to check it everytime the menu is opened since the profiles can't change without the MHI
 uint8_t current_profile = 5;
 uint8_t sl_out, sl_in;
 /*
@@ -350,11 +350,12 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
     uint8_t q;
     uint8_t value_size = strlen(str_bfr);
     uint8_t name_size = strlen(item->name);
-    for (q = 0; q < (31 - name_size - value_size); q++)
+    for (q = 0; q < (31 - name_size - value_size - 1); q++)
     {
         strcat(item->name, " ");
     }
     strcat(item->name, str_bfr);
+    strcat(item->name, "%");
 
     //if stereo link is on we need to update the other menu item as well
     if ((((event == MENU_EV_UP) || (event == MENU_EV_DOWN)) && (dir ? sl_out : sl_in))&& (item->desc->id != HP_VOLUME))
@@ -626,9 +627,12 @@ void system_master_vol_link_cb(void *arg, int event)
             master_vol_port = 0;
 
         set_item_value(MASTER_VOL_SET_LINK_CMD, master_vol_port);
+        item->data.value = master_vol_port;
     }
-
-    request_item_value(MASTER_VOL_GET_LINK_CMD, item);
+    else 
+    {
+        request_item_value(MASTER_VOL_GET_LINK_CMD, item);
+    }
 
     char str_bfr[4];
     switch (master_vol_port)
@@ -637,12 +641,16 @@ void system_master_vol_link_cb(void *arg, int event)
             if (event == MENU_EV_ENTER)
             {
                 //turn on stereo link and sync gains
-                set_item_value(SL_OUT_SET_CMD, 1);
-                char value[8];
-                cli_command("mod-amixer out 2 xvol ", CLI_CACHE_ONLY);
-                gains_volumes[OUT2_VOLUME - VOLUME_ID] = gains_volumes[OUT1_VOLUME - VOLUME_ID];
-                float_to_str(gains_volumes[OUT2_VOLUME - VOLUME_ID], value, sizeof value, 1);
-                cli_command(value, CLI_DISCARD_RESPONSE);
+                if (!sl_out)
+                {
+                    sl_out = 1;
+                    set_item_value(SL_OUT_SET_CMD, 1);
+                    char value[8];
+                    cli_command("mod-amixer out 2 xvol ", CLI_CACHE_ONLY);
+                    gains_volumes[OUT2_VOLUME - VOLUME_ID] = gains_volumes[OUT1_VOLUME - VOLUME_ID];
+                    float_to_str(gains_volumes[OUT2_VOLUME - VOLUME_ID], value, sizeof value, 1);
+                    cli_command(value, CLI_DISCARD_RESPONSE);
+                }
             }
             strcpy(str_bfr,"1&2");
         break;

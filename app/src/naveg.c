@@ -2865,11 +2865,12 @@ void naveg_update_gain(uint8_t display_id, uint8_t update_id, float value, float
             uint8_t q;
             uint8_t value_size = strlen(str_buf);
             uint8_t name_size = strlen(item->name);
-            for (q = 0; q < (31 - name_size - value_size); q++)
+            for (q = 0; q < (31 - name_size - value_size - 1); q++)
             {
                 strcat(item->name, " ");
             }
             strcat(item->name, str_buf);
+            strcat(item->name, "%");
         }
     }
 }
