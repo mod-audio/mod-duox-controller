@@ -14,6 +14,7 @@
 #include "comm.h"
 #include "FreeRTOS.h"
 #include "semphr.h"
+#include "actuator.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -34,6 +35,8 @@ enum {BANKS_LIST, PEDALBOARD_LIST};
 
 #define MAX_CHARS_MENU_NAME     (128/4)
 #define MAX_TOOLS               5
+
+#define DIALOG_MAX_SEM_COUNT   1
 
 /*
 ************************************************************************************************************************
@@ -91,7 +94,7 @@ static bank_config_t g_bank_functions[BANK_FUNC_AMOUNT];
 static uint8_t g_initialized, g_ui_connected;
 static void (*g_update_cb)(void *data, int event);
 static void *g_update_data;
-static volatile xSemaphoreHandle g_dialog_sem;
+static volatile xSemaphoreHandle g_dialog_sem = NULL;
 static uint8_t dialog_active = 0;
 static float master_vol_value;
 static uint8_t snapshot_loaded[2] = {};
@@ -161,8 +164,8 @@ static int get_display_by_id(uint8_t id, uint8_t type)
         else
             return 0;
     }
-
-    return 2;
+    //error
+    return 0;
 }
 
 static void display_disable_all_tools(uint8_t display)
@@ -239,7 +242,6 @@ static control_t *search_encoder(uint8_t hw_id, uint8_t *display)
             }
         }
     }
-
     return NULL;
 }
 
@@ -360,20 +362,6 @@ static void display_encoder_rm(uint8_t hw_id)
     {
         screen_encoder(display, NULL);
     }
-
-    //if remove all controls, not implemented atm TODO
-    /*for (display = 0; display < SLOTS_COUNT; display++)
-    {
-        control = g_controls[display];
-
-        if (control->hw_id == hw_id)
-        {
-            data_free_control(control);
-            g_controls[display] = NULL;
-
-            if (!display_has_tool_enabled(display)) screen_control(display, NULL);
-        }
-    }*/
 }
 
 // control assigned to display
@@ -714,7 +702,7 @@ static void control_set(uint8_t id, control_t *control)
                 if (!display_has_tool_enabled(id))
                     screen_encoder(id, control);
             }
-            else if ( (ENCODERS_COUNT + FOOTSWITCHES_ACTUATOR_COUNT < control->hw_id) && (control->hw_id < TOTAL_ACTUATORS))
+            else if ( (ENCODERS_COUNT + FOOTSWITCHES_ACTUATOR_COUNT <= control->hw_id) && (control->hw_id < TOTAL_ACTUATORS))
             {
                 if (!display_has_tool_enabled(get_display_by_id(id, POTENTIOMETER)))
                 {
@@ -1376,9 +1364,13 @@ static void menu_enter(uint8_t display_id)
 
     if (item->desc->type == MENU_CONFIRM2)
     {
-        portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
         dialog_active = 0;
+        portBASE_TYPE xHigherPriorityTaskWoken;
+        xHigherPriorityTaskWoken = pdFALSE;
         xSemaphoreGiveFromISR(g_dialog_sem, &xHigherPriorityTaskWoken);
+        portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+        //portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+        //xSemaphoreGiveFromISR(g_dialog_sem, &xHigherPriorityTaskWoken);
     }
 }
 
@@ -1712,8 +1704,9 @@ void naveg_init(void)
 
     g_initialized = 1;
 
-    vSemaphoreCreateBinary(g_dialog_sem);
-    xSemaphoreTake(g_dialog_sem, 0);
+    //vSemaphoreCreateBinary(g_dialog_sem);
+    //xSemaphoreTake(g_dialog_sem, 0);
+    g_dialog_sem = xSemaphoreCreateCounting(DIALOG_MAX_SEM_COUNT, 0);
 }
 
 void naveg_initial_state(char *bank_uid, char *pedalboard_uid, char **pedalboards_list)
@@ -2756,7 +2749,7 @@ void naveg_reset_menu(void)
     g_current_menu = g_menu;
     g_current_item = g_menu->first_child->data;
     g_current_main_menu = g_menu;
-    g_current_item = g_menu->first_child->data;
+    g_current_main_item = g_menu->first_child->data;
     reset_menu_hover(g_menu);
 }
 
@@ -2776,9 +2769,11 @@ void naveg_update(void)
 
 uint8_t naveg_dialog(const char *msg)
 {
-    static node_t *dummy_menu;
-    static menu_desc_t desc = {"dialog", MENU_CONFIRM2, DIALOG_ID, DIALOG_ID, NULL, 0};
+    static node_t *dummy_menu = NULL;
+    static menu_desc_t desc = {NULL, MENU_CONFIRM2, DIALOG_ID, DIALOG_ID, NULL, 0};
 
+    ledz_on(hardware_leds(2), RED);
+    
     if (!dummy_menu)
     {
         menu_item_t *item;
@@ -2786,14 +2781,13 @@ uint8_t naveg_dialog(const char *msg)
         item->data.hover = 0;
         item->data.selected = 0xFF;
         item->data.list_count = 2;
-        item->data.list = 0;
+        item->data.list = (char **) MALLOC(item->data.list_count * sizeof(char *));;
         item->data.popup_content = msg;
         item->data.popup_header = "selftest";
         item->desc = &desc;
-        item->name = "dialog";
+        item->name = NULL;
         dummy_menu = node_create(item);
     }
-
 
     display_disable_all_tools(DISPLAY_LEFT);
     tool_on(DISPLAY_TOOL_SYSTEM, DISPLAY_LEFT);
@@ -2807,7 +2801,8 @@ uint8_t naveg_dialog(const char *msg)
     ledz_on(hardware_leds(0), GREEN);
 
     naveg_toggle_tool(DISPLAY_TOOL_SYSTEM, DISPLAY_TOOL_SYSTEM);
-    return g_current_item->data.hover;
+
+    return g_current_main_item->data.hover;
 }
 
 uint8_t naveg_ui_status(void)

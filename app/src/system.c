@@ -699,17 +699,18 @@ void system_display_cb(void *arg, int event)
 {
     menu_item_t *item = arg;
 
-    static int level = 2;
-
+    if(event == MENU_EV_NONE)
+    {
+        request_item_value(BRIGHTNESS_GET_CMD, item);
+    }
     if (event == MENU_EV_ENTER)
     {
-        if (++level > MAX_BRIGHTNESS)
-            level = 0;
+        if (item->data.value > MAX_BRIGHTNESS)
+            item->data.value  = 0;
 
-        hardware_glcd_brightness(level);
+        hardware_glcd_brightness(item->data.value); 
+        set_item_value(BRIGHTNESS_SET_CMD, item->data.value);
     }
-
-    item->data.value = level;
 
     char str_buf[8];
     int_to_str((item->data.value * 25), str_buf, sizeof(str_buf), 0);
@@ -1191,6 +1192,7 @@ void system_bypass_cb (void *arg, int event)
                 item->data.value = 1;
                 bypass[item->desc->id - (BYPASS_ID + 1)] = item->data.value;
             }
+            set_item_value(QBP_SET_CMD, item->data.value);
         }
         //toggle normal bypass
         else
@@ -1237,6 +1239,12 @@ void system_bypass_cb (void *arg, int event)
                 item->data.value = 0;
                 bypass[item->desc->id - (BYPASS_ID + 1)] = item->data.value;
             }
+        }
+        //quick bypass
+        else 
+        {
+            request_item_value(QBP_GET_CMD, item);
+            bypass[3] = item->data.value;
         }
     }
 

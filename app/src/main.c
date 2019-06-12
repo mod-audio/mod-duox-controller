@@ -370,7 +370,7 @@ static void setup_task(void *pvParameters)
     g_actuators_queue = xQueueCreate(ACTUATORS_QUEUE_SIZE, sizeof(uint8_t *));
 
     // create the tasks
-    xTaskCreate(procotol_task, TASK_NAME("proto"), 512, NULL, 4, NULL);
+    xTaskCreate(procotol_task, TASK_NAME("pro"), 512, NULL, 4, NULL);
     xTaskCreate(actuators_task, TASK_NAME("act"), 256, NULL, 3, NULL);
     xTaskCreate(cli_task, TASK_NAME("cli"), 128, NULL, 2, NULL);
     xTaskCreate(displays_task, TASK_NAME("disp"), 128, NULL, 1, NULL);
@@ -659,6 +659,13 @@ void UsageFault_Handler(void)
 void vApplicationMallocFailedHook(void)
 {
     ledz_on(hardware_leds(4), CYAN);
+    while (1);
+}
+
+void vApplicationIdleHook(void)
+{
+    //should not reach here, however this should also not include the while(1)
+    ledz_on(hardware_leds(6), CYAN);
     while (1);
 }
 

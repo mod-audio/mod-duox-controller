@@ -110,14 +110,14 @@
 #define configUSE_ALTERNATIVE_API           0
 #define configUSE_RECURSIVE_MUTEXES         0
 #define configQUEUE_REGISTRY_SIZE           10
-#define configUSE_QUEUE_SETS                1
-#define configUSE_TIME_SLICING              1
-#define configUSE_NEWLIB_REENTRANT          1
+#define configUSE_QUEUE_SETS                0
+#define configUSE_TIME_SLICING              0
+#define configUSE_NEWLIB_REENTRANT          0
 
 /* Hook function related definitions. */
-#define configUSE_IDLE_HOOK                 0
+#define configUSE_IDLE_HOOK                 1
 #define configUSE_TICK_HOOK                 0
-#define configCHECK_FOR_STACK_OVERFLOW      0
+#define configCHECK_FOR_STACK_OVERFLOW      1
 #define configUSE_MALLOC_FAILED_HOOK        1
 
 /* Run time and task stats gathering related definitions. */
@@ -145,7 +145,7 @@
 #define INCLUDE_vTaskDelay                      1
 #define INCLUDE_uxTaskGetStackHighWaterMark     0
 #define INCLUDE_xTaskGetSchedulerState          0
-#define INCLUDE_xTaskGetCurrentTaskHandle       0
+#define INCLUDE_xTaskGetCurrentTaskHandle       1//
 #define INCLUDE_xTaskGetIdleTaskHandle          0
 #define INCLUDE_xTimerGetTimerDaemonTaskHandle  0
 #define INCLUDE_pcTaskGetTaskName               0
