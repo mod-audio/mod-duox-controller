@@ -322,6 +322,8 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define EXP_MODE_GET_CMD              "g_exp_m"
 //get input EXP mode
 #define EXP_MODE_SET_CMD              "s_exp_m %i"
+//change a menu setting
+#define MENU_ITEM_CHANGE              "sc %s %i"
 
 
 //// Control propertires definitions
@@ -413,7 +415,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 //inputs sub menu
 #define IN1_VOLUME          VOLUME_ID+0
 #define IN2_VOLUME          VOLUME_ID+1
-#define STEREO_LINK_INP     INP_ID+1
+#define STEREO_LINK_INP     INP_ID+3
 #define EXP_CV_INP          INP_ID+2
 #define CV_RANGE            INP_ID+4
 #define EXP_MODE            INP_ID+5
@@ -422,7 +424,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define OUT1_VOLUME         VOLUME_ID+2
 #define OUT2_VOLUME         VOLUME_ID+3
 #define HP_VOLUME           VOLUME_ID+4
-#define STEREO_LINK_OUTP    OUTP_ID+1
+#define STEREO_LINK_OUTP    OUTP_ID+3
 #define HP_CV_OUTP          OUTP_ID+2
 #define MASTER_VOL_LINK     OUTP_ID+4
 
@@ -446,7 +448,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"CHANNEL 1",                       MENU_TOGGLE,    BP1_ID,             BYPASS_ID,      system_bypass_cb           , 0},  \
     {"CHANNEL 2",                       MENU_TOGGLE,    BP2_ID,             BYPASS_ID,      system_bypass_cb           , 0},  \
     {"CHANNEL 1 & 2",                   MENU_TOGGLE,    BP12_ID,            BYPASS_ID,      system_bypass_cb           , 0},  \
-    {"QUICK BYPASS CHANNEL(S)",         MENU_TOGGLE,    BP_SELECT_ID,       BYPASS_ID,      system_bypass_cb           , 0},  \
+    {"QUICK BYPASS CHANNEL(S)",         MENU_TOGGLE,    BP_SELECT_ID,       BYPASS_ID,      system_qbp_channel_cb      , 0},  \
     {"TEMPO & TRANSPORT",               MENU_LIST,      TEMPO_ID,           ROOT_ID,        system_play_cb             , 0},  \
     {"TEMPO",                           MENU_SET,       GLOBAL_TEMPO_ID,    TEMPO_ID,       system_tempo_cb            , 0},  \
     {"BEATS PER BAR",                   MENU_SET,       ABLETON_LINK_ID,    TEMPO_ID,       system_bpb_cb              , 0},  \
@@ -530,6 +532,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {HP_CV_OUTP, "Set output to HP", HP_CV_POPUP_TXT}, \
     {HP_CV_OUTP+1, "Set output to CV", HP_CV_POPUP_TXT}, \
 
+#define MENU_LINE_CHARS     31
 //MENU ITEMS WE DO NOT SHOW RIGHT NOW BECAUSE WE DO NOT HAVE CV
     /*{"CV / EXP INPUT",                  MENU_TOGGLE,    EXP_CV_INP,         INP_ID,         system_cv_exp_cb           , 0},  \
     {"CV RANGE",                        MENU_TOGGLE,    CV_RANGE,           INP_ID,         system_cv_range_cb         , 0},  \

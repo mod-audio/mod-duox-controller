@@ -108,6 +108,7 @@ static void restore_cb(proto_t *proto);
 static void boot_cb(proto_t *proto);
 static void pedalboard_name_cb(proto_t *proto);
 static void snapshot_clear_cb(proto_t *proto);
+static void menu_item_changed_cb(proto_t *proto);
 
 /*
 ************************************************************************************************************************
@@ -414,6 +415,7 @@ static void setup_task(void *pvParameters)
     protocol_add_command(BOOT_HMI_CMD, boot_cb);
     protocol_add_command(PB_NAME_SET_CMD, pedalboard_name_cb);
     protocol_add_command(CLEAR_SNAPSHOT_COMMAND, snapshot_clear_cb);
+    protocol_add_command(MENU_ITEM_CHANGE, menu_item_changed_cb);
 
     // init the navigation
     naveg_init();
@@ -593,10 +595,10 @@ static void pedalboard_name_cb(proto_t *proto)
 static void boot_cb(proto_t *proto)
 {
     //set the display brightness 
-    hardware_glcd_brightness(atoi(proto->list[1]));
+    system_update_menu_value(160, atoi(proto->list[1]));
 
     //set the master volume link
-    system_master_volume_link(atoi(proto->list[2]));
+    system_update_menu_value(24, atoi(proto->list[2]));
     
     //set the master volume value
     float master_vol_value = atof(proto->list[3]);
@@ -612,6 +614,13 @@ static void boot_cb(proto_t *proto)
     //parse the pedalboard name
     screen_top_info(&proto->list[4] , 1);
 
+    protocol_response("resp 0", proto);
+}
+
+static void menu_item_changed_cb(proto_t *proto)
+{
+    naveg_menu_item_changed_cb(atoi(proto->list[1]), atoi(proto->list[2]));
+    
     protocol_response("resp 0", proto);
 }
 

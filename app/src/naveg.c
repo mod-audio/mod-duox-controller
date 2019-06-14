@@ -2821,6 +2821,7 @@ void naveg_settings_refresh(uint8_t display_id)
     display_id ? screen_system_menu(g_current_item) : screen_system_menu(g_current_main_item);
 }
 
+
 void naveg_menu_refresh(uint8_t display_id)
 {
 	node_t *node = display_id ? g_current_menu : g_current_main_menu;
@@ -2837,97 +2838,36 @@ void naveg_menu_refresh(uint8_t display_id)
     naveg_settings_refresh(display_id);
 }
 
-//the menu refresh is to slow for the gains so this one is added that only updates the set value.
-void naveg_update_gain(uint8_t display_id, uint8_t update_id, float value, float min, float max)
+void naveg_menu_item_changed_cb(uint8_t item_ID, uint8_t value)
 {
-    node_t *node = display_id ? g_current_menu : g_current_main_menu;
+    //set value in system.c
+    system_update_menu_value(item_ID, value);
 
-    //updates all items in a menu
-    for (node = node->first_child; node; node = node->next)
+    //are we inside the menu? if so we need to update
+    if (tool_is_on(DISPLAY_TOOL_SYSTEM))
     {
-        // gets the menu item
-        menu_item_t *item = node->data;
+        //menu update for left or right? or both? 
 
-        // updates the value
-        if ((item->desc->id == update_id))
+        //if left menu item, no need to change right
+        if((item_ID == TUNER_ID) || (item_ID == TEMPO_ID))
         {
-            item->data.value = value;
+            naveg_menu_refresh(DISPLAY_LEFT);
+            return;
+        }
+        
+        //otherwise update right for sure
+        else 
+        {
+            naveg_menu_refresh(DISPLAY_RIGHT);
 
-            char str_buf[8];
-            float value_bfr = MAP(value, min, max, 0, 100);
-            int_to_str(value_bfr, str_buf, sizeof(str_buf), 0);
-            strcpy(item->name, item->desc->name);
-            uint8_t q;
-            uint8_t value_size = strlen(str_buf);
-            uint8_t name_size = strlen(item->name);
-            for (q = 0; q < (31 - name_size - value_size - 1); q++)
+            //for bypass, left might change as well, we update just in case
+            if (((item_ID - BYPASS_ID) < 10) && ((item_ID - BYPASS_ID) > 0) )
             {
-                strcat(item->name, " ");
+               naveg_menu_refresh(DISPLAY_LEFT); 
             }
-            strcat(item->name, str_buf);
-            strcat(item->name, "%");
-        }
-    }
-}
-
-void naveg_bypass_refresh(uint8_t bypass_1, uint8_t bypass_2, uint8_t quick_bypass)
-{
-    node_t *node = g_current_menu;
-
-    //updates all items in a menu
-    for (node = node->first_child; node; node = node->next)
-    {
-        // gets the menu item
-        menu_item_t *item = node->data;
-
-        //if normal bypass
-        if ((item->desc->id - (BYPASS_ID + 1)) == 0)
-        {
-            item->data.value = bypass_1;
-        }
-        else if ((item->desc->id - (BYPASS_ID + 1)) == 1)
-        {
-            item->data.value = bypass_2;
-        }
-        //if bypass 1 and 2
-        else if ((item->desc->id - (BYPASS_ID + 1)) == 2)
-        {
-            if (bypass_1 && bypass_2) item->data.value = 1;
-            else item->data.value = 0;
-        }
-
-        //copy bypass txt
-        strcpy(item->name, item->desc->name);
-        uint8_t q;
-        uint8_t value_size = 3;
-        uint8_t name_size = strlen(item->name);
-
-        //add spaces
-        for (q = 0; q < (31 - name_size - value_size); q++)
-        {
-            strcat(item->name, " ");
-        }
-
-        //if bypass select add the channels, else add [X] or  [ ]
-        if (item->desc->id == BP_SELECT_ID)
-        {
-            char channel_value[4];
-            switch (quick_bypass)
-            {
-                case 0:
-                        strcpy(channel_value, "  1");
-                    break;
-                case 1:
-                        strcpy(channel_value, "  2");
-                    break;
-                case 2:
-                        strcpy(channel_value, "1&2");
-                    break;
-            }
-            strcat(item->name, channel_value);
-        }
-        else strcat(item->name, ((item->data.value)? "[X]" : "[ ]"));
+        } 
     }
 
-    naveg_settings_refresh(DISPLAY_RIGHT);
+    //when we are not in the menu, did we change the master volume link?
+        //TODO update the master volume link widget
 }

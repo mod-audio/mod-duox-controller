@@ -60,6 +60,7 @@
 */
 
 // system menu callbacks
+void system_update_menu_value(uint8_t item_ID, uint8_t value);
 uint8_t system_get_current_profile(void);
 uint8_t master_volume(int event, int step);
 void system_pedalboard_cb(void *arg, int event);
@@ -95,7 +96,7 @@ void system_cv_range_cb(void *arg, int event);
 void system_exp_mode_cb(void *arg, int event);
 float system_master_volume_cb(float value, int event);
 void system_master_volume_link(uint8_t link_value);
-
+void system_qbp_channel_cb (void *arg, int event);
 
 /*
 ************************************************************************************************************************
