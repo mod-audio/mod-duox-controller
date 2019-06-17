@@ -1011,7 +1011,6 @@ void screen_system_menu(menu_item_t *item)
             popup.content = item->data.popup_content;
             popup.button_selected = item->data.hover;
             widget_popup(display, &popup);
-            ledz_on(hardware_leds(2), GREEN);
             break;
 
         case MENU_TOGGLE:
