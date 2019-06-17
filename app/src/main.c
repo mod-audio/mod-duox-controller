@@ -622,7 +622,7 @@ static void menu_item_changed_cb(proto_t *proto)
     naveg_menu_item_changed_cb(atoi(proto->list[1]), atoi(proto->list[2]));
     
     uint8_t i;
-    for (i = 3; i < AMOUNT_OF_MENU_VARS + 1; i+2)
+    for (i = 3; i < ((AMOUNT_OF_MENU_VARS+1) * 2); i+=2)
     {
         if (atoi(proto->list[i]) != 0)
         {
