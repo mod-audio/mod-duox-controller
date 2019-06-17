@@ -2678,7 +2678,6 @@ void naveg_enter(uint8_t display)
 void naveg_up(uint8_t display)
 {
     if (!g_initialized) return;
-
     if (display_has_tool_enabled(display))
     {
         if (display == 0)
@@ -2809,9 +2808,8 @@ uint8_t naveg_dialog(const char *msg)
     screen_system_menu(g_current_item);
 
     dialog_active = 1;
-    //can we do this without the semaphore
     xSemaphoreTake(g_dialog_sem, portMAX_DELAY);
-
+    
     naveg_toggle_tool(DISPLAY_TOOL_SYSTEM, DISPLAY_TOOL_SYSTEM);
 
     return g_current_main_item->data.hover;

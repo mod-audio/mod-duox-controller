@@ -412,7 +412,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 
 //tempo sub menu
 #define GLOBAL_TEMPO_ID    TEMPO_ID + 1
-#define ABLETON_LINK_ID    TEMPO_ID + 2
+#define BEATS_PER_BAR_ID   TEMPO_ID + 2
 
 //inputs sub menu
 #define IN1_VOLUME          VOLUME_ID+0
@@ -430,7 +430,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define HP_CV_OUTP          OUTP_ID+2
 #define MASTER_VOL_LINK     OUTP_ID+4
 
-//midi sub menu
+//sync & midi sub menu
 #define MIDI_CLK_SOURCE     MIDI_ID+2
 #define MIDI_CLK_SEND       MIDI_ID+3
 #define MIDI_SNAPSHOT       MIDI_ID+4
@@ -453,7 +453,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"QUICK BYPASS CHANNEL(S)",         MENU_TOGGLE,    BP_SELECT_ID,       BYPASS_ID,      system_qbp_channel_cb      , 0},  \
     {"TEMPO & TRANSPORT",               MENU_LIST,      TEMPO_ID,           ROOT_ID,        system_play_cb             , 0},  \
     {"TEMPO",                           MENU_SET,       GLOBAL_TEMPO_ID,    TEMPO_ID,       system_tempo_cb            , 0},  \
-    {"BEATS PER BAR",                   MENU_SET,       ABLETON_LINK_ID,    TEMPO_ID,       system_bpb_cb              , 0},  \
+    {"BEATS PER BAR",                   MENU_SET,       BEATS_PER_BAR_ID,   TEMPO_ID,       system_bpb_cb              , 0},  \
     {"TUNER",                           MENU_NONE,      TUNER_ID,           ROOT_ID,        system_tuner_cb            , 0},  \
     {"USER PROFILES",                   MENU_LIST,      PROFILES_ID,        ROOT_ID,        NULL                       , 0},  \
     {"USER PROFILE A",                  MENU_TOGGLE,    PROFILES_ID+1,      PROFILES_ID,    system_load_pro_cb         , 0},  \

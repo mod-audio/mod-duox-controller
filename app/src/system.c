@@ -348,6 +348,14 @@ void system_update_menu_value(uint8_t item_ID, uint8_t value)
         case PLAY_STATUS_ID:
             g_play_status = value;
         break;
+        //global tempo
+        case GLOBAL_TEMPO_ID:
+            g_beats_per_minute = value;
+        break;
+        //global tempo status
+        case BEATS_PER_BAR_ID:
+            g_beats_per_bar = value;
+        break;
         //tuner mute
         case TUNER_MUTE_ID: 
             g_tuner_mute = value;
