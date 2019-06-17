@@ -277,8 +277,8 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
     if (event == MENU_EV_ENTER) cli_command("mod-amixer save", CLI_DISCARD_RESPONSE);
 
     //update the displays
-    //when enter we need to update the whole menu, but also when stereo link is enabled. 
-    if ((((event == MENU_EV_UP) ||(event == MENU_EV_DOWN)) && (dir ? g_sl_out : g_sl_in)) || (event == MENU_EV_ENTER))
+    //we need to update the whole menu when stereo link is enabled. 
+    if (((event == MENU_EV_UP) ||(event == MENU_EV_DOWN)) && (dir ? g_sl_out : g_sl_in))
     {
         naveg_menu_refresh(DISPLAY_RIGHT);
     }
