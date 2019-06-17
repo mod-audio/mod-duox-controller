@@ -160,7 +160,7 @@ void set_item_value(char *command, uint8_t value)
 
     // copy the value
     char str_buf[8];
-    int_to_str(value, str_buf, sizeof(str_buf), 0);
+    int_to_str(value, str_buf, 4, 0);
     const char *p = str_buf;
     while (*p)
     {
@@ -195,14 +195,14 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
         //PGA (input)
         if (!dir)
         {
-            float_to_str(g_gains_volumes[item->desc->id - VOLUME_ID], value, sizeof value, 1);
+            float_to_str(g_gains_volumes[item->desc->id - VOLUME_ID], value, 4, 1);
             cli_command("mod-amixer in 0 xvol ", CLI_CACHE_ONLY);
             cli_command(value, CLI_DISCARD_RESPONSE);
         }
         //DAC (output)
         else
         {
-            float_to_str(g_gains_volumes[item->desc->id - VOLUME_ID], value, sizeof value, 1);
+            float_to_str(g_gains_volumes[item->desc->id - VOLUME_ID], value, 4, 1);
             cli_command("mod-amixer out 0 xvol ", CLI_CACHE_ONLY);
             cli_command(value, CLI_DISCARD_RESPONSE);
         }
@@ -226,7 +226,7 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
             g_gains_volumes[item->desc->id - VOLUME_ID] = item->data.value;
 
             //set the value
-            float_to_str(g_gains_volumes[item->desc->id - VOLUME_ID], value, sizeof value, 1);
+            float_to_str(g_gains_volumes[item->desc->id - VOLUME_ID], value, 4, 1);
             cli_command("mod-amixer ", CLI_CACHE_ONLY);
             cli_command(source, CLI_CACHE_ONLY);
             cli_command(" xvol ", CLI_CACHE_ONLY);
@@ -267,7 +267,7 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
 
     char *str_bfr = (char *) MALLOC(8 * sizeof(char));
     float value_bfr = MAP(item->data.value, min, max, 0, 100);
-    int_to_str(value_bfr, str_bfr, sizeof(str_bfr), 0);
+    int_to_str(value_bfr, str_bfr, 4, 0);
     strcat(str_bfr, "%");
     add_chars_to_menu_name(item, str_bfr);
     FREE(str_bfr);
@@ -298,7 +298,7 @@ float system_master_volume_cb(float value, int event)
 {
     //what is the master volume currently connected to? and convert it to a char
     char channel_char[8];
-    int_to_str(g_master_vol_port, channel_char, sizeof channel_char, 0);
+    int_to_str(g_master_vol_port, channel_char, 4, 0);
 
     if ((event == MENU_EV_ENTER) || (event == MENU_EV_NONE))
     {
@@ -317,7 +317,7 @@ float system_master_volume_cb(float value, int event)
         char value_char[8];
 
         //set the value
-        float_to_str(value, value_char, sizeof value_char, 1);
+        float_to_str(value, value_char, 4, 1);
         cli_command("mod-amixer out ", CLI_CACHE_ONLY);
         cli_command(channel_char, CLI_CACHE_ONLY);
         cli_command(" xvol ", CLI_CACHE_ONLY);
@@ -622,7 +622,7 @@ void system_master_vol_link_cb(void *arg, int event)
 
             //also set the gains to the same value
             char value_bfr[8];
-            float_to_str(g_gains_volumes[2], value_bfr, sizeof value_bfr, 1);
+            float_to_str(g_gains_volumes[2], value_bfr, 4, 1);
             cli_command("mod-amixer out 0 xvol ", CLI_CACHE_ONLY);
             cli_command(value_bfr, CLI_DISCARD_RESPONSE);
             //keep everything in sync
@@ -674,7 +674,7 @@ void system_display_cb(void *arg, int event)
     }
 
     char str_bfr[8];
-    int_to_str((g_display_brightness * 25), str_bfr, sizeof(str_bfr), 0);
+    int_to_str((g_display_brightness * 25), str_bfr, 4, 0);
     strcat(str_bfr, "%");
     add_chars_to_menu_name(item, str_bfr);
 }
@@ -694,7 +694,7 @@ void system_sl_in_cb (void *arg, int event)
         char value_bfr[8];
         if (g_sl_in == 1)
         {
-            float_to_str(g_gains_volumes[0], value_bfr, sizeof value_bfr, 1);
+            float_to_str(g_gains_volumes[0], value_bfr, 4, 1);
             cli_command("mod-amixer in 0 xvol ", CLI_CACHE_ONLY);
             cli_command(value_bfr, CLI_DISCARD_RESPONSE);
             //keep everything in sync
@@ -723,7 +723,7 @@ void system_sl_out_cb (void *arg, int event)
             
             //also set the gains to the same value
             char value_bfr[8];
-            float_to_str(g_gains_volumes[2], value_bfr, sizeof value_bfr, 1);
+            float_to_str(g_gains_volumes[2], value_bfr, 4, 1);
             cli_command("mod-amixer out 0 xvol ", CLI_CACHE_ONLY);
             cli_command(value_bfr, CLI_DISCARD_RESPONSE);
             //keep everything in sync
@@ -893,7 +893,7 @@ void system_tempo_cb (void *arg, int event)
     else g_beats_per_minute = item->data.value;
 
     char str_bfr[8] = {};
-    int_to_str(g_beats_per_minute, str_bfr, sizeof(str_bfr), 0);
+    int_to_str(g_beats_per_minute, str_bfr, 4, 0);
     strcat(str_bfr, " BPM");
     add_chars_to_menu_name(item, str_bfr);
 }
@@ -918,7 +918,7 @@ void system_bpb_cb (void *arg, int event)
 
     //add the items to the 
     char str_bfr[8] = {};
-    int_to_str(g_beats_per_bar, str_bfr, sizeof(str_bfr), 0);
+    int_to_str(g_beats_per_bar, str_bfr, 4, 0);
     strcat(str_bfr, "/4");
     add_chars_to_menu_name(item, str_bfr);
 }
@@ -939,7 +939,7 @@ void system_bypass_cb (void *arg, int event)
             {
                 //add channel to the command 
                 strcpy(cmd_bfr, BYPASS_SET_CMD);
-                int_to_str(0, channel, sizeof channel, 0);
+                int_to_str(0, channel, 4, 0);
                 strcat(cmd_bfr, channel);
                 strcat(cmd_bfr, " ");
                 //we toggle the bypass 
@@ -956,7 +956,7 @@ void system_bypass_cb (void *arg, int event)
             {
                 //add channel to the command 
                 strcpy(cmd_bfr, BYPASS_SET_CMD);
-                int_to_str(1, channel, sizeof channel, 0);
+                int_to_str(1, channel, 4, 0);
                 strcat(cmd_bfr, channel);
                 strcat(cmd_bfr, " ");
                 //we toggle the bypass 
@@ -971,7 +971,7 @@ void system_bypass_cb (void *arg, int event)
             {
                 //add channel to the command 
                 strcpy(cmd_bfr, BYPASS_SET_CMD);
-                int_to_str(2, channel, sizeof channel, 0);
+                int_to_str(2, channel, 4, 0);
                 strcat(cmd_bfr, channel);
                 strcat(cmd_bfr, " ");
                 //toggle the bypasses
@@ -1055,7 +1055,7 @@ void system_quick_bypass_cb (void *arg, int event)
             {
                 //add channel to the command 
                 strcpy(cmd_bfr, BYPASS_SET_CMD);
-                int_to_str(0, channel, sizeof channel, 0);
+                int_to_str(0, channel, 4, 0);
                 strcat(cmd_bfr, channel);
                 strcat(cmd_bfr, " ");
                 //we toggle the bypass 
@@ -1072,7 +1072,7 @@ void system_quick_bypass_cb (void *arg, int event)
             {
                 //add channel to the command 
                 strcpy(cmd_bfr, BYPASS_SET_CMD);
-                int_to_str(1, channel, sizeof channel, 0);
+                int_to_str(1, channel, 4, 0);
                 strcat(cmd_bfr, channel);
                 strcat(cmd_bfr, " ");
                 //we toggle the bypass 
@@ -1089,7 +1089,7 @@ void system_quick_bypass_cb (void *arg, int event)
             {
                 //add channel to the command 
                 strcpy(cmd_bfr, BYPASS_SET_CMD);
-                int_to_str(2, channel, sizeof channel, 0);
+                int_to_str(2, channel, 4, 0);
                 strcat(cmd_bfr, channel);
                 strcat(cmd_bfr, " ");
                 //we toggle the bypass
