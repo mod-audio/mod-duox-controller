@@ -180,6 +180,7 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
 {
     char *value = (char *) MALLOC(8 * sizeof(char));
     static const char *response = NULL;
+    //clear the buffer just to be sure
     cli_command(NULL, CLI_DISCARD_RESPONSE);
 
     //check if we are input or not
@@ -853,7 +854,7 @@ void system_ss_prog_change_cb (void *arg, int event)
         //HMI changes the item, resync
         g_snapshot_prog_change = item->data.value;
         //let mod-ui know
-        set_item_value(BPB_SET_CMD, g_snapshot_prog_change);
+        set_item_value(MIDI_SNAPSHOT_SET_CMD, g_snapshot_prog_change);
     }
 
     char str_bfr[8] = {};
@@ -885,7 +886,7 @@ void system_pb_prog_change_cb (void *arg, int event)
         //HMI changes the item, resync
         g_pedalboard_prog_change = item->data.value;
         //let mod-ui know
-        set_item_value(BPB_SET_CMD, g_pedalboard_prog_change);
+        set_item_value(MIDI_PRGCH_SET_CMD, g_pedalboard_prog_change);
     }
 
     char str_bfr[8] = {};
@@ -917,7 +918,7 @@ void system_tempo_cb (void *arg, int event)
         //HMI changes the item, resync
         g_beats_per_minute = item->data.value;
         //let mod-ui know
-        set_item_value(BPB_SET_CMD, g_beats_per_minute);
+        set_item_value(TEMPO_SET_CMD, g_beats_per_minute);
     }
 
     char str_bfr[8] = {};
