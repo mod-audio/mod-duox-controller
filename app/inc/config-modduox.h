@@ -323,7 +323,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 //get input EXP mode
 #define EXP_MODE_SET_CMD              "s_exp_m %i"
 //change a menu setting
-#define MENU_ITEM_CHANGE              "sc %i %i ..."
+#define MENU_ITEM_CHANGE              "mc %i %i ..."
 
 
 //// Control propertires definitions
