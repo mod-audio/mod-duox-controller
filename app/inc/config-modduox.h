@@ -263,9 +263,9 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 // get the quick bypass channel
 #define QBP_GET_CMD                   "g_qbp"              
 // toggle play status
-#define PLAY_SET_CMD                  "s_p %i"       
+#define PLAY_SET_CMD                  "s_ps %i"       
 // get play status 
-#define PLAY_GET_CMD                  "g_p"        
+#define PLAY_GET_CMD                  "g_ps"        
 // set midi clk source <internal = 0, slave = 1, link = 2>   
 #define MIDI_SRC_SET_CMD              "s_cls %i"                             
 // get the midi clk source channel
