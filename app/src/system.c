@@ -848,7 +848,13 @@ void system_ss_prog_change_cb (void *arg, int event)
         item->data.max = 16;
         item->data.step = 1;
     }
-    else g_snapshot_prog_change = item->data.value;
+    else 
+    {
+        //HMI changes the item, resync
+        g_snapshot_prog_change = item->data.value;
+        //let mod-ui know
+        set_item_value(BPB_SET_CMD, g_snapshot_prog_change);
+    }
 
     char str_bfr[8] = {};
     int_to_str(g_snapshot_prog_change, str_bfr, 3, 0);
@@ -873,7 +879,14 @@ void system_pb_prog_change_cb (void *arg, int event)
         item->data.max = 16;
         item->data.step = 1;
     }
-    else g_pedalboard_prog_change = item->data.value;
+    //scrolling up/down
+    else 
+    {
+        //HMI changes the item, resync
+        g_pedalboard_prog_change = item->data.value;
+        //let mod-ui know
+        set_item_value(BPB_SET_CMD, g_pedalboard_prog_change);
+    }
 
     char str_bfr[8] = {};
     int_to_str(g_pedalboard_prog_change, str_bfr, 3, 0);
@@ -898,7 +911,14 @@ void system_tempo_cb (void *arg, int event)
         item->data.max = 220;
         item->data.step = 1;
     }
-    else g_beats_per_minute = item->data.value;
+    //scrolling up/down
+    else 
+    {
+        //HMI changes the item, resync
+        g_beats_per_minute = item->data.value;
+        //let mod-ui know
+        set_item_value(BPB_SET_CMD, g_beats_per_minute);
+    }
 
     char str_bfr[8] = {};
     int_to_str(g_beats_per_minute, str_bfr, 4, 0);
@@ -922,7 +942,14 @@ void system_bpb_cb (void *arg, int event)
         item->data.max = 16;
         item->data.step = 1;
     }
-    else g_beats_per_bar = item->data.value;
+    //scrolling up/down
+    else 
+    {
+        //HMI changes the item, resync
+        g_beats_per_bar = item->data.value;
+        //let mod-ui know
+        set_item_value(BPB_SET_CMD, g_beats_per_bar);
+    }
 
     //add the items to the 
     char str_bfr[8] = {};

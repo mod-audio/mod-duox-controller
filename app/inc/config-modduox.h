@@ -541,7 +541,9 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"EXP MODE",                        MENU_TOGGLE,    EXP_MODE,           INP_ID,         system_exp_mode_cb         , 0},  \
       {"CV / HP OUTPUT",                  MENU_TOGGLE,    HP_CV_OUTP,         OUTP_ID,        system_cv_hp_cb            , 0},  \*/
 
-//ID's for menu callback funtions
+//ID's for menu callback funtions 
+//THIS SHOULD NOT BE HERE ALMOST ALL OF THEM ARE ALREDY DEFINE ABOVE
+// TODO REMOVE THIS AND ADD THE CORRECT ONES TO SYSTEM.C
 #define PLAY_STATUS_ID        180
 #define TUNER_MUTE_ID         30
 #define BYPASS1_ID            171
