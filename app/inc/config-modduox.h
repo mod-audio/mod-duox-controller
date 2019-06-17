@@ -323,7 +323,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 //get input EXP mode
 #define EXP_MODE_SET_CMD              "s_exp_m %i"
 //change a menu setting
-#define MENU_ITEM_CHANGE              "sc %s %i"
+#define MENU_ITEM_CHANGE              "sc %i %i ..."
 
 
 //// Control propertires definitions
@@ -539,7 +539,23 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"EXP MODE",                        MENU_TOGGLE,    EXP_MODE,           INP_ID,         system_exp_mode_cb         , 0},  \
       {"CV / HP OUTPUT",                  MENU_TOGGLE,    HP_CV_OUTP,         OUTP_ID,        system_cv_hp_cb            , 0},  \*/
 
-//// Foot functions leds colors
+//ID's for menu callback funtions
+#define PLAY_STATUS_ID        180
+#define TUNER_MUTE_ID         30
+#define BYPASS1_ID            171
+#define BYPASS2_ID            172
+#define QUICK_BYPASS_ID       174
+#define STEREOLINK_INP_ID     13
+#define STEREOLINK_OUTP_ID    23
+#define MASTER_VOL_PORT_ID    24
+#define MIDI_CLK_SOURCE_ID    202
+#define MIDI_CLK_SEND_ID      203
+#define SNAPSHOT_PRGCHGE_ID   204
+#define PB_PRGCHNGE_ID        205
+#define DISPLAY_BRIGHTNESS_ID 160
+
+#define AMOUNT_OF_MENU_VARS   13
+
 //// Foot functions leds colors
 #define TOGGLED_COLOR           RED
 #define TRIGGER_COLOR           WHITE

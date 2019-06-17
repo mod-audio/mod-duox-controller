@@ -345,55 +345,55 @@ void system_update_menu_value(uint8_t item_ID, uint8_t value)
     switch(item_ID)
     {
         //play status
-        case 180:
+        case PLAY_STATUS_ID:
             g_play_status = value;
         break;
         //tuner mute
-        case 30: 
+        case TUNER_MUTE_ID: 
             g_tuner_mute = value;
         break;
         //bypass channel 1
-        case 171: 
+        case BYPASS1_ID: 
             g_bypass[0] = value;
         break;
         //bypass channel 2
-        case 172: 
+        case BYPASS2_ID: 
             g_bypass[1] = value;
         break;
         //quick bypass channel
-        case 174: 
+        case QUICK_BYPASS_ID: 
             g_q_bypass = value;
         break;
         //sl input
-        case 13: 
+        case STEREOLINK_INP_ID: 
             g_sl_in = value;
         break;
         //master volume target 
-        case 24: 
+        case MASTER_VOL_PORT_ID: 
             g_master_vol_port = value;
         break;
         //stereo link output
-        case 23: 
+        case STEREOLINK_OUTP_ID: 
             g_sl_out = value;
         break;
         //MIDI clock source
-        case 202: 
+        case MIDI_CLK_SOURCE_ID: 
             g_MIDI_clk_src = value;
         break;
         //send midi clock
-        case 203: 
+        case MIDI_CLK_SEND_ID: 
             g_MIDI_clk_send = value;
         break;
         //snapshot prog change 
-        case 204: 
+        case SNAPSHOT_PRGCHGE_ID: 
             g_snapshot_prog_change = value;
         break;
         //pedalboard prog change 
-        case 205: 
+        case PB_PRGCHNGE_ID: 
             g_pedalboard_prog_change = value;
         break;
         //display brightness
-        case 160: 
+        case DISPLAY_BRIGHTNESS_ID: 
             g_display_brightness = value;
             hardware_glcd_brightness(g_display_brightness); 
         break;
