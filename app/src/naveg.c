@@ -94,10 +94,11 @@ static bank_config_t g_bank_functions[BANK_FUNC_AMOUNT];
 static uint8_t g_initialized, g_ui_connected;
 static void (*g_update_cb)(void *data, int event);
 static void *g_update_data;
-static volatile xSemaphoreHandle g_dialog_sem = NULL;
+static xSemaphoreHandle g_dialog_sem;
 static uint8_t dialog_active = 0;
 static float master_vol_value;
 static uint8_t snapshot_loaded[2] = {};
+static uint8_t page = 1;
 /*
 ************************************************************************************************************************
 *           LOCAL FUNCTION PROTOTYPES
@@ -1704,9 +1705,11 @@ void naveg_init(void)
 
     g_initialized = 1;
 
-    //vSemaphoreCreateBinary(g_dialog_sem);
-    //xSemaphoreTake(g_dialog_sem, 0);
-    g_dialog_sem = xSemaphoreCreateCounting(DIALOG_MAX_SEM_COUNT, 0);
+    vSemaphoreCreateBinary(g_dialog_sem);
+    // vSemaphoreCreateBinary is created as available which makes
+    // first xSemaphoreTake pass even if semaphore has not been given
+    // http://sourceforge.net/p/freertos/discussion/382005/thread/04bfabb9
+    xSemaphoreTake(g_dialog_sem, 0);
 }
 
 void naveg_initial_state(char *bank_uid, char *pedalboard_uid, char **pedalboards_list)
@@ -2224,9 +2227,6 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 
     if (display_has_tool_enabled(get_display_by_id(foot, FOOT))) return;
 
-    //we initialize with page 1 so we load the right page when first pressing a button
-    static uint8_t page = 1;
-
     switch (foot)
     {
         //actuator buttons
@@ -2332,6 +2332,20 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 break;
             }
     }
+}
+
+void naveg_reset_page(void)
+{
+    //reset variable
+    page = 1;
+
+    //reset LED
+    ledz_off(hardware_leds(5), LEDZ_ALL_COLORS);
+
+    //enable red LED to indicate we are in page 1
+    ledz_on(hardware_leds(5), RED);
+
+    return;
 }
 
 void naveg_save_snapshot(uint8_t foot)
@@ -2771,8 +2785,6 @@ uint8_t naveg_dialog(const char *msg)
 {
     static node_t *dummy_menu = NULL;
     static menu_desc_t desc = {NULL, MENU_CONFIRM2, DIALOG_ID, DIALOG_ID, NULL, 0};
-
-    ledz_on(hardware_leds(2), RED);
     
     if (!dummy_menu)
     {
@@ -2791,14 +2803,14 @@ uint8_t naveg_dialog(const char *msg)
 
     display_disable_all_tools(DISPLAY_LEFT);
     tool_on(DISPLAY_TOOL_SYSTEM, DISPLAY_LEFT);
-    g_current_main_menu = dummy_menu;
-    g_current_main_item = dummy_menu->data;
-    screen_system_menu(g_current_main_item);
+    tool_on(DISPLAY_TOOL_SYSTEM_SUBMENU, DISPLAY_LEFT);
+    g_current_menu = dummy_menu;
+    g_current_item = dummy_menu->data;
+    screen_system_menu(g_current_item);
 
     dialog_active = 1;
-    ledz_on(hardware_leds(0), RED);
+    //can we do this without the semaphore
     xSemaphoreTake(g_dialog_sem, portMAX_DELAY);
-    ledz_on(hardware_leds(0), GREEN);
 
     naveg_toggle_tool(DISPLAY_TOOL_SYSTEM, DISPLAY_TOOL_SYSTEM);
 

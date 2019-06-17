@@ -220,7 +220,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 // pedalboard_save
 #define PEDALBOARD_SAVE_CMD           "pbs"
 // tuner <frequency> <note> <cents>
-#define TUNER_CMD                     "tu %f %s %i"
+#define TUNER_CMD                     "tu_v %f %s %i"
 // tuner on
 #define TUNER_ON_CMD                  "tu on"
 // tuner off
@@ -324,6 +324,8 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define EXP_MODE_SET_CMD              "s_exp_m %i"
 //change a menu setting
 #define MENU_ITEM_CHANGE              "mc %i %i ..."
+//clear both snapshots and controls 
+#define CLEAR_PEDALBOARD              "pb_cl"
 
 
 //// Control propertires definitions

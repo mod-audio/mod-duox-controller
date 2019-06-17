@@ -915,7 +915,7 @@ void screen_system_menu(menu_item_t *item)
     static menu_item_t *last_item = NULL;
 
     glcd_t *display;
-    if ((item->desc->id == ROOT_ID) || (item->desc->id == DIALOG_ID))
+    if (item->desc->id == ROOT_ID)
     {
         display = hardware_glcds(DISPLAY_TOOL_SYSTEM);
     }
