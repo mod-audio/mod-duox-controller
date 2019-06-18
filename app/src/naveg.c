@@ -94,10 +94,11 @@ static bank_config_t g_bank_functions[BANK_FUNC_AMOUNT];
 static uint8_t g_initialized, g_ui_connected;
 static void (*g_update_cb)(void *data, int event);
 static void *g_update_data;
-static volatile xSemaphoreHandle g_dialog_sem = NULL;
+static xSemaphoreHandle g_dialog_sem;
 static uint8_t dialog_active = 0;
 static float master_vol_value;
 static uint8_t snapshot_loaded[2] = {};
+static uint8_t page = 1;
 /*
 ************************************************************************************************************************
 *           LOCAL FUNCTION PROTOTYPES
@@ -1380,10 +1381,14 @@ static void menu_up(uint8_t display_id)
 
     if ((item->desc->type == MENU_VOL) || (item->desc->type == MENU_SET))
     {
-        item->data.value -= (item->data.step * hardware_get_acceleration());
-        if (item->data.value < item->data.min)
+        if ((item->data.value -= (item->data.step)) < item->data.min)
+        {
             item->data.value = item->data.min;
-
+        }
+        else 
+        {
+            item->data.value -= (item->data.step);
+        }
     }
     else
     {
@@ -1404,9 +1409,15 @@ static void menu_down(uint8_t display_id)
 
     if ((item->desc->type == MENU_VOL) || (item->desc->type == MENU_SET))
     {
-        item->data.value += (item->data.step* hardware_get_acceleration());
-        if (item->data.value > item->data.max)
+        if ((item->data.value += (item->data.step)) > item->data.max)
+        {
             item->data.value = item->data.max;
+        }
+        else 
+        {
+            item->data.value += (item->data.step);  
+        }
+
     }
     else
     {
@@ -1704,9 +1715,11 @@ void naveg_init(void)
 
     g_initialized = 1;
 
-    //vSemaphoreCreateBinary(g_dialog_sem);
-    //xSemaphoreTake(g_dialog_sem, 0);
-    g_dialog_sem = xSemaphoreCreateCounting(DIALOG_MAX_SEM_COUNT, 0);
+    vSemaphoreCreateBinary(g_dialog_sem);
+    // vSemaphoreCreateBinary is created as available which makes
+    // first xSemaphoreTake pass even if semaphore has not been given
+    // http://sourceforge.net/p/freertos/discussion/382005/thread/04bfabb9
+    xSemaphoreTake(g_dialog_sem, 0);
 }
 
 void naveg_initial_state(char *bank_uid, char *pedalboard_uid, char **pedalboards_list)
@@ -2224,9 +2237,6 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 
     if (display_has_tool_enabled(get_display_by_id(foot, FOOT))) return;
 
-    //we initialize with page 1 so we load the right page when first pressing a button
-    static uint8_t page = 1;
-
     switch (foot)
     {
         //actuator buttons
@@ -2332,6 +2342,20 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 break;
             }
     }
+}
+
+void naveg_reset_page(void)
+{
+    //reset variable
+    page = 1;
+
+    //reset LED
+    ledz_off(hardware_leds(5), LEDZ_ALL_COLORS);
+
+    //enable red LED to indicate we are in page 1
+    ledz_on(hardware_leds(5), RED);
+
+    return;
 }
 
 void naveg_save_snapshot(uint8_t foot)
@@ -2664,7 +2688,6 @@ void naveg_enter(uint8_t display)
 void naveg_up(uint8_t display)
 {
     if (!g_initialized) return;
-
     if (display_has_tool_enabled(display))
     {
         if (display == 0)
@@ -2771,8 +2794,6 @@ uint8_t naveg_dialog(const char *msg)
 {
     static node_t *dummy_menu = NULL;
     static menu_desc_t desc = {NULL, MENU_CONFIRM2, DIALOG_ID, DIALOG_ID, NULL, 0};
-
-    ledz_on(hardware_leds(2), RED);
     
     if (!dummy_menu)
     {
@@ -2791,15 +2812,14 @@ uint8_t naveg_dialog(const char *msg)
 
     display_disable_all_tools(DISPLAY_LEFT);
     tool_on(DISPLAY_TOOL_SYSTEM, DISPLAY_LEFT);
-    g_current_main_menu = dummy_menu;
-    g_current_main_item = dummy_menu->data;
-    screen_system_menu(g_current_main_item);
+    tool_on(DISPLAY_TOOL_SYSTEM_SUBMENU, DISPLAY_LEFT);
+    g_current_menu = dummy_menu;
+    g_current_item = dummy_menu->data;
+    screen_system_menu(g_current_item);
 
     dialog_active = 1;
-    ledz_on(hardware_leds(0), RED);
     xSemaphoreTake(g_dialog_sem, portMAX_DELAY);
-    ledz_on(hardware_leds(0), GREEN);
-
+    
     naveg_toggle_tool(DISPLAY_TOOL_SYSTEM, DISPLAY_TOOL_SYSTEM);
 
     return g_current_main_item->data.hover;
@@ -2820,6 +2840,7 @@ void naveg_settings_refresh(uint8_t display_id)
 {
     display_id ? screen_system_menu(g_current_item) : screen_system_menu(g_current_main_item);
 }
+
 
 void naveg_menu_refresh(uint8_t display_id)
 {
@@ -2870,64 +2891,36 @@ void naveg_update_gain(uint8_t display_id, uint8_t update_id, float value, float
     }
 }
 
-void naveg_bypass_refresh(uint8_t bypass_1, uint8_t bypass_2, uint8_t quick_bypass)
+void naveg_menu_item_changed_cb(uint8_t item_ID, uint8_t value)
 {
-    node_t *node = g_current_menu;
+    //set value in system.c
+    system_update_menu_value(item_ID, value);
 
-    //updates all items in a menu
-    for (node = node->first_child; node; node = node->next)
+    //are we inside the menu? if so we need to update
+    if (tool_is_on(DISPLAY_TOOL_SYSTEM))
     {
-        // gets the menu item
-        menu_item_t *item = node->data;
+        //menu update for left or right? or both? 
 
-        //if normal bypass
-        if ((item->desc->id - (BYPASS_ID + 1)) == 0)
+        //if left menu item, no need to change right
+        if((item_ID == TUNER_ID) || (item_ID == TEMPO_ID))
         {
-            item->data.value = bypass_1;
+            naveg_menu_refresh(DISPLAY_LEFT);
+            return;
         }
-        else if ((item->desc->id - (BYPASS_ID + 1)) == 1)
+        
+        //otherwise update right for sure
+        else 
         {
-            item->data.value = bypass_2;
-        }
-        //if bypass 1 and 2
-        else if ((item->desc->id - (BYPASS_ID + 1)) == 2)
-        {
-            if (bypass_1 && bypass_2) item->data.value = 1;
-            else item->data.value = 0;
-        }
+            naveg_menu_refresh(DISPLAY_RIGHT);
 
-        //copy bypass txt
-        strcpy(item->name, item->desc->name);
-        uint8_t q;
-        uint8_t value_size = 3;
-        uint8_t name_size = strlen(item->name);
-
-        //add spaces
-        for (q = 0; q < (31 - name_size - value_size); q++)
-        {
-            strcat(item->name, " ");
-        }
-
-        //if bypass select add the channels, else add [X] or  [ ]
-        if (item->desc->id == BP_SELECT_ID)
-        {
-            char channel_value[4];
-            switch (quick_bypass)
+            //for bypass, left might change as well, we update just in case
+            if (((item_ID - BYPASS_ID) < 10) && ((item_ID - BYPASS_ID) > 0) )
             {
-                case 0:
-                        strcpy(channel_value, "  1");
-                    break;
-                case 1:
-                        strcpy(channel_value, "  2");
-                    break;
-                case 2:
-                        strcpy(channel_value, "1&2");
-                    break;
+               naveg_menu_refresh(DISPLAY_LEFT); 
             }
-            strcat(item->name, channel_value);
-        }
-        else strcat(item->name, ((item->data.value)? "[X]" : "[ ]"));
+        } 
     }
 
-    naveg_settings_refresh(DISPLAY_RIGHT);
+    //when we are not in the menu, did we change the master volume link?
+        //TODO update the master volume link widget
 }

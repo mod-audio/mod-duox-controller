@@ -220,7 +220,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 // pedalboard_save
 #define PEDALBOARD_SAVE_CMD           "pbs"
 // tuner <frequency> <note> <cents>
-#define TUNER_CMD                     "tu %f %s %i"
+#define TUNER_CMD                     "tu_v %f %s %i"
 // tuner on
 #define TUNER_ON_CMD                  "tu on"
 // tuner off
@@ -322,6 +322,10 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define EXP_MODE_GET_CMD              "g_exp_m"
 //get input EXP mode
 #define EXP_MODE_SET_CMD              "s_exp_m %i"
+//change a menu setting
+#define MENU_ITEM_CHANGE              "mc %i %i ..."
+//clear both snapshots and controls 
+#define CLEAR_PEDALBOARD              "pb_cl"
 
 
 //// Control propertires definitions
@@ -408,12 +412,12 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 
 //tempo sub menu
 #define GLOBAL_TEMPO_ID    TEMPO_ID + 1
-#define ABLETON_LINK_ID    TEMPO_ID + 2
+#define BEATS_PER_BAR_ID   TEMPO_ID + 2
 
 //inputs sub menu
 #define IN1_VOLUME          VOLUME_ID+0
 #define IN2_VOLUME          VOLUME_ID+1
-#define STEREO_LINK_INP     INP_ID+1
+#define STEREO_LINK_INP     INP_ID+3
 #define EXP_CV_INP          INP_ID+2
 #define CV_RANGE            INP_ID+4
 #define EXP_MODE            INP_ID+5
@@ -422,11 +426,11 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define OUT1_VOLUME         VOLUME_ID+2
 #define OUT2_VOLUME         VOLUME_ID+3
 #define HP_VOLUME           VOLUME_ID+4
-#define STEREO_LINK_OUTP    OUTP_ID+1
+#define STEREO_LINK_OUTP    OUTP_ID+3
 #define HP_CV_OUTP          OUTP_ID+2
 #define MASTER_VOL_LINK     OUTP_ID+4
 
-//midi sub menu
+//sync & midi sub menu
 #define MIDI_CLK_SOURCE     MIDI_ID+2
 #define MIDI_CLK_SEND       MIDI_ID+3
 #define MIDI_SNAPSHOT       MIDI_ID+4
@@ -446,10 +450,10 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"CHANNEL 1",                       MENU_TOGGLE,    BP1_ID,             BYPASS_ID,      system_bypass_cb           , 0},  \
     {"CHANNEL 2",                       MENU_TOGGLE,    BP2_ID,             BYPASS_ID,      system_bypass_cb           , 0},  \
     {"CHANNEL 1 & 2",                   MENU_TOGGLE,    BP12_ID,            BYPASS_ID,      system_bypass_cb           , 0},  \
-    {"QUICK BYPASS CHANNEL(S)",         MENU_TOGGLE,    BP_SELECT_ID,       BYPASS_ID,      system_bypass_cb           , 0},  \
+    {"QUICK BYPASS CHANNEL(S)",         MENU_TOGGLE,    BP_SELECT_ID,       BYPASS_ID,      system_qbp_channel_cb      , 0},  \
     {"TEMPO & TRANSPORT",               MENU_LIST,      TEMPO_ID,           ROOT_ID,        system_play_cb             , 0},  \
     {"TEMPO",                           MENU_SET,       GLOBAL_TEMPO_ID,    TEMPO_ID,       system_tempo_cb            , 0},  \
-    {"BEATS PER BAR",                   MENU_SET,       ABLETON_LINK_ID,    TEMPO_ID,       system_bpb_cb              , 0},  \
+    {"BEATS PER BAR",                   MENU_SET,       BEATS_PER_BAR_ID,   TEMPO_ID,       system_bpb_cb              , 0},  \
     {"TUNER",                           MENU_NONE,      TUNER_ID,           ROOT_ID,        system_tuner_cb            , 0},  \
     {"USER PROFILES",                   MENU_LIST,      PROFILES_ID,        ROOT_ID,        NULL                       , 0},  \
     {"USER PROFILE A",                  MENU_TOGGLE,    PROFILES_ID+1,      PROFILES_ID,    system_load_pro_cb         , 0},  \
@@ -530,13 +534,32 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {HP_CV_OUTP, "Set output to HP", HP_CV_POPUP_TXT}, \
     {HP_CV_OUTP+1, "Set output to CV", HP_CV_POPUP_TXT}, \
 
+#define MENU_LINE_CHARS     31
 //MENU ITEMS WE DO NOT SHOW RIGHT NOW BECAUSE WE DO NOT HAVE CV
     /*{"CV / EXP INPUT",                  MENU_TOGGLE,    EXP_CV_INP,         INP_ID,         system_cv_exp_cb           , 0},  \
     {"CV RANGE",                        MENU_TOGGLE,    CV_RANGE,           INP_ID,         system_cv_range_cb         , 0},  \
     {"EXP MODE",                        MENU_TOGGLE,    EXP_MODE,           INP_ID,         system_exp_mode_cb         , 0},  \
       {"CV / HP OUTPUT",                  MENU_TOGGLE,    HP_CV_OUTP,         OUTP_ID,        system_cv_hp_cb            , 0},  \*/
 
-//// Foot functions leds colors
+//ID's for menu callback funtions 
+//THIS SHOULD NOT BE HERE ALMOST ALL OF THEM ARE ALREDY DEFINE ABOVE
+// TODO REMOVE THIS AND ADD THE CORRECT ONES TO SYSTEM.C
+#define PLAY_STATUS_ID        180
+#define TUNER_MUTE_ID         30
+#define BYPASS1_ID            171
+#define BYPASS2_ID            172
+#define QUICK_BYPASS_ID       174
+#define STEREOLINK_INP_ID     13
+#define STEREOLINK_OUTP_ID    23
+#define MASTER_VOL_PORT_ID    24
+#define MIDI_CLK_SOURCE_ID    202
+#define MIDI_CLK_SEND_ID      203
+#define SNAPSHOT_PRGCHGE_ID   204
+#define PB_PRGCHNGE_ID        205
+#define DISPLAY_BRIGHTNESS_ID 160
+
+#define AMOUNT_OF_MENU_VARS   13
+
 //// Foot functions leds colors
 #define TOGGLED_COLOR           RED
 #define TRIGGER_COLOR           WHITE

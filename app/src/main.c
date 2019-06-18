@@ -108,6 +108,8 @@ static void restore_cb(proto_t *proto);
 static void boot_cb(proto_t *proto);
 static void pedalboard_name_cb(proto_t *proto);
 static void snapshot_clear_cb(proto_t *proto);
+static void menu_item_changed_cb(proto_t *proto);
+static void  pedalboard_clear_cb(proto_t *proto);
 
 /*
 ************************************************************************************************************************
@@ -414,6 +416,8 @@ static void setup_task(void *pvParameters)
     protocol_add_command(BOOT_HMI_CMD, boot_cb);
     protocol_add_command(PB_NAME_SET_CMD, pedalboard_name_cb);
     protocol_add_command(CLEAR_SNAPSHOT_COMMAND, snapshot_clear_cb);
+    protocol_add_command(MENU_ITEM_CHANGE, menu_item_changed_cb);
+    protocol_add_command(CLEAR_PEDALBOARD, pedalboard_clear_cb);
 
     // init the navigation
     naveg_init();
@@ -593,10 +597,10 @@ static void pedalboard_name_cb(proto_t *proto)
 static void boot_cb(proto_t *proto)
 {
     //set the display brightness 
-    hardware_glcd_brightness(atoi(proto->list[1]));
+    system_update_menu_value(160, atoi(proto->list[1]));
 
     //set the master volume link
-    system_master_volume_link(atoi(proto->list[2]));
+    system_update_menu_value(24, atoi(proto->list[2]));
     
     //set the master volume value
     float master_vol_value = atof(proto->list[3]);
@@ -615,11 +619,48 @@ static void boot_cb(proto_t *proto)
     protocol_response("resp 0", proto);
 }
 
+static void menu_item_changed_cb(proto_t *proto)
+{
+    naveg_menu_item_changed_cb(atoi(proto->list[1]), atoi(proto->list[2]));
+    
+    uint8_t i;
+    for (i = 3; i < ((AMOUNT_OF_MENU_VARS+1) * 2); i+=2)
+    {
+        if (atoi(proto->list[i]) != 0)
+        {
+            naveg_menu_item_changed_cb(atoi(proto->list[i]), atoi(proto->list[i+1]));
+        }
+        else break;
+    }
+
+    protocol_response("resp 0", proto);
+}
+
 static void snapshot_clear_cb(proto_t *proto)
 {
     //we dont care yet about which snapshot, thats why hardcoded
     naveg_clear_snapshot(6);
     naveg_clear_snapshot(4);
+
+    protocol_response("resp 0", proto);
+}
+
+static void  pedalboard_clear_cb(proto_t *proto)
+{
+    //clear controls
+    uint8_t i;
+    for (i = 0; i < TOTAL_ACTUATORS; i++)
+    {
+        naveg_remove_control(i);
+    }
+
+    //clear snapshots
+    //we dont care yet about which snapshot, thats why hardcoded
+    naveg_clear_snapshot(6);
+    naveg_clear_snapshot(4);
+
+    //reset the page to page 1
+    naveg_reset_page();
 
     protocol_response("resp 0", proto);
 }
