@@ -141,6 +141,7 @@ void naveg_print_pb_name(uint8_t display);
 void naveg_menu_item_changed_cb(uint8_t item_ID, uint8_t value);
 
 void naveg_reset_page(void);
+
 /*
 ************************************************************************************************************************
 *           CONFIGURATION ERRORS

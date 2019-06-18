@@ -1381,10 +1381,14 @@ static void menu_up(uint8_t display_id)
 
     if ((item->desc->type == MENU_VOL) || (item->desc->type == MENU_SET))
     {
-        item->data.value -= (item->data.step * hardware_get_acceleration());
-        if (item->data.value < item->data.min)
+        if ((item->data.value -= (item->data.step)) < item->data.min)
+        {
             item->data.value = item->data.min;
-
+        }
+        else 
+        {
+            item->data.value -= (item->data.step);
+        }
     }
     else
     {
@@ -1405,9 +1409,15 @@ static void menu_down(uint8_t display_id)
 
     if ((item->desc->type == MENU_VOL) || (item->desc->type == MENU_SET))
     {
-        item->data.value += (item->data.step* hardware_get_acceleration());
-        if (item->data.value > item->data.max)
+        if ((item->data.value += (item->data.step)) > item->data.max)
+        {
             item->data.value = item->data.max;
+        }
+        else 
+        {
+            item->data.value += (item->data.step);  
+        }
+
     }
     else
     {
@@ -2846,6 +2856,39 @@ void naveg_menu_refresh(uint8_t display_id)
         if ((item->desc->action_cb)) item->desc->action_cb(item, MENU_EV_NONE);
 	}
     naveg_settings_refresh(display_id);
+}
+
+//the menu refresh is to slow for the gains so this one is added that only updates the set value.
+void naveg_update_gain(uint8_t display_id, uint8_t update_id, float value, float min, float max)
+{
+    node_t *node = display_id ? g_current_menu : g_current_main_menu;
+
+    //updates all items in a menu
+    for (node = node->first_child; node; node = node->next)
+    {
+        // gets the menu item
+        menu_item_t *item = node->data;
+
+        // updates the value
+        if ((item->desc->id == update_id))
+        {
+            item->data.value = value;
+
+            char str_buf[8];
+            float value_bfr = MAP(value, min, max, 0, 100);
+            int_to_str(value_bfr, str_buf, sizeof(str_buf), 0);
+            strcpy(item->name, item->desc->name);
+            uint8_t q;
+            uint8_t value_size = strlen(str_buf);
+            uint8_t name_size = strlen(item->name);
+            for (q = 0; q < (31 - name_size - value_size - 1); q++)
+            {
+                strcat(item->name, " ");
+            }
+            strcat(item->name, str_buf);
+            strcat(item->name, "%");
+        }
+    }
 }
 
 void naveg_menu_item_changed_cb(uint8_t item_ID, uint8_t value)

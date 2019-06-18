@@ -178,110 +178,101 @@ void set_item_value(char *command, uint8_t value)
 
 static void volume(menu_item_t *item, int event, const char *source, float min, float max, float step)
 {
-    char *value = (char *) MALLOC(8 * sizeof(char));
+    char value[8] = {};
     static const char *response = NULL;
-    //clear the buffer just to be sure
     cli_command(NULL, CLI_DISCARD_RESPONSE);
-
-    //check if we are input or not
     uint8_t dir = (source[0] == 'i') ? 0 : 1;
 
-    //are we turning a stereo link enabled gain
-    if ((((event == MENU_EV_UP) || (event == MENU_EV_DOWN)) && (dir ? g_sl_out : g_sl_in)) && (item->desc->id != HP_VOLUME))
+    if (((event == MENU_EV_UP) || (event == MENU_EV_DOWN)) && (dir ? g_sl_out : g_sl_in) && (item->desc->id != HP_VOLUME))
     {
-        //save gains globaly for stereo link functions
-        g_gains_volumes[item->desc->id - VOLUME_ID] = item->data.value;
-
         //change volume for both
         //PGA (input)
         if (!dir)
         {
-            float_to_str(g_gains_volumes[item->desc->id - VOLUME_ID], value, 4, 1);
+            float_to_str(item->data.value, value, 8, 1);
             cli_command("mod-amixer in 0 xvol ", CLI_CACHE_ONLY);
             cli_command(value, CLI_DISCARD_RESPONSE);
         }
         //DAC (output)
         else
         {
-            float_to_str(g_gains_volumes[item->desc->id - VOLUME_ID], value, 4, 1);
+            float_to_str(item->data.value, value, 8, 1);
             cli_command("mod-amixer out 0 xvol ", CLI_CACHE_ONLY);
             cli_command(value, CLI_DISCARD_RESPONSE);
         }
-
-        //also update the other gain value 
-        if (strchr(source, '1'))
-        {
-            g_gains_volumes[(item->desc->id + 1) - VOLUME_ID] = g_gains_volumes[item->desc->id - VOLUME_ID];
-        }
-        else
-        {
-            g_gains_volumes[(item->desc->id - 1) - VOLUME_ID] = g_gains_volumes[item->desc->id - VOLUME_ID];
-        }
     }
-    //no stereo link enabled
     else
     {
-        if ((event == MENU_EV_UP) ||(event == MENU_EV_DOWN))
+        if ((event == MENU_EV_ENTER) || (event == MENU_EV_NONE))
         {
-            //save gains globaly for stereo link functions
-            g_gains_volumes[item->desc->id - VOLUME_ID] = item->data.value;
+            cli_command("mod-amixer ", CLI_CACHE_ONLY);
+            cli_command(source, CLI_CACHE_ONLY);
+            cli_command(" xvol", CLI_CACHE_ONLY);
+            response = cli_command(NULL, CLI_RETRIEVE_RESPONSE);
 
-            //set the value
-            float_to_str(g_gains_volumes[item->desc->id - VOLUME_ID], value, 4, 1);
+            char str[LINE_BUFFER_SIZE+1];
+            strcpy(str, response);
+
+            item->data.min = min;
+            item->data.max = max;
+            item->data.step = step;
+
+            int res = 0;  // Initialize result
+            int sign = 1;  // Initialize sign as positive
+            int i = 0;  // Initialize index of first digit
+
+            // If number is negative, then update sign
+            if (str[0] == '-')
+            {
+                sign = -1;
+                i++;  // Also update index of first digit
+            }
+
+            // Iterate through all digits and update the result
+            for (; str[i] != '.'; ++i)
+                res = res*10 + (int)str[i] - 48;
+
+            // Return result with sign
+            item->data.value = sign*res;
+
+        }
+        else if ((event == MENU_EV_UP) ||(event == MENU_EV_DOWN))
+        {
+            float_to_str(item->data.value, value, 8, 1);
             cli_command("mod-amixer ", CLI_CACHE_ONLY);
             cli_command(source, CLI_CACHE_ONLY);
             cli_command(" xvol ", CLI_CACHE_ONLY);
             cli_command(value, CLI_DISCARD_RESPONSE);
         }
-        if ((event == MENU_EV_ENTER) || (event == MENU_EV_NONE))
-        {
-            //check if stereo link, the menu refresh fucntion will get here for adding the new value, 
-            //if they are in sync (because the change at the same time on the UP/DOWN movement)
-            //we dont have to request it from alsa, this makes stuff faster.
-            //check for stereo link AND if the gains are the same 
-            if (((strchr(source, '1')?g_gains_volumes[(item->desc->id + 1) - VOLUME_ID]:g_gains_volumes[(item->desc->id - 1) - VOLUME_ID]) == g_gains_volumes[item->desc->id - VOLUME_ID]) && (dir ? g_sl_out : g_sl_in))
-            {
-                //actually, we dont need to do anything here yet :) 
-            }
-            //if not, normal operation
-            else 
-            {
-                //we get the value from alsa, save internaly 
-                cli_command("mod-amixer ", CLI_CACHE_ONLY);
-                cli_command(source, CLI_CACHE_ONLY);
-                cli_command(" xvol", CLI_CACHE_ONLY);
-                response = cli_command(NULL, CLI_RETRIEVE_RESPONSE);
-
-                //set bounderies for changing it in naveg
-                item->data.min = min;
-                item->data.max = max;
-                item->data.step = step;
-                item->data.value = atof(response);
-
-                //save gains globaly for stereo link functions
-                g_gains_volumes[item->desc->id - VOLUME_ID] = item->data.value;
-            }
-        }
     }
 
-    FREE(value);
+    //save gains globaly for stereo link functions
+    g_gains_volumes[item->desc->id - VOLUME_ID] = item->data.value;
 
-    char *str_bfr = (char *) MALLOC(8 * sizeof(char));
+    char str_bfr[8] = {};
     float value_bfr = MAP(item->data.value, min, max, 0, 100);
-    int_to_str(value_bfr, str_bfr, 4, 0);
-    strcat(str_bfr, "%");
-    add_chars_to_menu_name(item, str_bfr);
-    FREE(str_bfr);
-
-    //save alsa when pressing enter 
-    if (event == MENU_EV_ENTER) cli_command("mod-amixer save", CLI_DISCARD_RESPONSE);
-
-    //update the displays
-    //we need to update the whole menu when stereo link is enabled. 
-    if (((event == MENU_EV_UP) ||(event == MENU_EV_DOWN)) && (dir ? g_sl_out : g_sl_in))
+    int_to_str(value_bfr, str_bfr, 8, 0);
+    strcpy(item->name, item->desc->name);
+    uint8_t q;
+    uint8_t value_size = strlen(str_bfr);
+    uint8_t name_size = strlen(item->name);
+    for (q = 0; q < (31 - name_size - value_size - 1); q++)
     {
-        naveg_menu_refresh(DISPLAY_RIGHT);
+        strcat(item->name, " ");
     }
+    strcat(item->name, str_bfr);
+    strcat(item->name, "%");
+
+    //if stereo link is on we need to update the other menu item as well
+    if ((((event == MENU_EV_UP) || (event == MENU_EV_DOWN)) && (dir ? g_sl_out : g_sl_in))&& (item->desc->id != HP_VOLUME))
+    {
+        if (strchr(source, '1'))
+            naveg_update_gain(DISPLAY_RIGHT, item->desc->id + 1, item->data.value, min, max);
+        else
+            naveg_update_gain(DISPLAY_RIGHT, item->desc->id - 1, item->data.value, min, max);
+    }
+    
+    naveg_settings_refresh(DISPLAY_RIGHT);
 }
 
 /*
@@ -630,12 +621,16 @@ void system_master_vol_link_cb(void *arg, int event)
             set_item_value(SL_OUT_SET_CMD, g_sl_out);
 
             //also set the gains to the same value
-            char value_bfr[8];
-            float_to_str(g_gains_volumes[2], value_bfr, 4, 1);
+            char value_bfr[8] = {};
+            float_to_str(g_gains_volumes[OUT1_VOLUME - VOLUME_ID], value_bfr, 8, 1);
             cli_command("mod-amixer out 0 xvol ", CLI_CACHE_ONLY);
             cli_command(value_bfr, CLI_DISCARD_RESPONSE);
             //keep everything in sync
-            g_gains_volumes[3] = g_gains_volumes[2];
+            g_gains_volumes[OUT2_VOLUME - VOLUME_ID] = g_gains_volumes[OUT1_VOLUME - VOLUME_ID];
+
+            naveg_update_gain(DISPLAY_RIGHT, OUT2_VOLUME, g_gains_volumes[OUT1_VOLUME - VOLUME_ID], 0, 78);
+
+            system_save_gains_cb(NULL, MENU_EV_ENTER);
         }
         set_item_value(MASTER_VOL_SET_LINK_CMD, g_master_vol_port);
     }
@@ -700,14 +695,18 @@ void system_sl_in_cb (void *arg, int event)
         set_item_value(SL_IN_SET_CMD, g_sl_in);
 
         //if we toggled to 1, we need to change gain 2 to  gain 1
-        char value_bfr[8];
+        char value_bfr[8] = {};
         if (g_sl_in == 1)
         {
-            float_to_str(g_gains_volumes[0], value_bfr, 4, 1);
+            float_to_str(g_gains_volumes[IN1_VOLUME - VOLUME_ID], value_bfr, 8, 1);
             cli_command("mod-amixer in 0 xvol ", CLI_CACHE_ONLY);
             cli_command(value_bfr, CLI_DISCARD_RESPONSE);
             //keep everything in sync
-            g_gains_volumes[1] = g_gains_volumes[0];
+            g_gains_volumes[IN2_VOLUME - VOLUME_ID] = g_gains_volumes[IN1_VOLUME - VOLUME_ID];
+
+            naveg_update_gain(DISPLAY_RIGHT, IN2_VOLUME, g_gains_volumes[IN1_VOLUME - VOLUME_ID], 0, 78);
+
+            system_save_gains_cb(NULL, MENU_EV_ENTER);
         }
     }
 
@@ -716,8 +715,8 @@ void system_sl_in_cb (void *arg, int event)
     else strcpy(str_bfr,"OFF");   
     add_chars_to_menu_name(item, str_bfr);
 
-    //gains can change because of this, update the whole menu
-    if (event == MENU_EV_ENTER) naveg_menu_refresh(DISPLAY_RIGHT);
+    //gains can change because of this, update the menu
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
 }
 
 void system_sl_out_cb (void *arg, int event)
@@ -731,15 +730,19 @@ void system_sl_out_cb (void *arg, int event)
             g_sl_out = 1;
             
             //also set the gains to the same value
-            char value_bfr[8];
-            float_to_str(g_gains_volumes[2], value_bfr, 4, 1);
+            char value_bfr[8] = {};
+            float_to_str(g_gains_volumes[OUT1_VOLUME - VOLUME_ID], value_bfr, 8, 1);
             cli_command("mod-amixer out 0 xvol ", CLI_CACHE_ONLY);
             cli_command(value_bfr, CLI_DISCARD_RESPONSE);
             //keep everything in sync
-            g_gains_volumes[3] = g_gains_volumes[2];
+            g_gains_volumes[OUT2_VOLUME - VOLUME_ID] = g_gains_volumes[OUT1_VOLUME - VOLUME_ID];
             
             //we also need to change the master volume link to 0 (1&2)
             g_master_vol_port = 0;
+
+            naveg_update_gain(DISPLAY_RIGHT, OUT2_VOLUME, g_gains_volumes[OUT1_VOLUME - VOLUME_ID], 0, 78);
+
+            system_save_gains_cb(NULL, MENU_EV_ENTER);
         }
         else 
         {
@@ -1045,7 +1048,7 @@ void system_qbp_channel_cb (void *arg, int event)
     if (event == MENU_EV_ENTER)
     {
         //count from 0 to 2 
-        if (g_q_bypass < 3) g_q_bypass++;
+        if (g_q_bypass < 2) g_q_bypass++;
         else g_q_bypass = 0;
         set_item_value(QBP_SET_CMD, g_q_bypass);
     }

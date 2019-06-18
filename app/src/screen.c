@@ -281,7 +281,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
                 unit.align = ALIGN_NONE_NONE;
                 widget_textbox(display, &unit);
 
-                //writing text clears up to 3 pixels below it (for some add reason TODO)
+                //writing text clears up to 3 pixels below it (for some odd reason TODO)
                 //thats why when there is a unit on one of the bottom pots we need to redraw the devision line
                 // horizontal footer line
                 if (pot_id == 1 || pot_id == 3 || pot_id == 5 || pot_id == 7)
@@ -294,6 +294,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
                 strcat(value_str_bfr, unit_str);
             }
         }
+        else value.y += 3;
 
         //value
         value.color = GLCD_BLACK;
