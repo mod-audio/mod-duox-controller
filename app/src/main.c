@@ -258,7 +258,10 @@ static void actuators_task(void *pvParameters)
 
     while (1)
     {
-        if (g_protocol_bussy) return; 
+        if (g_protocol_bussy)
+        {
+            if (!naveg_dialog_status()) return;
+        }  
 
         portBASE_TYPE xStatus;
 

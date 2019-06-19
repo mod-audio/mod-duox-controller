@@ -309,7 +309,7 @@ float system_master_volume_cb(float value, int event)
         char value_char[8];
 
         //set the value
-        float_to_str(value, value_char, 4, 1);
+        float_to_str(value, value_char, 8, 1);
         cli_command("mod-amixer out ", CLI_CACHE_ONLY);
         cli_command(channel_char, CLI_CACHE_ONLY);
         cli_command(" xvol ", CLI_CACHE_ONLY);

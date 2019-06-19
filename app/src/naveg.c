@@ -1366,12 +1366,8 @@ static void menu_enter(uint8_t display_id)
     if (item->desc->type == MENU_CONFIRM2)
     {
         dialog_active = 0;
-        portBASE_TYPE xHigherPriorityTaskWoken;
-        xHigherPriorityTaskWoken = pdFALSE;
+        portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
         xSemaphoreGiveFromISR(g_dialog_sem, &xHigherPriorityTaskWoken);
-        portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-        //portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
-        //xSemaphoreGiveFromISR(g_dialog_sem, &xHigherPriorityTaskWoken);
     }
 }
 
@@ -1381,13 +1377,10 @@ static void menu_up(uint8_t display_id)
 
     if ((item->desc->type == MENU_VOL) || (item->desc->type == MENU_SET))
     {
+        //substract one, if we reach the limit, value becomes the limit
         if ((item->data.value -= (item->data.step)) < item->data.min)
         {
             item->data.value = item->data.min;
-        }
-        else 
-        {
-            item->data.value -= (item->data.step);
         }
     }
     else
@@ -1409,15 +1402,11 @@ static void menu_down(uint8_t display_id)
 
     if ((item->desc->type == MENU_VOL) || (item->desc->type == MENU_SET))
     {
+        //up one, if we reach the limit, value becomes the limit
         if ((item->data.value += (item->data.step)) > item->data.max)
         {
             item->data.value = item->data.max;
         }
-        else 
-        {
-            item->data.value += (item->data.step);  
-        }
-
     }
     else
     {
@@ -2802,7 +2791,7 @@ uint8_t naveg_dialog(const char *msg)
         item->data.hover = 0;
         item->data.selected = 0xFF;
         item->data.list_count = 2;
-        item->data.list = (char **) MALLOC(item->data.list_count * sizeof(char *));;
+        item->data.list = NULL;
         item->data.popup_content = msg;
         item->data.popup_header = "selftest";
         item->desc = &desc;
@@ -2812,22 +2801,42 @@ uint8_t naveg_dialog(const char *msg)
 
     display_disable_all_tools(DISPLAY_LEFT);
     tool_on(DISPLAY_TOOL_SYSTEM, DISPLAY_LEFT);
-    tool_on(DISPLAY_TOOL_SYSTEM_SUBMENU, DISPLAY_LEFT);
+    tool_on(DISPLAY_TOOL_SYSTEM_SUBMENU, DISPLAY_RIGHT);
     g_current_menu = dummy_menu;
     g_current_item = dummy_menu->data;
     screen_system_menu(g_current_item);
 
     dialog_active = 1;
-    xSemaphoreTake(g_dialog_sem, portMAX_DELAY);
-    
-    naveg_toggle_tool(DISPLAY_TOOL_SYSTEM, DISPLAY_TOOL_SYSTEM);
+    if (xSemaphoreTake(g_dialog_sem, portMAX_DELAY) == pdTRUE)
+    {
+        dialog_active = 0;
+        display_disable_all_tools(DISPLAY_LEFT);
+        display_disable_all_tools(DISPLAY_RIGHT);
 
-    return g_current_main_item->data.hover;
+        g_update_cb = NULL;
+        g_update_data = NULL;
+        naveg_reset_menu();
+
+        screen_clear(DISPLAY_RIGHT);
+
+        return g_current_main_item->data.hover;
+    }
+    //we can never get here, portMAX_DELAY means wait indefinatly I'm adding this to remove a compiler warning
+    else
+    {
+        //ERROR
+        return -1; 
+    }
 }
 
 uint8_t naveg_ui_status(void)
 {
     return g_ui_connected;
+}
+
+uint8_t naveg_dialog_status(void)
+{
+    return dialog_active;
 }
 
 uint8_t naveg_tap_tempo_status(uint8_t id)
