@@ -609,10 +609,10 @@ static void boot_cb(proto_t *proto)
     system_update_menu_value(TUNER_MUTE_ID, atoi(proto->list[3]));
 
     //set the current user profile 
-    system_update_menu_value(TUNER_MUTE_ID, atoi(proto->list[4]));
+    system_update_menu_value(PROFILES_ID, atoi(proto->list[4]));
 
     //set the master volume link
-    system_update_menu_value(PROFILES_ID, atoi(proto->list[5]));
+    system_update_menu_value(MASTER_VOL_PORT_ID, atoi(proto->list[5]));
     
     //set the master volume value
     float master_vol_value = atof(proto->list[6]);
