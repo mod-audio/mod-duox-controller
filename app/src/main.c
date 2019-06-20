@@ -600,13 +600,16 @@ static void pedalboard_name_cb(proto_t *proto)
 static void boot_cb(proto_t *proto)
 {
     //set the display brightness 
-    system_update_menu_value(160, atoi(proto->list[1]));
+    system_update_menu_value(DISPLAY_BRIGHTNESS_ID, atoi(proto->list[1]));
+
+    //set the quick bypass link
+    system_update_menu_value(QUICK_BYPASS_ID, atoi(proto->list[2]));
 
     //set the master volume link
-    system_update_menu_value(24, atoi(proto->list[2]));
+    system_update_menu_value(MASTER_VOL_PORT_ID, atoi(proto->list[3]));
     
     //set the master volume value
-    float master_vol_value = atof(proto->list[3]);
+    float master_vol_value = atof(proto->list[4]);
     //-60 is our 0, we dont use lower values right now (doesnt make sense because of log scale)
     if (master_vol_value < -60) master_vol_value = -60;
     //convert value for screen
@@ -617,7 +620,7 @@ static void boot_cb(proto_t *proto)
     ledz_on(hardware_leds(5), RED);
 
     //parse the pedalboard name
-    screen_top_info(&proto->list[4] , 1);
+    screen_top_info(&proto->list[5] , 1);
 
     protocol_response("resp 0", proto);
 }
