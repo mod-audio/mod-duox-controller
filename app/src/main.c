@@ -608,11 +608,14 @@ static void boot_cb(proto_t *proto)
     //set the tuner mute state 
     system_update_menu_value(TUNER_MUTE_ID, atoi(proto->list[3]));
 
+    //set the current user profile 
+    system_update_menu_value(TUNER_MUTE_ID, atoi(proto->list[4]));
+
     //set the master volume link
-    system_update_menu_value(MASTER_VOL_PORT_ID, atoi(proto->list[4]));
+    system_update_menu_value(PROFILES_ID, atoi(proto->list[5]));
     
     //set the master volume value
-    float master_vol_value = atof(proto->list[5]);
+    float master_vol_value = atof(proto->list[6]);
     //-60 is our 0, we dont use lower values right now (doesnt make sense because of log scale)
     if (master_vol_value < -60) master_vol_value = -60;
     //convert value for screen
@@ -623,7 +626,7 @@ static void boot_cb(proto_t *proto)
     ledz_on(hardware_leds(5), RED);
 
     //parse the pedalboard name
-    screen_top_info(&proto->list[6] , 1);
+    screen_top_info(&proto->list[7] , 1);
 
     protocol_response("resp 0", proto);
 }

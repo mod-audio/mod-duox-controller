@@ -392,6 +392,10 @@ void system_update_menu_value(uint8_t item_ID, uint8_t value)
         case PB_PRGCHNGE_ID: 
             g_pedalboard_prog_change = value;
         break;
+        //user profile change 
+        case PROFILES_ID: 
+            g_current_profile = value;
+        break;
         //display brightness
         case DISPLAY_BRIGHTNESS_ID: 
             g_display_brightness = value;
