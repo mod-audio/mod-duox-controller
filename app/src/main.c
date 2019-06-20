@@ -526,7 +526,7 @@ static void control_rm_cb(proto_t *proto)
     uint8_t i;
     for (i = 2; i < TOTAL_ACTUATORS + 1; i++)
     {
-        if (atoi(proto->list[i]) != 0)
+        if ((proto->list[i]) != NULL)
         {
             naveg_remove_control(atoi(proto->list[i]));
         }
