@@ -388,7 +388,7 @@ static void display_pot_add(control_t *control)
     //within this range the difference should be smaller then 50 before the pot starts turning
     uint16_t pot_adc_range_value = MAP(g_pots[id]->value, g_pots[id]->minimum, g_pots[id]->maximum, 50, 3950)
     //float new_pot_value = (tmp_value - 50) * (g_pots[id]->maximum  - g_pots[id]->minimum) / (3950 - 50) + g_pots[id]->minimum;
-    if ((tmp_value > pot_adc_range_value ? tmp_value - pot_adc_range_value : pot_adc_range_value - tmp_value) < 300)
+    if (((tmp_value > pot_adc_range_value ? tmp_value - pot_adc_range_value : pot_adc_range_value - tmp_value) < 300) || dialog_active)
     {
         g_pots[id]->scroll_dir = 0;
     }
@@ -2148,7 +2148,7 @@ void naveg_set_control(uint8_t hw_id, float value)
 
             uint16_t pot_adc_range_value = MAP(g_pots[id]->value, g_pots[id]->minimum, g_pots[id]->maximum, 50, 3950)
 
-            if ((tmp_value > pot_adc_range_value ? tmp_value - pot_adc_range_value : pot_adc_range_value - tmp_value) < POT_DIFF_THRESHOLD)
+            if (((tmp_value > pot_adc_range_value ? tmp_value - pot_adc_range_value : pot_adc_range_value - tmp_value) < POT_DIFF_THRESHOLD) || dialog_active)
             {
                 g_pots[id]->scroll_dir = 0;
             }
@@ -2815,11 +2815,14 @@ uint8_t naveg_dialog(const char *msg)
 
         g_update_cb = NULL;
         g_update_data = NULL;
-        naveg_reset_menu();
+
+        g_current_main_menu = g_menu;
+        g_current_main_item = g_menu->first_child->data;
+        reset_menu_hover(g_menu);
 
         screen_clear(DISPLAY_RIGHT);
 
-        return g_current_main_item->data.hover;
+        return g_current_item->data.hover;
     }
     //we can never get here, portMAX_DELAY means wait indefinatly I'm adding this to remove a compiler warning
     else
