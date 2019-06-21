@@ -388,7 +388,7 @@ static void display_pot_add(control_t *control)
     //within this range the difference should be smaller then 50 before the pot starts turning
     uint16_t pot_adc_range_value = MAP(g_pots[id]->value, g_pots[id]->minimum, g_pots[id]->maximum, 50, 3950)
     //float new_pot_value = (tmp_value - 50) * (g_pots[id]->maximum  - g_pots[id]->minimum) / (3950 - 50) + g_pots[id]->minimum;
-    if (((tmp_value > pot_adc_range_value ? tmp_value - pot_adc_range_value : pot_adc_range_value - tmp_value) < 300) || dialog_active)
+    if ((tmp_value > pot_adc_range_value ? tmp_value - pot_adc_range_value : pot_adc_range_value - tmp_value) < 300)
     {
         g_pots[id]->scroll_dir = 0;
     }
@@ -2148,7 +2148,7 @@ void naveg_set_control(uint8_t hw_id, float value)
 
             uint16_t pot_adc_range_value = MAP(g_pots[id]->value, g_pots[id]->minimum, g_pots[id]->maximum, 50, 3950)
 
-            if (((tmp_value > pot_adc_range_value ? tmp_value - pot_adc_range_value : pot_adc_range_value - tmp_value) < POT_DIFF_THRESHOLD) || dialog_active)
+            if ((tmp_value > pot_adc_range_value ? tmp_value - pot_adc_range_value : pot_adc_range_value - tmp_value) < POT_DIFF_THRESHOLD)
             {
                 g_pots[id]->scroll_dir = 0;
             }
