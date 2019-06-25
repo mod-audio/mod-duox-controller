@@ -57,8 +57,8 @@
 #define TASK_NAME(name)     ((const char * const) (name))
 #define ACTUATOR_TYPE(act)  (((button_t *)(act))->type)
 
-#define ACTUATORS_QUEUE_SIZE    20
-
+#define ACTUATORS_QUEUE_SIZE    30
+#define RESERVED_QUEUE_SPACES	5
 
 /*
 ************************************************************************************************************************
@@ -175,15 +175,29 @@ static void actuators_cb(void *actuator)
     actuator_info[1] = ((button_t *)(actuator))->id;
     actuator_info[2] = actuator_get_status(actuator);
 
-    // queue actuator info
+    //we always reserve 5 empty spaces in the queue, these are for non analog actuators
+    //when these are triggered they are moved to the front of the queue for imidiate excecution. 
+    //the analog actuators can not overflow the whole queue, there is always 5 places left. 
+   	//when an overflow happens, samples of the analog actuator are not send, basicly lowering the resolution for us already
     portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
-    //we want the buttons and encoders to always be handled, the pots can cluther the qeue.
-    //the encoder and buttons are in this sense prioritized over the potentiometer events. 
-    //for reference: https://www.freertos.org/xQueueOverwrite.html
-    if ((ACTUATOR_TYPE(actuator) == BUTTON) || (ACTUATOR_TYPE(actuator) == ROTARY_ENCODER)) xQueueOverwrite(g_actuators_queue, &actuator_info);
-    else xQueueSendFromISR(g_actuators_queue, &actuator_info, &xHigherPriorityTaskWoken);
 
-    portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+   	if ((ACTUATOR_TYPE(actuator) == BUTTON) || (ACTUATOR_TYPE(actuator) == ROTARY_ENCODER))
+   	{
+   		xQueueSendToFrontFromISR(g_actuators_queue, &actuator_info, &xHigherPriorityTaskWoken);
+   	}
+   	else 
+   	{
+   		if (uxQueueSpacesAvailable(g_actuators_queue) > RESERVED_QUEUE_SPACES)
+   		{
+    		// queue actuator info
+			xQueueSendToBackFromISR(g_actuators_queue, &actuator_info, &xHigherPriorityTaskWoken);
+   		}
+   		else 
+   			return;
+
+   	}
+   	
+   	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }
 
 
@@ -265,7 +279,7 @@ static void actuators_task(void *pvParameters)
 
         portBASE_TYPE xStatus;
 
-        // take the actuator from queue
+        // take the actuator from queue 
         xStatus = xQueueReceive(g_actuators_queue, &actuator_info, portMAX_DELAY);
 
         // check if must enter in the restore mode
@@ -501,10 +515,19 @@ static void glcd_draw_cb(proto_t *proto)
 
 static void gui_connection_cb(proto_t *proto)
 {
+	//lock actuators
+	g_protocol_bussy = 1;
+
+	//clear the buffer so we dont send any messages
+	comm_webgui_clear();
+
     if (strcmp(proto->list[0], GUI_CONNECTED_CMD) == 0)
         naveg_ui_connection(UI_CONNECTED);
     else
         naveg_ui_connection(UI_DISCONNECTED);
+
+    //we are done supposedly closing the menu, we can unlock the actuators
+    g_protocol_bussy = 0;
 
     protocol_response("resp 0", proto);
 }

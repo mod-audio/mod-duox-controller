@@ -1790,7 +1790,7 @@ void naveg_ui_connection(uint8_t status)
         g_selected_pedalboards = NULL;
     }
 
-    //why do i exist?
+
     if ((tool_is_on(DISPLAY_TOOL_NAVIG)) || tool_is_on(DISPLAY_TOOL_SYSTEM))
     {
         naveg_toggle_tool(DISPLAY_TOOL_SYSTEM, 0);
