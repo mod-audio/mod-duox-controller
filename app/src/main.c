@@ -211,6 +211,8 @@ static void procotol_task(void *pvParameters)
 {
     UNUSED_PARAM(pvParameters);
 
+    hardware_eneble_serial_interupt(WEBGUI_SERIAL);
+
     while (1)
     {
         uint32_t msg_size;
@@ -222,7 +224,7 @@ static void procotol_task(void *pvParameters)
         if (msg_size > 0)
         {
             //if parsing messages block the actuator messages. 
-            g_protocol_bussy = 1;
+            //g_protocol_bussy = 1;
             msg_t msg;
             msg.sender_id = 0;
             msg.data = (char *) g_msg_buffer;
@@ -362,6 +364,8 @@ static void cli_task(void *pvParameters)
     UNUSED_PARAM(pvParameters);
 
     //hardware_coreboard_power(COREBOARD_INIT);
+
+	hardware_eneble_serial_interupt(CLI_SERIAL);
 
     while (1)
     {

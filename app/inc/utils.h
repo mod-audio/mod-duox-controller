@@ -116,6 +116,7 @@ uint32_t ringbuff_is_full(ringbuff_t *rb);
 uint32_t ringbuff_is_empty(ringbuff_t *rb);
 // ringbuff_flush: reset buffer indexes (old data will be overwritten)
 void ringbuff_flush(ringbuff_t *rb);
+void ringbuff_free(ringbuff_t *rb);
 // ringbuff_count: returns amount of ocurrencies of byte in the buffer
 uint32_t ringbuff_count(ringbuff_t *rb, uint8_t byte);
 // ringbuff_peek: read buffer keeping data in the ringbuffer
