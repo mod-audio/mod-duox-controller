@@ -2652,6 +2652,9 @@ void naveg_enter(uint8_t display)
     {
         if (display == 0)
         {
+            //we dont use this knob in dialog mode
+            if (dialog_active) return;
+
             if (tool_is_on(DISPLAY_TOOL_TUNER) || dialog_active)
             {
                 menu_enter(display);
@@ -2681,6 +2684,9 @@ void naveg_up(uint8_t display)
     {
         if (display == 0)
         {
+            //we dont use this knob in dialog mode
+            if (dialog_active) return;
+
         	if ( (tool_is_on(DISPLAY_TOOL_TUNER)) || (tool_is_on(DISPLAY_TOOL_NAVIG)) )
             {
            			naveg_toggle_tool((tool_is_on(DISPLAY_TOOL_TUNER) ? DISPLAY_TOOL_TUNER : DISPLAY_TOOL_NAVIG), display);
@@ -2722,6 +2728,9 @@ void naveg_down(uint8_t display)
     {
         if (display == 0)
         {
+            //we dont use this knob in dialog mode
+            if (dialog_active) return;
+
         	if ( (tool_is_on(DISPLAY_TOOL_TUNER)) || (tool_is_on(DISPLAY_TOOL_NAVIG)) )
             {
            			naveg_toggle_tool((tool_is_on(DISPLAY_TOOL_TUNER) ? DISPLAY_TOOL_TUNER : DISPLAY_TOOL_NAVIG), display);
