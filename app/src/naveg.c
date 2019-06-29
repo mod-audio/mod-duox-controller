@@ -1108,7 +1108,7 @@ static void menu_enter(uint8_t display_id)
         	if (naveg_ui_status())
         	{
                 //change menu type to menu_ok to display pop-up
-            	item->desc->type = MENU_OK;
+            	item->desc->type = MENU_MESSAGE;
             	g_current_item = item;
         	}
         	else
@@ -1141,7 +1141,7 @@ static void menu_enter(uint8_t display_id)
     // FIXME: that's dirty, so dirty...
     if ((item->desc->id == PEDALBOARD_ID) || (item->desc->id == BANKS_ID))
     {
-        if (naveg_ui_status()) item->desc->type = MENU_OK;
+        if (naveg_ui_status()) item->desc->type = MENU_MESSAGE;
     }
 
     // checks the selected item
@@ -1175,7 +1175,7 @@ static void menu_enter(uint8_t display_id)
             if ((item->desc->action_cb)) item->desc->action_cb(item, MENU_EV_ENTER);
         }
     }
-    else if (item->desc->type == MENU_CONFIRM ||item->desc->type == MENU_OK || item->desc->parent_id == PROFILES_ID ||  item->desc->id == EXP_CV_INP || item->desc->id == HP_CV_OUTP)
+    else if (item->desc->type == MENU_CONFIRM ||item->desc->type == MENU_OK || item->desc->parent_id == PROFILES_ID ||  item->desc->id == EXP_CV_INP || item->desc->id == HP_CV_OUTP || item->desc->type == MENU_MESSAGE)
     {
         if (item->desc->type == MENU_OK)
         {
@@ -1184,6 +1184,14 @@ static void menu_enter(uint8_t display_id)
 
             // defines the buttons count
             item->data.list_count = 1;
+        }
+        else if (item->desc->type == MENU_MESSAGE)
+        {
+            // highlights the default button
+            item->data.hover = 0;
+
+            // defines the buttons count
+            item->data.list_count = 0;
         }
         else
         {
