@@ -163,6 +163,11 @@ void serial_error(uint8_t uart_id, uint32_t error)
 // this callback is called from a ISR
 static void actuators_cb(void *actuator)
 {
+    if (g_protocol_bussy)
+    {
+        if (!naveg_dialog_status()) return;
+    }  
+
     static uint8_t i, info[ACTUATORS_QUEUE_SIZE][3];
 
     // does a copy of actuator id and status
@@ -217,6 +222,7 @@ static void procotol_task(void *pvParameters)
     {
         uint32_t msg_size;
         g_protocol_bussy = 0;
+        system_lock_comm_serial(g_protocol_bussy);
         // blocks until receive a new message
         ringbuff_t *rb = comm_webgui_read();
         msg_size = ringbuff_read_until(rb, g_msg_buffer, WEBGUI_COMM_RX_BUFF_SIZE, 0);
@@ -225,6 +231,7 @@ static void procotol_task(void *pvParameters)
         {
             //if parsing messages block the actuator messages. 
             g_protocol_bussy = 1;
+            system_lock_comm_serial(g_protocol_bussy);
             msg_t msg;
             msg.sender_id = 0;
             msg.data = (char *) g_msg_buffer;
@@ -274,11 +281,6 @@ static void actuators_task(void *pvParameters)
 
     while (1)
     {
-        if (g_protocol_bussy)
-        {
-            if (!naveg_dialog_status()) return;
-        }  
-
         portBASE_TYPE xStatus;
 
         // take the actuator from queue 
@@ -521,7 +523,7 @@ static void gui_connection_cb(proto_t *proto)
 {
 	//lock actuators
 	g_protocol_bussy = 1;
-
+    system_lock_comm_serial(g_protocol_bussy);
 	//clear the buffer so we dont send any messages
 	comm_webgui_clear();
 
@@ -532,7 +534,7 @@ static void gui_connection_cb(proto_t *proto)
 
     //we are done supposedly closing the menu, we can unlock the actuators
     g_protocol_bussy = 0;
-
+    system_lock_comm_serial(g_protocol_bussy);
     protocol_response("resp 0", proto);
 }
 

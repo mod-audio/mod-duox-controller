@@ -78,7 +78,7 @@ char *option_disabled = "[ ]";
 *           LOCAL GLOBAL VARIABLES
 ************************************************************************************************************************
 */
-
+static uint8_t g_comm_protocol_bussy = 0;
 float g_gains_volumes[5] = {};
 uint8_t g_master_vol_port = 0;
 uint8_t g_q_bypass = 0;
@@ -153,6 +153,8 @@ void add_chars_to_menu_name(menu_item_t *item, char *chars_to_add)
 //TODO CHECK IF WE CAN USE DYNAMIC MEMORY HERE
 void set_item_value(char *command, uint8_t value)
 {
+    if (g_comm_protocol_bussy) return;
+
     uint8_t i;
     char buffer[50];
 
@@ -280,6 +282,12 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
 *           GLOBAL FUNCTIONS
 ************************************************************************************************************************
 */
+
+void system_lock_comm_serial(uint8_t bussy)
+{
+    g_comm_protocol_bussy = bussy;
+}
+
 uint8_t system_get_current_profile(void)
 {
     return g_current_profile;
