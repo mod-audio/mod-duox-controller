@@ -211,6 +211,8 @@ static void procotol_task(void *pvParameters)
 {
     UNUSED_PARAM(pvParameters);
 
+    hardware_eneble_serial_interupt(WEBGUI_SERIAL);
+
     while (1)
     {
         uint32_t msg_size;
@@ -362,6 +364,8 @@ static void cli_task(void *pvParameters)
     UNUSED_PARAM(pvParameters);
 
     //hardware_coreboard_power(COREBOARD_INIT);
+
+	hardware_eneble_serial_interupt(CLI_SERIAL);
 
     while (1)
     {

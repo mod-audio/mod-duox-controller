@@ -604,6 +604,16 @@ void ringbuff_flush(ringbuff_t *rb)
     }
 }
 
+void ringbuff_free(ringbuff_t *rb)
+{
+    if (rb)
+    {
+        rb->head = 0;
+        rb->tail = 0;
+        rb->buffer = NULL;
+    }
+}
+
 uint32_t ringbuff_count(ringbuff_t *rb, uint8_t byte)
 {
     uint32_t count = 0;
