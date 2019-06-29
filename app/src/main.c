@@ -224,7 +224,7 @@ static void procotol_task(void *pvParameters)
         if (msg_size > 0)
         {
             //if parsing messages block the actuator messages. 
-            //g_protocol_bussy = 1;
+            g_protocol_bussy = 1;
             msg_t msg;
             msg.sender_id = 0;
             msg.data = (char *) g_msg_buffer;

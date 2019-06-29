@@ -260,7 +260,9 @@ void serial_init(serial_t *serial)
             break;
     }
 
-
+    //keeping the compiler happy 
+    (void) irq;
+    
     // UART Configuration structure variable
     UART_CFG_Type UARTConfigStruct;
 
@@ -300,19 +302,6 @@ void serial_init(serial_t *serial)
     // Initialize FIFO for UART peripheral
     UART_FIFOConfig(uart, &UARTFIFOConfigStruct);
 
-
-    // Enable UART Rx interrupt
-    //UART_IntConfig(uart, UART_INTCFG_RBR, ENABLE);
-
-    // Enable UART line status interrupt
-    //UART_IntConfig(uart, UART_INTCFG_RLS, ENABLE);
-
-    // set priority
-    //NVIC_SetPriority(irq, serial->priority);
-
-    // Enable Interrupt for UART channel
-    //NVIC_EnableIRQ(irq);
-
     // creates ring buffers
     serial->rx_buffer = ringbuff_create(serial->rx_buffer_size + 1);
     serial->tx_buffer = ringbuff_create(serial->tx_buffer_size + 1);
@@ -323,8 +312,8 @@ void serial_init(serial_t *serial)
     serial->eof = 0;
 
     // checks if output enable is used
-    //if (serial->has_oe) CONFIG_PIN_OUTPUT(serial->oe_port, serial->oe_pin);
-    //READ_MODE(serial);
+    if (serial->has_oe) CONFIG_PIN_OUTPUT(serial->oe_port, serial->oe_pin);
+    READ_MODE(serial);
 
     // stores a pointer to serial object
     g_serial_instances[serial->uart_id] = serial;
@@ -365,9 +354,6 @@ void serial_enable_interupt(serial_t *serial)
     ringbuff_flush(serial->rx_buffer);
     ringbuff_flush(serial->tx_buffer);
 
-    //ringbuff_free(serial->rx_buffer);
-    //ringbuff_free(serial->tx_buffer);
-
     // Enable UART Transmit
     UART_TxCmd(uart, ENABLE);
 
@@ -382,11 +368,6 @@ void serial_enable_interupt(serial_t *serial)
 
     // Enable Interrupt for UART channel
     NVIC_EnableIRQ(irq);
-
-    // checks if output enable is used
-    if (serial->has_oe) CONFIG_PIN_OUTPUT(serial->oe_port, serial->oe_pin);
-    READ_MODE(serial);
-
 }
 
 uint32_t serial_send(uint8_t uart_id, const uint8_t *data, uint32_t data_size)
