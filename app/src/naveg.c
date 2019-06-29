@@ -86,7 +86,7 @@ struct TOOL_T {
 
 static control_t *g_encoders[ENCODERS_COUNT], *g_foots[FOOTSWITCHES_ACTUATOR_COUNT], *g_pots[POTS_COUNT];
 static bp_list_t *g_banks, *g_naveg_pedalboards, *g_selected_pedalboards;
-static uint8_t g_bp_state, g_current_bank, g_current_pedalboard, g_bp_first;
+static uint8_t g_bp_state, g_current_pedalboard, g_bp_first;
 static node_t *g_menu, *g_current_menu, *g_current_main_menu;
 static menu_item_t *g_current_item, *g_current_main_item;
 static uint8_t g_max_items_list;
@@ -99,6 +99,7 @@ static uint8_t dialog_active = 0;
 static float master_vol_value;
 static uint8_t snapshot_loaded[2] = {};
 static uint8_t page = 1;
+static int8_t g_current_bank;
 /*
 ************************************************************************************************************************
 *           LOCAL FUNCTION PROTOTYPES
@@ -937,6 +938,7 @@ static void bp_enter(void)
     if (g_bp_state == BANKS_LIST)
     {
         request_pedalboards_list(g_banks->uids[g_banks->hover]);
+
         if (!g_naveg_pedalboards) return;
 
         // if reach here, received the pedalboards list
@@ -1727,7 +1729,7 @@ void naveg_initial_state(char *bank_uid, char *pedalboard_uid, char **pedalboard
         {
             g_banks->selected = 0;
             g_banks->hover = 0;
-            g_current_bank = 0;
+            g_current_bank = -1;
         }
 
         if (g_naveg_pedalboards)
@@ -2422,6 +2424,17 @@ void naveg_toggle_tool(uint8_t tool, uint8_t display)
         	g_current_main_menu = g_current_menu;
     		g_current_main_item = g_current_item;
             menu_enter(0);
+        }
+
+        //if we are entering banks
+        if (tool == DISPLAY_TOOL_NAVIG)
+        {
+            //if we have a bank selected
+            if (g_current_bank != -1)
+            {
+                g_banks->hover = g_current_bank;
+                bp_enter();
+            }
         }
     }
     // changes the display to control mode
