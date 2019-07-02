@@ -2433,7 +2433,7 @@ void naveg_toggle_tool(uint8_t tool, uint8_t display)
         if (tool == DISPLAY_TOOL_NAVIG)
         {
             //if we have a bank selected
-            if ((g_current_bank != -1)&&g_pb_selected)
+            if ((g_current_bank != -1) && g_pb_selected && (g_banks->hover != 0))
             {
                 g_banks->hover = g_current_bank;
                 bp_enter();

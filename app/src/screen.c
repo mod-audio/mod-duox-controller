@@ -175,13 +175,13 @@ void screen_pot(uint8_t pot_id, control_t *control)
         //convert value
         //value_str is our temporary value which we use for what kind of value representation we need
         //value_str_bfr is the value that gets printed
-        char value_str[10];
+        char value_str[10] = {0};
         char *value_str_bfr = (char *) MALLOC(6 * sizeof(char));
 
         //if the value becomes bigger then 9999 (4 characters), then switch to another view 10999 becomes 10.9K
         if (control->value > 9999)
         {
-            int_to_str(control->value/1000, value_str, sizeof(value_str), 0);
+            int_to_str(control->value/1000, value_str, sizeof(value_str) - 1, 0);
             strcat(value_str, "K");
         }
         //else if we have a value bigger then 100, we dont display decimals anymore
@@ -203,7 +203,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
             }
             else if (control->value < -9999.9)
             {
-                int_to_str((control->value/1000), value_str, sizeof(value_str), 0);
+                int_to_str((control->value/1000), value_str, sizeof(value_str) - 1, 0);
                 strcat(value_str, "K");
             }
             else
@@ -219,12 +219,15 @@ void screen_pot(uint8_t pot_id, control_t *control)
 
         //copy to value_str_bfr, the first 5 char
         strncpy(value_str_bfr, value_str, 5);
-        //terminate the text with line ending
-        value_str_bfr[6] ='\0';
 
         //convert unit
-        const char *unit_str;
-        unit_str = (strcmp(control->unit, "") == 0 ? NULL : control->unit);
+        char *unit_str;
+        if (strcmp(control->unit, "") == 0)
+        {
+            unit_str = control->unit;     
+            unit_str[strlen(unit_str) - 1] = '\0';
+        }
+        else unit_str = NULL;
 
         //knob
         knob.color = GLCD_BLACK;
@@ -286,12 +289,17 @@ void screen_pot(uint8_t pot_id, control_t *control)
                 // horizontal footer line
                 if (pot_id == 1 || pot_id == 3 || pot_id == 5 || pot_id == 7)
                     glcd_hline(display, 0, 55, DISPLAY_WIDTH, GLCD_BLACK);
+
+                //terminate the text with line ending, since no unit is added to it
+                value_str_bfr[5] = '\0';
             }
             //if unit = %, add it to the value string (if its one of the pots on the left add 4 pixels (1 char))
             else
             {
                 value.y += 3;
                 strcat(value_str_bfr, unit_str);
+                //terminate the text with line ending, the % was added, so the index is also increased by 1
+                value_str_bfr[6] = '\0';
             }
         }
         else value.y += 3;
@@ -429,7 +437,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
         //copy to value_str_bfr, the first 5 char
         strncpy(value_str_bfr, value_str, 5);
         //terminate the text with line ending
-        value_str_bfr[6] ='\0';
+        value_str_bfr[5] ='\0';
 
         //convert unit
         const char *unit_str;
@@ -498,9 +506,11 @@ void screen_encoder(uint8_t display_id, control_t *control)
     // integer type control
     else if (control->properties == CONTROL_PROP_INTEGER)
     {
+        char *title_str_bfr = (char *) MALLOC(15 * sizeof(char));
+        strncpy(title_str_bfr, control->label, 14);
+        title_str_bfr[14] = '\0';
 
         textbox_t title;
-        char *title_str_bfr = (char *) MALLOC(8 * sizeof(char));
         title.color = GLCD_BLACK;
         title.mode = TEXT_SINGLE_LINE;
         title.font = SMfont;
@@ -510,8 +520,6 @@ void screen_encoder(uint8_t display_id, control_t *control)
         title.bottom_margin = 0;
         title.left_margin = 0;
         title.right_margin = 0;
-        strncpy(title_str_bfr, control->label, 7);
-        //strcat(title_str_bfr, '\0');
         title.text = title_str_bfr;
         title.align = ALIGN_NONE_NONE;
         title.x = ((DISPLAY_WIDTH / 4) - (strlen(title_str_bfr) * 1.5));
