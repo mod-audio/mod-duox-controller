@@ -33,7 +33,7 @@
 // defines the heap size
 const HeapRegion_t xHeapRegions[] =
 {
-    //{ ( uint8_t * ) 0x10003000, 0x5000 },
+    { ( uint8_t * ) 0x10007000, 0x1000 },
     { ( uint8_t * ) 0x20000000, 0x8000 },
     { NULL, 0 } /* Terminates the array. */
 };

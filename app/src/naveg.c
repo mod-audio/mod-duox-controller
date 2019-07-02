@@ -22,6 +22,9 @@
 #include <math.h>
 #include <float.h>
 
+//reset actuator queue
+void reset_queue(void);
+
 
 /*
 ************************************************************************************************************************
@@ -807,6 +810,9 @@ static void control_set(uint8_t id, control_t *control)
 
     // send the data to GUI
     comm_webgui_send(buffer, i);
+
+    //wait for a response from mod-ui
+    comm_webgui_wait_response();
 }
 
 static void parse_banks_list(void *data, menu_item_t *item)
@@ -2283,14 +2289,19 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                        //ledz_off(hardware_leds(foot), SNAPSHOT_LOAD_COLOR);
                 	   ledz_on(hardware_leds(foot), SNAPSHOT_COLOR);
 
-                        char buffer[128];
+                        char buffer[10];
                         uint8_t i;
 
                         i = copy_command(buffer, LOAD_SNAPSHOT_COMMAND);
 
                         i += int_to_str((foot == 6)?1:0, &buffer[i], sizeof(buffer) - i, 0);
 
+                        //do not do actuators here
+                        reset_queue();
+
+                        comm_webgui_clear();
                         comm_webgui_send(buffer, i);
+                        comm_webgui_wait_response();
                     }
                     else
                     {
@@ -2304,9 +2315,20 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
         case 5:
         	if (!pressed) return;
         ; //keeping the compiler happy
-            char buffer[128];
+            char buffer[10];
             uint8_t i;
             i = copy_command(buffer, NEXT_PAGE_COMMAND);
+            
+            //clear actuator queue
+            reset_queue();
+
+            //clear controls            
+            uint8_t j;
+            for (j = 0; j < TOTAL_ACTUATORS; j++)
+            {
+                naveg_remove_control(j);
+            }
+
             switch (page)
             {
                 case 0:
@@ -2317,7 +2339,9 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                     // insert the page number on buffer
                     i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
 
+                    comm_webgui_clear();
                     comm_webgui_send(buffer, i);
+                    //comm_webgui_wait_response();
                     page++;
                 break;
                 case 1:
@@ -2328,7 +2352,9 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                     // insert the page number on buffer
                     i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
 
+                    comm_webgui_clear();
                     comm_webgui_send(buffer, i);
+                    //comm_webgui_wait_response();
                     page++;
                 break;
                 case 2:
@@ -2339,7 +2365,9 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                     // insert the page number on buffer
                     i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
 
+                    comm_webgui_clear();
                     comm_webgui_send(buffer, i);
+                    //comm_webgui_wait_response();
                     page=0;
                 break;
             }

@@ -456,6 +456,11 @@ static void setup_task(void *pvParameters)
 ************************************************************************************************************************
 */
 
+void reset_queue(void)
+{
+    xQueueReset(g_actuators_queue);
+}
+
 static void ping_cb(proto_t *proto)
 {
     g_ui_communication_started = 1;
@@ -540,8 +545,15 @@ static void gui_connection_cb(proto_t *proto)
 
 static void control_add_cb(proto_t *proto)
 {
+    //lock actuators
+    g_protocol_bussy = 1;
+    system_lock_comm_serial(g_protocol_bussy);
+
     control_t *control = data_parse_control(proto->list);
     naveg_add_control(control);
+
+    g_protocol_bussy = 0;
+    system_lock_comm_serial(g_protocol_bussy);
 
     protocol_response("resp 0", proto);
 }
@@ -567,8 +579,15 @@ static void control_rm_cb(proto_t *proto)
 
 static void control_set_cb(proto_t *proto)
 {
+    //lock actuators
+    g_protocol_bussy = 1;
+    system_lock_comm_serial(g_protocol_bussy);
+
     naveg_set_control(atoi(proto->list[1]), atof(proto->list[2]));
     protocol_response("resp 0", proto);
+
+    g_protocol_bussy = 0;
+    system_lock_comm_serial(g_protocol_bussy);
 }
 
 static void control_get_cb(proto_t *proto)
@@ -716,38 +735,38 @@ static void  pedalboard_clear_cb(proto_t *proto)
 
 void HardFault_Handler(void)
 {
-    ledz_on(hardware_leds(0), CYAN);
+    ledz_on(hardware_leds(0), MAGENTA);
     while (1);
 }
 
 void MemManage_Handler(void)
 {
-    ledz_on(hardware_leds(1), CYAN);
+    ledz_on(hardware_leds(1), MAGENTA);
     while (1);
 }
 
 void BusFault_Handler(void)
 {
-    ledz_on(hardware_leds(2), CYAN);
+    ledz_on(hardware_leds(2), MAGENTA);
     while (1);
 }
 
 void UsageFault_Handler(void)
 {
-    ledz_on(hardware_leds(3), CYAN);
+    ledz_on(hardware_leds(3), MAGENTA);
     while (1);
 }
 
 void vApplicationMallocFailedHook(void)
 {
-    ledz_on(hardware_leds(4), CYAN);
+    ledz_on(hardware_leds(4), MAGENTA);
     while (1);
 }
 
 void vApplicationIdleHook(void)
 {
     //should not reach here, however this should also not include the while(1)
-    ledz_on(hardware_leds(6), CYAN);
+    ledz_on(hardware_leds(6), MAGENTA);
     while (1);
 }
 
