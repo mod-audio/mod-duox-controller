@@ -2318,9 +2318,6 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
             char buffer[10];
             uint8_t i;
             i = copy_command(buffer, NEXT_PAGE_COMMAND);
-            
-            //clear actuator queue
-            reset_queue();
 
             //clear controls            
             uint8_t j;
@@ -2339,10 +2336,14 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                     // insert the page number on buffer
                     i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
 
+                    page++;
+
+                    //clear actuator queue
+                    reset_queue();
+
                     comm_webgui_clear();
                     comm_webgui_send(buffer, i);
-                    //comm_webgui_wait_response();
-                    page++;
+                    comm_webgui_wait_response();
                 break;
                 case 1:
                     ledz_off(hardware_leds(5), PAGES1_COLOR);
@@ -2352,10 +2353,14 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                     // insert the page number on buffer
                     i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
 
+                    page++;
+
+                    //clear actuator queue
+                    reset_queue();
+
                     comm_webgui_clear();
                     comm_webgui_send(buffer, i);
-                    //comm_webgui_wait_response();
-                    page++;
+                    comm_webgui_wait_response();
                 break;
                 case 2:
                     ledz_off(hardware_leds(5), PAGES2_COLOR);
@@ -2365,9 +2370,14 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                     // insert the page number on buffer
                     i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
 
+                    page++;
+
+                    //clear actuator queue
+                    reset_queue();
+
                     comm_webgui_clear();
                     comm_webgui_send(buffer, i);
-                    //comm_webgui_wait_response();
+                    comm_webgui_wait_response();
                     page=0;
                 break;
             }

@@ -168,7 +168,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         textbox_t value, unit, title;
 
         //convert title
-        char *title_str_bfr = (char *) MALLOC(8 * sizeof(char));
+        char title_str_bfr[8] = {0};
         strncpy(title_str_bfr, control->label, 7);
         title_str_bfr[7] = '\0';
 
@@ -176,7 +176,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         //value_str is our temporary value which we use for what kind of value representation we need
         //value_str_bfr is the value that gets printed
         char value_str[10] = {0};
-        char *value_str_bfr = (char *) MALLOC(6 * sizeof(char));
+        char value_str_bfr[7] = {0};
 
         //if the value becomes bigger then 9999 (4 characters), then switch to another view 10999 becomes 10.9K
         if (control->value > 9999)
@@ -219,13 +219,14 @@ void screen_pot(uint8_t pot_id, control_t *control)
 
         //copy to value_str_bfr, the first 5 char
         strncpy(value_str_bfr, value_str, 5);
+        //terminate the text with line ending, since no unit is added to it
+        value_str_bfr[5] = '\0';
 
         //convert unit
         char *unit_str;
         if (strcmp(control->unit, "") == 0)
         {
             unit_str = control->unit;     
-            unit_str[strlen(unit_str) - 1] = '\0';
         }
         else unit_str = NULL;
 
@@ -255,8 +256,6 @@ void screen_pot(uint8_t pot_id, control_t *control)
         title.text = title_str_bfr;
         title.align = ALIGN_NONE_NONE;
         widget_textbox(display, &title);
-
-        FREE(title_str_bfr);
 
         //sets the value y, for both value as unit
         value.y = knob.y - 5;
@@ -289,9 +288,6 @@ void screen_pot(uint8_t pot_id, control_t *control)
                 // horizontal footer line
                 if (pot_id == 1 || pot_id == 3 || pot_id == 5 || pot_id == 7)
                     glcd_hline(display, 0, 55, DISPLAY_WIDTH, GLCD_BLACK);
-
-                //terminate the text with line ending, since no unit is added to it
-                value_str_bfr[5] = '\0';
             }
             //if unit = %, add it to the value string (if its one of the pots on the left add 4 pixels (1 char))
             else
@@ -321,7 +317,6 @@ void screen_pot(uint8_t pot_id, control_t *control)
         value.text = value_str_bfr;
         value.align = ALIGN_NONE_NONE;
         widget_textbox(display, &value);
-        FREE (value_str_bfr);
     }
 
     //invert the pot area
@@ -394,14 +389,14 @@ void screen_encoder(uint8_t display_id, control_t *control)
         //convert value
         //value_str is our temporary value which we use for what kind of value representation we need
         //value_str_bfr is the value that gets printed
-        char value_str[10];
-        char *value_str_bfr = (char *) MALLOC(6 * sizeof(char));
+        char value_str[10] = {0};
+        char value_str_bfr[6] = {0};
         char *unit_str_bfr = NULL;
 
         //if the value becomes bigger then 9999 (4 characters), then switch to another view 10999 becomes 10.9K
         if (control->value > 9999)
         {
-            int_to_str(control->value/1000, value_str, sizeof(value_str), 0);
+            int_to_str(control->value/1000, value_str, sizeof(value_str) - 1, 0);
             strcat(value_str, "K");
         }
         //else if we have a value bigger then 100, we dont display decimals anymore
@@ -423,7 +418,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
             }
             else if (control->value < -9999.9)
             {
-                int_to_str((control->value/1000), value_str, sizeof(value_str), 0);
+                int_to_str((control->value/1000), value_str, sizeof(value_str) - 1, 0);
                 strcat(value_str, "K");
             }
             else int_to_str(control->value, value_str, sizeof(value_str), 0);
@@ -490,7 +485,6 @@ void screen_encoder(uint8_t display_id, control_t *control)
         value.align = ALIGN_RIGHT_NONE;
         widget_textbox(display, &value);
 
-        FREE (value_str_bfr);
         FREE (unit_str_bfr);
 
         bar_t volume_bar;
@@ -529,7 +523,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
 
         textbox_t int_box;
         char *value_str = (char *) MALLOC(16 * sizeof(char));
-        char *value_str_bfr = (char *) MALLOC(5 * sizeof(char));
+        char value_str_bfr[5] = {0};
         int_to_str(control->value, value_str, sizeof(value_str), 0);
         int_box.color = GLCD_BLACK;
         int_box.mode = TEXT_SINGLE_LINE;
@@ -541,21 +535,27 @@ void screen_encoder(uint8_t display_id, control_t *control)
         int_box.left_margin = 0;
         int_box.right_margin = 0;
         strncpy(value_str_bfr, value_str, 4);
+        value_str_bfr[4] = '\0';
         FREE(value_str);
-        //strcat(value_str_bfr, '\0');
         int_box.text = value_str_bfr;
         int_box.align = ALIGN_NONE_NONE;
         int_box.x = (((DISPLAY_WIDTH / 4) + (DISPLAY_WIDTH / 2) )- (strlen(value_str_bfr) * 1.5));
         int_box.y = 13;
         widget_textbox(display, &int_box);
-        FREE(value_str_bfr);
     }
 
     // list type control
     else if (control->properties == CONTROL_PROP_ENUMERATION ||
              control->properties == CONTROL_PROP_SCALE_POINTS)
     {
-        static char *labels_list[128];
+        uint8_t scalepoint_count_local = control->scale_points_count > 64 ? 64 : control->scale_points_count;
+
+        char **labels_list = MALLOC(sizeof(char*) * scalepoint_count_local);
+
+        if (labels_list == NULL)
+        {
+            return null_screen_encoded(display, display_id);
+        }
 
         if (control->scroll_dir)
             control->scroll_dir = 1;
@@ -563,7 +563,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
             control->scroll_dir = 0;
 
         uint8_t i;
-        for (i = 0; i < control->scale_points_count; i++)
+        for (i = 0; i < scalepoint_count_local; i++)
         {
             labels_list[i] = control->scale_points[i]->label;
         }
@@ -575,7 +575,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
         list.color = GLCD_BLACK;
         list.font = SMfont;
         list.selected = control->step;
-        list.count = control->scale_points_count;
+        list.count = scalepoint_count_local;
         list.list = labels_list;
         list.direction = control->scroll_dir;
         list.line_space = 1;
@@ -584,6 +584,8 @@ void screen_encoder(uint8_t display_id, control_t *control)
         list.text_left_margin = 1;
         list.name = control->label;
         widget_listbox3(display, &list);
+
+        FREE(labels_list);
     }
     else
     {
@@ -715,8 +717,8 @@ void screen_footer(uint8_t id, const char *name, const char *value)
             }
         }
 
-        char *title_str_bfr = (char *) MALLOC(char_cnt_name * sizeof(char));
-        char *value_str_bfr = (char *) MALLOC(char_cnt_value * sizeof(char));
+        char *title_str_bfr = (char *) MALLOC((char_cnt_name + 1) * sizeof(char));
+        char *value_str_bfr = (char *) MALLOC((char_cnt_value + 1) * sizeof(char));
 
         // draws the name field
         textbox_t footer;
