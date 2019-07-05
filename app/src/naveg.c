@@ -103,6 +103,10 @@ static float master_vol_value;
 static uint8_t snapshot_loaded[2] = {};
 static uint8_t page = 1;
 static int8_t g_current_bank;
+
+// only enabled after "boot" command received
+bool g_should_wait_for_webgui = false;
+
 /*
 ************************************************************************************************************************
 *           LOCAL FUNCTION PROTOTYPES
@@ -812,7 +816,9 @@ static void control_set(uint8_t id, control_t *control)
     comm_webgui_send(buffer, i);
 
     //wait for a response from mod-ui
-    comm_webgui_wait_response();
+    if (g_should_wait_for_webgui) {
+        comm_webgui_wait_response();
+    }
 }
 
 static void parse_banks_list(void *data, menu_item_t *item)
@@ -2301,7 +2307,9 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 
                         comm_webgui_clear();
                         comm_webgui_send(buffer, i);
-                        comm_webgui_wait_response();
+                        if (g_should_wait_for_webgui) {
+                            comm_webgui_wait_response();
+                        }
                     }
                     else
                     {
@@ -2343,7 +2351,9 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 
                     comm_webgui_clear();
                     comm_webgui_send(buffer, i);
-                    comm_webgui_wait_response();
+                    if (g_should_wait_for_webgui) {
+                        comm_webgui_wait_response();
+                    }
                 break;
                 case 1:
                     ledz_off(hardware_leds(5), PAGES1_COLOR);
@@ -2360,7 +2370,9 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 
                     comm_webgui_clear();
                     comm_webgui_send(buffer, i);
-                    comm_webgui_wait_response();
+                    if (g_should_wait_for_webgui) {
+                        comm_webgui_wait_response();
+                    }
                 break;
                 case 2:
                     ledz_off(hardware_leds(5), PAGES2_COLOR);
@@ -2377,7 +2389,9 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 
                     comm_webgui_clear();
                     comm_webgui_send(buffer, i);
-                    comm_webgui_wait_response();
+                    if (g_should_wait_for_webgui) {
+                        comm_webgui_wait_response();
+                    }
                     page=0;
                 break;
             }
