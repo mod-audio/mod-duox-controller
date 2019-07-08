@@ -917,8 +917,8 @@ void system_tempo_cb (void *arg, int event)
 
     if (event == MENU_EV_ENTER)
     {
-        //we can only change tempo when its generated internaly 
-        if (g_MIDI_clk_src == 0)set_item_value(TEMPO_SET_CMD, item->data.value);
+        //we can only change tempo when not linked to MIDI
+        if (g_MIDI_clk_src != 1) set_item_value(TEMPO_SET_CMD, item->data.value);
     }
     else if (event == MENU_EV_NONE)
     {
@@ -931,8 +931,8 @@ void system_tempo_cb (void *arg, int event)
     //scrolling up/down
     else 
     {
-        //we can only change tempo when its generated internaly 
-        if (g_MIDI_clk_src == 0)
+        //we can only change tempo when not linked to MIDI
+        if (g_MIDI_clk_src != 1)
         {
             //HMI changes the item, resync
             g_beats_per_minute = item->data.value;
