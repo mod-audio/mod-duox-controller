@@ -2,8 +2,6 @@
 
 Files for the Duo X controller firmware
 
-Not ready for a stable release yet, though good for testing.
-
 This repo will only work with the latest revision of the MOD DuoX controller board (Rev 5, March 2019).
 The board features a 12Mhz crystal (main CLK of 120Mhz) on the LPC1777.
 

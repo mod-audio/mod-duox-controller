@@ -2521,6 +2521,9 @@ void naveg_toggle_tool(uint8_t tool, uint8_t display)
                 break;
         }
 
+        //clear previous commands in the buffer
+        comm_webgui_clear();
+
         control_t *control = g_encoders[display];
 
         // draws the control
