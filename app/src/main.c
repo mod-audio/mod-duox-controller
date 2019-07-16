@@ -110,6 +110,7 @@ static void pedalboard_name_cb(proto_t *proto);
 static void snapshot_clear_cb(proto_t *proto);
 static void menu_item_changed_cb(proto_t *proto);
 static void  pedalboard_clear_cb(proto_t *proto);
+static void  page_available_cb(proto_t *proto);
 
 /*
 ************************************************************************************************************************
@@ -441,6 +442,7 @@ static void setup_task(void *pvParameters)
     protocol_add_command(CLEAR_SNAPSHOT_COMMAND, snapshot_clear_cb);
     protocol_add_command(MENU_ITEM_CHANGE, menu_item_changed_cb);
     protocol_add_command(CLEAR_PEDALBOARD, pedalboard_clear_cb);
+    protocol_add_command(PAGE_AVAILABLE_CMD, page_available_cb);
 
     // init the navigation
     naveg_init();
@@ -674,6 +676,8 @@ static void boot_cb(proto_t *proto)
     
     //enable red LED to indicate we are in page 1
     ledz_on(hardware_leds(5), RED);
+    //by default, we only have 1 page
+    naveg_pages_available(1, 0, 0);
 
     //parse the pedalboard name
     screen_top_info(&proto->list[7] , 1);
@@ -723,6 +727,13 @@ static void  pedalboard_clear_cb(proto_t *proto)
 
     //reset the page to page 1
     naveg_reset_page();
+
+    protocol_response("resp 0", proto);
+}
+
+static void  page_available_cb(proto_t *proto)
+{
+    naveg_pages_available(atoi(proto->list[1]), atoi(proto->list[2]), atoi(proto->list[3]));
 
     protocol_response("resp 0", proto);
 }

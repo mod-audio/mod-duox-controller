@@ -101,8 +101,9 @@ static xSemaphoreHandle g_dialog_sem;
 static uint8_t dialog_active = 0;
 static float master_vol_value;
 static uint8_t snapshot_loaded[2] = {};
-static uint8_t page = 1;
+static uint8_t page = 0;
 static int8_t g_current_bank;
+static uint8_t page_available[3] = {0, 0, 0};
 
 // only disabled after "boot" command received
 bool g_self_test_mode = true;
@@ -2323,6 +2324,36 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
         case 5:
         	if (!pressed) return;
         ; //keeping the compiler happy
+
+            if (!g_self_test_mode) {
+                if (page == 2)
+                {
+                    if (page_available[0] == 1)
+                        page = 0;
+                    else if (page_available[1] == 1)
+                        page = 1;
+                    else return;
+                }
+                else if (page == 1)
+                {
+                    if (page_available[2] == 1)
+                        page = 2;
+                    else if (page_available[0] == 1)
+                        page = 0;
+                    else return;
+                }
+                else if (page == 0)
+                {
+                    if (page_available[1] == 1)
+                        page = 1;
+                    else if (page_available[2] == 1)
+                        page = 2;
+                    else return;
+                }
+                //out of bounds
+                else return;
+            }
+
             char buffer[10];
             uint8_t i;
             i = copy_command(buffer, NEXT_PAGE_COMMAND);
@@ -2337,14 +2368,12 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
             switch (page)
             {
                 case 0:
-                    ledz_off(hardware_leds(5), PAGES3_COLOR);
+                    ledz_off(hardware_leds(5), LEDZ_ALL_COLORS);
                     ledz_on(hardware_leds(5), PAGES1_COLOR);
 
                     // sends the request next page command
                     // insert the page number on buffer
                     i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
-
-                    page++;
 
                     //clear actuator queue
                     reset_queue();
@@ -2356,14 +2385,12 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                     }
                 break;
                 case 1:
-                    ledz_off(hardware_leds(5), PAGES1_COLOR);
+                    ledz_off(hardware_leds(5), LEDZ_ALL_COLORS);
                     ledz_on(hardware_leds(5), PAGES2_COLOR);
 
                     // sends the request next page command
                     // insert the page number on buffer
                     i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
-
-                    page++;
 
                     //clear actuator queue
                     reset_queue();
@@ -2375,14 +2402,12 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                     }
                 break;
                 case 2:
-                    ledz_off(hardware_leds(5), PAGES2_COLOR);
+                    ledz_off(hardware_leds(5), LEDZ_ALL_COLORS);
                     ledz_on(hardware_leds(5), PAGES3_COLOR);
 
                     // sends the request next page command
                     // insert the page number on buffer
                     i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
-
-                    page++;
 
                     //clear actuator queue
                     reset_queue();
@@ -2392,7 +2417,6 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                     if (!g_self_test_mode) {
                         comm_webgui_wait_response();
                     }
-                    page=0;
                 break;
             }
     }
@@ -2401,13 +2425,13 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 void naveg_reset_page(void)
 {
     //reset variable
-    page = 1;
+    page = 0;
 
     //reset LED
     ledz_off(hardware_leds(5), LEDZ_ALL_COLORS);
 
     //enable red LED to indicate we are in page 1
-    ledz_on(hardware_leds(5), RED);
+    ledz_on(hardware_leds(5), PAGES1_COLOR);
 
     return;
 }
@@ -2595,6 +2619,13 @@ void naveg_master_volume(uint8_t set)
     int8_t screen_val =  MAP(master_vol_value , -60, -0, 0, 100);
     screen_master_vol(screen_val);
 
+}
+
+void naveg_pages_available(uint8_t page_1, uint8_t page_2, uint8_t page_3)
+{
+    page_available[0] = page_1;
+    page_available[1] = page_2;
+    page_available[2] = page_3;
 }
 
 void naveg_print_pb_name(uint8_t display)

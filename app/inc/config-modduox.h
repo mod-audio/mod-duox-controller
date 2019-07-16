@@ -156,6 +156,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define POT6_PINS        {0, 26, 1, 3} //pot 6
 #define POT7_PINS        {0, 13, 3, 7} //pot 7
 
+#define PAGES_COUNT 3
 
 //total amount of actuators
 #define TOTAL_ACTUATORS (ENCODERS_COUNT + FOOTSWITCHES_COUNT + POTS_COUNT)
@@ -328,6 +329,8 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define CLEAR_PEDALBOARD              "pb_cl"
 //for encoder self-test click
 #define ENCODER_CLICKED_CMD           "encoder_clicked %i"
+//let the HMI know if a page is available
+#define PAGE_AVAILABLE_CMD            "pa %i %i %i"
 
 
 //// Control propertires definitions
