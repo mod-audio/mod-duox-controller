@@ -223,12 +223,20 @@ void screen_pot(uint8_t pot_id, control_t *control)
         value_str_bfr[5] = '\0';
 
         //convert unit
-        char *unit_str;
-        if (strcmp(control->unit, "") == 0)
+        char *unit_str = 0;
+        char tmp_unit[5];
+        char tmp_unit2[2];
+        char tmp_unit_check[10];
+
+        strcpy(tmp_unit_check, control->unit);
+        strcpy(tmp_unit, "none");
+  		strcpy(tmp_unit2, "%");
+
+        if (strcmp(tmp_unit_check, tmp_unit) == 0)
         {
-            unit_str = control->unit;     
+        	unit_str = NULL;  
         }
-        else unit_str = NULL;
+        else unit_str = control->unit;   
 
         //knob
         knob.color = GLCD_BLACK;
@@ -263,7 +271,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         //draws the unit
         if (unit_str != NULL)
         {
-            if (strchr(unit_str, '%') == NULL)
+            if (strcmp(unit_str, tmp_unit2) != 0)
             {
                 unit.color = GLCD_BLACK;
                 unit.mode = TEXT_SINGLE_LINE;

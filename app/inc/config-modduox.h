@@ -326,6 +326,8 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define MENU_ITEM_CHANGE              "mc %i %i ..."
 //clear both snapshots and controls 
 #define CLEAR_PEDALBOARD              "pb_cl"
+//for encoder self-test click
+#define ENCODER_CLICKED_CMD           "encoder_clicked %i"
 
 
 //// Control propertires definitions

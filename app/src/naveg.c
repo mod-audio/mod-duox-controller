@@ -104,8 +104,8 @@ static uint8_t snapshot_loaded[2] = {};
 static uint8_t page = 1;
 static int8_t g_current_bank;
 
-// only enabled after "boot" command received
-bool g_should_wait_for_webgui = false;
+// only disabled after "boot" command received
+bool g_self_test_mode = true;
 
 /*
 ************************************************************************************************************************
@@ -816,7 +816,7 @@ static void control_set(uint8_t id, control_t *control)
     comm_webgui_send(buffer, i);
 
     //wait for a response from mod-ui
-    if (g_should_wait_for_webgui) {
+    if (!g_self_test_mode) {
         comm_webgui_wait_response();
     }
 }
@@ -2216,19 +2216,19 @@ void naveg_pot_change(uint8_t pot)
     uint16_t tmp_value = hardware_get_pot_value(pot);
     //we check if the pot needs to be grabbed before. if so we raise the scroll_dir variable of the control
     //in this case scroll_dir is used as a flag. TODO: rename scroll_dir to actuator_flag
-    if (tmp_value < 50) tmp_value = 50;
-    else if (tmp_value > 3950) tmp_value = 3950;
+    if (tmp_value < 25) tmp_value = 25;
+    else if (tmp_value > 3975) tmp_value = 3975;
     //since the actuall actuator limits can scale verry differently we scale the actuator value in a range of 50 to 3950
     //within this range the difference should be smaller then 50 before the pot starts turning
-    uint16_t pot_adc_range_value = MAP(g_pots[pot]->value, g_pots[pot]->minimum, g_pots[pot]->maximum, 50, 3950)
+    uint16_t pot_adc_range_value = MAP(g_pots[pot]->value, g_pots[pot]->minimum, g_pots[pot]->maximum, 25, 3975)
 
     //if the actuator is still locked
-    if (g_pots[pot]->scroll_dir == 1)
+    if ((g_pots[pot]->scroll_dir == 1) && !g_self_test_mode)
     {
     	if ((tmp_value > pot_adc_range_value ? tmp_value - pot_adc_range_value : pot_adc_range_value - tmp_value) < POT_DIFF_THRESHOLD)
     	{
     	    g_pots[pot]->scroll_dir = 0;
-    	    g_pots[pot]->value = MAP(tmp_value, 50, 3950,  g_pots[pot]->minimum,  g_pots[pot]->maximum);
+    	    g_pots[pot]->value = MAP(tmp_value, 25, 3975,  g_pots[pot]->minimum,  g_pots[pot]->maximum);
     	    // send the pot value
     	    control_set(pot, g_pots[pot]);
     	}
@@ -2236,7 +2236,7 @@ void naveg_pot_change(uint8_t pot)
     }
     else
     {
-    	g_pots[pot]->value = MAP(tmp_value, 50, 3950,  g_pots[pot]->minimum,  g_pots[pot]->maximum);
+    	g_pots[pot]->value = MAP(tmp_value, 25, 3975,  g_pots[pot]->minimum,  g_pots[pot]->maximum);
     	// send the pot value
     	control_set(pot, g_pots[pot]);
     }
@@ -2307,7 +2307,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 
                         comm_webgui_clear();
                         comm_webgui_send(buffer, i);
-                        if (g_should_wait_for_webgui) {
+                        if (!g_self_test_mode) {
                             comm_webgui_wait_response();
                         }
                     }
@@ -2351,7 +2351,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 
                     comm_webgui_clear();
                     comm_webgui_send(buffer, i);
-                    if (g_should_wait_for_webgui) {
+                    if (!g_self_test_mode) {
                         comm_webgui_wait_response();
                     }
                 break;
@@ -2370,7 +2370,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 
                     comm_webgui_clear();
                     comm_webgui_send(buffer, i);
-                    if (g_should_wait_for_webgui) {
+                    if (!g_self_test_mode) {
                         comm_webgui_wait_response();
                     }
                 break;
@@ -2389,7 +2389,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 
                     comm_webgui_clear();
                     comm_webgui_send(buffer, i);
-                    if (g_should_wait_for_webgui) {
+                    if (!g_self_test_mode) {
                         comm_webgui_wait_response();
                     }
                     page=0;
@@ -2725,6 +2725,23 @@ bp_list_t *naveg_get_pedalboards(void)
 
 void naveg_enter(uint8_t display)
 {
+    //if in selftest mode, we just send if we are working or not
+    if (g_self_test_mode)
+    {
+        char buffer[30];
+        uint8_t i;
+
+        i = copy_command(buffer, ENCODER_CLICKED_CMD);
+
+        // insert the hw_id on buffer
+        i += int_to_str(display, &buffer[i], sizeof(buffer) - i, 0);
+
+        // send the data to GUI
+        comm_webgui_send(buffer, i);
+
+        return;
+    }
+
     if ((!g_initialized)&&(g_update_cb)) return;
 
     if (display_has_tool_enabled(display))
