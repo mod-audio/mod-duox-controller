@@ -229,7 +229,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         char tmp_unit_check[10];
 
         strcpy(tmp_unit_check, control->unit);
-        strcpy(tmp_unit, "none");
+        strcpy(tmp_unit, "");
   		strcpy(tmp_unit2, "%");
 
         if (strcmp(tmp_unit_check, tmp_unit) == 0)
