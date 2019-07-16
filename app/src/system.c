@@ -723,8 +723,8 @@ void system_sl_in_cb (void *arg, int event)
     }
 
     char str_bfr[4] = {};
-    if (g_sl_in == 1) strcpy(str_bfr," ON");
-    else strcpy(str_bfr,"OFF");   
+    if (g_sl_in == 1) strcpy(str_bfr,option_enabled);
+    else strcpy(str_bfr,option_disabled);   
     add_chars_to_menu_name(item, str_bfr);
 
     //gains can change because of this, update the menu
@@ -768,8 +768,8 @@ void system_sl_out_cb (void *arg, int event)
     }
 
     char str_bfr[4] = {};
-    if (g_sl_out == 1) strcpy(str_bfr," ON");
-    else strcpy(str_bfr,"OFF");   
+    if (g_sl_out == 1) strcpy(str_bfr,option_enabled);
+    else strcpy(str_bfr,option_disabled);   
     add_chars_to_menu_name(item, str_bfr);
 
     //gains can change because of this, update the whole menu
