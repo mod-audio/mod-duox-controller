@@ -96,6 +96,10 @@ uint8_t g_MIDI_clk_src = 0;
 uint8_t g_play_status = 0;
 uint8_t g_tuner_mute = 0;
 uint8_t g_display_brightness = 2;
+uint8_t g_cv_in_mode = 0;
+uint8_t g_cv_in_range = 0;
+uint8_t g_exp_mode = 0;
+uint8_t g_cv_out_mode = 0;
 
 /*
 ************************************************************************************************************************
@@ -408,6 +412,22 @@ void system_update_menu_value(uint8_t item_ID, uint8_t value)
         case DISPLAY_BRIGHTNESS_ID: 
             g_display_brightness = value;
             hardware_glcd_brightness(g_display_brightness); 
+        break;
+        //CV in mode
+        case EXP_CV_INP: 
+            g_cv_in_mode = value;
+        break;
+        //CV in range
+        case CV_RANGE: 
+            g_cv_in_range = value;
+        break;
+        //expression mode
+        case EXP_MODE: 
+            g_exp_mode = value;
+        break;
+        //display brightness
+        case HP_CV_OUTP: 
+            g_cv_out_mode = value;
         break;
         default:
             return;
@@ -1236,136 +1256,75 @@ void system_save_pro_cb(void *arg, int event)
     //we do not need to update, there is nothing that changes
 }
 
-//ONLY NEEDED ONCE CV IS WORKING, NOT USED RIGHT NOW
-/*
+//CV stuff
 void system_cv_exp_cb (void *arg, int event)
 {
     menu_item_t *item = arg;
 
-    if (event == MENU_EV_ENTER || event == MENU_EV_NONE)
+    if (event == MENU_EV_ENTER)
     {
-        if (event == MENU_EV_ENTER && item->data.hover == 0)
-        {
-            if (item->data.value == 0) item->data.value = 1;
-            else item->data.value = 0;
-            set_item_value(EXPCV_SET_CMD, item->data.value);
-        }
-        else if (event == MENU_EV_NONE)
-        {
-            item->data.value = 0;
-            request_item_value(EXPCV_GET_CMD, item);
-        }
-
-        strcpy(item->name, item->desc->name);
-        uint8_t q;
-        uint8_t value_size = 3;
-        uint8_t name_size = strlen(item->name);
-
-        for (q = 0; q < (31 - name_size - value_size); q++)
-        {
-            strcat(item->name, " ");
-        }
-
-        strcat(item->name, (item->data.value ? "EXP" : " CV"));
-
-        if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
+        if (g_cv_in_mode == 0) g_cv_in_mode = 1;
+        else g_cv_in_mode = 0;
+        set_item_value(PLAY_SET_CMD, g_cv_in_mode);
     }
+    char str_bfr[15] = {};
+    strcat(str_bfr,(g_cv_in_mode ? "CV" : "EXP"));
+    add_chars_to_menu_name(item, str_bfr);
+
+    //this setting changes just 1 item
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
+}
+
+void system_cv_range_cb (void *arg, int event)
+{
+    menu_item_t *item = arg;
+
+    if (event == MENU_EV_ENTER)
+    {
+        if (g_cv_in_range == 0) g_cv_in_range = 1;
+        else g_cv_in_range = 0;
+        set_item_value(PLAY_SET_CMD, g_cv_in_range);
+    }
+    char str_bfr[15] = {};
+    strcat(str_bfr,(g_cv_in_range ? "0 TO 5" : "-2.5 TO 2.5"));
+    add_chars_to_menu_name(item, str_bfr);
+
+    //this setting changes just 1 item
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
+}
+
+void system_exp_mode_cb (void *arg, int event)
+{
+    menu_item_t *item = arg;
+
+    if (event == MENU_EV_ENTER)
+    {
+        if (g_exp_mode == 0) g_exp_mode = 1;
+        else g_exp_mode = 0;
+        set_item_value(PLAY_SET_CMD, g_exp_mode);
+    }
+    char str_bfr[15] = {};
+    strcat(str_bfr,(g_exp_mode ? "Signal on Tip" : "Signal on Ring"));
+    add_chars_to_menu_name(item, str_bfr);
+
+    //this setting changes just 1 item
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
 }
 
 void system_cv_hp_cb (void *arg, int event)
 {
     menu_item_t *item = arg;
 
-    if (event == MENU_EV_ENTER || event == MENU_EV_NONE)
-    {
-        if (event == MENU_EV_ENTER && item->data.hover == 0)
-        {
-            if (item->data.value == 0) item->data.value = 1;
-            else item->data.value = 0;
-            set_item_value(HPCV_SET_CMD, item->data.value);
-        }
-        else if (event == MENU_EV_NONE)
-        {
-            item->data.value = 0;
-            request_item_value(HPCV_GET_CMD, item);
-        }
-
-        strcpy(item->name, item->desc->name);
-        uint8_t q;
-        uint8_t value_size = 2;
-        uint8_t name_size = strlen(item->name);
-        for (q = 0; q < (31 - name_size - value_size); q++)
-        {
-            strcat(item->name, " ");
-        }
-        strcat(item->name, (item->data.value ? "HP" : "CV"));
-        if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
-    }
-}
-
-void system_cv_range_cb(void *arg, int event)
-{
-    menu_item_t *item = arg;
-
     if (event == MENU_EV_ENTER)
     {
-        if (item->data.value < 1) item->data.value++;
-        else item->data.value = 0;
-        set_item_value(CV_BIAS_SET_CMD, item->data.value);
+        if (g_cv_out_mode == 0) g_cv_out_mode = 1;
+        else g_cv_out_mode = 0;
+        set_item_value(PLAY_SET_CMD, g_cv_out_mode);
     }
-    else if (event == MENU_EV_NONE)
-    {
-        request_item_value(CV_BIAS_GET_CMD, item);
-        item->data.value = 0;
-    }
+    char str_bfr[15] = {};
+    strcat(str_bfr,(g_cv_out_mode ? "CV" : "Headphone"));
+    add_chars_to_menu_name(item, str_bfr);
 
-    char str_bfr[16];
-    if (item->data.value == 0) strcpy(str_bfr,"0 to +5V");
-    else if (item->data.value == 1) strcpy(str_bfr,"-2.5 to +2.5V");
-
-    strcpy(item->name, item->desc->name);
-    uint8_t q;
-    uint8_t value_size = strlen(str_bfr);
-    uint8_t name_size = strlen(item->name);
-    for (q = 0; q < (31 - name_size - value_size); q++)
-    {
-        strcat(item->name, " ");
-    }
-    strcat(item->name, (str_bfr));
-
+    //this setting changes just 1 item
     if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
 }
-
-void system_exp_mode_cb(void *arg, int event)
-{
-    menu_item_t *item = arg;
-
-    if (event == MENU_EV_ENTER)
-    {
-        if (item->data.value < 1) item->data.value++;
-        else item->data.value = 0;
-        set_item_value(EXP_MODE_SET_CMD, item->data.value);
-    }
-    else if (event == MENU_EV_NONE)
-    {
-        item->data.value = 0;
-        request_item_value(EXP_MODE_GET_CMD, item);
-    }
-
-    char str_bfr[16];
-    if (item->data.value == 0) strcpy(str_bfr,"Signal on tip");
-    else if (item->data.value == 1) strcpy(str_bfr,"Signal on ring");
-
-    strcpy(item->name, item->desc->name);
-    uint8_t q;
-    uint8_t value_size = strlen(str_bfr);
-    uint8_t name_size = strlen(item->name);
-    for (q = 0; q < (31 - name_size - value_size); q++)
-    {
-        strcat(item->name, " ");
-    }
-    strcat(item->name, (str_bfr));
-
-    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
-}
-*/
