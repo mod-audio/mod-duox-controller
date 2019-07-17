@@ -516,13 +516,13 @@ static void foot_control_add(control_t *control)
         case CONTROL_PROP_TRIGGER:
             // updates the led
             //check if its assigned to a trigger and if the button is released
-            if (!control->scroll_dir)
+            if (control->scroll_dir == 2) ledz_on(hardware_leds(control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR);
+            else if (!control->scroll_dir)
             {
                 ledz_off(hardware_leds(control->hw_id - ENCODERS_COUNT), TRIGGER_PRESSED_COLOR);
                 ledz_on(hardware_leds(control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR); //TRIGGER_COLOR
                 return;
             }
-            else if (control->scroll_dir == 2) ledz_on(hardware_leds(control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR);
             else
             {
                 ledz_off(hardware_leds(control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR);
@@ -778,6 +778,9 @@ static void control_set(uint8_t id, control_t *control)
 
             // to update the footer and screen
             foot_control_add(control);
+
+            if (!control->scroll_dir) return;
+            
             break;
 
         case CONTROL_PROP_TAP_TEMPO:
