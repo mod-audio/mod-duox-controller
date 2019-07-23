@@ -103,7 +103,7 @@ static float master_vol_value;
 static uint8_t snapshot_loaded[2] = {};
 static uint8_t page = 0;
 static int8_t g_current_bank;
-static uint8_t page_available[3] = {0, 0, 0};
+static uint8_t page_available[3] = {1, 1, 1};
 
 // only disabled after "boot" command received
 bool g_self_test_mode = true;

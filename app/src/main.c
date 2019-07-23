@@ -677,7 +677,7 @@ static void boot_cb(proto_t *proto)
     //enable red LED to indicate we are in page 1
     ledz_on(hardware_leds(5), RED);
     //by default, we only have 1 page
-    naveg_pages_available(1, 0, 0);
+    naveg_pages_available(1, 1, 1);
 
     //parse the pedalboard name
     screen_top_info(&proto->list[7] , 1);
