@@ -104,6 +104,16 @@ static uint8_t get_text_width(const char *text, const uint8_t *font)
 
     return text_width;
 }
+
+float mapLog(float value, float min1, float max1, float min2, float max2) {
+  min2 = log(min2);
+  max2 = log(max2);
+ 
+  float outgoing =
+    exp(min2 + (max2 - min2) * ((value - min1) / (max1 - min1)));
+
+  return outgoing;
+}
 /*
 ************************************************************************************************************************
 *           GLOBAL FUNCTIONS
@@ -424,10 +434,42 @@ void widget_bar_indicator(glcd_t *display, bar_t *bar)
 void widget_knob(glcd_t *display, knob_t *knob)
 {
     float NewValue;
-    uint8_t knob_possistion;
+    uint8_t knob_possistion = 0;
 
-    NewValue = MAP(knob->value, knob->min, knob->max, 1, 16);
-    knob_possistion = ROUND(NewValue);
+    uint8_t amount_of_divisions = 15;
+
+    float division_values[amount_of_divisions];
+
+    //liniar
+    if (knob->mode == 0)
+    {
+        NewValue = MAP(knob->value, knob->min, knob->max, 1, amount_of_divisions);
+        knob_possistion = ROUND(NewValue);
+    }
+    //logaritmic
+    else if (knob->mode == 1)
+    {
+        float division = (POT_UPPER_THRESHOLD - POT_LOWER_THRESHOLD) / amount_of_divisions;
+
+        uint8_t i = 1;
+
+        for(i = 1; i < amount_of_divisions; i++)
+        {
+            float p_step = ((float) (i * division)) / ((float) (POT_UPPER_THRESHOLD - 1));
+            division_values[i] = knob->min * pow(knob->max / knob->min, p_step);
+
+            if (division_values[i] < knob->value)
+            {
+                knob_possistion = i;
+                continue;
+            }
+        } 
+    }
+    //ERROR
+    else
+    {
+        return;
+    }
 
     //draw the circle
     glcd_rect_fill(display, (knob->x - 2) , (knob->y - 5), 5, 1, knob->color);
@@ -604,6 +646,9 @@ void widget_knob(glcd_t *display, knob_t *knob)
            //if (knob->lock) glcd_rect_fill(display, (knob->x + 1) , (knob->y + 2), 1, 3, knob->color);
            //else 
             glcd_rect_fill(display, (knob->x + 1) , (knob->y + 2), 1, 2, knob->color);
+        break;
+        default:
+            glcd_rect_fill(display, (knob->x - 1) , (knob->y + 2), 1, 2, knob->color);
         break;
     }
 

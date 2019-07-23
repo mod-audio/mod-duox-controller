@@ -244,6 +244,15 @@ void screen_pot(uint8_t pot_id, control_t *control)
         knob.value = control->value;
         knob.min = control->minimum;
         knob.max = control->maximum;
+        if (control->properties == CONTROL_PROP_LINEAR)
+        {
+            knob.mode = 0;
+        }
+        else if (control->properties == CONTROL_PROP_LOGARITHMIC)
+        {
+            knob.mode = 1;
+        }
+        else knob.mode = 0;
         widget_knob(display, &knob);
 
         //title:

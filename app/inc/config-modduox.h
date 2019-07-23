@@ -141,9 +141,12 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define POTS_COUNT          8
 
 //the resolution of a pot
-#define POT_THRESHOLD       25  
-//the value differance at which a pot gets locked
-#define POT_DIFF_THRESHOLD  450
+#define POT_THRESHOLD       25
+
+#define POT_LOWER_THRESHOLD (POT_THRESHOLD + 10)
+#define POT_UPPER_THRESHOLD (4095- POT_THRESHOLD - 20)
+
+#define POT_DIFF_THRESHOLD 300
 
 // Potentiometers ports, pins and functions definitions
 // pot definition: {POT_PORT, POT_PIN, PIN_ADC_FUNCTION, ADC CHANNEL}

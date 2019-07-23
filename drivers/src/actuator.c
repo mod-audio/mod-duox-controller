@@ -629,17 +629,25 @@ void actuators_clock(void)
                 break;
 
             case POT:
+                //clear the pot event
                 CLR_FLAG(pot->status, EV_POT_TURNED);
-                //if channel bussy we skip an actuator clock cycle
+
+                //if channel bussy we skip an actuator clock cycle, TODO make me not so dirty 
                 if (ADC_ChannelGetStatus(LPC_ADC, pot->channel, 1))
                 {
-                    CLR_FLAG(pot->status, EV_POT_TURNED);
+                    //this is our weighing factor for smoothing the pot value's
                     static float k = 0.01;
+                    
+                    //some memory for calculations
                     static uint16_t current_value[POTS_COUNT] = {};
+
                     //get value
                     uint16_t tmp = ADC_ChannelGetData(LPC_ADC, pot->channel);
 
+                    //apply weighing factor
                     current_value[pot->id] = k * tmp + (1.0 - k) * current_value[pot->id];
+
+                    //set a tmp val
                     uint16_t val = current_value[pot->id];
 
                     //if turned and difference is suficiant

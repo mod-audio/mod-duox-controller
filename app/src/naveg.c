@@ -391,15 +391,34 @@ static void display_pot_add(control_t *control)
     //we check if the pot needs to be grabbed before. if so we raise the scroll_dir variable of the control
     //in this case scroll_dir is used as a flag. TODO: rename scroll_dir to actuator_flag
     uint16_t tmp_value = hardware_get_pot_value(id);
-    if (tmp_value < 50)
-        tmp_value = 50;
-    else if (tmp_value > 3950)
-        tmp_value = 3950;
+
+    if (tmp_value < POT_LOWER_THRESHOLD)
+        tmp_value = POT_LOWER_THRESHOLD;
+    else if (tmp_value > POT_THRESHOLD)
+        tmp_value = POT_THRESHOLD;
+
     //since the actuall actuator limits can scale verry differently we scale the actuator value in a range of 50 to 3950
     //within this range the difference should be smaller then 50 before the pot starts turning
-    uint16_t pot_adc_range_value = MAP(g_pots[id]->value, g_pots[id]->minimum, g_pots[id]->maximum, 50, 3950)
+    uint16_t tmp_control_value = 0;
+
+    if (g_pots[id]->properties == CONTROL_PROP_LINEAR)
+    {
+    	//map the current value to the ADC range
+    	tmp_control_value = MAP(g_pots[id]->value, g_pots[id]->minimum,  g_pots[id]->maximum, POT_LOWER_THRESHOLD, POT_UPPER_THRESHOLD);
+    }
+    else if (g_pots[id]->properties == CONTROL_PROP_LOGARITHMIC)
+    {
+    	//map the current value to the ADC range logarithmicly 
+    	tmp_control_value = (POT_UPPER_THRESHOLD - POT_LOWER_THRESHOLD) * log(g_pots[id]->value / g_pots[id]->minimum) / log(g_pots[id]->maximum / g_pots[id]->minimum);
+    }
+    else 
+    {
+    	//map the current value to the ADC range
+    	tmp_control_value = MAP(g_pots[id]->value, g_pots[id]->minimum,  g_pots[id]->maximum, POT_LOWER_THRESHOLD, POT_UPPER_THRESHOLD);
+    }
+
     //float new_pot_value = (tmp_value - 50) * (g_pots[id]->maximum  - g_pots[id]->minimum) / (3950 - 50) + g_pots[id]->minimum;
-    if ((tmp_value > pot_adc_range_value ? tmp_value - pot_adc_range_value : pot_adc_range_value - tmp_value) < 300)
+    if ((tmp_value > tmp_control_value ? tmp_value - tmp_control_value : tmp_control_value - tmp_value) < POT_DIFF_THRESHOLD)
     {
         g_pots[id]->scroll_dir = 0;
     }
@@ -2194,14 +2213,31 @@ void naveg_set_control(uint8_t hw_id, float value)
         else
         {
             uint16_t tmp_value = hardware_get_pot_value(id);
-            if (tmp_value < 50)
-                tmp_value = 50;
-            else if (tmp_value > 3950)
-                tmp_value = 3950;
+            
+            if (tmp_value < POT_LOWER_THRESHOLD)
+                tmp_value = POT_LOWER_THRESHOLD;
+            else if (tmp_value > POT_UPPER_THRESHOLD)
+                tmp_value = POT_UPPER_THRESHOLD;
 
-            uint16_t pot_adc_range_value = MAP(g_pots[id]->value, g_pots[id]->minimum, g_pots[id]->maximum, 50, 3950)
+            uint16_t tmp_control_value = 0;
 
-            if ((tmp_value > pot_adc_range_value ? tmp_value - pot_adc_range_value : pot_adc_range_value - tmp_value) < POT_DIFF_THRESHOLD)
+            if (g_pots[id]->properties == CONTROL_PROP_LINEAR)
+            {
+            	//map the current value to the ADC range
+            	tmp_control_value = MAP(g_pots[id]->value, g_pots[id]->minimum,  g_pots[id]->maximum, POT_LOWER_THRESHOLD, POT_UPPER_THRESHOLD);
+            }
+            else if (g_pots[id]->properties == CONTROL_PROP_LOGARITHMIC)
+            {
+            	//map the current value to the ADC range logarithmicly 
+            	tmp_control_value = (POT_UPPER_THRESHOLD - POT_LOWER_THRESHOLD) * log(g_pots[id]->value / g_pots[id]->minimum) / log(g_pots[id]->maximum / g_pots[id]->minimum);
+            }
+            else 
+            {
+            	//map the current value to the ADC range
+            	tmp_control_value = MAP(g_pots[id]->value, g_pots[id]->minimum,  g_pots[id]->maximum, POT_LOWER_THRESHOLD, POT_UPPER_THRESHOLD);
+            }
+
+            if ((tmp_value > tmp_control_value ? tmp_value - tmp_control_value : tmp_control_value - tmp_value) < POT_DIFF_THRESHOLD)
             {
                 g_pots[id]->scroll_dir = 0;
             }
@@ -2238,36 +2274,65 @@ void naveg_pot_change(uint8_t pot)
     // checks if there is assigned control
     if (g_pots[pot] == NULL) return;
 
+    //if we are in tool mode block potentiometers
     if (display_has_tool_enabled(get_display_by_id(pot, POTENTIOMETER))) return;
 
-    //set the new value
+    //set the new value as tmp
     uint16_t tmp_value = hardware_get_pot_value(pot);
-    //we check if the pot needs to be grabbed before. if so we raise the scroll_dir variable of the control
-    //in this case scroll_dir is used as a flag. TODO: rename scroll_dir to actuator_flag
-    if (tmp_value < 25) tmp_value = 25;
-    else if (tmp_value > 3975) tmp_value = 3975;
-    //since the actuall actuator limits can scale verry differently we scale the actuator value in a range of 50 to 3950
-    //within this range the difference should be smaller then 50 before the pot starts turning
-    uint16_t pot_adc_range_value = MAP(g_pots[pot]->value, g_pots[pot]->minimum, g_pots[pot]->maximum, 25, 3975)
+
+    //if the pot is lower then its upper and lower thresholds, they are the same
+    if (tmp_value < POT_LOWER_THRESHOLD) tmp_value = POT_LOWER_THRESHOLD;
+    else if (tmp_value > POT_UPPER_THRESHOLD) tmp_value = POT_UPPER_THRESHOLD;
+
+    uint16_t tmp_control_value = 0;
+
+    if (g_pots[pot]->properties == CONTROL_PROP_LINEAR)
+    {
+    	//map the current value to the ADC range
+    	tmp_control_value = MAP(g_pots[pot]->value, g_pots[pot]->minimum,  g_pots[pot]->maximum, POT_LOWER_THRESHOLD, POT_UPPER_THRESHOLD);
+    }
+    else if (g_pots[pot]->properties == CONTROL_PROP_LOGARITHMIC)
+    {
+    	//map the current value to the ADC range logarithmicly 
+    	tmp_control_value = (POT_UPPER_THRESHOLD - POT_LOWER_THRESHOLD) * log(g_pots[pot]->value / g_pots[pot]->minimum) / log(g_pots[pot]->maximum / g_pots[pot]->minimum);
+    }
+    else 
+    {
+    	//map the current value to the ADC range
+    	tmp_control_value = MAP(g_pots[pot]->value, g_pots[pot]->minimum,  g_pots[pot]->maximum, POT_LOWER_THRESHOLD, POT_UPPER_THRESHOLD);
+    }
 
     //if the actuator is still locked
     if ((g_pots[pot]->scroll_dir == 1) && !g_self_test_mode)
     {
-    	if ((tmp_value > pot_adc_range_value ? tmp_value - pot_adc_range_value : pot_adc_range_value - tmp_value) < POT_DIFF_THRESHOLD)
+    	if ((tmp_value > tmp_control_value ? tmp_value - tmp_control_value : tmp_control_value - tmp_value) < POT_DIFF_THRESHOLD)
     	{
     	    g_pots[pot]->scroll_dir = 0;
-    	    g_pots[pot]->value = MAP(tmp_value, 25, 3975,  g_pots[pot]->minimum,  g_pots[pot]->maximum);
-    	    // send the pot value
-    	    control_set(pot, g_pots[pot]);
     	}
-    	else g_pots[pot]->scroll_dir = 1;
+    	else 
+    	{
+    		g_pots[pot]->scroll_dir = 1;
+    		return;
+    	}
     }
-    else
+
+    if (g_pots[pot]->properties == CONTROL_PROP_LINEAR)
+  	{
+    	g_pots[pot]->value = MAP(tmp_value, POT_LOWER_THRESHOLD, POT_UPPER_THRESHOLD,  g_pots[pot]->minimum,  g_pots[pot]->maximum);
+    }
+    else if (g_pots[pot]->properties == CONTROL_PROP_LOGARITHMIC)
     {
-    	g_pots[pot]->value = MAP(tmp_value, 25, 3975,  g_pots[pot]->minimum,  g_pots[pot]->maximum);
-    	// send the pot value
-    	control_set(pot, g_pots[pot]);
+    	float p_step = ((float) tmp_value) / ((float) (POT_UPPER_THRESHOLD - 1));
+    	g_pots[pot]->value = g_pots[pot]->minimum * pow(g_pots[pot]->maximum / g_pots[pot]->minimum, p_step);
     }
+    //default, liniar
+    else 
+    {
+    	g_pots[pot]->value = MAP(tmp_value, POT_LOWER_THRESHOLD, POT_UPPER_THRESHOLD,  g_pots[pot]->minimum,  g_pots[pot]->maximum);
+    }
+
+   	// send the pot value
+   	control_set(pot, g_pots[pot]);
 }
 
 void naveg_foot_change(uint8_t foot, uint8_t pressed)

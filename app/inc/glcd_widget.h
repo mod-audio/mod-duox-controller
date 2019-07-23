@@ -77,6 +77,7 @@ typedef struct KNOB_T {
     uint8_t x, y;
     uint8_t color;
     uint8_t orientation;
+    uint8_t mode;
     uint8_t lock;
     float min, max, value;
 } knob_t;
