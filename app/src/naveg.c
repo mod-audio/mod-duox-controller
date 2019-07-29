@@ -774,6 +774,7 @@ static void control_set(uint8_t id, control_t *control)
             }
             break;
 
+
         case CONTROL_PROP_TOGGLED:
         case CONTROL_PROP_BYPASS:
             if (control->value > control->minimum) control->value = control->minimum;
