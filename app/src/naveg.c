@@ -784,17 +784,18 @@ static void control_set(uint8_t id, control_t *control)
             }
             break;
 
+
         case CONTROL_PROP_TOGGLED:
         case CONTROL_PROP_BYPASS:
-            if (control->value > 0) control->value = 0;
-            else control->value = 1;
+            if (control->value > control->minimum) control->value = control->minimum;
+            else control->value = control->maximum;
 
             // to update the footer and screen
             foot_control_add(control);
             break;
 
         case CONTROL_PROP_TRIGGER:
-
+            control->value = control->maximum;
             // to update the footer and screen
             foot_control_add(control);
 
@@ -2090,8 +2091,6 @@ void naveg_set_control(uint8_t hw_id, float value)
                     ledz_off(hardware_leds(control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR);
                     ledz_on(hardware_leds(control->hw_id - ENCODERS_COUNT), TRIGGER_PRESSED_COLOR);
                 }
-
-                // updates the led
 
                 // if is in tool mode break
                 if (display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT)))

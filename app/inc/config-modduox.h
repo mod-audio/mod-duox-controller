@@ -544,11 +544,6 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {HP_CV_OUTP+1, "Set output to CV", HP_CV_POPUP_TXT}, \
 
 #define MENU_LINE_CHARS     31
-//MENU ITEMS WE DO NOT SHOW RIGHT NOW BECAUSE WE DO NOT HAVE CV
-    /*{"CV / EXP INPUT",                  MENU_TOGGLE,    EXP_CV_INP,         INP_ID,         system_cv_exp_cb           , 0},  \
-    {"CV RANGE",                        MENU_TOGGLE,    CV_RANGE,           INP_ID,         system_cv_range_cb         , 0},  \
-    {"EXP MODE",                        MENU_TOGGLE,    EXP_MODE,           INP_ID,         system_exp_mode_cb         , 0},  \
-      {"CV / HP OUTPUT",                  MENU_TOGGLE,    HP_CV_OUTP,         OUTP_ID,        system_cv_hp_cb            , 0},  \*/
 
 //ID's for menu callback funtions 
 //THIS SHOULD NOT BE HERE ALMOST ALL OF THEM ARE ALREDY DEFINE ABOVE
