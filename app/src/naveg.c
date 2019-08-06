@@ -861,7 +861,7 @@ static void parse_banks_list(void *data, menu_item_t *item)
 {
     (void) item;
     char **list = data;
-    uint32_t count = strarr_length(list) - 2;
+    uint32_t count = strarr_length(list);
 
     // workaround freeze when opening menu
     delay_ms(20);
@@ -1236,7 +1236,7 @@ static void menu_enter(uint8_t display_id)
             {
                 item->desc->action_cb(item, MENU_EV_ENTER);
             }
-            
+
             // highlights the default button
             item->data.hover = 0;
 
@@ -1579,7 +1579,7 @@ static void bank_config_update(uint8_t bank_func_idx)
             {
                 g_current_pedalboard++;
 
-                if (g_current_pedalboard == g_selected_pedalboards->count)
+                if (g_current_pedalboard >= g_selected_pedalboards->count)
                 {
                     // if previous pedalboard function is not being used, does circular selection
                     // the minimum value is 1 because the option 0 is 'back to banks list'
@@ -1593,7 +1593,7 @@ static void bank_config_update(uint8_t bank_func_idx)
                 g_selected_pedalboards->selected = g_current_pedalboard;
 
                 if (current_pedalboard != g_current_pedalboard)
-                    send_load_pedalboard(g_current_bank - 1, g_selected_pedalboards->uids[g_selected_pedalboards->selected]);
+                    send_load_pedalboard(g_current_bank, g_selected_pedalboards->uids[g_selected_pedalboards->selected]);
             }
             break;
 
@@ -1602,7 +1602,7 @@ static void bank_config_update(uint8_t bank_func_idx)
             {
                 g_current_pedalboard--;
 
-                if (g_current_pedalboard == 0)
+                if (g_current_pedalboard <= 0)
                 {
                     // if next pedalboard function is not being used, does circular selection
                     if (g_bank_functions[BANK_FUNC_PEDALBOARD_NEXT].function == BANK_FUNC_NONE)
@@ -1615,7 +1615,7 @@ static void bank_config_update(uint8_t bank_func_idx)
                 g_selected_pedalboards->selected = g_current_pedalboard;
 
                 if (current_pedalboard != g_current_pedalboard)
-                    send_load_pedalboard(g_current_bank - 1, g_selected_pedalboards->uids[g_selected_pedalboards->selected]);
+                    send_load_pedalboard(g_current_bank, g_selected_pedalboards->uids[g_selected_pedalboards->selected]);
             }
             break;
     }
@@ -1800,7 +1800,7 @@ void naveg_initial_state(char *bank_uid, char *pedalboard_uid, char **pedalboard
     }
 
     // sets the bank index
-    uint8_t bank_id = atoi(bank_uid) + 1;
+    uint8_t bank_id = atoi(bank_uid);
     g_current_bank = bank_id;
     if (g_banks)
     {
@@ -2589,13 +2589,9 @@ void naveg_toggle_tool(uint8_t tool, uint8_t display)
         	g_current_main_menu = g_current_menu;
     		g_current_main_item = g_current_item;
             menu_enter(0);
-        }
 
-        //if we are entering banks
-        if (tool == DISPLAY_TOOL_NAVIG)
-        {
             //if we have a bank selected
-            if ((g_current_bank != -1) && g_pb_selected && (g_banks->hover != 0))
+            if ((g_current_bank != -1))
             {
                 g_banks->hover = g_current_bank;
                 bp_enter();

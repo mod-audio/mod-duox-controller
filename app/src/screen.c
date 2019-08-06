@@ -681,7 +681,6 @@ void screen_footer(uint8_t id, const char *name, const char *value)
     ///checks if its toggle or a value
     else if((value[1] == 'F') || (value[1] == 'N') || (value == NULL))
     {
-        ledz_on(hardware_leds(6), RED);
         // draws the name field
         char *title_str_bfr = (char *) MALLOC(16 * sizeof(char));
         textbox_t footer;
@@ -714,7 +713,6 @@ void screen_footer(uint8_t id, const char *name, const char *value)
     //other footers
     else
     {
-        ledz_on(hardware_leds(4), GREEN);
         uint8_t char_cnt_name = strlen(name);
         uint8_t char_cnt_value = strlen(value);
 
@@ -740,8 +738,6 @@ void screen_footer(uint8_t id, const char *name, const char *value)
 
         char *title_str_bfr = (char *) MALLOC((char_cnt_name + 1) * sizeof(char));
         char *value_str_bfr = (char *) MALLOC((char_cnt_value + 1) * sizeof(char));
-
-        ledz_on(hardware_leds(4), BLUE);
 
         // draws the name field
         textbox_t footer;
