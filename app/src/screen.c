@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include "cli.h"
 
+#include "ledz.h"
+
 /*
 ************************************************************************************************************************
 *           LOCAL DEFINES
@@ -652,8 +654,11 @@ void screen_footer(uint8_t id, const char *name, const char *value)
     //vertival footer line
     glcd_vline(display, 64, 56, 8, GLCD_BLACK);
 
+    ledz_on(hardware_leds(4), RED);
+
     if (name == NULL || value == NULL)
     {
+        ledz_on(hardware_leds(6), GREEN);
         char text[sizeof(SCREEN_FOOT_DEFAULT_NAME) + 2];
         strcpy(text, SCREEN_FOOT_DEFAULT_NAME);
         text[sizeof(SCREEN_FOOT_DEFAULT_NAME)-1] = (id + '1');
@@ -672,6 +677,7 @@ void screen_footer(uint8_t id, const char *name, const char *value)
         title.text = text;
         title.align = align ? ALIGN_RCENTER_BOTTOM : ALIGN_LCENTER_BOTTOM;
         title.y = 0;
+        ledz_on(hardware_leds(6), BLUE);
         widget_textbox(display, &title);
         return;
     }
@@ -679,6 +685,7 @@ void screen_footer(uint8_t id, const char *name, const char *value)
     ///checks if its toggle or a value
     else if((value[1] == 'F') || (value[1] == 'N') || (value == NULL))
     {
+        ledz_on(hardware_leds(6), RED);
         // draws the name field
         char *title_str_bfr = (char *) MALLOC(16 * sizeof(char));
         textbox_t footer;
@@ -711,6 +718,7 @@ void screen_footer(uint8_t id, const char *name, const char *value)
     //other footers
     else
     {
+        ledz_on(hardware_leds(4), GREEN);
         uint8_t char_cnt_name = strlen(name);
         uint8_t char_cnt_value = strlen(value);
 
@@ -736,6 +744,8 @@ void screen_footer(uint8_t id, const char *name, const char *value)
 
         char *title_str_bfr = (char *) MALLOC((char_cnt_name + 1) * sizeof(char));
         char *value_str_bfr = (char *) MALLOC((char_cnt_value + 1) * sizeof(char));
+
+        ledz_on(hardware_leds(4), BLUE);
 
         // draws the name field
         textbox_t footer;
