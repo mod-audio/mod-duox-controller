@@ -654,11 +654,8 @@ void screen_footer(uint8_t id, const char *name, const char *value)
     //vertival footer line
     glcd_vline(display, 64, 56, 8, GLCD_BLACK);
 
-    ledz_on(hardware_leds(4), RED);
-
     if (name == NULL || value == NULL)
     {
-        ledz_on(hardware_leds(6), GREEN);
         char text[sizeof(SCREEN_FOOT_DEFAULT_NAME) + 2];
         strcpy(text, SCREEN_FOOT_DEFAULT_NAME);
         text[sizeof(SCREEN_FOOT_DEFAULT_NAME)-1] = (id + '1');
@@ -677,7 +674,6 @@ void screen_footer(uint8_t id, const char *name, const char *value)
         title.text = text;
         title.align = align ? ALIGN_RCENTER_BOTTOM : ALIGN_LCENTER_BOTTOM;
         title.y = 0;
-        ledz_on(hardware_leds(6), BLUE);
         widget_textbox(display, &title);
         return;
     }
