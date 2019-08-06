@@ -2042,7 +2042,10 @@ void naveg_set_control(uint8_t hw_id, float value)
         //encoder
         if (hw_id < ENCODERS_COUNT)
         {
-            screen_encoder(id, control);
+            if (!display_has_tool_enabled(hw_id))
+            {
+                screen_encoder(id, control);
+            }
         }
         //button
         else if (hw_id < FOOTSWITCHES_ACTUATOR_COUNT + ENCODERS_COUNT)
@@ -2239,7 +2242,11 @@ void naveg_set_control(uint8_t hw_id, float value)
             {
                 g_pots[id]->scroll_dir = 1;
             }
-            screen_pot(id, control);
+
+            if (!display_has_tool_enabled(get_display_by_id(id, POTENTIOMETER)))
+            {
+                screen_pot(id, control);
+            }
         }
 
     }
@@ -2591,7 +2598,7 @@ void naveg_toggle_tool(uint8_t tool, uint8_t display)
             menu_enter(0);
 
             //if we have a bank selected
-            if ((g_current_bank != -1))
+            if ((g_current_bank != -1) && !naveg_ui_status())
             {
                 g_banks->hover = g_current_bank;
                 bp_enter();
@@ -3141,7 +3148,10 @@ void naveg_menu_item_changed_cb(uint8_t item_ID, uint8_t value)
         //otherwise update right for sure
         else 
         {
-            naveg_menu_refresh(DISPLAY_RIGHT);
+            if (!tool_is_on(DISPLAY_TOOL_TUNER))
+            {
+                naveg_menu_refresh(DISPLAY_RIGHT);
+            }
 
             //for bypass, left might change as well, we update just in case
             if (((item_ID - BYPASS_ID) < 10) && ((item_ID - BYPASS_ID) > 0) )
