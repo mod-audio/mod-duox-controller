@@ -743,6 +743,7 @@ static void control_set(uint8_t id, control_t *control)
             }
             break;
 
+        case CONTROL_PROP_REVERSE_ENUM:
         case CONTROL_PROP_ENUMERATION:
         case CONTROL_PROP_SCALE_POINTS:
             if (control->hw_id < ENCODERS_COUNT)
@@ -753,9 +754,18 @@ static void control_set(uint8_t id, control_t *control)
             }
             else if ((ENCODERS_COUNT <= control->hw_id) && ( control->hw_id < FOOTSWITCHES_ACTUATOR_COUNT + ENCODERS_COUNT))
             {
-                // increments the step
-                control->step++;
-                if (control->step >= control->scale_points_count) control->step = 0;
+                if (control->properties != CONTROL_PROP_REVERSE_ENUM)
+                {
+                    // increments the step
+                    control->step++;
+                    if (control->step >= control->scale_points_count) control->step = 0;
+                }
+                else 
+                {
+                    // decrements the step
+                    control->step--;
+                    if (control->step <= 0) control->step = control->scale_points_count;
+                }
 
                 // updates the value and the screen
                 control->value = control->scale_points[control->step]->value;
@@ -763,27 +773,6 @@ static void control_set(uint8_t id, control_t *control)
                     screen_footer(control->hw_id - ENCODERS_COUNT, control->label, control->scale_points[control->step]->label);
             }
             break;
-
-        case CONTROL_PROP_REVERSE_ENUM:
-         if (control->hw_id < ENCODERS_COUNT)
-            {
-                // update the screen
-                if (!display_has_tool_enabled(id))
-                    screen_encoder(id, control);
-            }
-            else if ((ENCODERS_COUNT <= control->hw_id) && ( control->hw_id < FOOTSWITCHES_ACTUATOR_COUNT + ENCODERS_COUNT))
-            {
-                // decrements the step
-                control->step--;
-                if (control->step <= 0) control->step = control->scale_points_count;
-
-                // updates the value and the screen
-                control->value = control->scale_points[control->step]->value;
-                if (!display_has_tool_enabled(get_display_by_id(id, FOOT)))
-                    screen_footer(control->hw_id - ENCODERS_COUNT, control->label, control->scale_points[control->step]->label);
-            }
-            break;
-
 
         case CONTROL_PROP_TOGGLED:
         case CONTROL_PROP_BYPASS:
@@ -1242,6 +1231,12 @@ static void menu_enter(uint8_t display_id)
     {
         if (item->desc->type == MENU_OK)
         {
+            //if bleutooth activate right away
+            if (item->desc->id == BLUETOOTH_DISCO_ID)
+            {
+                item->desc->action_cb(item, MENU_EV_ENTER);
+            }
+            
             // highlights the default button
             item->data.hover = 0;
 
