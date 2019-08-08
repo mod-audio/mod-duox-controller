@@ -98,6 +98,7 @@ uint8_t g_play_status = 0;
 uint8_t g_tuner_mute = 0;
 uint8_t g_display_brightness = 2;
 int8_t g_actuator_hide = -1;
+int8_t g_pots_lock = -1;
 uint8_t g_cv_in_mode = 0;
 uint8_t g_cv_in_range = 0;
 uint8_t g_exp_mode = 0;
@@ -748,6 +749,43 @@ void system_hide_actuator_cb(void *arg, int event)
     {
         menu_item_t *item = arg;
         add_chars_to_menu_name(item, g_actuator_hide ? option_enabled : option_disabled);
+    }
+
+    //this setting changes just 1 item
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);    
+}
+
+void system_lock_pots_cb(void *arg, int event)
+{
+    if (g_pots_lock == -1)
+    {
+        //read EEPROM
+        uint8_t read_buffer = 0;
+        EEPROM_Read(0, 1, &read_buffer, MODE_8_BIT, 1);
+
+        g_pots_lock = read_buffer;
+
+        //write to naveg.c
+        naveg_lock_pots(g_pots_lock);
+    }
+
+    if (event == MENU_EV_ENTER)
+    {
+        if (g_pots_lock == 0) g_pots_lock = 1;
+        else g_pots_lock = 0;
+        
+        //also write to EEPROM
+        uint8_t write_buffer = g_pots_lock;
+        EEPROM_Write(0, 1, &write_buffer, MODE_8_BIT, 1);
+
+        //write to naveg.c
+        naveg_lock_pots(g_pots_lock);
+    }
+
+    if (arg != NULL)
+    {
+        menu_item_t *item = arg;
+        add_chars_to_menu_name(item, g_pots_lock ? option_enabled : option_disabled);
     }
     
     //this setting changes just 1 item

@@ -104,6 +104,7 @@ static uint8_t snapshot_loaded[2] = {};
 static uint8_t page = 0;
 static int8_t g_current_bank;
 static uint8_t page_available[3] = {1, 1, 1};
+static uint8_t g_lock_potentiometers = 1;
 
 // only disabled after "boot" command received
 bool g_self_test_mode = true;
@@ -417,15 +418,18 @@ static void display_pot_add(control_t *control)
     	tmp_control_value = MAP(g_pots[id]->value, g_pots[id]->minimum,  g_pots[id]->maximum, POT_LOWER_THRESHOLD, POT_UPPER_THRESHOLD);
     }
 
-    
-    if ((tmp_value > tmp_control_value ? tmp_value - tmp_control_value : tmp_control_value - tmp_value) < POT_DIFF_THRESHOLD)
-    {
-        g_pots[id]->scroll_dir = 0;
+    if (g_lock_potentiometers)
+    {    
+        if ((tmp_value > tmp_control_value ? tmp_value - tmp_control_value : tmp_control_value - tmp_value) < POT_DIFF_THRESHOLD)
+        {
+            g_pots[id]->scroll_dir = 0;
+        }
+        else
+        {
+            g_pots[id]->scroll_dir = 1;
+        }
     }
-    else
-    {
-        g_pots[id]->scroll_dir = 1;
-    }
+    else g_pots[id]->scroll_dir = 0;
 
     // calculates initial step
     switch (control->properties)
@@ -1773,6 +1777,9 @@ void naveg_init(void)
 
     //check if we need to hide actuators or not
     system_hide_actuator_cb(NULL, MENU_EV_NONE);
+    
+    //check if we need to lock the potentiometers or not
+    system_lock_pots_cb(NULL, MENU_EV_NONE);
 
     vSemaphoreCreateBinary(g_dialog_sem);
     // vSemaphoreCreateBinary is created as available which makes
@@ -2237,14 +2244,18 @@ void naveg_set_control(uint8_t hw_id, float value)
             	tmp_control_value = MAP(g_pots[id]->value, g_pots[id]->minimum,  g_pots[id]->maximum, POT_LOWER_THRESHOLD, POT_UPPER_THRESHOLD);
             }
 
-            if ((tmp_value > tmp_control_value ? tmp_value - tmp_control_value : tmp_control_value - tmp_value) < POT_DIFF_THRESHOLD)
+            if (g_lock_potentiometers)
             {
-                g_pots[id]->scroll_dir = 0;
+                if ((tmp_value > tmp_control_value ? tmp_value - tmp_control_value : tmp_control_value - tmp_value) < POT_DIFF_THRESHOLD)
+                {
+                    g_pots[id]->scroll_dir = 0;
+                }
+                else
+                {
+                    g_pots[id]->scroll_dir = 1;
+                }
             }
-            else
-            {
-                g_pots[id]->scroll_dir = 1;
-            }
+            else g_pots[id]->scroll_dir = 0;
 
             if (!display_has_tool_enabled(get_display_by_id(id, POTENTIOMETER)))
             {
@@ -3063,6 +3074,11 @@ uint8_t naveg_dialog(const char *msg)
 uint8_t naveg_ui_status(void)
 {
     return g_ui_connected;
+}
+
+void naveg_lock_pots(uint8_t lock)
+{
+    g_lock_potentiometers = lock;
 }
 
 uint8_t naveg_dialog_status(void)
