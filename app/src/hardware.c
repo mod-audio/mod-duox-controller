@@ -267,6 +267,24 @@ void hardware_setup(void)
 
     EEPROM_Init();
 
+    //check if this unit is being turned on for the first time (empty EEPROM)
+    uint8_t read_buffer = 0;
+    EEPROM_Read(0, EEPROM_EMPTY_CHECK_ADRESS, &read_buffer, MODE_8_BIT, 1);
+
+    //check if value is 170 (we put that in the last page to detect new units (binary 10101010))
+    if (read_buffer != 170)
+    {
+        //set the eeprom default values
+        uint8_t write_buffer = 170;
+        EEPROM_Write(0, EEPROM_EMPTY_CHECK_ADRESS, &write_buffer, MODE_8_BIT, 1);
+        write_buffer = 0;
+        EEPROM_Write(0, HIDE_ACTUATOR_ADRESS, &write_buffer, MODE_8_BIT, 1);
+        write_buffer = 1;
+        EEPROM_Write(0, LOCK_POTENTIOMTERS_ADRESS, &write_buffer, MODE_8_BIT, 1);
+        write_buffer = 2;
+        EEPROM_Write(0, DISPLAY_BRIGHTNESS_ADRESS, &write_buffer, MODE_8_BIT, 1);
+    }
+
     //set 3 color leds
     const ledz_color_t colors[] = {RED, GREEN, BLUE};
 
@@ -312,7 +330,7 @@ void hardware_setup(void)
     adc_initalisation();
 
     // default glcd brightness
-    g_brightness = MAX_BRIGHTNESS;
+    system_display_cb(NULL, MENU_EV_NONE);
 
     ////////////////////////////////////////////////////////////////
     // Timer 0 configuration

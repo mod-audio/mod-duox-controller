@@ -96,7 +96,7 @@ uint8_t g_MIDI_clk_send = 0;
 uint8_t g_MIDI_clk_src = 0;
 uint8_t g_play_status = 0;
 uint8_t g_tuner_mute = 0;
-uint8_t g_display_brightness = 2;
+int8_t g_display_brightness = -1;
 int8_t g_actuator_hide = -1;
 int8_t g_pots_lock = -1;
 uint8_t g_cv_in_mode = 0;
@@ -701,21 +701,40 @@ void system_banks_cb(void *arg, int event)
 
 void system_display_cb(void *arg, int event)
 {
-    menu_item_t *item = arg;
+    if (g_display_brightness == -1)
+    {
+        //read EEPROM
+        uint8_t read_buffer = 0;
+        EEPROM_Read(0, DISPLAY_BRIGHTNESS_ADRESS, &read_buffer, MODE_8_BIT, 1);
+
+        g_display_brightness = read_buffer;
+
+        hardware_glcd_brightness(g_display_brightness); 
+    }
 
     if (event == MENU_EV_ENTER)
     {
         if (g_display_brightness < MAX_BRIGHTNESS) g_display_brightness++;
         else g_display_brightness = 0;
+        
+        //also write to EEPROM
+        uint8_t write_buffer = g_display_brightness;
+        EEPROM_Write(0, DISPLAY_BRIGHTNESS_ADRESS, &write_buffer, MODE_8_BIT, 1);
 
         hardware_glcd_brightness(g_display_brightness); 
-        set_item_value(BRIGHTNESS_SET_CMD, g_display_brightness);
     }
 
-    char str_bfr[8];
-    int_to_str((g_display_brightness * 25), str_bfr, 4, 0);
-    strcat(str_bfr, "%");
-    add_chars_to_menu_name(item, str_bfr);
+    if (arg != NULL)
+    {
+        menu_item_t *item = arg;
+        char str_bfr[8];
+        int_to_str((g_display_brightness * 25), str_bfr, 4, 0);
+        strcat(str_bfr, "%");
+        add_chars_to_menu_name(item, str_bfr);
+    }
+    
+    //this setting changes just 1 item
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);    
 }
 
 void system_hide_actuator_cb(void *arg, int event)
@@ -724,7 +743,7 @@ void system_hide_actuator_cb(void *arg, int event)
     {
         //read EEPROM
         uint8_t read_buffer = 0;
-        EEPROM_Read(0, 0, &read_buffer, MODE_8_BIT, 1);
+        EEPROM_Read(0, HIDE_ACTUATOR_ADRESS, &read_buffer, MODE_8_BIT, 1);
 
         g_actuator_hide = read_buffer;
 
@@ -739,7 +758,7 @@ void system_hide_actuator_cb(void *arg, int event)
         
         //also write to EEPROM
         uint8_t write_buffer = g_actuator_hide;
-        EEPROM_Write(0, 0, &write_buffer, MODE_8_BIT, 1);
+        EEPROM_Write(0, HIDE_ACTUATOR_ADRESS, &write_buffer, MODE_8_BIT, 1);
 
         //write to screen.c
         screen_set_hide_non_assigned_actuators(g_actuator_hide);
@@ -761,7 +780,7 @@ void system_lock_pots_cb(void *arg, int event)
     {
         //read EEPROM
         uint8_t read_buffer = 0;
-        EEPROM_Read(0, 1, &read_buffer, MODE_8_BIT, 1);
+        EEPROM_Read(0, LOCK_POTENTIOMTERS_ADRESS, &read_buffer, MODE_8_BIT, 1);
 
         g_pots_lock = read_buffer;
 
@@ -776,7 +795,7 @@ void system_lock_pots_cb(void *arg, int event)
         
         //also write to EEPROM
         uint8_t write_buffer = g_pots_lock;
-        EEPROM_Write(0, 1, &write_buffer, MODE_8_BIT, 1);
+        EEPROM_Write(0, LOCK_POTENTIOMTERS_ADRESS, &write_buffer, MODE_8_BIT, 1);
 
         //write to naveg.c
         naveg_lock_pots(g_pots_lock);

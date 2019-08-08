@@ -651,9 +651,6 @@ static void boot_cb(proto_t *proto)
 {
     g_self_test_mode = false;
 
-    //set the display brightness 
-    system_update_menu_value(DISPLAY_BRIGHTNESS_ID, atoi(proto->list[1]));
-
     //set the quick bypass link
     system_update_menu_value(QUICK_BYPASS_ID, atoi(proto->list[2]));
 

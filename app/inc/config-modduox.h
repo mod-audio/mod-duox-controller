@@ -627,6 +627,12 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 // defines how much time wait for console response (in milliseconds)
 #define CLI_RESPONSE_TIMEOUT        500
 
+///EEPROM adress page defines
+#define EEPROM_EMPTY_CHECK_ADRESS   62
+#define HIDE_ACTUATOR_ADRESS        0
+#define LOCK_POTENTIOMTERS_ADRESS   1
+#define DISPLAY_BRIGHTNESS_ADRESS   2
+
 // these macros should be used in replacement to default malloc and free functions of stdlib.h
 // The FREE function is NULL safe
 #include "FreeRTOS.h"

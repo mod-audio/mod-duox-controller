@@ -1775,6 +1775,8 @@ void naveg_init(void)
 
     g_initialized = 1;
 
+    
+
     //check if we need to hide actuators or not
     system_hide_actuator_cb(NULL, MENU_EV_NONE);
     
