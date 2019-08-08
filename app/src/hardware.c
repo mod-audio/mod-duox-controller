@@ -265,6 +265,8 @@ void hardware_setup(void)
     //CONFIG_PIN_OUTPUT(SHUTDOWN_BUTTON_PORT, SHUTDOWN_BUTTON_PIN);
     //CLR_PIN(SHUTDOWN_BUTTON_PORT, SHUTDOWN_BUTTON_PIN);
 
+    EEPROM_Init();
+
     //set 3 color leds
     const ledz_color_t colors[] = {RED, GREEN, BLUE};
 

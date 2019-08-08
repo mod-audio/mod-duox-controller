@@ -682,6 +682,7 @@ static void boot_cb(proto_t *proto)
     //parse the pedalboard name
     screen_top_info(&proto->list[7] , 1);
 
+    //tell mod-ui we are good
     protocol_response("resp 0", proto);
 }
 

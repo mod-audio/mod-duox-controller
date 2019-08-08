@@ -55,6 +55,7 @@
 */
 
 static tuner_t g_tuner = {0, NULL, 0, 1};
+static uint8_t g_hide_non_assigned_actuators = 0;
 
 
 /*
@@ -82,6 +83,12 @@ static tuner_t g_tuner = {0, NULL, 0, 1};
 *           GLOBAL FUNCTIONS
 ************************************************************************************************************************
 */
+
+void screen_set_hide_non_assigned_actuators(uint8_t hide)
+{
+    g_hide_non_assigned_actuators = hide;
+    return;
+}
 
 void screen_clear(uint8_t display_id)
 {
@@ -142,14 +149,8 @@ void screen_pot(uint8_t pot_id, control_t *control)
     //no assignment
     if (!control)
     {
-        char text[sizeof(SCREEN_POT_DEFAULT_NAME) + 2];
-        strcpy(text, SCREEN_POT_DEFAULT_NAME);
-        text[sizeof(SCREEN_POT_DEFAULT_NAME)-1] = pot_id + '1';
-        text[sizeof(SCREEN_POT_DEFAULT_NAME)] = 0;
-
-        const uint8_t text_len = strlen(text);
-
         textbox_t blank_title;
+
         blank_title.color = GLCD_BLACK;
         blank_title.mode = TEXT_SINGLE_LINE;
         blank_title.font = SMfont;
@@ -159,10 +160,27 @@ void screen_pot(uint8_t pot_id, control_t *control)
         blank_title.bottom_margin = 0;
         blank_title.left_margin = 0;
         blank_title.right_margin = 0;
-        blank_title.text = text;
-        blank_title.x = knob.orientation ? (knob.x - 8 - (text_len*1.5)) : (knob.x + 3 - (text_len*1.5));
         blank_title.y = knob.y - 3;
         blank_title.align = ALIGN_NONE_NONE;
+
+        if (g_hide_non_assigned_actuators)
+        {
+            blank_title.x = knob.orientation ? knob.x - 5 : knob.x + 1 ;
+            blank_title.text = "-";
+        }
+        else 
+        {
+            char text[sizeof(SCREEN_POT_DEFAULT_NAME) + 2];
+            strcpy(text, SCREEN_POT_DEFAULT_NAME);
+            text[sizeof(SCREEN_POT_DEFAULT_NAME)-1] = pot_id + '1';
+            text[sizeof(SCREEN_POT_DEFAULT_NAME)] = 0;
+
+            const uint8_t text_len = strlen(text);
+            blank_title.x = knob.orientation ? (knob.x - 8 - (text_len*1.5)) : (knob.x + 3 - (text_len*1.5));
+
+            blank_title.text = text;
+        }
+
         widget_textbox(display, &blank_title);
     }
     else
@@ -362,12 +380,6 @@ void screen_pot(uint8_t pot_id, control_t *control)
 
 static void null_screen_encoded(glcd_t *display, uint8_t display_id)
 {
-    char text[sizeof(SCREEN_ROTARY_DEFAULT_NAME) + 2];
-
-    strcpy(text, SCREEN_ROTARY_DEFAULT_NAME);
-    text[sizeof(SCREEN_ROTARY_DEFAULT_NAME)-1] = display_id + '1';
-    text[sizeof(SCREEN_ROTARY_DEFAULT_NAME)] = 0;
-
     textbox_t blank_title;
     blank_title.color = GLCD_BLACK;
     blank_title.mode = TEXT_SINGLE_LINE;
@@ -378,10 +390,25 @@ static void null_screen_encoded(glcd_t *display, uint8_t display_id)
     blank_title.bottom_margin = 0;
     blank_title.left_margin = 0;
     blank_title.right_margin = 0;
-    blank_title.text = text;
-    blank_title.x = ((DISPLAY_WIDTH/2) - ((strlen(text)*4)/2));
     blank_title.y = 14;
     blank_title.align = ALIGN_NONE_NONE;
+
+    if (g_hide_non_assigned_actuators)
+    {
+        blank_title.text = "-";
+        blank_title.x = (DISPLAY_WIDTH/2) - 1;
+    }
+    else 
+    {
+        char text[sizeof(SCREEN_ROTARY_DEFAULT_NAME) + 2];
+        strcpy(text, SCREEN_ROTARY_DEFAULT_NAME);
+        text[sizeof(SCREEN_ROTARY_DEFAULT_NAME)-1] = display_id + '1';
+        text[sizeof(SCREEN_ROTARY_DEFAULT_NAME)] = 0;
+        blank_title.x = ((DISPLAY_WIDTH/2) - ((strlen(text)*4)/2));
+        blank_title.text = text;
+
+    }
+
     widget_textbox(display, &blank_title);
     glcd_hline(display, 0, 24, DISPLAY_WIDTH, GLCD_BLACK);
 }
@@ -656,11 +683,6 @@ void screen_footer(uint8_t id, const char *name, const char *value)
 
     if (name == NULL || value == NULL)
     {
-        char text[sizeof(SCREEN_FOOT_DEFAULT_NAME) + 2];
-        strcpy(text, SCREEN_FOOT_DEFAULT_NAME);
-        text[sizeof(SCREEN_FOOT_DEFAULT_NAME)-1] = (id + '1');
-        text[sizeof(SCREEN_FOOT_DEFAULT_NAME)] = 0;
-
         textbox_t title;
         title.color = GLCD_BLACK;
         title.mode = TEXT_SINGLE_LINE;
@@ -671,9 +693,22 @@ void screen_footer(uint8_t id, const char *name, const char *value)
         title.right_margin = 0;
         title.height = 0;
         title.width = 0;
-        title.text = text;
         title.align = align ? ALIGN_RCENTER_BOTTOM : ALIGN_LCENTER_BOTTOM;
         title.y = 0;
+
+        if (g_hide_non_assigned_actuators)
+        {
+            title.text = "-";
+        }
+        else 
+        {
+            char text[sizeof(SCREEN_FOOT_DEFAULT_NAME) + 2];
+            strcpy(text, SCREEN_FOOT_DEFAULT_NAME);
+            text[sizeof(SCREEN_FOOT_DEFAULT_NAME)-1] = (id + '1');
+            text[sizeof(SCREEN_FOOT_DEFAULT_NAME)] = 0;
+            title.text = text;            
+        }
+
         widget_textbox(display, &title);
         return;
     }

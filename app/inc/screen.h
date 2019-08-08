@@ -61,6 +61,7 @@
 ************************************************************************************************************************
 */
 
+void screen_set_hide_non_assigned_actuators(uint8_t hide);
 void screen_clear(uint8_t display_id);
 void screen_encoder(uint8_t display_id, control_t *control);
 void screen_footer(uint8_t id, const char *name, const char *value);

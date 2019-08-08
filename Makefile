@@ -39,6 +39,7 @@ CDL_LIBS = lpc177x_8x_clkpwr.c
 CDL_LIBS += lpc177x_8x_adc.c lpc177x_8x_gpio.c  lpc177x_8x_pinsel.c
 CDL_LIBS += lpc177x_8x_systick.c lpc177x_8x_timer.c
 CDL_LIBS += lpc177x_8x_uart.c lpc177x_8x_ssp.c
+CDL_LIBS += lpc177x_8x_eeprom.c
 
 SRC = $(wildcard $(CMSIS_SRC)/*.c) $(addprefix $(CDL_SRC)/,$(CDL_LIBS)) $(wildcard $(RTOS_SRC)/*.c) \
 	  $(wildcard $(DRIVERS_SRC)/*.c) $(wildcard $(APP_SRC)/*.c)

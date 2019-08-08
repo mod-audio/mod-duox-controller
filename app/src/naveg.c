@@ -417,7 +417,7 @@ static void display_pot_add(control_t *control)
     	tmp_control_value = MAP(g_pots[id]->value, g_pots[id]->minimum,  g_pots[id]->maximum, POT_LOWER_THRESHOLD, POT_UPPER_THRESHOLD);
     }
 
-    //float new_pot_value = (tmp_value - 50) * (g_pots[id]->maximum  - g_pots[id]->minimum) / (3950 - 50) + g_pots[id]->minimum;
+    
     if ((tmp_value > tmp_control_value ? tmp_value - tmp_control_value : tmp_control_value - tmp_value) < POT_DIFF_THRESHOLD)
     {
         g_pots[id]->scroll_dir = 0;
@@ -1770,6 +1770,9 @@ void naveg_init(void)
     g_update_data = NULL;
 
     g_initialized = 1;
+
+    //check if we need to hide actuators or not
+    system_hide_actuator_cb(NULL, MENU_EV_NONE);
 
     vSemaphoreCreateBinary(g_dialog_sem);
     // vSemaphoreCreateBinary is created as available which makes

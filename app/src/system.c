@@ -17,6 +17,7 @@
 #include "glcd_widget.h"
 #include "glcd.h"
 #include "utils.h"
+#include "device.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -96,6 +97,7 @@ uint8_t g_MIDI_clk_src = 0;
 uint8_t g_play_status = 0;
 uint8_t g_tuner_mute = 0;
 uint8_t g_display_brightness = 2;
+int8_t g_actuator_hide = -1;
 uint8_t g_cv_in_mode = 0;
 uint8_t g_cv_in_range = 0;
 uint8_t g_exp_mode = 0;
@@ -713,6 +715,43 @@ void system_display_cb(void *arg, int event)
     int_to_str((g_display_brightness * 25), str_bfr, 4, 0);
     strcat(str_bfr, "%");
     add_chars_to_menu_name(item, str_bfr);
+}
+
+void system_hide_actuator_cb(void *arg, int event)
+{
+    if (g_actuator_hide == -1)
+    {
+        //read EEPROM
+        uint8_t read_buffer = 0;
+        EEPROM_Read(0, 0, &read_buffer, MODE_8_BIT, 1);
+
+        g_actuator_hide = read_buffer;
+
+        //write to screen.c
+        screen_set_hide_non_assigned_actuators(g_actuator_hide);
+    }
+
+    if (event == MENU_EV_ENTER)
+    {
+        if (g_actuator_hide == 0) g_actuator_hide = 1;
+        else g_actuator_hide = 0;
+        
+        //also write to EEPROM
+        uint8_t write_buffer = g_actuator_hide;
+        EEPROM_Write(0, 0, &write_buffer, MODE_8_BIT, 1);
+
+        //write to screen.c
+        screen_set_hide_non_assigned_actuators(g_actuator_hide);
+    }
+
+    if (arg != NULL)
+    {
+        menu_item_t *item = arg;
+        add_chars_to_menu_name(item, g_actuator_hide ? option_enabled : option_disabled);
+    }
+    
+    //this setting changes just 1 item
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);    
 }
 
 void system_sl_in_cb (void *arg, int event)
