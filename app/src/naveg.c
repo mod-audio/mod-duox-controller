@@ -126,8 +126,6 @@ static void foot_control_rm(uint8_t hw_id);
 
 static uint8_t bank_config_check(uint8_t foot);
 static void bank_config_update(uint8_t bank_func_idx);
-static void bank_config_footer(void);
-
 
 /*
 ************************************************************************************************************************
@@ -1047,10 +1045,6 @@ static void bp_enter(void)
             // sets the variables to update the screen
             title = g_banks->names[g_banks->hover];
             bp_list = g_naveg_pedalboards;
-
-            // if has a valid pedalboards list update the screens
-            if (g_selected_pedalboards)
-                bank_config_footer();
         }
     }
     else
@@ -1624,9 +1618,6 @@ static void bank_config_update(uint8_t bank_func_idx)
             break;
     }
 
-    // updates the footers
-    bank_config_footer();
-
     // updates the navigation menu if the current pedalboards list
     // is the same assigned to foot pedalboards navigation (bank config)
     if (g_selected_pedalboards && g_current_bank == g_banks->hover &&
@@ -1635,64 +1626,6 @@ static void bank_config_update(uint8_t bank_func_idx)
         g_naveg_pedalboards->selected = g_selected_pedalboards->selected;
         g_naveg_pedalboards->hover = g_selected_pedalboards->selected;
         screen_bp_list(g_banks->names[g_banks->hover], g_naveg_pedalboards);
-    }
-}
-
-static void bank_config_footer(void)
-{
-    uint8_t bypass;
-    char *pedalboard_name = g_selected_pedalboards
-                          ? g_selected_pedalboards->names[g_selected_pedalboards->selected]
-                          : NULL;
-
-    // updates all footer screen with bank functions
-    uint8_t i;
-    for (i = 1; i < BANK_FUNC_AMOUNT; i++)
-    {
-        bank_config_t *bank_conf;
-        bank_conf = &g_bank_functions[i];
-
-        switch (bank_conf->function)
-        {
-            case BANK_FUNC_TRUE_BYPASS:
-                bypass = 0; // FIX: get true bypass state
-
-                if (!bypass)
-                    ledz_on(hardware_leds(bank_conf->hw_id - ENCODERS_COUNT), TRUE_BYPASS_COLOR);
-                else
-                    ledz_off(hardware_leds(bank_conf->hw_id - ENCODERS_COUNT), LEDZ_ALL_COLORS);
-
-                if (display_has_tool_enabled(bank_conf->hw_id - ENCODERS_COUNT))
-                    break;
-
-                screen_footer(bank_conf->hw_id - ENCODERS_COUNT, TRUE_BYPASS_FOOTER_TEXT,
-                              (bypass ? BYPASS_ON_FOOTER_TEXT : BYPASS_OFF_FOOTER_TEXT));
-                break;
-
-            case BANK_FUNC_PEDALBOARD_NEXT:
-                if (g_selected_pedalboards && g_current_pedalboard == (g_selected_pedalboards->count - 1))
-                    ledz_off(hardware_leds(bank_conf->hw_id - ENCODERS_COUNT), LEDZ_ALL_COLORS);
-                else
-                    ledz_on(hardware_leds(bank_conf->hw_id - ENCODERS_COUNT), PEDALBOARD_NEXT_COLOR);
-
-                if (display_has_tool_enabled(bank_conf->hw_id - ENCODERS_COUNT))
-                    break;
-
-                screen_footer(bank_conf->hw_id - ENCODERS_COUNT, pedalboard_name, PEDALBOARD_NEXT_FOOTER_TEXT);
-                break;
-
-            case BANK_FUNC_PEDALBOARD_PREV:
-                if (g_current_pedalboard == 1)
-                    ledz_off(hardware_leds(bank_conf->hw_id - ENCODERS_COUNT), LEDZ_ALL_COLORS);
-                else
-                    ledz_on(hardware_leds(bank_conf->hw_id - ENCODERS_COUNT), PEDALBOARD_PREV_COLOR);
-
-                if (display_has_tool_enabled(bank_conf->hw_id - ENCODERS_COUNT))
-                    break;
-
-                screen_footer(bank_conf->hw_id - ENCODERS_COUNT, pedalboard_name, PEDALBOARD_PREV_FOOTER_TEXT);
-                break;
-        }
     }
 }
 
@@ -2841,8 +2774,6 @@ void naveg_bank_config(bank_config_t *bank_conf)
     {
         g_selected_pedalboards = g_naveg_pedalboards;
     }
-
-    bank_config_footer();
 }
 
 void naveg_set_pedalboards(bp_list_t *bp_list)
