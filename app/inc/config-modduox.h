@@ -507,8 +507,8 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"DEVICE SETTINGS",                 MENU_LIST,      DEVICE_SETTINGS_ID,   SYSTEM_ID,          NULL                       , 0},  \
     {"< BACK TO SYSTEM",                MENU_RETURN,    DEVICE_SETTINGS_ID+1, DEVICE_SETTINGS_ID, NULL                       , 0},  \
     {"DISPLAY BRIGHTNESS",              MENU_TOGGLE,    DISP_BL_ID,           DEVICE_SETTINGS_ID, system_display_cb          , 0},  \
-    {"HIDE NON ASSIGNED ACUATORS",      MENU_TOGGLE,    ACTU_HIDE_ID,         DEVICE_SETTINGS_ID, system_hide_actuator_cb    , 0},  \
-    {"LOCK OUT OF SYNC KNOBS",          MENU_TOGGLE,    POT_LOCK_ID,          DEVICE_SETTINGS_ID, system_lock_pots_cb        , 0},  \
+    {"UNASSIGNED ACTUATORS",            MENU_TOGGLE,    ACTU_HIDE_ID,         DEVICE_SETTINGS_ID, system_hide_actuator_cb    , 0},  \
+    {"KNOB MODE ",                      MENU_TOGGLE,    POT_LOCK_ID,          DEVICE_SETTINGS_ID, system_lock_pots_cb        , 0},  \
     {"INFO",                            MENU_LIST,      INFO_ID,              SYSTEM_ID,          NULL                       , 0},  \
     {"< BACK TO SYSTEM",                MENU_RETURN,    INFO_ID+1,            INFO_ID,            NULL                       , 0},  \
     {"SERVICES",                        MENU_LIST,      SERVICES_ID,          INFO_ID,            system_services_cb         , 1},  \

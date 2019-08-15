@@ -767,7 +767,7 @@ void system_hide_actuator_cb(void *arg, int event)
     if (arg != NULL)
     {
         menu_item_t *item = arg;
-        add_chars_to_menu_name(item, g_actuator_hide ? option_enabled : option_disabled);
+        add_chars_to_menu_name(item, g_actuator_hide ? "HIDE" : "SHOW");
     }
 
     //this setting changes just 1 item
@@ -804,7 +804,7 @@ void system_lock_pots_cb(void *arg, int event)
     if (arg != NULL)
     {
         menu_item_t *item = arg;
-        add_chars_to_menu_name(item, g_pots_lock ? option_enabled : option_disabled);
+        add_chars_to_menu_name(item, g_pots_lock ? "GRAB" : "DIRECT");
     }
     
     //this setting changes just 1 item
