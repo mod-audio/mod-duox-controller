@@ -2793,7 +2793,7 @@ bp_list_t *naveg_get_pedalboards(void)
 void naveg_enter(uint8_t display)
 {
     //if in selftest mode, we just send if we are working or not
-    if (g_self_test_mode)
+    if ((g_self_test_mode) && !dialog_active)
     {
         char buffer[30];
         uint8_t i;
