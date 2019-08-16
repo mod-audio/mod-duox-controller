@@ -762,7 +762,7 @@ static void control_set(uint8_t id, control_t *control)
                 {
                     // decrements the step
                     control->step--;
-                    if (control->step <= control->minimum) control->step = control->scale_points_count;
+                    if (control->step <= control->minimum) control->step = control->scale_points_count - 1;
                 }
 
                 // updates the value and the screen
