@@ -209,14 +209,14 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define CONTROL_NEXT_CMD              "n %i"
 // control_index_set <hw_id> <current_index> <total_index>
 #define CONTROL_INDEX_SET             "si %i %i %i"
-// initial_state <current_bank_uid> <current_pedalboard_uid> [current_pedalboards_list]
-#define INITIAL_STATE_CMD             "is %s %s ..."
-// banks
-#define BANKS_CMD                     "banks"
+// initial_state <amount of pb's> <page_min> <page_max> <bank_id> <pb_id> [current_pedalboards_list]
+#define INITIAL_STATE_CMD             "is %i %i %i %i %i %s %s ..."
+// banks <direction> <current banks hover id>
+#define BANKS_CMD                     "banks %i %i"
 // bank_config <hw_id> <function>
 #define BANK_CONFIG_CMD               "bank_config %i %i"
-// pedalboards <bank_uid>
-#define PEDALBOARDS_CMD               "pedalboards %s"
+// pedalboards <up/down page> <current page index> <bank_uid>
+#define PEDALBOARDS_CMD               "pedalboards %i %i %s"
 // pedalboard <bank_id> <pedalboard_uid>
 #define PEDALBOARD_CMD                "pb %i %s"
 // pedalboard_reset
@@ -334,6 +334,8 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define ENCODER_CLICKED_CMD           "encoder_clicked %i"
 //let the HMI know if a page is available
 #define PAGE_AVAILABLE_CMD            "pa %i %i %i"
+//next control page <hw_id> <up/down>
+#define CONTROL_PAGE_CMD              "ncp %i %i"
 
 
 //// Control propertires definitions
