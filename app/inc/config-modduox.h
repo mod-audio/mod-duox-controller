@@ -483,16 +483,12 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"STEREO LINK",                     MENU_TOGGLE,    STEREO_LINK_INP,      INP_ID,             system_sl_in_cb            , 0},  \
     {"INPUT 1 GAIN",                    MENU_VOL,       IN1_VOLUME,           INP_ID,             system_volume_cb           , 0},  \
     {"INPUT 2 GAIN",                    MENU_VOL,       IN2_VOLUME,           INP_ID,             system_volume_cb           , 0},  \
-    {"CV / EXP INPUT",                  MENU_TOGGLE,    EXP_CV_INP,           INP_ID,             system_cv_exp_cb           , 0},  \
-    {"CV RANGE",                        MENU_TOGGLE,    CV_RANGE,             INP_ID,             system_cv_range_cb         , 0},  \
-    {"EXP MODE",                        MENU_TOGGLE,    EXP_MODE,             INP_ID,             system_exp_mode_cb         , 0},  \
     {"OUTPUTS",                         MENU_LIST,      OUTP_ID,              SYSTEM_ID,          NULL                       , 0},  \
     {"< BACK TO SYSTEM",                MENU_RETURN,    OUTP_ID+1,            OUTP_ID,            NULL                       , 0},  \
     {"STEREO LINK ",                    MENU_TOGGLE,    STEREO_LINK_OUTP,     OUTP_ID,            system_sl_out_cb           , 0},  \
     {"OUTPUT 1 VOLUME",                 MENU_VOL,       OUT1_VOLUME,          OUTP_ID,            system_volume_cb           , 0},  \
     {"OUTPUT 2 VOLUME",                 MENU_VOL,       OUT2_VOLUME,          OUTP_ID,            system_volume_cb           , 0},  \
     {"HEADPHONE VOLUME",                MENU_VOL,       HP_VOLUME,            OUTP_ID,            system_volume_cb           , 0},  \
-    {"CV / HP OUTPUT",                  MENU_TOGGLE,    HP_CV_OUTP,           OUTP_ID,            system_cv_hp_cb            , 0},  \
     {"MASTER VOLUME LINK ",             MENU_TOGGLE,    MASTER_VOL_LINK,      OUTP_ID,            system_master_vol_link_cb  , 0},  \
     {"SYNC & MIDI",                     MENU_LIST,      MIDI_ID,              SYSTEM_ID,          NULL                       , 0},  \
     {"< BACK TO SYSTEM",                MENU_RETURN,    MIDI_ID+1,            MIDI_ID,            NULL                       , 0},  \

@@ -99,10 +99,6 @@ uint8_t g_tuner_mute = 0;
 int8_t g_display_brightness = -1;
 int8_t g_actuator_hide = -1;
 int8_t g_pots_lock = -1;
-uint8_t g_cv_in_mode = 0;
-uint8_t g_cv_in_range = 0;
-uint8_t g_exp_mode = 0;
-uint8_t g_cv_out_mode = 0;
 
 /*
 ************************************************************************************************************************
@@ -415,22 +411,6 @@ void system_update_menu_value(uint8_t item_ID, uint8_t value)
         case DISPLAY_BRIGHTNESS_ID: 
             g_display_brightness = value;
             hardware_glcd_brightness(g_display_brightness); 
-        break;
-        //CV in mode
-        case EXP_CV_INP: 
-            g_cv_in_mode = value;
-        break;
-        //CV in range
-        case CV_RANGE: 
-            g_cv_in_range = value;
-        break;
-        //expression mode
-        case EXP_MODE: 
-            g_exp_mode = value;
-        break;
-        //display brightness
-        case HP_CV_OUTP: 
-            g_cv_out_mode = value;
         break;
         default:
             return;
@@ -1352,7 +1332,8 @@ void system_save_pro_cb(void *arg, int event)
     //we do not need to update, there is nothing that changes
 }
 
-//CV stuff
+//ONLY NEEDED ONCE CV IS WORKING, NOT USED RIGHT NOW
+/*
 void system_cv_exp_cb (void *arg, int event)
 {
     menu_item_t *item = arg;
@@ -1424,3 +1405,4 @@ void system_cv_hp_cb (void *arg, int event)
     //this setting changes just 1 item
     if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
 }
+*/
