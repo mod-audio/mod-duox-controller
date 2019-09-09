@@ -109,6 +109,8 @@ static uint8_t page = 0;
 static int8_t g_current_bank;
 static uint8_t page_available[3] = {1, 1, 1};
 static uint8_t g_lock_potentiometers = 1;
+//default scrolling direction, will only change and set back once needed
+static uint8_t g_scroll_dir = 1;
 
 // only disabled after "boot" command received
 bool g_self_test_mode = true;
@@ -238,7 +240,7 @@ void draw_all_foots(uint8_t display)
 }
 
 // search the control
-static control_t *search_encoder(uint8_t hw_id, uint8_t *display)
+static control_t *search_encoder(uint8_t hw_id)
 {
     uint8_t i;
     control_t *control;
@@ -250,7 +252,6 @@ static control_t *search_encoder(uint8_t hw_id, uint8_t *display)
         {
             if (hw_id == control->hw_id)
             {
-                (*display) = i;
                 return control;
             }
         }
@@ -329,7 +330,8 @@ static void display_encoder_add(control_t *control)
         case CONTROL_PROP_SCALE_POINTS:
             control->step = 0;
             uint8_t i;
-            control->scroll_dir = 1;
+            control->scroll_dir = g_scroll_dir;
+
             for (i = 0; i < control->scale_points_count; i++)
             {
                 if (control->value == control->scale_points[i]->value)
@@ -2261,8 +2263,14 @@ void naveg_dec_control(uint8_t display)
             control->step--;
         else
         {
+        	//temporaraly change to add the right direction on parsing the new page
+        	g_scroll_dir = 0;
+
             //request new data, a new control we be assigned after
             request_control_page(control, 0);
+
+            //restore so we can add controls normaly again
+            g_scroll_dir = 1;
 
             //since a new control is assigned we can return
             return;
@@ -2542,11 +2550,9 @@ void naveg_set_control(uint8_t hw_id, float value)
 float naveg_get_control(uint8_t hw_id)
 {
     if (!g_initialized) return 0.0;
-
-    uint8_t display;
     control_t *control;
 
-    control = search_encoder(hw_id, &display);
+    control = search_encoder(hw_id);
     if (control) return control->value;
 
     return 0.0;
