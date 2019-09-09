@@ -2211,7 +2211,7 @@ void naveg_inc_control(uint8_t display)
             return;
         }
         // increments the step
-        if (control->step < (control->steps - 1))
+        if (control->step < (control->steps - 2))
             control->step++;
         else
         {
@@ -2257,7 +2257,7 @@ void naveg_dec_control(uint8_t display)
             return;
         }
         // decrements the step
-        if (control->step > 0)
+        if (control->step > 1)
             control->step--;
         else
         {
