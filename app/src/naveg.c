@@ -2557,35 +2557,33 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
         	if (!pressed) return;
         ; //keeping the compiler happy
 
-            if (!g_self_test_mode) {
-                if (page == 2)
-                {
-                    if (page_available[0] == 1)
-                        page = 0;
-                    else if (page_available[1] == 1)
-                        page = 1;
-                    else return;
-                }
-                else if (page == 1)
-                {
-                    if (page_available[2] == 1)
-                        page = 2;
-                    else if (page_available[0] == 1)
-                        page = 0;
-                    else return;
-                }
-                else if (page == 0)
-                {
-                    if (page_available[1] == 1)
-                        page = 1;
-                    else if (page_available[2] == 1)
-                        page = 2;
-                    else return;
-                }
-                //out of bounds
+            if (page == 2)
+            {
+                if (page_available[0] == 1)
+                    page = 0;
+                else if (page_available[1] == 1)
+                    page = 1;
                 else return;
             }
-
+            else if (page == 1)
+            {
+                if (page_available[2] == 1)
+                    page = 2;
+                else if (page_available[0] == 1)
+                    page = 0;
+                else return;
+            }
+            else if (page == 0)
+            {
+                if (page_available[1] == 1)
+                    page = 1;
+                else if (page_available[2] == 1)
+                    page = 2;
+                else return;
+            }
+            //out of bounds
+            else return;
+            
             char buffer[10];
             uint8_t i;
             i = copy_command(buffer, NEXT_PAGE_COMMAND);
@@ -2606,15 +2604,6 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                     // sends the request next page command
                     // insert the page number on buffer
                     i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
-
-                    //clear actuator queue
-                    reset_queue();
-
-                    comm_webgui_clear();
-                    comm_webgui_send(buffer, i);
-                    if (!g_self_test_mode) {
-                        comm_webgui_wait_response();
-                    }
                 break;
                 case 1:
                     ledz_off(hardware_leds(5), LEDZ_ALL_COLORS);
@@ -2623,15 +2612,6 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                     // sends the request next page command
                     // insert the page number on buffer
                     i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
-
-                    //clear actuator queue
-                    reset_queue();
-
-                    comm_webgui_clear();
-                    comm_webgui_send(buffer, i);
-                    if (!g_self_test_mode) {
-                        comm_webgui_wait_response();
-                    }
                 break;
                 case 2:
                     ledz_off(hardware_leds(5), LEDZ_ALL_COLORS);
@@ -2640,16 +2620,18 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                     // sends the request next page command
                     // insert the page number on buffer
                     i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
-
-                    //clear actuator queue
-                    reset_queue();
-
-                    comm_webgui_clear();
-                    comm_webgui_send(buffer, i);
-                    if (!g_self_test_mode) {
-                        comm_webgui_wait_response();
-                    }
                 break;
+            }
+
+            //clear actuator queue
+            reset_queue();
+
+            comm_webgui_clear();
+
+            comm_webgui_send(buffer, i);
+
+            if (!g_self_test_mode) {
+                comm_webgui_wait_response();
             }
     }
 }
