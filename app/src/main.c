@@ -613,10 +613,7 @@ static void initial_state_cb(proto_t *proto)
 
 static void bank_config_cb(proto_t *proto)
 {
-    bank_config_t bank_func;
-    bank_func.hw_id = atoi(proto->list[1]);
-    bank_func.function = atoi(proto->list[2]);
-    naveg_bank_config(&bank_func);
+    //we dont support this on the DuoX
     protocol_response("resp 0", proto);
 }
 

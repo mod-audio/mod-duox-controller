@@ -187,7 +187,7 @@ bp_list_t *data_parse_banks_list(char **list_data, uint32_t list_count)
 {
     if (!list_data || list_count == 0 || (list_count % 2)) return NULL;
 
-    list_count = (list_count / 2);
+    list_count = (list_count / 2) ;
 
     // creates a array of bank
     bp_list_t *bp_list = (bp_list_t *) MALLOC(sizeof(bp_list_t));
@@ -195,7 +195,6 @@ bp_list_t *data_parse_banks_list(char **list_data, uint32_t list_count)
 
     bp_list->hover = 0;
     bp_list->selected = 0;
-    bp_list->count = list_count - 1;
     bp_list->names = (char **) MALLOC(sizeof(char *) * (list_count + 1));
     bp_list->uids = (char **) MALLOC(sizeof(char *) * (list_count + 1));
 
@@ -210,10 +209,6 @@ bp_list_t *data_parse_banks_list(char **list_data, uint32_t list_count)
         bp_list->names[i] = NULL;
         bp_list->uids[i] = NULL;
     }
-
-    // first line is 'back to banks list'
-    //bp_list->names[0] = g_back_to_settings;
-    //bp_list->uids[0] = NULL;
 
     // fills the bp_list struct
     i = 0;
@@ -241,10 +236,11 @@ void data_free_banks_list(bp_list_t *bp_list)
     if (!bp_list) return;
 
     uint32_t i;
+    uint8_t count = (bp_list->page_max - bp_list->page_min + 1);
 
     if (bp_list->names)
     {
-        for (i = 1; i < bp_list->count; i++)
+        for (i = 0; i < count; i++)
             FREE(bp_list->names[i]);
 
         FREE(bp_list->names);
@@ -252,13 +248,14 @@ void data_free_banks_list(bp_list_t *bp_list)
 
     if (bp_list->uids)
     {
-        for (i = 1; i < bp_list->count; i++)
+        for (i = 0; i < count; i++)
             FREE(bp_list->uids[i]);
 
         FREE(bp_list->uids);
     }
 
     FREE(bp_list);
+    return;
 }
 
 bp_list_t *data_parse_pedalboards_list(char **list_data, uint32_t list_count)
@@ -272,8 +269,7 @@ bp_list_t *data_parse_pedalboards_list(char **list_data, uint32_t list_count)
     if (!bp_list) goto error;
 
     bp_list->hover = 0;
-    bp_list->selected = 1;
-    bp_list->count = list_count;
+    bp_list->selected = 0;
     bp_list->names = (char **) MALLOC(sizeof(char *) * (list_count + 1));
     bp_list->uids = (char **) MALLOC(sizeof(char *) * (list_count + 1));
 
@@ -291,7 +287,7 @@ bp_list_t *data_parse_pedalboards_list(char **list_data, uint32_t list_count)
 
     // first line is 'back to banks list'
     bp_list->names[0] = g_back_to_bank;
-    bp_list->uids[0] = NULL;
+    bp_list->uids[0] = NULL;  
 
     // fills the bp_list struct
     i = 0;
@@ -319,10 +315,11 @@ void data_free_pedalboards_list(bp_list_t *bp_list)
     if (!bp_list) return;
 
     uint32_t i;
+    uint8_t count = (bp_list->page_max - bp_list->page_min + 1);
 
     if (bp_list->names)
     {
-        for (i = 1; i < bp_list->count; i++)
+        for (i = 1; i < count; i++)
             FREE(bp_list->names[i]);
 
         FREE(bp_list->names);
@@ -330,11 +327,13 @@ void data_free_pedalboards_list(bp_list_t *bp_list)
 
     if (bp_list->uids)
     {
-        for (i = 1; i < bp_list->count; i++)
+        for (i = 1; i < count; i++)
             FREE(bp_list->uids[i]);
 
         FREE(bp_list->uids);
     }
 
     FREE(bp_list);
+    return;
 }
+

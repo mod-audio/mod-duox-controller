@@ -26,7 +26,7 @@
 #define FOOTER_NAME_WIDTH       ((DISPLAY_WIDTH * 50)/100)
 #define FOOTER_VALUE_WIDTH      (DISPLAY_WIDTH - FOOTER_NAME_WIDTH)
 
-
+enum {BANKS_LIST, PEDALBOARD_LIST};
 /*
 ************************************************************************************************************************
 *           LOCAL CONSTANTS
@@ -885,20 +885,15 @@ void screen_tool(uint8_t tool, uint8_t display_id)
 
         case DISPLAY_TOOL_NAVIG:
             bp_list = naveg_get_banks();
-            /*
-            if (bp_list && bp_list->selected == 0)
+
+            if (naveg_banks_mode_pb() == BANKS_LIST)
             {
-                bp_list->selected = 1;
-                bp_list->hover = 1;
+                screen_bp_list("BANKS", bp_list);
             }
-            */
-            //if we already have a bank selected we enter that bank automaticly
-            /*else {
-                bp_list->hover = bp_list->selected;
-                naveg_enter(1);
-                return;
-                }*/
-            screen_bp_list("BANKS", bp_list);
+            else 
+            {
+                screen_bp_list(naveg_get_current_pb_name(), bp_list);
+            }
             break;
     }
 }
@@ -906,7 +901,7 @@ void screen_tool(uint8_t tool, uint8_t display_id)
 void screen_bp_list(const char *title, bp_list_t *list)
 {
     if (!naveg_is_tool_mode(DISPLAY_RIGHT))
-    return; 
+        return; 
 
     listbox_t list_box;
     textbox_t title_box;
@@ -942,8 +937,8 @@ void screen_bp_list(const char *title, bp_list_t *list)
         list_box.width = 128;
         list_box.height = 53;
         list_box.color = GLCD_BLACK;
-        list_box.hover = list->hover - list->page_min;;
-        list_box.selected = list->selected;
+        list_box.hover = list->hover - list->page_min;
+        list_box.selected = list->selected - list->page_min;
         list_box.count = count;
         list_box.list = list->names;
         list_box.font = SMfont;
