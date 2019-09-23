@@ -75,7 +75,7 @@ extern "C"
 //#define LEDZ_BRIGHTNESS_SUPPORT
 
 // tick period in us
-#define LEDZ_TICK_PERIOD        10
+#define LEDZ_TICK_PERIOD        5
 
 //always blink value
 #define LED_BLINK_INFINIT		-1
