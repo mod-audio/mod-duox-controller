@@ -408,7 +408,7 @@ void widget_listbox3(glcd_t *display, listbox_t *listbox)
 void widget_bar_indicator(glcd_t *display, bar_t *bar)
 {
     float OldRange, NewRange, NewValue;
-    int bar_possistion, NewMax, NewMin;
+    int32_t bar_possistion, NewMax, NewMin;
 
     NewMin = 1;
     //Old swith statement value -> NewMax = 19;

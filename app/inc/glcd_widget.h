@@ -86,7 +86,7 @@ typedef struct BAR_T {
     uint8_t x, y;
     uint8_t color;
     uint8_t width, height;
-    int8_t step, steps;
+    int32_t step, steps;
 } bar_t;
 
 typedef struct PEAKMETER_T {
