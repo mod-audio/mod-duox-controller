@@ -2069,17 +2069,29 @@ void naveg_inc_control(uint8_t display)
             control_set(display, control);
             return;
         }
-        // increments the step
-        if (control->step < (control->steps - 2))
-            control->step++;
-        else
-        {
-            //request new data, a new control we be assigned after
-            request_control_page(control, 1);
 
-            //since a new control is assigned we can return
-            return;
-        }
+        if (control->scale_points_flag)
+        {
+        	// increments the step
+        	if (control->step < (control->steps - 2))
+        	    control->step++;
+        	else
+        	{
+        	    //request new data, a new control we be assigned after
+        	    request_control_page(control, 1);
+
+            	//since a new control is assigned we can return
+            	return;
+        	}
+    	}
+    	else 
+    	{
+    		// increments the step
+    		if (control->step < (control->steps - 1))
+    		    control->step++;
+    		else
+    		    return;	
+    	}
     }
     else
     {
@@ -2115,23 +2127,36 @@ void naveg_dec_control(uint8_t display)
             control_set(display, control);
             return;
         }
-        // decrements the step
-        if (control->step > 1)
-            control->step--;
-        else
+
+        if (&control->scale_points_flag)
         {
-        	//temporaraly change to add the right direction on parsing the new page
-        	g_scroll_dir = 0;
 
-            //request new data, a new control we be assigned after
-            request_control_page(control, 0);
+        	// decrements the step
+        	if (control->step > 1)
+        	    control->step--;
+        	else
+        	{
+        		//temporaraly change to add the right direction on parsing the new page
+        		g_scroll_dir = 0;
 
-            //restore so we can add controls normaly again
-            g_scroll_dir = 1;
+            	//request new data, a new control we be assigned after
+            	request_control_page(control, 0);
 
-            //since a new control is assigned we can return
-            return;
+            	//restore so we can add controls normaly again
+            	g_scroll_dir = 1;
+
+            	//since a new control is assigned we can return
+            	return;
+        	}
         }
+        else 
+    	{
+    		// increments the step
+    		if (control->step < (control->steps - 1))
+    		    control->step++;
+    		else
+    		    return;	
+    	}
     }
     else
     {
