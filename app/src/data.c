@@ -134,7 +134,7 @@ control_t *data_parse_control(char **data)
     if (len >= (min_params+1) && (control->properties == CONTROL_PROP_ENUMERATION ||
         control->properties == CONTROL_PROP_SCALE_POINTS || control->properties == CONTROL_PROP_REVERSE_ENUM))
     {
-        control->scale_points_count = atoi(data[min_params]);
+        control->scale_points_count = atoi(data[min_params - 1]);
         if (control->scale_points_count == 0) return control;
 
         control->scale_points = (scale_point_t **) MALLOC(sizeof(scale_point_t*) * control->scale_points_count);
