@@ -2130,7 +2130,7 @@ void naveg_dec_control(uint8_t display)
             return;
         }
 
-        if (&control->scale_points_flag)
+        if (control->scale_points_flag)
         {
 
         	// decrements the step
