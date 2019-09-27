@@ -778,7 +778,6 @@ static void parse_banks_list(void *data, menu_item_t *item)
         g_banks->menu_max = (atoi(list[2]));
         g_banks->page_min = (atoi(list[3]));
         g_banks->page_max = (atoi(list[4]));
-        g_banks->selected = g_current_bank;
     }
 
     naveg_set_banks(g_banks);
@@ -910,7 +909,7 @@ static void request_pedalboards(uint8_t dir, uint16_t bank_uid)
     else
     {
         // insert the current hover on buffer
-        i += int_to_str(g_naveg_pedalboards->hover, &buffer[i], sizeof(buffer) - i, 0);
+        i += int_to_str(g_naveg_pedalboards->hover - 1, &buffer[i], sizeof(buffer) - i, 0);
     }
 
     // inserts one space
@@ -1183,7 +1182,9 @@ static void bp_enter(void)
 
             // request to GUI load the pedalboard
             //index is relevant in the array so - page_min, also the HMI array is always shifted right 1 because of back to banks, correct here
-            send_load_pedalboard(atoi(g_banks->uids[g_banks->selected - g_banks->page_min]), g_naveg_pedalboards->uids[g_naveg_pedalboards->hover - g_naveg_pedalboards->page_min - 1]);
+            //TODO dirty fix for the 0'th index item not being properly saved in the UID array. Please FIXME later 
+            if (g_naveg_pedalboards->hover == 1) send_load_pedalboard(atoi(g_banks->uids[g_banks->hover - g_banks->page_min]), "0");
+            else send_load_pedalboard(atoi(g_banks->uids[g_banks->hover - g_banks->page_min]), g_naveg_pedalboards->uids[(g_naveg_pedalboards->hover - g_naveg_pedalboards->page_min - 1)]);
 
             g_current_pedalboard = g_naveg_pedalboards->hover;
 
