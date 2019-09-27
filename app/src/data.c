@@ -84,7 +84,7 @@ control_t *data_parse_control(char **data)
     uint16_t properties_mask = 0;
 
     // checks if all data was received
-    if (len < min_params)
+    if (len < min_params - 1)
         return NULL;
 
     control = (control_t *) MALLOC(sizeof(control_t));
