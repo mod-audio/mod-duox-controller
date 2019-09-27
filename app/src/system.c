@@ -1370,7 +1370,7 @@ void system_cv_exp_cb (void *arg, int event)
 {
     menu_item_t *item = arg;
 
-    if (event == MENU_EV_ENTER)
+    if (event == MENU_EV_ENTER && item->data.hover == 0)
     {
         if (g_cv_in_mode == 0) g_cv_in_mode = 1;
         else g_cv_in_mode = 0;
@@ -1424,7 +1424,7 @@ void system_cv_hp_cb (void *arg, int event)
 {
     menu_item_t *item = arg;
 
-    if (event == MENU_EV_ENTER)
+    if (event == MENU_EV_ENTER && item->data.hover == 0)
     {
         if (g_cv_out_mode == 0) g_cv_out_mode = 1;
         else g_cv_out_mode = 0;
