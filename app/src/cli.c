@@ -299,7 +299,7 @@ void cli_process(void)
                         // go back to where it went wrong
 
                         //if we retrieved password, we need to enter first and then go back to the login boot step
-                        if (j == 4)
+                        if (j == PASSWORD)
                         {
                             cli_command(NULL, CLI_RETRIEVE_RESPONSE);
                             g_cli.boot_step = j - 1;
