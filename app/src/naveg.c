@@ -48,6 +48,9 @@ enum {BANKS_LIST, PEDALBOARD_LIST};
 #define PAGE_DIR_UP         1
 #define PAGE_DIR_INIT       2
 
+#define PAGINATION_FLAG     1
+#define WRAP_AROUND_FLAG    2
+
 /*
 ************************************************************************************************************************
 *           LOCAL CONSTANTS
@@ -1023,7 +1026,7 @@ static void control_set(uint8_t id, control_t *control)
                     if (control->step < (control->steps - 1))
                         control->step++;
                     //we need to request a new page
-                    else if (control->scale_points_flag)
+                    else if (control->scale_points_flag & PAGINATION_FLAG)
                     {
                         //request new data, a new control we be assigned after
                         request_control_page(control, 1);
@@ -1039,7 +1042,7 @@ static void control_set(uint8_t id, control_t *control)
                     if (control->step > 0)
                         control->step--;
                     //we are at the end of our list ask for more data
-                    else if (control->scale_points_flag)
+                    else if (control->scale_points_flag & PAGINATION_FLAG)
                     {
                         //request new data, a new control we be assigned after
                         request_control_page(control, 0);
@@ -2072,7 +2075,7 @@ void naveg_inc_control(uint8_t display)
             return;
         }
 
-        if (control->scale_points_flag)
+        if (control->scale_points_flag & PAGINATION_FLAG)
         {
         	// increments the step
         	if (control->step < (control->steps - 2))
@@ -2130,7 +2133,7 @@ void naveg_dec_control(uint8_t display)
             return;
         }
 
-        if (control->scale_points_flag)
+        if (control->scale_points_flag & PAGINATION_FLAG)
         {
 
         	// decrements the step

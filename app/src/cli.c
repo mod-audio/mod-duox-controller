@@ -280,11 +280,27 @@ void cli_process(void)
             // and already tried login ...
             else if (g_cli.boot_step == LOGIN)
             {
+                //we cant assume this 
+                /*
                 // assume boot is done
                 g_cli.boot_step = SHELL_CONFIG;
                 // send new line to force interrupt
                 cli_command("echo", CLI_DISCARD_RESPONSE);
-                return;
+                */
+
+                // retrieve at what point we are now. 
+                cli_command(NULL, CLI_RETRIEVE_RESPONSE);
+
+                uint8_t j = 0;
+                for (j = 0; j < N_BOOT_STEPS; j++)
+                {
+                    if (strncmp(g_cli.received, g_boot_steps[j], strlen(g_boot_steps[j])))
+                    {
+                        // go back to where it went wrong
+                        g_cli.boot_step = j;
+                        break;
+                    }
+                }
             }
         }
 
