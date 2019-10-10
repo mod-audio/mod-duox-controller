@@ -428,7 +428,7 @@ void system_update_menu_value(uint8_t item_ID, uint8_t value)
         case EXP_MODE: 
             g_exp_mode = value;
         break;
-        //display brightness
+        //CV out mode
         case HP_CV_OUTP: 
             g_cv_out_mode = value;
         break;
@@ -1425,7 +1425,7 @@ void system_cv_exp_cb (void *arg, int event)
     {
         if (g_cv_in_mode == 0) g_cv_in_mode = 1;
         else g_cv_in_mode = 0;
-        set_item_value(PLAY_SET_CMD, g_cv_in_mode);
+        set_item_value(EXPCV_SET_CMD, g_cv_in_mode);
     }
     char str_bfr[15] = {};
     strcat(str_bfr,(g_cv_in_mode ? "EXP" : "CV"));
@@ -1443,7 +1443,7 @@ void system_cv_range_cb (void *arg, int event)
     {
         if (g_cv_in_range == 0) g_cv_in_range = 1;
         else g_cv_in_range = 0;
-        set_item_value(PLAY_SET_CMD, g_cv_in_range);
+        set_item_value(CV_BIAS_SET_CMD, g_cv_in_range);
     }
     char str_bfr[15] = {};
     strcat(str_bfr,(g_cv_in_range ? "-2.5 TO 2.5": "0 TO 5"));
@@ -1461,7 +1461,7 @@ void system_exp_mode_cb (void *arg, int event)
     {
         if (g_exp_mode == 0) g_exp_mode = 1;
         else g_exp_mode = 0;
-        set_item_value(PLAY_SET_CMD, g_exp_mode);
+        set_item_value(EXP_MODE_SET_CMD, g_exp_mode);
     }
     char str_bfr[15] = {};
     strcat(str_bfr,(g_exp_mode ? "Signal on Ring" : "Signal on Tip"));
@@ -1479,7 +1479,7 @@ void system_cv_hp_cb (void *arg, int event)
     {
         if (g_cv_out_mode == 0) g_cv_out_mode = 1;
         else g_cv_out_mode = 0;
-        set_item_value(PLAY_SET_CMD, g_cv_out_mode);
+        set_item_value(HPCV_SET_CMD, g_cv_out_mode);
     }
     char str_bfr[15] = {};
     strcat(str_bfr,(g_cv_out_mode ? "CV" : "Headphone"));

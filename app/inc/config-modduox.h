@@ -320,11 +320,11 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define BOOT_HMI_CMD                  "boot %i %i %s ..."
 //get input cv bias
 #define CV_BIAS_GET_CMD               "g_cvb"
-//get input cv bias
+//set input cv bias
 #define CV_BIAS_SET_CMD               "s_cvb %i"
 //get input EXP mode
 #define EXP_MODE_GET_CMD              "g_exp_m"
-//get input EXP mode
+//set input EXP mode
 #define EXP_MODE_SET_CMD              "s_exp_m %i"
 //change a menu setting
 #define MENU_ITEM_CHANGE              "mc %i %i ..."

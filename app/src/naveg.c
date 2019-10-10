@@ -2173,11 +2173,11 @@ void naveg_dec_control(uint8_t display)
         }
         else 
     	{
-    		// increments the step
-    		if (control->step < (control->steps - 1))
-    		    control->step++;
-    		else
-    		    return;	
+            // decrements the step
+            if (control->step > 0)
+                control->step--;
+            else
+                return;
     	}
     }
     else
