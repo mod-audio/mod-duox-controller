@@ -297,7 +297,17 @@ void cli_process(void)
                     if (strncmp(g_cli.received, g_boot_steps[j], strlen(g_boot_steps[j])))
                     {
                         // go back to where it went wrong
-                        g_cli.boot_step = j;
+
+                        //if we retrieved password, we need to enter first and then go back to the login boot step
+                        if (j == 4)
+                        {
+                            cli_command(NULL, CLI_RETRIEVE_RESPONSE);
+                            g_cli.boot_step = j - 1;
+                        }
+                        else 
+                        {
+                            g_cli.boot_step = j;
+                        }
                         break;
                     }
                 }
