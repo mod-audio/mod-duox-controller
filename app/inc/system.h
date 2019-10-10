@@ -66,6 +66,8 @@ uint8_t system_get_current_profile(void);
 uint8_t master_volume(int event, int step);
 void system_pedalboard_cb(void *arg, int event);
 void system_bluetooth_cb(void *arg, int event);
+void system_input_cb(void *arg, int event);
+void system_output_cb(void *arg, int event);
 void system_services_cb(void *arg, int event);
 void system_versions_cb(void *arg, int event);
 void system_release_cb(void *arg, int event);

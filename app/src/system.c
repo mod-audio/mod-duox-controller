@@ -493,6 +493,57 @@ void system_bluetooth_cb(void *arg, int event)
     }
 }
 
+void system_input_cb(void *arg, int event)
+{
+    (void) arg;
+
+    if (event == MENU_EV_ENTER)
+    {
+        const char *response;
+        char resp[LINE_BUFFER_SIZE];
+
+        response = cli_command("mod-amixer in xall", CLI_RETRIEVE_RESPONSE);
+            
+        strncpy(resp, response, sizeof(resp));
+        char **items = strarr_split(resp, '|');;
+
+        if (items)
+        {
+            g_gains_volumes[0] = atof(items[0]);
+            g_gains_volumes[1] = atof(items[1]);
+            g_cv_in_mode = atoi(items[2]);
+            g_cv_in_range = atoi(items[3]);
+            g_exp_mode = atoi(items[4]);
+        } 
+        
+    }
+}
+
+void system_output_cb(void *arg, int event)
+{
+    (void) arg;
+    
+    if (event == MENU_EV_ENTER)
+    {
+        const char *response;
+        char resp[LINE_BUFFER_SIZE];
+
+        response = cli_command("mod-amixer out xall", CLI_RETRIEVE_RESPONSE);
+            
+        strncpy(resp, response, sizeof(resp));
+        char **items = strarr_split(resp, '|');;
+
+        if (items)
+        {
+            g_gains_volumes[2] = atof(items[0]);
+            g_gains_volumes[3] = atof(items[1]);
+            g_gains_volumes[4] = atof(items[2]);
+            g_cv_out_mode = atoi(items[3]);
+        } 
+        
+    }
+}
+
 void system_services_cb(void *arg, int event)
 {
     menu_item_t *item = arg;
@@ -1377,7 +1428,7 @@ void system_cv_exp_cb (void *arg, int event)
         set_item_value(PLAY_SET_CMD, g_cv_in_mode);
     }
     char str_bfr[15] = {};
-    strcat(str_bfr,(g_cv_in_mode ? "CV" : "EXP"));
+    strcat(str_bfr,(g_cv_in_mode ? "EXP" : "CV"));
     add_chars_to_menu_name(item, str_bfr);
 
     //this setting changes just 1 item
@@ -1395,7 +1446,7 @@ void system_cv_range_cb (void *arg, int event)
         set_item_value(PLAY_SET_CMD, g_cv_in_range);
     }
     char str_bfr[15] = {};
-    strcat(str_bfr,(g_cv_in_range ? "0 TO 5" : "-2.5 TO 2.5"));
+    strcat(str_bfr,(g_cv_in_range ? "-2.5 TO 2.5": "0 TO 5"));
     add_chars_to_menu_name(item, str_bfr);
 
     //this setting changes just 1 item
@@ -1413,7 +1464,7 @@ void system_exp_mode_cb (void *arg, int event)
         set_item_value(PLAY_SET_CMD, g_exp_mode);
     }
     char str_bfr[15] = {};
-    strcat(str_bfr,(g_exp_mode ? "Signal on Tip" : "Signal on Ring"));
+    strcat(str_bfr,(g_exp_mode ? "Signal on Ring" : "Signal on Tip"));
     add_chars_to_menu_name(item, str_bfr);
 
     //this setting changes just 1 item

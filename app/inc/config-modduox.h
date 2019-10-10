@@ -478,7 +478,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"USER PROFILE D",                  MENU_TOGGLE,    PROFILES_ID+4,        PROFILES_ID,        system_load_pro_cb         , 0},  \
     {"OVERWRITE CURRENT PROFILE",       MENU_TOGGLE,    PROFILES_ID+5,        PROFILES_ID,        system_save_pro_cb         , 0},  \
     {"SYSTEM",                          MENU_LIST,      SYSTEM_ID,            ROOT_ID,            NULL                       , 0},  \
-    {"INPUTS",                          MENU_LIST,      INP_ID,               SYSTEM_ID,          NULL                       , 0},  \
+    {"INPUTS",                          MENU_LIST,      INP_ID,               SYSTEM_ID,          system_input_cb            , 0},  \
     {"< BACK TO SYSTEM",                MENU_RETURN,    INP_ID+1,             INP_ID,             NULL                       , 0},  \
     {"STEREO LINK",                     MENU_TOGGLE,    STEREO_LINK_INP,      INP_ID,             system_sl_in_cb            , 0},  \
     {"INPUT 1 GAIN",                    MENU_VOL,       IN1_VOLUME,           INP_ID,             system_volume_cb           , 0},  \
@@ -486,7 +486,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"CV / EXP INPUT",                  MENU_TOGGLE,    EXP_CV_INP,           INP_ID,             system_cv_exp_cb           , 0},  \
     {"CV RANGE",                        MENU_TOGGLE,    CV_RANGE,             INP_ID,             system_cv_range_cb         , 0},  \
     {"EXP MODE",                        MENU_TOGGLE,    EXP_MODE,             INP_ID,             system_exp_mode_cb         , 0},  \
-    {"OUTPUTS",                         MENU_LIST,      OUTP_ID,              SYSTEM_ID,          NULL                       , 0},  \
+    {"OUTPUTS",                         MENU_LIST,      OUTP_ID,              SYSTEM_ID,          system_output_cb           , 0},  \
     {"< BACK TO SYSTEM",                MENU_RETURN,    OUTP_ID+1,            OUTP_ID,            NULL                       , 0},  \
     {"STEREO LINK ",                    MENU_TOGGLE,    STEREO_LINK_OUTP,     OUTP_ID,            system_sl_out_cb           , 0},  \
     {"OUTPUT 1 VOLUME",                 MENU_VOL,       OUT1_VOLUME,          OUTP_ID,            system_volume_cb           , 0},  \
