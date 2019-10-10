@@ -51,6 +51,10 @@ enum {BANKS_LIST, PEDALBOARD_LIST};
 #define PAGINATION_FLAG     1
 #define WRAP_AROUND_FLAG    2
 
+#define CONTROL_PAGINATED   1
+#define CONTROL_WRAP_AROUND 2
+#define CONTROL_END_PAGE    4
+
 /*
 ************************************************************************************************************************
 *           LOCAL CONSTANTS
@@ -749,7 +753,7 @@ static void request_control_page(control_t *control, uint8_t dir)
     //bitmask for the page direction and wrap around
     uint8_t bitmask = 0;
     if (dir) bitmask |= LIST_PAGE_UP;
-    if (control->hw_id >= ENCODERS_COUNT) bitmask |= LIST_WRAP_AROUND;
+    if ((control->hw_id >= ENCODERS_COUNT) && (control->scale_points_flag & CONTROL_WRAP_AROUND)) bitmask |= LIST_WRAP_AROUND;
 
     // insert the direction on buffer
     i += int_to_str(bitmask, &buffer[i], sizeof(buffer) - i, 0);
@@ -1025,8 +1029,19 @@ static void control_set(uint8_t id, control_t *control)
                     // increments the step
                     if (control->step < (control->steps - 1))
                         control->step++;
+                    //if we are reaching the end of the control
+                    else if (control->scale_points_flag & CONTROL_END_PAGE)
+                    {
+                        //we wrap around so the step becomes 0 again
+                        if (control->scale_points_flag & CONTROL_WRAP_AROUND)
+                        {
+                            request_control_page(control, 1);
+                        }
+                        //we are at max and dont wrap around
+                        else return; 
+                    }
                     //we need to request a new page
-                    else if (control->scale_points_flag & PAGINATION_FLAG)
+                    else if (control->scale_points_flag & CONTROL_PAGINATED) 
                     {
                         //request new data, a new control we be assigned after
                         request_control_page(control, 1);
@@ -1042,7 +1057,7 @@ static void control_set(uint8_t id, control_t *control)
                     if (control->step > 0)
                         control->step--;
                     //we are at the end of our list ask for more data
-                    else if (control->scale_points_flag & PAGINATION_FLAG)
+                    else if ((control->scale_points_flag & CONTROL_PAGINATED) || (control->scale_points_flag & CONTROL_WRAP_AROUND))
                     {
                         //request new data, a new control we be assigned after
                         request_control_page(control, 0);
@@ -2065,7 +2080,8 @@ void naveg_inc_control(uint8_t display)
     control_t *control = g_encoders[display];
     if (!control) return;
 
-    if ((control->properties == CONTROL_PROP_ENUMERATION) || (control->properties == CONTROL_PROP_SCALE_POINTS) || (control->properties == CONTROL_PROP_REVERSE_ENUM))
+    if  (((control->properties == CONTROL_PROP_ENUMERATION) || (control->properties == CONTROL_PROP_SCALE_POINTS) 
+        || (control->properties == CONTROL_PROP_REVERSE_ENUM)) && (control->scale_points_flag & CONTROL_PAGINATED))
     {
         //check/sets the direction
         if (control->scroll_dir == 0)
@@ -2123,7 +2139,8 @@ void naveg_dec_control(uint8_t display)
     control_t *control = g_encoders[display];
     if (!control) return;
 
-    if ((control->properties == CONTROL_PROP_ENUMERATION) || (control->properties == CONTROL_PROP_SCALE_POINTS) || (control->properties == CONTROL_PROP_REVERSE_ENUM))
+    if  (((control->properties == CONTROL_PROP_ENUMERATION) || (control->properties == CONTROL_PROP_SCALE_POINTS) ||
+     (control->properties == CONTROL_PROP_REVERSE_ENUM)) && (control->scale_points_flag & CONTROL_PAGINATED))
     {
         //check/sets the direction
         if (control->scroll_dir != 0)
