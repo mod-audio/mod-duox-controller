@@ -683,6 +683,11 @@ void screen_footer(uint8_t id, const char *name, const char *value)
 
     if (name == NULL || value == NULL)
     {
+        char text[sizeof(SCREEN_FOOT_DEFAULT_NAME) + 2];
+        strcpy(text, SCREEN_FOOT_DEFAULT_NAME);
+        text[sizeof(SCREEN_FOOT_DEFAULT_NAME)-1] = (id + '1');
+        text[sizeof(SCREEN_FOOT_DEFAULT_NAME)] = 0;    
+
         textbox_t title;
         title.color = GLCD_BLACK;
         title.mode = TEXT_SINGLE_LINE;
@@ -692,22 +697,10 @@ void screen_footer(uint8_t id, const char *name, const char *value)
         title.left_margin = 0;
         title.right_margin = 0;
         title.height = 0;
+        title.text = g_hide_non_assigned_actuators? "-" : text;  
         title.width = 0;
         title.align = align ? ALIGN_RCENTER_BOTTOM : ALIGN_LCENTER_BOTTOM;
         title.y = 0;
-
-        if (g_hide_non_assigned_actuators)
-        {
-            title.text = "-";
-        }
-        else 
-        {
-            char text[sizeof(SCREEN_FOOT_DEFAULT_NAME) + 2];
-            strcpy(text, SCREEN_FOOT_DEFAULT_NAME);
-            text[sizeof(SCREEN_FOOT_DEFAULT_NAME)-1] = (id + '1');
-            text[sizeof(SCREEN_FOOT_DEFAULT_NAME)] = 0;
-            title.text = text;            
-        }
 
         widget_textbox(display, &title);
         return;
