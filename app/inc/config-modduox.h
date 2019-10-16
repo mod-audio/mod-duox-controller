@@ -598,6 +598,9 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 // defines the time (in milliseconds) that the tap can be over the maximum value to be registered
 #define TAP_TEMPO_MAXVAL_OVERFLOW 50
 
+//time in us for the display brightness + led tick interupt
+#define LED_DISPL_INTERUPT_TIME     100
+
 //// Toggled
 // defines the toggled footer text
 #define TOGGLED_ON_FOOTER_TEXT      "ON"
