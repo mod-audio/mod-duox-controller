@@ -1035,8 +1035,15 @@ static void control_set(uint8_t id, control_t *control)
                         //we wrap around so the step becomes 0 again
                         if (control->scale_points_flag & CONTROL_WRAP_AROUND)
                         {
-                            request_control_page(control, 1);
-                            return;
+                        	if (control->scale_points_flag & CONTROL_PAGINATED)
+                        	{
+                            	request_control_page(control, 1);
+                            	return;
+                        	}
+                        	else
+                        	{
+                        		control->step = 0;
+                        	}
                         }
                         //we are at max and dont wrap around
                         else return; 
