@@ -1036,6 +1036,7 @@ static void control_set(uint8_t id, control_t *control)
                         if (control->scale_points_flag & CONTROL_WRAP_AROUND)
                         {
                             request_control_page(control, 1);
+                            return;
                         }
                         //we are at max and dont wrap around
                         else return; 
