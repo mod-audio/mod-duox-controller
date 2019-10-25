@@ -1513,12 +1513,6 @@ void system_page_mode_cb(void *arg, int event)
         uint8_t read_buffer = 0;
         EEPROM_Read(0, PAGE_MODE_ADRESS, &read_buffer, MODE_8_BIT, 1);
 
-        //if not valid, default
-        if (read_buffer != 0 || read_buffer != 1)
-        {
-            read_buffer = 0;
-        }
-
         g_page_mode = read_buffer;
 
         //write to naveg.cs

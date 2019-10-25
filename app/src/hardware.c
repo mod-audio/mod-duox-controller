@@ -284,6 +284,8 @@ void hardware_setup(void)
         EEPROM_Write(0, LOCK_POTENTIOMTERS_ADRESS, &write_buffer, MODE_8_BIT, 1);
         write_buffer = 2;
         EEPROM_Write(0, DISPLAY_BRIGHTNESS_ADRESS, &write_buffer, MODE_8_BIT, 1);
+        write_buffer = 0;
+        EEPROM_Write(0, PAGE_MODE_ADRESS, &write_buffer, MODE_8_BIT, 1);
 
         //write default pot value's
         calibration_write_default();
@@ -333,7 +335,7 @@ void hardware_setup(void)
     //check if the calibration value's are valid, if not write defualts
     if (!calibration_check_valid())
         calibration_write_default();
-    
+
     //start ADC burst mode
     adc_initalisation();
 
