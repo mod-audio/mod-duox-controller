@@ -220,6 +220,7 @@ void ledz_set(ledz_t* led, ledz_color_t color, int value);
  * @param[in] color the color to blink
  * @param[in] time_on the time in milliseconds which the LED will be on
  * @param[in] time_off the time in milliseconds which the LED will be off
+ * @param[in] the amount of blinks the led should preform, pass -1 for infinate amount.
  */
 void ledz_blink(ledz_t* led, ledz_color_t color, uint16_t time_on, uint16_t time_off, int8_t amount_of_blinks);
 
@@ -274,6 +275,34 @@ void ledz_fade_out(ledz_t* led, ledz_color_t color, unsigned int rate, unsigned 
  * using the LEDZ_TICK_PERIOD macro.
  */
 void ledz_tick(void);
+
+/**
+ * Store and toggle LED state
+ *
+ * Colors can be combinated using the OR operator.
+ *
+ * Stores the state of the LED in the driver. can be used for on, off or blink mode
+ * after setting a state here the state can be recalled with ledz_restore_state.
+ *
+ * @param[in] led ledz object pointer
+ * @param[in] color of the led
+ * @param[in] state of the led (0 = off, 1 = on, 2 = blinking)
+ * @param[in] time_on the time in milliseconds which the LED will be on
+ * @param[in] time_off the time in milliseconds which the LED will be off
+ * @param[in] the amount of blinks the led should preform, pass -1 for infinate amount. 
+ */
+void ledz_set_state(ledz_t* led, uint8_t led_id, ledz_color_t color, uint8_t state, uint16_t time_on, uint16_t time_off, int8_t amount_of_blinks);
+
+/**
+ * toggle previous LED state
+ *
+ * Colors can be combinated using the OR operator.
+ *
+ * restores the previously stored state of the LED
+ *
+ * @param[in] led ledz object pointer
+ */
+void ledz_restore_state(ledz_t* led, uint8_t led_id);
 
 /**
  * @}

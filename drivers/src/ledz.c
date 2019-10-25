@@ -110,6 +110,14 @@ struct LEDZ_T {
     ledz_t *next;
 };
 
+typedef struct LED_STATE_T {
+    ledz_t *led;
+    ledz_color_t color;
+    uint8_t state;
+    int16_t time_on, time_off;
+    int8_t amount_of_blinks; 
+} led_state_t;
+
 /*
 ****************************************************************************************************
 *       INTERNAL GLOBAL VARIABLES
@@ -118,7 +126,7 @@ struct LEDZ_T {
 
 static ledz_t g_leds[LEDZ_MAX_INSTANCES];
 static unsigned int g_leds_available = LEDZ_MAX_INSTANCES;
-
+static led_state_t g_led_state[LEDZ_MAX_INSTANCES];
 
 /*
 ****************************************************************************************************
@@ -489,4 +497,56 @@ void ledz_tick(void)
         }
 #endif
     }
+}
+
+void ledz_set_state(ledz_t* led, uint8_t led_id, ledz_color_t color, uint8_t state, uint16_t time_on, uint16_t time_off, int8_t amount_of_blinks)
+{
+    switch (state)
+    {
+        //off
+        case 0:
+            ledz_off(led, color);
+        break;
+
+        //on
+        case 1:
+            ledz_off(led, LEDZ_ALL_COLORS);
+            ledz_on(led, color);
+        break;
+
+        //blink
+        case 2:
+            ledz_blink(led, color, time_on, time_off, amount_of_blinks);
+        break;
+    }
+
+    //store the LED state
+    g_led_state[led_id].led = led;
+    g_led_state[led_id].color = color;
+    g_led_state[led_id].state = state;
+    g_led_state[led_id].time_on = time_on;
+    g_led_state[led_id].time_off = time_off;
+    g_led_state[led_id].amount_of_blinks = amount_of_blinks;
+}
+
+void ledz_restore_state(ledz_t* led, uint8_t led_id)
+{
+    switch (g_led_state[led_id].state)
+    {
+        //off
+        case 0:
+            ledz_off(led, LEDZ_ALL_COLORS);
+        break;
+
+        //on
+        case 1:
+            ledz_off(led, LEDZ_ALL_COLORS);
+            ledz_on(led, g_led_state[led_id].color);
+        break;
+
+        //blink
+        case 2:
+            ledz_blink(led, g_led_state[led_id].color, g_led_state[led_id].time_on, g_led_state[led_id].time_off, g_led_state[led_id].amount_of_blinks);
+        break;
+    } 
 }

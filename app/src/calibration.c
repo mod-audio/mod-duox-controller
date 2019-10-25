@@ -89,6 +89,8 @@ void toggle_leds(void)
 
     if (orientation==DISPLAY_LEFT)
     {
+        ledz_off(hardware_leds(SAVE_MIN_VAL_LEFT_BUTTON), LEDZ_ALL_COLORS);
+        ledz_off(hardware_leds(SAVE_MAX_VAL_LEFT_BUTTON), LEDZ_ALL_COLORS);
         ledz_on(hardware_leds(SAVE_MIN_VAL_LEFT_BUTTON), SAVE_VAL_COLOR);
         ledz_on(hardware_leds(SAVE_MAX_VAL_LEFT_BUTTON), SAVE_VAL_COLOR);
         ledz_off(hardware_leds(SAVE_MIN_VAL_RIGHT_BUTTON), LEDZ_ALL_COLORS);
@@ -96,6 +98,8 @@ void toggle_leds(void)
     }
     else 
     {
+        ledz_off(hardware_leds(SAVE_MIN_VAL_RIGHT_BUTTON), LEDZ_ALL_COLORS);
+        ledz_off(hardware_leds(SAVE_MAX_VAL_RIGHT_BUTTON), LEDZ_ALL_COLORS);
         ledz_on(hardware_leds(SAVE_MIN_VAL_RIGHT_BUTTON), SAVE_VAL_COLOR);
         ledz_on(hardware_leds(SAVE_MAX_VAL_RIGHT_BUTTON), SAVE_VAL_COLOR);
         ledz_off(hardware_leds(SAVE_MIN_VAL_LEFT_BUTTON), LEDZ_ALL_COLORS);
