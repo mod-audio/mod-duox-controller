@@ -436,7 +436,7 @@ void widget_knob(glcd_t *display, knob_t *knob)
     float NewValue;
     uint8_t knob_possistion = 0;
 
-    uint8_t amount_of_divisions = 15;
+    uint8_t amount_of_divisions = 16;
 
     float division_values[amount_of_divisions];
 
@@ -449,13 +449,14 @@ void widget_knob(glcd_t *display, knob_t *knob)
     //logaritmic
     else if (knob->mode == 1)
     {
-        float division = (POT_UPPER_THRESHOLD - POT_LOWER_THRESHOLD) / amount_of_divisions;
+
+        float division = (knob->max_cal - knob->min_cal) / amount_of_divisions;
 
         uint8_t i = 1;
 
         for(i = 1; i < amount_of_divisions; i++)
         {
-            float p_step = ((float) (i * division)) / ((float) (POT_UPPER_THRESHOLD - 1));
+            float p_step = ((float) (i * division)) / ((float) (knob->max_cal - 1));
             division_values[i] = knob->min * pow(knob->max / knob->min, p_step);
 
             if (division_values[i] < knob->value)

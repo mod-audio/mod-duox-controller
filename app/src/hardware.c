@@ -12,6 +12,7 @@
 #include "actuator.h"
 #include "task.h"
 #include "device.h"
+#include "calibration.h"
 
 /*
 ************************************************************************************************************************
@@ -283,6 +284,9 @@ void hardware_setup(void)
         EEPROM_Write(0, LOCK_POTENTIOMTERS_ADRESS, &write_buffer, MODE_8_BIT, 1);
         write_buffer = 2;
         EEPROM_Write(0, DISPLAY_BRIGHTNESS_ADRESS, &write_buffer, MODE_8_BIT, 1);
+
+        //write default pot value's
+        calibration_write_default();
     }
 
     //set 3 color leds
@@ -325,6 +329,10 @@ void hardware_setup(void)
         actuator_create(POT, i, hardware_actuators(POT0 + i));
         actuator_set_pins(hardware_actuators(POT0 + i), POT_PINS[i]);
     }
+    
+    //check if the calibration value's are valid, if not write defualts
+    if (!calibration_check_valid())
+        calibration_write_default();
     
     //start ADC burst mode
     adc_initalisation();

@@ -15,6 +15,7 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "actuator.h"
+#include "calibration.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -69,7 +70,6 @@ static menu_desc_t g_menu_desc[] = {
 static const menu_popup_t g_menu_popups[] = {
     POPUP_CONTENT
     {-1, NULL, NULL}
-
 };
 
 
@@ -124,6 +124,7 @@ static uint8_t g_scroll_dir = 1;
 
 // only disabled after "boot" command received
 bool g_self_test_mode = true;
+uint16_t g_pot_calibrations[2][POTS_COUNT] = {{0}};
 
 /*
 ************************************************************************************************************************
@@ -404,10 +405,10 @@ static void display_pot_add(control_t *control)
     //in this case scroll_dir is used as a flag. TODO: rename scroll_dir to actuator_flag
     uint16_t tmp_value = hardware_get_pot_value(id);
 
-    if (tmp_value < POT_LOWER_THRESHOLD)
-        tmp_value = POT_LOWER_THRESHOLD;
-    else if (tmp_value > POT_THRESHOLD)
-        tmp_value = POT_THRESHOLD;
+    if (tmp_value < g_pot_calibrations[0][id])
+        tmp_value = g_pot_calibrations[0][id];
+    else if (tmp_value > g_pot_calibrations[1][id])
+        tmp_value = g_pot_calibrations[1][id];
 
     //since the actuall actuator limits can scale verry differently we scale the actuator value in a range of 50 to 3950
     //within this range the difference should be smaller then 50 before the pot starts turning
@@ -416,17 +417,17 @@ static void display_pot_add(control_t *control)
     if (g_pots[id]->properties == CONTROL_PROP_LINEAR)
     {
     	//map the current value to the ADC range
-    	tmp_control_value = MAP(g_pots[id]->value, g_pots[id]->minimum,  g_pots[id]->maximum, POT_LOWER_THRESHOLD, POT_UPPER_THRESHOLD);
+    	tmp_control_value = MAP(g_pots[id]->value, g_pots[id]->minimum,  g_pots[id]->maximum, g_pot_calibrations[0][id], g_pot_calibrations[1][id]);
     }
     else if (g_pots[id]->properties == CONTROL_PROP_LOGARITHMIC)
     {
     	//map the current value to the ADC range logarithmicly 
-    	tmp_control_value = (POT_UPPER_THRESHOLD - POT_LOWER_THRESHOLD) * log(g_pots[id]->value / g_pots[id]->minimum) / log(g_pots[id]->maximum / g_pots[id]->minimum);
+    	tmp_control_value = (g_pot_calibrations[1][id] - g_pot_calibrations[0][id]) * log(g_pots[id]->value / g_pots[id]->minimum) / log(g_pots[id]->maximum / g_pots[id]->minimum);
     }
     else 
     {
     	//map the current value to the ADC range
-    	tmp_control_value = MAP(g_pots[id]->value, g_pots[id]->minimum,  g_pots[id]->maximum, POT_LOWER_THRESHOLD, POT_UPPER_THRESHOLD);
+    	tmp_control_value = MAP(g_pots[id]->value, g_pots[id]->minimum,  g_pots[id]->maximum, g_pot_calibrations[0][id], g_pot_calibrations[1][id]);
     }
 
     if (g_lock_potentiometers)
@@ -1719,6 +1720,9 @@ static void menu_enter(uint8_t display_id)
         }
     }
 
+    //if we entered calibration mode we dont do these steps
+    if (g_calibration_mode) return;
+
     if (item->desc->parent_id == DEVICE_ID && item->desc->action_cb)
         item->desc->action_cb(item, MENU_EV_ENTER);
 
@@ -1879,6 +1883,10 @@ void naveg_init(void)
     {
         // initialize the display controls pointers
         g_pots[i] = NULL;
+
+        //get the calibration for this pot
+        g_pot_calibrations[0][i] = calibration_get_min(i);
+        g_pot_calibrations[1][i] = calibration_get_max(i);
     }
 
     g_banks = NULL;
@@ -2414,27 +2422,27 @@ void naveg_set_control(uint8_t hw_id, float value)
         {
             uint16_t tmp_value = hardware_get_pot_value(id);
             
-            if (tmp_value < POT_LOWER_THRESHOLD)
-                tmp_value = POT_LOWER_THRESHOLD;
-            else if (tmp_value > POT_UPPER_THRESHOLD)
-                tmp_value = POT_UPPER_THRESHOLD;
+            if (tmp_value < g_pot_calibrations[0][id])
+                tmp_value = g_pot_calibrations[0][id];
+            else if (tmp_value > g_pot_calibrations[1][id])
+                tmp_value = g_pot_calibrations[1][id];
 
             uint16_t tmp_control_value = 0;
 
             if (g_pots[id]->properties == CONTROL_PROP_LINEAR)
             {
             	//map the current value to the ADC range
-            	tmp_control_value = MAP(g_pots[id]->value, g_pots[id]->minimum,  g_pots[id]->maximum, POT_LOWER_THRESHOLD, POT_UPPER_THRESHOLD);
+            	tmp_control_value = MAP(g_pots[id]->value, g_pots[id]->minimum,  g_pots[id]->maximum, g_pot_calibrations[0][id], g_pot_calibrations[1][id]);
             }
             else if (g_pots[id]->properties == CONTROL_PROP_LOGARITHMIC)
             {
             	//map the current value to the ADC range logarithmicly 
-            	tmp_control_value = (POT_UPPER_THRESHOLD - POT_LOWER_THRESHOLD) * log(g_pots[id]->value / g_pots[id]->minimum) / log(g_pots[id]->maximum / g_pots[id]->minimum);
+            	tmp_control_value = (g_pot_calibrations[1][id] - g_pot_calibrations[0][id]) * log(g_pots[id]->value / g_pots[id]->minimum) / log(g_pots[id]->maximum / g_pots[id]->minimum);
             }
             else 
             {
             	//map the current value to the ADC range
-            	tmp_control_value = MAP(g_pots[id]->value, g_pots[id]->minimum,  g_pots[id]->maximum, POT_LOWER_THRESHOLD, POT_UPPER_THRESHOLD);
+            	tmp_control_value = MAP(g_pots[id]->value, g_pots[id]->minimum,  g_pots[id]->maximum, g_pot_calibrations[0][id], g_pot_calibrations[1][id]);
             }
 
             if (g_lock_potentiometers)
@@ -2487,25 +2495,25 @@ void naveg_pot_change(uint8_t pot)
     uint16_t tmp_value = hardware_get_pot_value(pot);
 
     //if the pot is lower then its upper and lower thresholds, they are the same
-    if (tmp_value < POT_LOWER_THRESHOLD) tmp_value = POT_LOWER_THRESHOLD;
-    else if (tmp_value > POT_UPPER_THRESHOLD) tmp_value = POT_UPPER_THRESHOLD;
+    if (tmp_value < g_pot_calibrations[0][pot]) tmp_value = g_pot_calibrations[0][pot];
+    else if (tmp_value > g_pot_calibrations[1][pot]) tmp_value = g_pot_calibrations[1][pot];
 
     uint16_t tmp_control_value = 0;
 
     if (g_pots[pot]->properties == CONTROL_PROP_LINEAR)
     {
     	//map the current value to the ADC range
-    	tmp_control_value = MAP(g_pots[pot]->value, g_pots[pot]->minimum,  g_pots[pot]->maximum, POT_LOWER_THRESHOLD, POT_UPPER_THRESHOLD);
+    	tmp_control_value = MAP(g_pots[pot]->value, g_pots[pot]->minimum,  g_pots[pot]->maximum, g_pot_calibrations[0][pot], g_pot_calibrations[1][pot]);
     }
     else if (g_pots[pot]->properties == CONTROL_PROP_LOGARITHMIC)
     {
     	//map the current value to the ADC range logarithmicly 
-    	tmp_control_value = (POT_UPPER_THRESHOLD - POT_LOWER_THRESHOLD) * log(g_pots[pot]->value / g_pots[pot]->minimum) / log(g_pots[pot]->maximum / g_pots[pot]->minimum);
+    	tmp_control_value = (g_pot_calibrations[1][pot] - g_pot_calibrations[0][pot]) * log(g_pots[pot]->value / g_pots[pot]->minimum) / log(g_pots[pot]->maximum / g_pots[pot]->minimum);
     }
     else 
     {
     	//map the current value to the ADC range
-    	tmp_control_value = MAP(g_pots[pot]->value, g_pots[pot]->minimum,  g_pots[pot]->maximum, POT_LOWER_THRESHOLD, POT_UPPER_THRESHOLD);
+    	tmp_control_value = MAP(g_pots[pot]->value, g_pots[pot]->minimum,  g_pots[pot]->maximum, g_pot_calibrations[0][pot], g_pot_calibrations[1][pot]);
     }
 
     //if the actuator is still locked
@@ -2524,17 +2532,17 @@ void naveg_pot_change(uint8_t pot)
 
     if (g_pots[pot]->properties == CONTROL_PROP_LINEAR)
   	{
-    	g_pots[pot]->value = MAP(tmp_value, POT_LOWER_THRESHOLD, POT_UPPER_THRESHOLD,  g_pots[pot]->minimum,  g_pots[pot]->maximum);
+    	g_pots[pot]->value = MAP(tmp_value, g_pot_calibrations[0][pot], g_pot_calibrations[1][pot],  g_pots[pot]->minimum,  g_pots[pot]->maximum);
     }
     else if (g_pots[pot]->properties == CONTROL_PROP_LOGARITHMIC)
     {
-    	float p_step = ((float) tmp_value) / ((float) (POT_UPPER_THRESHOLD - 1));
+    	float p_step = ((float) tmp_value) / ((float) (g_pot_calibrations[1][pot] - 1));
     	g_pots[pot]->value = g_pots[pot]->minimum * pow(g_pots[pot]->maximum / g_pots[pot]->minimum, p_step);
     }
     //default, liniar
     else 
     {
-    	g_pots[pot]->value = MAP(tmp_value, POT_LOWER_THRESHOLD, POT_UPPER_THRESHOLD,  g_pots[pot]->minimum,  g_pots[pot]->maximum);
+    	g_pots[pot]->value = MAP(tmp_value, g_pot_calibrations[0][pot], g_pot_calibrations[1][pot],  g_pots[pot]->minimum,  g_pots[pot]->maximum);
     }
 
    	// send the pot value
@@ -3286,4 +3294,21 @@ void naveg_menu_item_changed_cb(uint8_t item_ID, uint16_t value)
 
     //when we are not in the menu, did we change the master volume link?
         //TODO update the master volume link widget
+}
+
+//function used to update the calibration value's adn restore the LED states
+//function is toggled after the calibration is exited
+void naveg_update_calibration(void)
+{
+    //update calibration value's
+    uint8_t i = 0;
+    for (i = 0; i < POTS_COUNT; i++)
+    {
+        //get the calibration for this pot
+        g_pot_calibrations[0][i] = calibration_get_min(i);
+        g_pot_calibrations[1][i] = calibration_get_max(i);
+    }
+
+    //update the led states
+
 }

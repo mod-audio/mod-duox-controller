@@ -80,6 +80,7 @@ typedef struct KNOB_T {
     uint8_t mode;
     uint8_t lock;
     float min, max, value;
+    uint16_t min_cal, max_cal;
 } knob_t;
 
 typedef struct BAR_T {

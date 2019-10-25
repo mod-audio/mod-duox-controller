@@ -143,8 +143,8 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 //the resolution of a pot
 #define POT_THRESHOLD       25
 
-#define POT_LOWER_THRESHOLD (POT_THRESHOLD + 30)
-#define POT_UPPER_THRESHOLD (4095- POT_THRESHOLD - 100)
+#define POT_LOWER_THRESHOLD (POT_THRESHOLD)
+#define POT_UPPER_THRESHOLD (4095- POT_THRESHOLD)
 
 #define POT_DIFF_THRESHOLD 300
 
@@ -386,6 +386,8 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define SCREEN_FOOT_DEFAULT_NAME        "BUTTON "
 // defines the default pot text
 #define SCREEN_POT_DEFAULT_NAME         "KNOB "
+// defines the default pot text in calibration
+#define SCREEN_POT_CAL_DEFAULT_NAME     "KNOB #"
 
 //// System menu configuration
 // includes the system menu callbacks
@@ -451,6 +453,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define DISP_BL_ID          DEVICE_SETTINGS_ID + 2      
 #define ACTU_HIDE_ID        DEVICE_SETTINGS_ID + 3 
 #define POT_LOCK_ID         DEVICE_SETTINGS_ID + 4
+#define POT_CALL_ID         DEVICE_SETTINGS_ID + 6
 
 #define BLUETOOTH_DISCO_ID  BLUETOOTH_ID+2
 
@@ -511,6 +514,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"DISPLAY BRIGHTNESS",              MENU_TOGGLE,    DISP_BL_ID,           DEVICE_SETTINGS_ID, system_display_cb          , 0},  \
     {"UNASSIGNED ACTUATORS",            MENU_TOGGLE,    ACTU_HIDE_ID,         DEVICE_SETTINGS_ID, system_hide_actuator_cb    , 0},  \
     {"KNOB MODE ",                      MENU_TOGGLE,    POT_LOCK_ID,          DEVICE_SETTINGS_ID, system_lock_pots_cb        , 0},  \
+    {"POT CALLIBRATION MODE",           MENU_CONFIRM,   POT_CALL_ID,          DEVICE_SETTINGS_ID, system_pot_callibration    , 0},  \
     {"INFO",                            MENU_LIST,      INFO_ID,              SYSTEM_ID,          NULL                       , 0},  \
     {"< BACK TO SYSTEM",                MENU_RETURN,    INFO_ID+1,            INFO_ID,            NULL                       , 0},  \
     {"SERVICES",                        MENU_LIST,      SERVICES_ID,          INFO_ID,            system_services_cb         , 1},  \
@@ -557,6 +561,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {EXP_CV_INP+1, "Set input to CV",EXP_CV_POPUP_TXT}, \
     {HP_CV_OUTP, "Set output to HP", HP_CV_POPUP_TXT}, \
     {HP_CV_OUTP+1, "Set output to CV", HP_CV_POPUP_TXT}, \
+    {POT_CALL_ID, "knob calibration mode", "enter knob calibration mode?\nthis mode is used to\ncalibrate the range of the\nanalog potentiometers.\nThis mode locks the menu\nfrom other actions temporarily"}, \
 
 #define MENU_LINE_CHARS     31
 
@@ -630,10 +635,27 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define CLI_RESPONSE_TIMEOUT        500
 
 ///EEPROM adress page defines
-#define EEPROM_EMPTY_CHECK_ADRESS   62
-#define HIDE_ACTUATOR_ADRESS        0
-#define LOCK_POTENTIOMTERS_ADRESS   1
-#define DISPLAY_BRIGHTNESS_ADRESS   2
+#define EEPROM_EMPTY_CHECK_ADRESS          62
+#define HIDE_ACTUATOR_ADRESS               0
+#define LOCK_POTENTIOMTERS_ADRESS          1
+#define DISPLAY_BRIGHTNESS_ADRESS          2
+#define SYS_BUTTON_CONFIG_ADRESS           3
+#define POT_1_MIN_CALIBRATION_ADRESS       4
+#define POT_1_MAX_CALIBRATION_ADRESS       6
+#define POT_2_MIN_CALIBRATION_ADRESS       8
+#define POT_2_MAX_CALIBRATION_ADRESS       10
+#define POT_3_MIN_CALIBRATION_ADRESS       12
+#define POT_3_MAX_CALIBRATION_ADRESS       14   
+#define POT_4_MIN_CALIBRATION_ADRESS       16
+#define POT_4_MAX_CALIBRATION_ADRESS       18
+#define POT_5_MIN_CALIBRATION_ADRESS       20
+#define POT_5_MAX_CALIBRATION_ADRESS       22
+#define POT_6_MIN_CALIBRATION_ADRESS       24    
+#define POT_6_MAX_CALIBRATION_ADRESS       26
+#define POT_7_MIN_CALIBRATION_ADRESS       28
+#define POT_7_MAX_CALIBRATION_ADRESS       30
+#define POT_8_MIN_CALIBRATION_ADRESS       32
+#define POT_8_MAX_CALIBRATION_ADRESS       34
 
 // these macros should be used in replacement to default malloc and free functions of stdlib.h
 // The FREE function is NULL safe

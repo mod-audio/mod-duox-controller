@@ -53,7 +53,7 @@ enum {UI_DISCONNECTED, UI_CONNECTED};
 */
 
 bool g_self_test_mode;
-
+uint16_t g_pot_calibrations[2][POTS_COUNT];
 /*
 ************************************************************************************************************************
 *           MACRO'S
@@ -152,6 +152,8 @@ char* naveg_get_current_pb_name(void);
 void naveg_reset_page(void);
 
 uint8_t naveg_dialog_status(void);
+
+void naveg_update_calibration(void);
 
 /*
 ************************************************************************************************************************

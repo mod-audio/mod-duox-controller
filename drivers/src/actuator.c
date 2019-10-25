@@ -340,11 +340,6 @@ uint8_t actuator_get_acceleration(void)
 
 uint16_t actuator_pot_value(uint8_t pot_id)
 {
-    if (g_pot_value[pot_id] < 20)
-        g_pot_value[pot_id] = 0;
-    else if (g_pot_value[pot_id] > 4075)
-        g_pot_value[pot_id] = 4095;
-
     return g_pot_value[pot_id];
 }
 

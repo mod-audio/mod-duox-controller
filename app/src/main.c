@@ -25,7 +25,7 @@
 #include "cli.h"
 #include "comm.h"
 #include "images.h"
-
+#include "calibration.h"
 
 /*
 ************************************************************************************************************************
@@ -301,28 +301,32 @@ static void actuators_task(void *pvParameters)
             // encoders
             if (type == ROTARY_ENCODER)
             {
-                if (BUTTON_CLICKED(status))
+                //we dont use the encoders in calibration mode
+                if (!g_calibration_mode) 
                 {
-                    naveg_enter(id);
-                }
-                if (BUTTON_HOLD(status))
-                {
-                    id ? naveg_master_volume(id) : 
-                    naveg_toggle_tool(id, id);          
-                }
-                if (BUTTON_RELEASED(status))
-                {
-                    if (id && naveg_is_master_vol()) naveg_master_volume(id);
-                }
-                if (ENCODER_TURNED_CW(status))
-                {
-                    naveg_inc_control(id);
-                    naveg_down(id);
-                }
-                if (ENCODER_TURNED_ACW(status))
-                {
-                    naveg_dec_control(id);
-                    naveg_up(id);
+                    if (BUTTON_CLICKED(status))
+                    {
+                        naveg_enter(id);
+                    }
+                    if (BUTTON_HOLD(status))
+                    {
+                        id ? naveg_master_volume(id) : 
+                        naveg_toggle_tool(id, id);          
+                    }
+                    if (BUTTON_RELEASED(status))
+                    {
+                        if (id && naveg_is_master_vol()) naveg_master_volume(id);
+                    }
+                    if (ENCODER_TURNED_CW(status))
+                    {
+                        naveg_inc_control(id);
+                        naveg_down(id);
+                    }
+                    if (ENCODER_TURNED_ACW(status))
+                    {
+                        naveg_dec_control(id);
+                        naveg_up(id);
+                    }
                 }
                 glcd_update(hardware_glcds(id));
             }
@@ -331,7 +335,15 @@ static void actuators_task(void *pvParameters)
             {
                 if (POT_TURNED(status))
                 {   
-                    naveg_pot_change(id);
+                    //check if we are in calibration mode
+                    if (g_calibration_mode)
+                    {
+                        calibration_pot_change(id);
+                    }
+                    else 
+                    {
+                        naveg_pot_change(id);
+                    }
                 }
                 
                 glcd_update(hardware_glcds((id > 3) ? 1 : 0));
@@ -342,18 +354,34 @@ static void actuators_task(void *pvParameters)
             {
                 if (BUTTON_PRESSED(status))
                 {
-                    naveg_foot_change(id, 1);
+                    //check if we are in calibration mode
+                    if (g_calibration_mode)
+                    {
+                        calibration_button_pressed(id);
+                    }
+                    else 
+                    {
+                        naveg_foot_change(id, 1);
+                    }
                 }
-                
+
                 if (BUTTON_RELEASED(status))
                 {
-                    //trigger LED 
-                    naveg_foot_change(id, 0);
+                    //we dont use these button events in callibration mode
+                    if (!g_calibration_mode) 
+                    {
+                        //trigger LED 
+                        naveg_foot_change(id, 0);
+                    }
                 }
 
                 if (BUTTON_HOLD(status))
                 {
-                    if ((id == 4)||(id == 6)) naveg_save_snapshot(id);
+                    //we dont use these button events in callibration mode
+                    if (!g_calibration_mode)
+                    {
+                        if ((id == 4)||(id == 6)) naveg_save_snapshot(id);
+                    }
                 }
 
                 glcd_update(hardware_glcds((id > 1) ? 1 : 0));

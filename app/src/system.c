@@ -18,10 +18,10 @@
 #include "glcd.h"
 #include "utils.h"
 #include "device.h"
-
+#include "calibration.h"
 #include <string.h>
 #include <stdlib.h>
-
+#include <stdbool.h>
 
 /*
 ************************************************************************************************************************
@@ -1487,4 +1487,19 @@ void system_cv_hp_cb (void *arg, int event)
 
     //this setting changes just 1 item
     if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
+}
+
+void system_pot_callibration(void *arg, int event)
+{
+    menu_item_t *item = arg;
+
+    //if clicked yes, enter callibration mode
+    if (event == MENU_EV_ENTER && item->data.hover == 0)
+    {
+        //write callibration mode screens, 0 because we start with the first potentiometer
+        calibration_write_display(0);
+
+        //toggle the mode so actuators dont toggle their normal actions
+        g_calibration_mode = true; 
+    }
 }

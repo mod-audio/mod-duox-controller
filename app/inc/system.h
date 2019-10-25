@@ -102,7 +102,7 @@ void system_master_volume_link(uint8_t link_value);
 void system_qbp_channel_cb (void *arg, int event);
 void system_hide_actuator_cb(void *arg, int event);
 void system_lock_pots_cb(void *arg, int event);
-
+void system_pot_callibration(void *arg, int event);
 
 /*
 ************************************************************************************************************************
