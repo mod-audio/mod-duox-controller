@@ -516,7 +516,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"UNASSIGNED ACTUATORS",            MENU_TOGGLE,    ACTU_HIDE_ID,         DEVICE_SETTINGS_ID, system_hide_actuator_cb    , 0},  \
     {"KNOB MODE ",                      MENU_TOGGLE,    POT_LOCK_ID,          DEVICE_SETTINGS_ID, system_lock_pots_cb        , 0},  \
     {"PAGES MODE ",                     MENU_TOGGLE,    PAGE_MODE_ID,         DEVICE_SETTINGS_ID, system_page_mode_cb        , 0},  \
-    {"POT CALLIBRATION MODE",           MENU_CONFIRM,   POT_CALL_ID,          DEVICE_SETTINGS_ID, system_pot_callibration    , 0},  \
+    {"POT CALIBRATION MODE",            MENU_CONFIRM,   POT_CALL_ID,          DEVICE_SETTINGS_ID, system_pot_callibration    , 0},  \
     {"INFO",                            MENU_LIST,      INFO_ID,              SYSTEM_ID,          NULL                       , 0},  \
     {"< BACK TO SYSTEM",                MENU_RETURN,    INFO_ID+1,            INFO_ID,            NULL                       , 0},  \
     {"SERVICES",                        MENU_LIST,      SERVICES_ID,          INFO_ID,            system_services_cb         , 1},  \
