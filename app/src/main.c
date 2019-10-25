@@ -695,10 +695,10 @@ static void boot_cb(proto_t *proto)
     //convert value for screen
     uint8_t screen_val =  ( ( master_vol_value - -60 ) / (0 - -60) ) * (100 - 0) + 0;
     screen_master_vol(screen_val);
-    
-    //enable red LED to indicate we are in page 1
-    ledz_set_state(hardware_leds(5), 5, RED, 1, 0, 0, 0);
-    //by default, we only have 1 page
+
+    naveg_turn_on_pagination_leds();
+        
+    //by default
     naveg_pages_available(1, 1, 1);
 
     //parse the pedalboard name

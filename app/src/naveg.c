@@ -121,6 +121,7 @@ static uint8_t page_available[3] = {1, 1, 1};
 static uint8_t g_lock_potentiometers = 1;
 //default scrolling direction, will only change and set back once needed
 static uint8_t g_scroll_dir = 1;
+static uint8_t g_page_mode = 0;
 
 // only disabled after "boot" command received
 bool g_self_test_mode = true;
@@ -1937,6 +1938,9 @@ void naveg_init(void)
     //check if we need to lock the potentiometers or not
     system_lock_pots_cb(NULL, MENU_EV_NONE);
 
+    //check the page mode
+    system_page_mode_cb(NULL, MENU_EV_NONE);
+
     vSemaphoreCreateBinary(g_dialog_sem);
     // vSemaphoreCreateBinary is created as available which makes
     // first xSemaphoreTake pass even if semaphore has not been given
@@ -2571,108 +2575,164 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
         //snapshot buttons
         case 4:
         case 6:
-            if (snapshot_loaded[(foot == 6)?1:0] > 0)
+
+            if (!g_page_mode)
             {
-            	if (pressed == 1)
-            	{
-                	ledz_set_state(hardware_leds(foot), foot, SNAPSHOT_LOAD_COLOR, 1, 0, 0, 0);
-                }
-                else
-               	{
-                    if ( snapshot_loaded[(foot == 6)?1:0] == 1)
+                if (snapshot_loaded[(foot == 6)?1:0] > 0)
+                {
+                	if (pressed == 1)
                 	{
-                	   ledz_set_state(hardware_leds(foot), foot, SNAPSHOT_COLOR, 1, 0, 0, 0);
-
-                        char buffer[10];
-                        uint8_t i;
-
-                        i = copy_command(buffer, LOAD_SNAPSHOT_COMMAND);
-
-                        i += int_to_str((foot == 6)?1:0, &buffer[i], sizeof(buffer) - i, 0);
-
-                        //do not do actuators here
-                        reset_queue();
-
-                        comm_webgui_clear();
-                        comm_webgui_send(buffer, i);
-                        if (!g_self_test_mode) {
-                            comm_webgui_wait_response();
-                        }
+                    	ledz_set_state(hardware_leds(foot), foot, SNAPSHOT_LOAD_COLOR, 1, 0, 0, 0);
                     }
                     else
-                    {
-                        snapshot_loaded[(foot == 6)?1:0] = 1;
-                    }
-            	}
+                   	{
+                        if ( snapshot_loaded[(foot == 6)?1:0] == 1)
+                    	{
+                    	   ledz_set_state(hardware_leds(foot), foot, SNAPSHOT_COLOR, 1, 0, 0, 0);
+
+                            char buffer[10];
+                            uint8_t i;
+
+                            i = copy_command(buffer, LOAD_SNAPSHOT_COMMAND);
+
+                            i += int_to_str((foot == 6)?1:0, &buffer[i], sizeof(buffer) - i, 0);
+
+                            //do not do actuators here
+                            reset_queue();
+
+                            comm_webgui_clear();
+                            comm_webgui_send(buffer, i);
+                            if (!g_self_test_mode) {
+                                comm_webgui_wait_response();
+                            }
+                        }
+                        else
+                        {
+                            snapshot_loaded[(foot == 6)?1:0] = 1;
+                        }
+            	    }
+                }
+            }
+            else 
+            {
+                char buffer[10];
+                uint8_t i;
+                i = copy_command(buffer, NEXT_PAGE_COMMAND);
+
+                if (foot == 4)
+                {
+                    if (!page_available[0])
+                        return;
+
+                    page = 0;
+                }
+                else
+                {
+                    if (!page_available[2])
+                        return;
+
+                    page = 2;
+                }
+
+                i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
+
+                //clear controls            
+                uint8_t j;
+                for (j = 0; j < TOTAL_ACTUATORS; j++)
+                {
+                    naveg_remove_control(j);
+                }
+
+                //clear actuator queue
+                reset_queue();
+
+                comm_webgui_clear();
+
+                comm_webgui_send(buffer, i);
+
+                if (!g_self_test_mode) {
+                    comm_webgui_wait_response();
+                }
             }
         break;
 
         //pagination
         case 5:
         	if (!pressed) return;
-        ; //keeping the compiler happy
 
-            if (page == 2)
-            {
-                if (page_available[0] == 1)
-                    page = 0;
-                else if (page_available[1] == 1)
-                    page = 1;
-                else return;
-            }
-            else if (page == 1)
-            {
-                if (page_available[2] == 1)
-                    page = 2;
-                else if (page_available[0] == 1)
-                    page = 0;
-                else return;
-            }
-            else if (page == 0)
-            {
-                if (page_available[1] == 1)
-                    page = 1;
-                else if (page_available[2] == 1)
-                    page = 2;
-                else return;
-            }
-            //out of bounds
-            else return;
-            
             char buffer[10];
             uint8_t i;
             i = copy_command(buffer, NEXT_PAGE_COMMAND);
 
+            if (!g_page_mode)
+            {
+                if (page == 2)
+                {
+                    if (page_available[0] == 1)
+                        page = 0;
+                    else if (page_available[1] == 1)
+                        page = 1;
+                    else return;
+                }
+                else if (page == 1)
+                {
+                    if (page_available[2] == 1)
+                        page = 2;
+                    else if (page_available[0] == 1)
+                        page = 0;
+                    else return;
+                }
+                else if (page == 0)
+                {
+                    if (page_available[1] == 1)
+                        page = 1;
+                    else if (page_available[2] == 1)
+                        page = 2;
+                    else return;
+                }
+
+                //out of bounds
+                else return;
+
+                switch (page)
+                {
+                    case 0:
+                        ledz_set_state(hardware_leds(5), 5, PAGES1_COLOR, 1, 0, 0, 0);
+
+                        // sends the request next page command
+                        // insert the page number on buffer
+                        i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
+                    break;
+                    case 1:
+                        ledz_set_state(hardware_leds(5), 5, PAGES2_COLOR, 1, 0, 0, 0);
+
+                        // sends the request next page command
+                        // insert the page number on buffer
+                        i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
+                    break;
+                    case 2:
+                        ledz_set_state(hardware_leds(5), 5, PAGES3_COLOR, 1, 0, 0, 0);
+
+                        // sends the request next page command
+                        // insert the page number on buffer
+                        i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
+                    break;
+                }
+            }
+            else 
+            {
+                if (!page_available[1])
+                    return;
+                
+                page = 1;
+                i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
+            }
+            
             //clear controls            
             uint8_t j;
             for (j = 0; j < TOTAL_ACTUATORS; j++)
             {
                 naveg_remove_control(j);
-            }
-
-            switch (page)
-            {
-                case 0:
-                    ledz_set_state(hardware_leds(5), 5, PAGES1_COLOR, 1, 0, 0, 0);
-
-                    // sends the request next page command
-                    // insert the page number on buffer
-                    i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
-                break;
-                case 1:
-                    ledz_set_state(hardware_leds(5), 5, PAGES2_COLOR, 1, 0, 0, 0);
-
-                    // sends the request next page command
-                    // insert the page number on buffer
-                    i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
-                break;
-                case 2:
-                    ledz_set_state(hardware_leds(5), 5, PAGES3_COLOR, 1, 0, 0, 0);
-
-                    // sends the request next page command
-                    // insert the page number on buffer
-                    i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
-                break;
             }
 
             //clear actuator queue
@@ -2685,6 +2745,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
             if (!g_self_test_mode) {
                 comm_webgui_wait_response();
             }
+        break;
     }
 }
 
@@ -2879,6 +2940,19 @@ void naveg_pages_available(uint8_t page_1, uint8_t page_2, uint8_t page_3)
     page_available[0] = page_1;
     page_available[1] = page_2;
     page_available[2] = page_3;
+
+    //if we are in 3 button page mode, we need to update the LED's
+    if (g_page_mode)
+    {
+       if (page_1) ledz_set_state(hardware_leds(4), 4, PAGES1_COLOR, 1, 0, 0, 0);
+       else ledz_set_state(hardware_leds(4), 4, PAGES1_COLOR, 0, 0, 0, 0);
+
+       if (page_2) ledz_set_state(hardware_leds(5), 5, PAGES2_COLOR, 1, 0, 0, 0);
+       else ledz_set_state(hardware_leds(5), 5, PAGES2_COLOR, 0, 0, 0, 0);
+
+       if (page_3) ledz_set_state(hardware_leds(6), 6, PAGES3_COLOR, 1, 0, 0, 0);
+       else ledz_set_state(hardware_leds(6), 6, PAGES3_COLOR, 0, 0, 0, 0);
+    }
 }
 
 void naveg_print_pb_name(uint8_t display)
@@ -3166,6 +3240,11 @@ void naveg_lock_pots(uint8_t lock)
     g_lock_potentiometers = lock;
 }
 
+void naveg_set_page_mode(uint8_t mode)
+{
+    g_page_mode = mode;
+}
+
 uint8_t naveg_dialog_status(void)
 {
     return dialog_active;
@@ -3296,5 +3375,50 @@ void naveg_update_calibration(void)
     for (i=0; i < LEDS_COUNT; i++)
     {
         ledz_restore_state(hardware_leds(i), i);
+    }
+}
+
+void naveg_turn_on_pagination_leds(void)
+{
+    if (!g_page_mode)
+    {
+        switch (page)
+        {
+            case 0:
+                //just trigger LED 5 red
+                ledz_set_state(hardware_leds(5), 5, PAGES1_COLOR, 1, 0, 0, 0);
+            break;
+
+            case 1:
+                //just trigger LED 5 yellow
+                ledz_set_state(hardware_leds(5), 5, PAGES2_COLOR, 1, 0, 0, 0);
+            break;
+
+            case 2:
+                //just trigger LED 5 cyan
+                ledz_set_state(hardware_leds(5), 5, PAGES3_COLOR, 1, 0, 0, 0);
+            break;
+
+            default:
+                //just trigger LED 5 red
+                ledz_set_state(hardware_leds(5), 5, PAGES1_COLOR, 1, 0, 0, 0);
+            break;
+        }
+
+        //we can not have snapshots when comming from this mode
+        ledz_set_state(hardware_leds(4), 4, LEDZ_ALL_COLORS, 0, 0, 0, 0);
+        ledz_set_state(hardware_leds(6), 6, LEDZ_ALL_COLORS, 0, 0, 0, 0);
+    }
+    else 
+    {
+        //trigger leds acourdingly 
+        if (page_available[0]) ledz_set_state(hardware_leds(4), 4, PAGES1_COLOR, 1, 0, 0, 0);
+        else ledz_set_state(hardware_leds(4), 4, PAGES1_COLOR, 0, 0, 0, 0);
+
+        if (page_available[1]) ledz_set_state(hardware_leds(5), 5, PAGES2_COLOR, 1, 0, 0, 0);
+        else ledz_set_state(hardware_leds(5), 5, PAGES2_COLOR, 0, 0, 0, 0);
+
+        if (page_available[2]) ledz_set_state(hardware_leds(6), 6, PAGES3_COLOR, 1, 0, 0, 0);
+        else ledz_set_state(hardware_leds(6), 6, PAGES3_COLOR, 0, 0, 0, 0);
     }
 }

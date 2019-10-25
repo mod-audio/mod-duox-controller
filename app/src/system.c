@@ -103,6 +103,7 @@ uint8_t g_cv_in_mode = 0;
 uint8_t g_cv_in_range = 0;
 uint8_t g_exp_mode = 0;
 uint8_t g_cv_out_mode = 0;
+int8_t g_page_mode = -1;
 
 /*
 ************************************************************************************************************************
@@ -1502,4 +1503,49 @@ void system_pot_callibration(void *arg, int event)
         //toggle the mode so actuators dont toggle their normal actions
         g_calibration_mode = true; 
     }
+}
+
+void system_page_mode_cb(void *arg, int event)
+{
+    if (g_page_mode == -1)
+    {
+        //read EEPROM
+        uint8_t read_buffer = 0;
+        EEPROM_Read(0, PAGE_MODE_ADRESS, &read_buffer, MODE_8_BIT, 1);
+
+        //if not valid, default
+        if (read_buffer != 0 || read_buffer != 1)
+        {
+            read_buffer = 0;
+        }
+
+        g_page_mode = read_buffer;
+
+        //write to naveg.cs
+        naveg_set_page_mode(g_page_mode);
+    }
+
+    if (event == MENU_EV_ENTER)
+    {
+        if (g_page_mode == 0) g_page_mode = 1;
+        else g_page_mode = 0;
+        
+        //also write to EEPROM
+        uint8_t write_buffer = g_page_mode;
+        EEPROM_Write(0, LOCK_POTENTIOMTERS_ADRESS, &write_buffer, MODE_8_BIT, 1);
+
+        //write to naveg.c
+        naveg_set_page_mode(g_page_mode);
+        
+        naveg_turn_on_pagination_leds();
+    }
+
+    if (arg != NULL)
+    {
+        menu_item_t *item = arg;
+        add_chars_to_menu_name(item, g_page_mode ? "3 BUTTON" : "1 BUTTONS");
+    }
+    
+    //this setting changes just 1 item
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);    
 }

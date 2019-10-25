@@ -143,6 +143,8 @@ void naveg_print_pb_name(uint8_t display);
 
 void naveg_lock_pots(uint8_t lock);
 
+void naveg_set_page_mode(uint8_t mode);
+
 void naveg_menu_item_changed_cb(uint8_t item_ID, uint16_t value);
 
 uint8_t naveg_banks_mode_pb(void);
@@ -154,6 +156,8 @@ void naveg_reset_page(void);
 uint8_t naveg_dialog_status(void);
 
 void naveg_update_calibration(void);
+
+void naveg_turn_on_pagination_leds(void);
 
 /*
 ************************************************************************************************************************
