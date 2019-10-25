@@ -1526,7 +1526,7 @@ void system_page_mode_cb(void *arg, int event)
         
         //also write to EEPROM
         uint8_t write_buffer = g_page_mode;
-        EEPROM_Write(0, LOCK_POTENTIOMTERS_ADRESS, &write_buffer, MODE_8_BIT, 1);
+        EEPROM_Write(0, PAGE_MODE_ADRESS, &write_buffer, MODE_8_BIT, 1);
 
         //write to naveg.c
         naveg_set_page_mode(g_page_mode);
