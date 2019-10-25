@@ -2754,8 +2754,7 @@ void naveg_reset_page(void)
     //reset variable
     page = 0;
 
-    //enable red LED to indicate we are in page 1
-    ledz_set_state(hardware_leds(5), 5, PAGES1_COLOR, 1, 0, 0, 0);
+    naveg_turn_on_pagination_leds();
 
     return;
 }
