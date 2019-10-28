@@ -2761,6 +2761,9 @@ void naveg_reset_page(void)
 
 void naveg_save_snapshot(uint8_t foot)
 {
+    //this function is disabled in 3 button pagination mode
+    if (g_page_mode) return;
+    
     char buffer[128];
     uint8_t i;
 
