@@ -1512,7 +1512,6 @@ void system_page_mode_cb(void *arg, int event)
         //read EEPROM
         uint8_t read_buffer = 0;
         EEPROM_Read(0, PAGE_MODE_ADRESS, &read_buffer, MODE_8_BIT, 1);
-
         g_page_mode = read_buffer;
 
         //write to naveg.cs

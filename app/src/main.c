@@ -109,8 +109,9 @@ static void boot_cb(proto_t *proto);
 static void pedalboard_name_cb(proto_t *proto);
 static void snapshot_clear_cb(proto_t *proto);
 static void menu_item_changed_cb(proto_t *proto);
-static void  pedalboard_clear_cb(proto_t *proto);
-static void  page_available_cb(proto_t *proto);
+static void pedalboard_clear_cb(proto_t *proto);
+static void page_available_cb(proto_t *proto);
+static void save_pot_cal_val_cb(proto_t *proto);
 
 /*
 ************************************************************************************************************************
@@ -471,6 +472,7 @@ static void setup_task(void *pvParameters)
     protocol_add_command(MENU_ITEM_CHANGE, menu_item_changed_cb);
     protocol_add_command(CLEAR_PEDALBOARD, pedalboard_clear_cb);
     protocol_add_command(PAGE_AVAILABLE_CMD, page_available_cb);
+    protocol_add_command(SAVE_POT_CAL_VAL_CMD, save_pot_cal_val_cb);
 
     // init the navigation
     naveg_init();
@@ -759,6 +761,19 @@ static void  page_available_cb(proto_t *proto)
     naveg_pages_available(atoi(proto->list[1]), atoi(proto->list[2]), atoi(proto->list[3]));
 
     protocol_response("resp 0", proto);
+}
+
+static void save_pot_cal_val_cb(proto_t *proto)
+{
+    //if the first argument == 1, we save the max value, if ==0 we save the min value
+    if(atoi(proto->list[1]) == 1)
+    {
+        calibration_write_max(atoi(proto->list[2]));
+    } 
+    else 
+    {
+        calibration_write_min(atoi(proto->list[2]));
+    }
 }
 
 /*

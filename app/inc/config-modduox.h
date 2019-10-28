@@ -336,6 +336,8 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define PAGE_AVAILABLE_CMD            "pa %i %i %i"
 //next control page <hw_id> <up/down>
 #define CONTROL_PAGE_CMD              "ncp %i %i"
+//save the current ADC value as calibration value
+#define SAVE_POT_CAL_VAL_CMD          "save_pot_cal %i %i"
 
 
 //// Control propertires definitions

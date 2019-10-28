@@ -368,8 +368,6 @@ void calibration_pot_change(uint8_t pot)
 
 void calibration_button_pressed(uint8_t button)
 {
-    uint16_t write_buffer = 0;
-
     switch (button)
     {
         //actuator buttons
@@ -476,31 +474,7 @@ void calibration_button_pressed(uint8_t button)
             //this button is turned off now
             if (orientation) return;
 
-            //add 10 because ADC value's fluctuate. 
-            write_buffer = (hardware_get_pot_value(current_pot) + 10);
-
-            switch(current_pot)
-            {
-                case 0: 
-                    EEPROM_Write(0, POT_1_MIN_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
-                break;
-
-                case 1: 
-                    EEPROM_Write(0, POT_2_MIN_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
-                break;
-
-                case 2: 
-                    EEPROM_Write(0, POT_3_MIN_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
-                break;
-
-                case 3: 
-                    EEPROM_Write(0, POT_4_MIN_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
-                break;
-                
-                default:
-                    display_error_message(orientation, ERROR_POT_NOT_FOUND);
-                break;
-            }
+            calibration_write_min(current_pot);
         break;
         
         case SAVE_MAX_VAL_LEFT_BUTTON:
@@ -508,31 +482,7 @@ void calibration_button_pressed(uint8_t button)
             //this button is turned off now
             if (orientation) return;
 
-            //substract 10 because ADC value's fluctuate. 
-            write_buffer = (hardware_get_pot_value(current_pot) - 10);
-
-            switch(current_pot)
-            {
-                case 0: 
-                    EEPROM_Write(0, POT_1_MAX_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
-                break;
-
-                case 1: 
-                    EEPROM_Write(0, POT_2_MAX_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
-                break;
-
-                case 2: 
-                    EEPROM_Write(0, POT_3_MAX_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
-                break;
-
-                case 3: 
-                    EEPROM_Write(0, POT_4_MAX_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
-                break;
-
-                default:
-                    display_error_message(orientation, ERROR_POT_NOT_FOUND);
-                break;
-            }
+            calibration_write_max(current_pot);
         break;
 
         case SAVE_MIN_VAL_RIGHT_BUTTON:
@@ -540,32 +490,6 @@ void calibration_button_pressed(uint8_t button)
             //this button is turned off now
             if (!orientation) return;
 
-            //add 10 because ADC value's fluctuate. 
-            write_buffer = (hardware_get_pot_value(current_pot) + 10);
-
-            switch(current_pot)
-            {
-                case 4: 
-                    EEPROM_Write(0, POT_5_MIN_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
-                break;
-
-                case 5: 
-                    EEPROM_Write(0, POT_6_MIN_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
-                break;
-
-                case 6: 
-                    EEPROM_Write(0, POT_7_MIN_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
-                break;
-
-                case 7: 
-                    EEPROM_Write(0, POT_8_MIN_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
-                break;
-                
-                default:
-                    display_error_message(orientation, ERROR_POT_NOT_FOUND);
-                break;
-
-            }
         break;
 
         case SAVE_MAX_VAL_RIGHT_BUTTON:
@@ -573,31 +497,7 @@ void calibration_button_pressed(uint8_t button)
             //this button is turned off now
             if (!orientation) return;
 
-            //substract 10 because ADC value's fluctuate. 
-            write_buffer = (hardware_get_pot_value(current_pot) - 10);
-
-            switch(current_pot)
-            {
-                case 4: 
-                    EEPROM_Write(0, POT_5_MAX_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
-                break;
-
-                case 5: 
-                    EEPROM_Write(0, POT_6_MAX_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
-                break;
-
-                case 6: 
-                    EEPROM_Write(0, POT_7_MAX_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
-                break;
-
-                case 7: 
-                    EEPROM_Write(0, POT_8_MAX_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
-                break;
-
-                default:
-                    display_error_message(orientation, ERROR_POT_NOT_FOUND);
-                break;
-            }
+            calibration_write_max(current_pot);
         break;
     }
 }
@@ -736,4 +636,109 @@ uint8_t calibration_check_valid(void)
         }
     }
     return 1; 
+}
+
+void calibration_write_max(uint8_t pot)
+{
+    //substract 10 because ADC value's fluctuate. 
+    uint16_t write_buffer = (hardware_get_pot_value(pot) - 10);
+
+    switch(pot)
+    {
+        case 0: 
+            EEPROM_Write(0, POT_1_MAX_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
+        break;
+
+        case 1: 
+            EEPROM_Write(0, POT_2_MAX_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
+        break;
+
+        case 2: 
+            EEPROM_Write(0, POT_3_MAX_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
+        break;
+
+        case 3: 
+            EEPROM_Write(0, POT_4_MAX_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
+        break;
+
+        case 4: 
+            EEPROM_Write(0, POT_5_MAX_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
+        break;
+
+        case 5: 
+            EEPROM_Write(0, POT_6_MAX_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
+        break;
+
+        case 6: 
+            EEPROM_Write(0, POT_7_MAX_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
+        break;
+
+        case 7: 
+            EEPROM_Write(0, POT_8_MAX_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
+        break;
+
+        //ERROR
+        default:
+            if (g_calibration_mode)
+            {
+                display_error_message(orientation, ERROR_POT_NOT_FOUND);
+            }
+            else 
+            {
+                return;
+            }
+        break;
+    }
+}
+
+void calibration_write_min(uint8_t pot)
+{
+    //add 10 because ADC value's fluctuate. 
+    uint16_t write_buffer = (hardware_get_pot_value(pot) + 10);
+
+    switch(pot)
+    {
+        case 0: 
+            EEPROM_Write(0, POT_1_MIN_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
+        break;
+
+        case 1: 
+            EEPROM_Write(0, POT_2_MIN_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
+        break;
+
+        case 2: 
+            EEPROM_Write(0, POT_3_MIN_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
+        break;
+
+        case 3: 
+            EEPROM_Write(0, POT_4_MIN_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
+        break;
+                
+        case 4: 
+            EEPROM_Write(0, POT_5_MIN_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
+        break;
+
+        case 5: 
+            EEPROM_Write(0, POT_6_MIN_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
+        break;
+
+        case 6: 
+            EEPROM_Write(0, POT_7_MIN_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
+        break;
+
+        case 7: 
+            EEPROM_Write(0, POT_8_MIN_CALIBRATION_ADRESS, &write_buffer, MODE_16_BIT, 1);
+        break;
+
+        default:
+            if (g_calibration_mode)
+            {
+                display_error_message(orientation, ERROR_POT_NOT_FOUND);
+            }
+            else 
+            {
+                return;
+            }
+        break;
+    }
 }
