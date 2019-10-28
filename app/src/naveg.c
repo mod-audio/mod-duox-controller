@@ -2615,6 +2615,9 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
             }
             else 
             {
+                //we dont use the release option in 3 button pagination mode
+                if (!pressed) return;
+
                 char buffer[10];
                 uint8_t i;
                 i = copy_command(buffer, NEXT_PAGE_COMMAND);
@@ -2763,7 +2766,7 @@ void naveg_save_snapshot(uint8_t foot)
 {
     //this function is disabled in 3 button pagination mode
     if (g_page_mode) return;
-    
+
     char buffer[128];
     uint8_t i;
 
