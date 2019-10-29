@@ -353,7 +353,7 @@ static void actuators_task(void *pvParameters)
             // footswitches
             else if (type == BUTTON)
             {
-                if (BUTTON_PRESSED(status))
+                if ((BUTTON_PRESSED(status)) && !(BUTTON_HOLD(status)))
                 {
                     //check if we are in calibration mode
                     if (g_calibration_mode)
@@ -378,7 +378,7 @@ static void actuators_task(void *pvParameters)
 
                 if (BUTTON_HOLD(status))
                 {
-                    //we dont use these button events in callibration mode
+                   	//we dont use these button events in callibration mode
                     if (!g_calibration_mode)
                     {
                         if ((id == 4)||(id == 6)) naveg_save_snapshot(id);
