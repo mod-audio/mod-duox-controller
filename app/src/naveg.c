@@ -2646,6 +2646,8 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                     naveg_remove_control(j);
                 }
 
+                naveg_turn_on_pagination_leds();
+
                 //clear actuator queue
                 reset_queue();
 
@@ -2729,6 +2731,8 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 
                 page = 1;
                 i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
+
+
             }
             
             //clear controls            
@@ -2737,6 +2741,8 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
             {
                 naveg_remove_control(j);
             }
+
+            naveg_turn_on_pagination_leds();
 
             //clear actuator queue
             reset_queue();
@@ -3410,20 +3416,34 @@ void naveg_turn_on_pagination_leds(void)
             break;
         }
 
-        //we can not have snapshots when comming from this mode
-        ledz_set_state(hardware_leds(4), 4, LEDZ_ALL_COLORS, 0, 0, 0, 0);
-        ledz_set_state(hardware_leds(6), 6, LEDZ_ALL_COLORS, 0, 0, 0, 0);
+        if (snapshot_loaded[0]) ledz_set_state(hardware_leds(4), 4, WHITE, 1, 0, 0, 0);
+        else ledz_set_state(hardware_leds(4), 4, WHITE, 0, 0, 0, 0);
+
+        if (snapshot_loaded[1]) ledz_set_state(hardware_leds(6), 6, WHITE, 1, 0, 0, 0);
+        else ledz_set_state(hardware_leds(6), 6, WHITE, 0, 0, 0, 0);
     }
     else 
     {
         //trigger leds acourdingly 
-        if (page_available[0]) ledz_set_state(hardware_leds(4), 4, PAGES1_COLOR, 1, 0, 0, 0);
+        if (page_available[0])
+        {
+            if (page == 0) ledz_set_state(hardware_leds(4), 4, WHITE, 1, 0, 0, 0);
+            else ledz_set_state(hardware_leds(4), 4, PAGES1_COLOR, 1, 0, 0, 0);
+        }
         else ledz_set_state(hardware_leds(4), 4, PAGES1_COLOR, 0, 0, 0, 0);
 
-        if (page_available[1]) ledz_set_state(hardware_leds(5), 5, PAGES2_COLOR, 1, 0, 0, 0);
+        if (page_available[1])
+        {
+            if (page == 1) ledz_set_state(hardware_leds(5), 5, WHITE, 1, 0, 0, 0);
+            else ledz_set_state(hardware_leds(5), 5, PAGES2_COLOR, 1, 0, 0, 0);
+        }
         else ledz_set_state(hardware_leds(5), 5, PAGES2_COLOR, 0, 0, 0, 0);
 
-        if (page_available[2]) ledz_set_state(hardware_leds(6), 6, PAGES3_COLOR, 1, 0, 0, 0);
+        if (page_available[2])
+        {
+            if (page == 2)ledz_set_state(hardware_leds(6), 6, WHITE, 1, 0, 0, 0);
+            else ledz_set_state(hardware_leds(6), 6, PAGES3_COLOR, 1, 0, 0, 0);
+        }
         else ledz_set_state(hardware_leds(6), 6, PAGES3_COLOR, 0, 0, 0, 0);
     }
 }

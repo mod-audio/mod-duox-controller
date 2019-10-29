@@ -698,10 +698,10 @@ static void boot_cb(proto_t *proto)
     uint8_t screen_val =  ( ( master_vol_value - -60 ) / (0 - -60) ) * (100 - 0) + 0;
     screen_master_vol(screen_val);
 
-    naveg_turn_on_pagination_leds();
-        
     //by default
     naveg_pages_available(1, 1, 1);
+
+    naveg_turn_on_pagination_leds();
 
     //parse the pedalboard name
     screen_top_info(&proto->list[7] , 1);
