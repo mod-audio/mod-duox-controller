@@ -699,12 +699,12 @@ static void boot_cb(proto_t *proto)
     screen_master_vol(screen_val);
 
     //by default
-    naveg_pages_available(1, 1, 1);
+    naveg_pages_available(atoi(proto->list[7]), atoi(proto->list[8]), atoi(proto->list[9]));
 
     naveg_turn_on_pagination_leds();
 
     //parse the pedalboard name
-    screen_top_info(&proto->list[7] , 1);
+    screen_top_info(&proto->list[10] , 1);
 
     //tell mod-ui we are good
     protocol_response("resp 0", proto);
@@ -759,6 +759,8 @@ static void  pedalboard_clear_cb(proto_t *proto)
 static void  page_available_cb(proto_t *proto)
 {
     naveg_pages_available(atoi(proto->list[1]), atoi(proto->list[2]), atoi(proto->list[3]));
+
+    naveg_turn_on_pagination_leds();
 
     protocol_response("resp 0", proto);
 }

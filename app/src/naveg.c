@@ -2763,6 +2763,10 @@ void naveg_reset_page(void)
     //reset variable
     page = 0;
 
+    page_available[0] = 1;
+    page_available[1] = 0;
+    page_available[2] = 0;
+
     naveg_turn_on_pagination_leds();
 
     return;
