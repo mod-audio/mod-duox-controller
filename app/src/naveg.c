@@ -2852,7 +2852,7 @@ uint8_t naveg_is_tool_mode(uint8_t display)
 
 void naveg_master_volume(uint8_t set)
 {
-    if (tool_is_on(DISPLAY_TOOL_SYSTEM))
+    if (tool_is_on(DISPLAY_TOOL_SYSTEM) || (g_self_test_mode))
     {
         naveg_enter(set);
         return;
