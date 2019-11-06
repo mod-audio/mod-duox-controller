@@ -1075,7 +1075,7 @@ void screen_system_menu(menu_item_t *item)
             break;
 
         case MENU_TOGGLE:
-            if (item->desc->parent_id == PROFILES_ID ||  item->desc->id == EXP_CV_INP || item->desc->id == HP_CV_OUTP)
+            if (item->desc->parent_id == PROFILES_ID || item->desc->id == EXP_CV_INP || item->desc->id == EXP_MODE || item->desc->id == HP_CV_OUTP)
             {
                 popup.type = YES_NO;
                 popup.title = item->data.popup_header;

@@ -1447,10 +1447,10 @@ static void menu_enter(uint8_t display_id)
         // updates the current item
        	if ((item->desc->type != MENU_TOGGLE) && (item->desc->type != MENU_NONE)) g_current_item = node->data;
        	// updates these 3 specific toggle items (toggle items with pop-ups)
-        if (item->desc->parent_id == PROFILES_ID || item->desc->id == EXP_CV_INP || item->desc->id == HP_CV_OUTP) g_current_item = node->data;
+        if (item->desc->parent_id == PROFILES_ID || item->desc->id == EXP_CV_INP || item->desc->id == EXP_MODE || item->desc->id == HP_CV_OUTP) g_current_item = node->data;
     }
     else if (item->desc->type == MENU_CONFIRM || item->desc->type == MENU_CANCEL || item->desc->type == MENU_OK ||
-    		item->desc->parent_id == PROFILES_ID || item->desc->id == EXP_CV_INP || item->desc->id == HP_CV_OUTP)
+    		item->desc->parent_id == PROFILES_ID || item->desc->id == EXP_CV_INP || item->desc->id == EXP_MODE || item->desc->id == HP_CV_OUTP)
     {
         // calls the action callback
         if ((item->desc->type != MENU_OK) && (item->desc->type != MENU_CANCEL) && (item->desc->action_cb))
@@ -1528,7 +1528,7 @@ static void menu_enter(uint8_t display_id)
             if ((item->desc->action_cb)) item->desc->action_cb(item, MENU_EV_ENTER);
         }
     }
-    else if (item->desc->type == MENU_CONFIRM ||item->desc->type == MENU_OK || item->desc->parent_id == PROFILES_ID ||  item->desc->id == EXP_CV_INP || item->desc->id == HP_CV_OUTP || item->desc->type == MENU_MESSAGE)
+    else if (item->desc->type == MENU_CONFIRM ||item->desc->type == MENU_OK || item->desc->parent_id == PROFILES_ID || item->desc->id == EXP_MODE || item->desc->id == EXP_CV_INP || item->desc->id == HP_CV_OUTP || item->desc->type == MENU_MESSAGE)
     {
         if (item->desc->type == MENU_OK)
         {
@@ -1608,7 +1608,7 @@ static void menu_enter(uint8_t display_id)
                     item->data.popup_header = (str3);
 
                 }
-                //cv toggle popups
+                //cv toggle popups, they have a different popup depending on their current value
                 else if ((item->desc->id == EXP_CV_INP) || (item->desc->id == HP_CV_OUTP))
                 {
                     if (!item->data.value)

@@ -1427,13 +1427,20 @@ void system_cv_exp_cb (void *arg, int event)
         if (g_cv_in_mode == 0) g_cv_in_mode = 1;
         else g_cv_in_mode = 0;
         set_item_value(EXPCV_SET_CMD, g_cv_in_mode);
+
+        //if we have a bias on, we need to turn that off
+        if (g_cv_in_range == 1)
+        {
+            g_cv_in_range = 0;
+            set_item_value(CV_BIAS_SET_CMD, g_cv_in_range);   
+        }
     }
     char str_bfr[15] = {};
     strcat(str_bfr,(g_cv_in_mode ? "EXP" : "CV"));
     add_chars_to_menu_name(item, str_bfr);
 
     //this setting changes just 1 item
-    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
+    if (event == MENU_EV_ENTER) naveg_menu_refresh(DISPLAY_RIGHT);
 }
 
 void system_cv_range_cb (void *arg, int event)
@@ -1442,7 +1449,7 @@ void system_cv_range_cb (void *arg, int event)
 
     if (event == MENU_EV_ENTER)
     {
-        if (g_cv_in_range == 0) g_cv_in_range = 1;
+        if (g_cv_in_range == 0 && !g_cv_in_mode) g_cv_in_range = 1;
         else g_cv_in_range = 0;
         set_item_value(CV_BIAS_SET_CMD, g_cv_in_range);
     }
@@ -1458,7 +1465,7 @@ void system_exp_mode_cb (void *arg, int event)
 {
     menu_item_t *item = arg;
 
-    if (event == MENU_EV_ENTER)
+    if (event == MENU_EV_ENTER && item->data.hover == 0)
     {
         if (g_exp_mode == 0) g_exp_mode = 1;
         else g_exp_mode = 0;
