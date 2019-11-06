@@ -3421,10 +3421,10 @@ void naveg_turn_on_pagination_leds(void)
         }
 
         if (snapshot_loaded[0]) ledz_set_state(hardware_leds(4), 4, WHITE, 1, 0, 0, 0);
-        else ledz_set_state(hardware_leds(4), 4, WHITE, 0, 0, 0, 0);
+        else ledz_set_state(hardware_leds(4), 4, LEDZ_ALL_COLORS, 0, 0, 0, 0);
 
         if (snapshot_loaded[1]) ledz_set_state(hardware_leds(6), 6, WHITE, 1, 0, 0, 0);
-        else ledz_set_state(hardware_leds(6), 6, WHITE, 0, 0, 0, 0);
+        else ledz_set_state(hardware_leds(6), 6, LEDZ_ALL_COLORS, 0, 0, 0, 0);
     }
     else 
     {
@@ -3434,20 +3434,20 @@ void naveg_turn_on_pagination_leds(void)
             if (page == 0) ledz_set_state(hardware_leds(4), 4, WHITE, 1, 0, 0, 0);
             else ledz_set_state(hardware_leds(4), 4, PAGES1_COLOR, 1, 0, 0, 0);
         }
-        else ledz_set_state(hardware_leds(4), 4, PAGES1_COLOR, 0, 0, 0, 0);
+        else ledz_set_state(hardware_leds(4), 4, LEDZ_ALL_COLORS, 0, 0, 0, 0);
 
         if (page_available[1])
         {
             if (page == 1) ledz_set_state(hardware_leds(5), 5, WHITE, 1, 0, 0, 0);
             else ledz_set_state(hardware_leds(5), 5, PAGES2_COLOR, 1, 0, 0, 0);
         }
-        else ledz_set_state(hardware_leds(5), 5, PAGES2_COLOR, 0, 0, 0, 0);
+        else ledz_set_state(hardware_leds(5), 5, LEDZ_ALL_COLORS, 0, 0, 0, 0);
 
         if (page_available[2])
         {
             if (page == 2)ledz_set_state(hardware_leds(6), 6, WHITE, 1, 0, 0, 0);
             else ledz_set_state(hardware_leds(6), 6, PAGES3_COLOR, 1, 0, 0, 0);
         }
-        else ledz_set_state(hardware_leds(6), 6, PAGES3_COLOR, 0, 0, 0, 0);
+        else ledz_set_state(hardware_leds(6), 6, LEDZ_ALL_COLORS, 0, 0, 0, 0);
     }
 }
