@@ -546,11 +546,12 @@ static void foot_control_add(control_t *control)
             // updates the led
             //check if its assigned to a trigger and if the button is released
             if (control->scroll_dir == 2) ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR, 1, 0, 0, 0);
-            else if (!control->scroll_dir)
+            //unless this is the first time a control is assigned, we always make the LED the pressed color here, this means we can turn it off right away at the naveg_foot_change function    
+            /*else if (!control->scroll_dir)
             {
                 ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR, 1, 0, 0, 0); //TRIGGER_COLOR
                 return;
-            }
+            }*/
             else
             {
                 ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TRIGGER_PRESSED_COLOR, 1, 0, 0, 0);
@@ -663,7 +664,12 @@ static void foot_control_add(control_t *control)
         case CONTROL_PROP_ENUMERATION:
         case CONTROL_PROP_SCALE_POINTS:
             // updates the led
-            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_COLOR, 1, 0, 0, 0);
+            //check if its assigned to a trigger and if the button is released
+            if (control->scroll_dir == 2) ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_COLOR, 1, 0, 0, 0);
+            else
+            {
+                ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_PRESSED_COLOR, 1, 0, 0, 0);
+            }
 
             // locates the current value
             control->step = 0;
@@ -729,7 +735,7 @@ static void parse_control_page(void *data, menu_item_t *item)
 
     control_t *control = data_parse_control(&list[1]);
 
-    naveg_add_control(control);
+    naveg_add_control(control, 0);
 }
 
 static void request_control_page(control_t *control, uint8_t dir)
@@ -1022,6 +1028,14 @@ static void control_set(uint8_t id, control_t *control)
             }
             else if ((ENCODERS_COUNT <= control->hw_id) && ( control->hw_id < FOOTSWITCHES_ACTUATOR_COUNT + ENCODERS_COUNT))
             {
+                // updates the led
+                //check if its assigned to a trigger and if the button is released
+                if (control->scroll_dir == 2) ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_COLOR, 1, 0, 0, 0);
+                else
+                {
+                    ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_PRESSED_COLOR, 1, 0, 0, 0);
+                }
+
                 if (control->properties != CONTROL_PROP_REVERSE_ENUM)
                 {
                     // increments the step
@@ -2045,7 +2059,7 @@ void naveg_ui_connection(uint8_t status)
 
 }
 
-void naveg_add_control(control_t *control)
+void naveg_add_control(control_t *control, uint8_t protocol)
 {
     if (!g_initialized) return;
     if (!control) return;
@@ -2059,7 +2073,9 @@ void naveg_add_control(control_t *control)
     }
     else if (control->hw_id < (ENCODERS_COUNT + FOOTSWITCHES_ACTUATOR_COUNT))
     {
-        control->scroll_dir = 2;
+        if (protocol) control->scroll_dir = 2;
+        else control->scroll_dir = 0;
+
         foot_control_add(control);
     }
     else
@@ -2561,8 +2577,29 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
         case 2:
         case 3:
 
-           	//detect a release action which we dont use right now for all actuator modes (only trigger)
- 			if ((!pressed) && (g_foots[foot]->properties != CONTROL_PROP_TRIGGER)) return;
+           	//detect a release action 
+ 			if (!pressed)
+            {
+                //check if we use the release action for this actuator
+                switch(g_foots[foot]->properties)
+                {
+                    case CONTROL_PROP_TRIGGER:
+                        ledz_set_state(hardware_leds(foot), foot, TRIGGER_COLOR, 1, 0, 0, 0); //TRIGGER_COLOR
+                    break;
+
+                    case CONTROL_PROP_SCALE_POINTS:
+                    case CONTROL_PROP_REVERSE_ENUM:
+                    case CONTROL_PROP_ENUMERATION:
+                        ledz_set_state(hardware_leds(foot), foot, ENUMERATED_COLOR, 1, 0, 0, 0); //ENUMERATED_COLOR
+                    break;
+                }
+
+                //not used right now anymore, maybe in the future, TODO: rename to actuator flag
+                g_foots[foot]->scroll_dir = pressed;
+
+                //we dont actually preform an action here
+                return;
+            }
 
             // checks if there is assigned control
             if (g_foots[foot] == NULL) return;

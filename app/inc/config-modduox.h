@@ -590,17 +590,18 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define AMOUNT_OF_MENU_VARS   13
 
 //// Button functions leds colors
-#define TOGGLED_COLOR           RED
-#define TRIGGER_COLOR           WHITE
-#define TRIGGER_PRESSED_COLOR   RED
-#define TAP_TEMPO_COLOR         WHITE
-#define ENUMERATED_COLOR        WHITE
-#define BYPASS_COLOR            RED
-#define PAGES1_COLOR            RED
-#define PAGES2_COLOR            YELLOW
-#define PAGES3_COLOR            CYAN
-#define SNAPSHOT_COLOR          WHITE
-#define SNAPSHOT_LOAD_COLOR     CYAN
+#define TOGGLED_COLOR             RED
+#define TRIGGER_COLOR             WHITE
+#define TRIGGER_PRESSED_COLOR     RED
+#define TAP_TEMPO_COLOR           WHITE
+#define ENUMERATED_COLOR          WHITE
+#define ENUMERATED_PRESSED_COLOR  RED
+#define BYPASS_COLOR              RED
+#define PAGES1_COLOR              RED
+#define PAGES2_COLOR              YELLOW
+#define PAGES3_COLOR              CYAN
+#define SNAPSHOT_COLOR            WHITE
+#define SNAPSHOT_LOAD_COLOR       CYAN
 
 //// Tap Tempo
 // defines the time that the led will stay turned on (in milliseconds)
