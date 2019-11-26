@@ -212,14 +212,30 @@ void screen_pot(uint8_t pot_id, control_t *control)
         //else if we have a value bigger then 10 we display just one decimal
         else if (control->value > 9.9)
         {
-            float_to_str((control->value), value_str, sizeof(value_str), 1);
+            //not for ints
+            if (control->properties == CONTROL_PROP_INTEGER)
+            {
+                int_to_str(control->value, value_str, sizeof(value_str), 0);
+            }
+            else
+            {
+                float_to_str((control->value), value_str, sizeof(value_str), 1);
+            }
         }
         //if the value becomes less then 0 we change to 1 or 0 decimals
         else if (control->value < 0)
         {
             if (control->value > -99.9)
             {
-                float_to_str(control->value, value_str, sizeof(value_str), 1);
+                //not for ints
+                if (control->properties == CONTROL_PROP_INTEGER)
+                {
+                    int_to_str(control->value, value_str, sizeof(value_str), 0);
+                }
+                else
+                {
+                    float_to_str((control->value), value_str, sizeof(value_str), 1);
+                }
             }
             else if (control->value < -9999.9)
             {
@@ -234,7 +250,15 @@ void screen_pot(uint8_t pot_id, control_t *control)
         //for values between 0 and 10 display 2 decimals
         else
         {
-            float_to_str(control->value, value_str, sizeof(value_str), 2);
+            //not for ints
+            if (control->properties == CONTROL_PROP_INTEGER)
+            {
+                int_to_str(control->value, value_str, sizeof(value_str), 0);
+            }
+            else
+            {
+                float_to_str((control->value), value_str, sizeof(value_str), 2);
+            }
         }
 
         //copy to value_str_bfr, the first 5 char
