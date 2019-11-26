@@ -2502,6 +2502,7 @@ void naveg_pot_change(uint8_t pot)
     	//map the current value to the ADC range logarithmicly 
     	tmp_control_value = (POT_UPPER_THRESHOLD - POT_LOWER_THRESHOLD) * log(g_pots[pot]->value / g_pots[pot]->minimum) / log(g_pots[pot]->maximum / g_pots[pot]->minimum);
     }
+    //default, liniar
     else 
     {
     	//map the current value to the ADC range
