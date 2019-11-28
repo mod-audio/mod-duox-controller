@@ -402,7 +402,7 @@ static void display_pot_add(control_t *control)
 
     //we check if the pot needs to be grabbed before. if so we raise the scroll_dir variable of the control
     //in this case scroll_dir is used as a flag. TODO: rename scroll_dir to actuator_flag
-    uint16_t tmp_value = hardware_get_pot_value(id);
+    uint32_t tmp_value = hardware_get_pot_value(id);
 
     if (tmp_value < POT_LOWER_THRESHOLD)
         tmp_value = POT_LOWER_THRESHOLD;
@@ -411,7 +411,7 @@ static void display_pot_add(control_t *control)
 
     //since the actuall actuator limits can scale verry differently we scale the actuator value in a range of 50 to 3950
     //within this range the difference should be smaller then 50 before the pot starts turning
-    uint16_t tmp_control_value = 0;
+    uint32_t tmp_control_value = 0;
 
     if (g_pots[id]->properties == CONTROL_PROP_LINEAR)
     {
@@ -2491,13 +2491,13 @@ void naveg_pot_change(uint8_t pot)
     if (display_has_tool_enabled(get_display_by_id(pot, POTENTIOMETER))) return;
 
     //set the new value as tmp
-    uint16_t tmp_value = hardware_get_pot_value(pot);
+    float tmp_value = hardware_get_pot_value(pot);
 
     //if the pot is lower then its upper and lower thresholds, they are the same
     if (tmp_value < POT_LOWER_THRESHOLD) tmp_value = POT_LOWER_THRESHOLD;
     else if (tmp_value > POT_UPPER_THRESHOLD) tmp_value = POT_UPPER_THRESHOLD;
 
-    uint16_t tmp_control_value = 0;
+    float tmp_control_value = 0;
 
     if (g_pots[pot]->properties == CONTROL_PROP_LINEAR)
     {
@@ -2566,6 +2566,9 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
         case 2:
         case 3:
 
+            // checks if there is assigned control
+            if (g_foots[foot] == NULL) return;
+
            	//detect a release action 
  			if (!pressed)
             {
@@ -2589,9 +2592,6 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 //we dont actually preform an action here
                 return;
             }
-
-            // checks if there is assigned control
-            if (g_foots[foot] == NULL) return;
 
             g_foots[foot]->scroll_dir = pressed;
 
