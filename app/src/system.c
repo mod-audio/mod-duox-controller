@@ -213,15 +213,22 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
     }
     else
     {
-        if ((event == MENU_EV_ENTER) || (event == MENU_EV_NONE))
-        {
-            cli_command("mod-amixer ", CLI_CACHE_ONLY);
-            cli_command(source, CLI_CACHE_ONLY);
-            cli_command(" xvol", CLI_CACHE_ONLY);
-            response = cli_command(NULL, CLI_RETRIEVE_RESPONSE);
+    	if ((event == MENU_EV_ENTER) || (event == MENU_EV_NONE))
+    	{
+    		char str[LINE_BUFFER_SIZE+1];
 
-            char str[LINE_BUFFER_SIZE+1];
-            strcpy(str, response);
+    	    if (event == MENU_EV_ENTER)
+        	{
+            	cli_command("mod-amixer ", CLI_CACHE_ONLY);
+            	cli_command(source, CLI_CACHE_ONLY);
+            	cli_command(" xvol", CLI_CACHE_ONLY);
+            	response = cli_command(NULL, CLI_RETRIEVE_RESPONSE);
+            	strcpy(str, response);
+        	}
+        	else 
+        	{
+        		float_to_str(g_gains_volumes[item->desc->id - VOLUME_ID], str, 8, 1);
+        	}
 
             item->data.min = min;
             item->data.max = max;
@@ -244,7 +251,6 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
 
             // Return result with sign
             item->data.value = sign*res;
-
         }
         else if ((event == MENU_EV_UP) ||(event == MENU_EV_DOWN))
         {
