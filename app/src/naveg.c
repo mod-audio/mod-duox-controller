@@ -2504,7 +2504,7 @@ void naveg_pot_change(uint8_t pot)
     if (tmp_value < POT_LOWER_THRESHOLD) tmp_value = POT_LOWER_THRESHOLD;
     else if (tmp_value > POT_UPPER_THRESHOLD) tmp_value = POT_UPPER_THRESHOLD;
 
-    float tmp_control_value = 0;
+    float tmp_control_value;
 
     if (g_pots[pot]->properties == CONTROL_PROP_LINEAR)
     {

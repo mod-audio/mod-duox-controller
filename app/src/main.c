@@ -26,6 +26,7 @@
 #include "comm.h"
 #include "images.h"
 
+#include "uc1701.h"
 
 /*
 ************************************************************************************************************************
@@ -109,8 +110,9 @@ static void boot_cb(proto_t *proto);
 static void pedalboard_name_cb(proto_t *proto);
 static void snapshot_clear_cb(proto_t *proto);
 static void menu_item_changed_cb(proto_t *proto);
-static void  pedalboard_clear_cb(proto_t *proto);
-static void  page_available_cb(proto_t *proto);
+static void pedalboard_clear_cb(proto_t *proto);
+static void page_available_cb(proto_t *proto);
+static void set_display_contrast(proto_t *proto);
 
 /*
 ************************************************************************************************************************
@@ -443,6 +445,7 @@ static void setup_task(void *pvParameters)
     protocol_add_command(MENU_ITEM_CHANGE, menu_item_changed_cb);
     protocol_add_command(CLEAR_PEDALBOARD, pedalboard_clear_cb);
     protocol_add_command(PAGE_AVAILABLE_CMD, page_available_cb);
+    protocol_add_command(SET_DISPLAY_COTNRAST_CMD, set_display_contrast);
 
     // init the navigation
     naveg_init();
@@ -726,11 +729,20 @@ static void  pedalboard_clear_cb(proto_t *proto)
     protocol_response("resp 0", proto);
 }
 
-static void  page_available_cb(proto_t *proto)
+static void page_available_cb(proto_t *proto)
 {
     naveg_pages_available(atoi(proto->list[1]), atoi(proto->list[2]), atoi(proto->list[3]));
 
     protocol_response("resp 0", proto);
+}
+
+static void set_display_contrast(proto_t *proto)
+{
+    uc1701_set_custom_value(hardware_glcds(0), atoi(proto->list[1]), atoi(proto->list[2]));
+    uc1701_set_custom_value(hardware_glcds(1), atoi(proto->list[1]), atoi(proto->list[2]));
+
+    glcd_update(hardware_glcds(0));
+    glcd_update(hardware_glcds(1));
 }
 
 /*

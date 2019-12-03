@@ -337,6 +337,9 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 //next control page <hw_id> <up/down>
 #define CONTROL_PAGE_CMD              "ncp %i %i"
 
+#define SET_DISPLAY_COTNRAST_CMD          "set_display_contrast %i %i"
+
+
 
 //// Control propertires definitions
 #define CONTROL_PROP_LINEAR         0

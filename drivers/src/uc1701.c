@@ -285,6 +285,99 @@ void uc1701_init(uc1701_t *disp)
 #endif
 }
 
+
+//TODO TAKE OUT NOT NEEDED SETS HERE 
+void uc1701_set_custom_value(uc1701_t *disp, uint8_t custom_pm, uint8_t custom_rr)
+{
+    // TODO: check if SSP is already initialized
+
+    // setup the GPIO pins
+    CONFIG_PIN_OUTPUT(disp->cs_port, disp->cs_pin);
+    CONFIG_PIN_OUTPUT(disp->rst_port, disp->rst_pin);
+    CONFIG_PIN_OUTPUT(disp->cd_port, disp->cd_pin);
+
+    // initial values of GPIO
+    SET_PIN(disp->cs_port, disp->cs_pin);
+    SET_PIN(disp->rst_port, disp->rst_pin);
+    SET_PIN(disp->cd_port, disp->cd_pin);
+
+    // backlight configuration
+    CONFIG_PIN_OUTPUT(disp->backlight_port, disp->backlight_pin);
+    BACKLIGHT_TURN_ON(disp->backlight_port, disp->backlight_pin);
+
+    // setup the SPI
+    PINSEL_SetPinFunc(disp->ssp_clk_port, disp->ssp_clk_pin, disp->ssp_clk_func);
+    PINSEL_SetPinFunc(disp->ssp_mosi_port, disp->ssp_mosi_pin, disp->ssp_mosi_func);
+
+    SSP_CFG_Type ssp_config;
+    // Initialize SSP Configuration parameter structure to default state:
+    // CPHA = SSP_CPHA_FIRST
+    // CPOL = SSP_CPOL_HI
+    // ClockRate = 1000000
+    // Databit = SSP_DATABIT_8
+    // Mode = SSP_MASTER_MODE
+    // FrameFormat = SSP_FRAME_SPI
+    SSP_ConfigStructInit(&ssp_config);
+
+    // change the clock to user value and apply the configuration
+    ssp_config.ClockRate = disp->ssp_clock;
+    SSP_Init(disp->ssp_module, &ssp_config);
+    SSP_Cmd(disp->ssp_module, ENABLE);
+
+    // reset display controller
+    CLR_PIN(disp->rst_port, disp->rst_pin);
+    DELAY_ms(2);
+    SET_PIN(disp->rst_port, disp->rst_pin);
+    DELAY_ms(2);
+
+    // bias ratio 1/7
+    write_cmd(disp, UC1701_SET_BR_7);
+
+    // set SEG direction (column)
+    write_cmd(disp, UC1701_SEG_DIR_NORMAL);
+
+    // set COM direction (row)
+    write_cmd(disp, UC1701_COM_DIR_NORMAL);
+
+    // resistor ratio
+    write_cmd(disp, UC1701_SET_RR | custom_rr);
+
+    // set eletronic volume (PM)
+    write_double_cmd(disp, UC1701_SET_PM, custom_pm);
+
+    // power rise step 1
+    write_cmd(disp, UC1701_SET_PC | 0x04);
+    DELAY_ms(2);
+
+    // power rise step 2
+    write_cmd(disp, UC1701_SET_PC | 0x06);
+    DELAY_ms(2);
+
+    // power rise step 3
+    write_cmd(disp, UC1701_SET_PC | 0x07);
+    DELAY_ms(2);
+
+    // set scroll line
+    write_cmd(disp, UC1701_SET_SL);
+
+    // display enable
+    write_cmd(disp, UC1701_SET_DC2_EN);
+
+    // clear display
+    uc1701_clear(disp, UC1701_WHITE);
+    uc1701_update(disp);
+
+    DELAY_ms(2);
+
+    // apply new configurations
+#ifdef UC1701_REVERSE_COLUMNS
+    write_cmd(disp, UC1701_SEG_DIR_INVERSE);
+#endif
+#ifdef UC1701_REVERSE_ROWS
+    write_cmd(disp, UC1701_COM_DIR_INVERSE);
+#endif
+}
+
 void uc1701_backlight(uc1701_t *disp, uint8_t state)
 {
     if (state)
