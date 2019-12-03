@@ -339,6 +339,9 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 //save the current ADC value as calibration value
 #define SAVE_POT_CAL_VAL_CMD          "save_pot_cal %i %i"
 
+#define SET_DISPLAY_COTNRAST_CMD          "set_display_contrast %i %i"
+
+
 
 //// Control propertires definitions
 #define CONTROL_PROP_LINEAR         0

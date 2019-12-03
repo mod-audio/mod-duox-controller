@@ -125,7 +125,7 @@ static uint8_t g_page_mode = 0;
 
 // only disabled after "boot" command received
 bool g_self_test_mode = true;
-uint16_t g_pot_calibrations[2][POTS_COUNT] = {{0}};
+float g_pot_calibrations[2][POTS_COUNT] = {{0}};
 
 /*
 ************************************************************************************************************************
@@ -2516,7 +2516,7 @@ void naveg_pot_change(uint8_t pot)
     if (tmp_value < g_pot_calibrations[0][pot]) tmp_value = g_pot_calibrations[0][pot];
     else if (tmp_value > g_pot_calibrations[1][pot]) tmp_value = g_pot_calibrations[1][pot];
 
-    float tmp_control_value = 0;
+    float tmp_control_value;
 
     if (g_pots[pot]->properties == CONTROL_PROP_LINEAR)
     {

@@ -122,7 +122,7 @@ void uc1701_rect_invert(uc1701_t *disp, uint8_t x, uint8_t y, uint8_t width, uin
 void uc1701_draw_image(uc1701_t *disp, uint8_t x, uint8_t y, const uint8_t *image, uint8_t color);
 void uc1701_text(uc1701_t *disp, uint8_t x, uint8_t y, const char *text, const uint8_t *font, uint8_t color);
 
-
+void uc1701_set_custom_value(uc1701_t *disp, uint8_t custom_pm, uint8_t custom_rr);
 /*
 ************************************************************************************************************************
 *           CONFIGURATION ERRORS

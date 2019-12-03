@@ -26,7 +26,7 @@
 #include "comm.h"
 #include "images.h"
 #include "calibration.h"
-
+#include "uc1701.h"
 /*
 ************************************************************************************************************************
 *           LOCAL DEFINES
@@ -112,6 +112,8 @@ static void menu_item_changed_cb(proto_t *proto);
 static void pedalboard_clear_cb(proto_t *proto);
 static void page_available_cb(proto_t *proto);
 static void save_pot_cal_val_cb(proto_t *proto);
+
+static void set_display_contrast(proto_t *proto);
 
 /*
 ************************************************************************************************************************
@@ -474,6 +476,8 @@ static void setup_task(void *pvParameters)
     protocol_add_command(PAGE_AVAILABLE_CMD, page_available_cb);
     protocol_add_command(SAVE_POT_CAL_VAL_CMD, save_pot_cal_val_cb);
 
+protocol_add_command(SET_DISPLAY_COTNRAST_CMD, set_display_contrast);
+
     // init the navigation
     naveg_init();
 
@@ -776,6 +780,15 @@ static void save_pot_cal_val_cb(proto_t *proto)
     {
         calibration_write_min(atoi(proto->list[2]));
     }
+}
+
+static void set_display_contrast(proto_t *proto)
+{
+    uc1701_set_custom_value(hardware_glcds(0), atoi(proto->list[1]), atoi(proto->list[2]));
+    uc1701_set_custom_value(hardware_glcds(1), atoi(proto->list[1]), atoi(proto->list[2]));
+
+    glcd_update(hardware_glcds(0));
+    glcd_update(hardware_glcds(1));
 }
 
 /*
