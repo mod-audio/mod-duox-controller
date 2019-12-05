@@ -566,7 +566,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {PROFILES_ID+9, "Reload user profile D", PROFILE_POPUP_RELOAD_TXT}, \
     {EXP_CV_INP, "Set input to EXP", EXP_CV_POPUP_TXT}, \
     {EXP_CV_INP+1, "Set input to CV",EXP_CV_POPUP_TXT}, \
-    {EXP_MODE, "Change EXP mode", "To configure your expression\npedal, please check the wiring\nof your pedal"}, \
+    {EXP_MODE, "Change EXP mode", "Please make sure that the\nselected EXP mode matches\nthe wiring of your expression\npedal. Using the incorrect\nmode may negatively impact\nyour audio inputs."}, \
     {HP_CV_OUTP, "Set output to HP", HP_CV_POPUP_TXT}, \
     {HP_CV_OUTP+1, "Set output to CV", HP_CV_POPUP_TXT}, \
     {POT_CALL_ID, "knob calibration mode", "enter knob calibration mode?\nthis mode is used to\ncalibrate the range of the\nanalog potentiometers.\nThis mode locks the menu\nfrom other actions temporarily"}, \
