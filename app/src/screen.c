@@ -219,7 +219,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
             }
             else
             {
-                float_to_str((control->value), value_str, sizeof(value_str), 1);
+                float_to_str((control->value), value_str, sizeof(value_str), 6);
             }
         }
         //if the value becomes less then 0 we change to 1 or 0 decimals
@@ -234,7 +234,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
                 }
                 else
                 {
-                    float_to_str((control->value), value_str, sizeof(value_str), 1);
+                    float_to_str((control->value), value_str, sizeof(value_str), 6);
                 }
             }
             else if (control->value < -9999.9)
@@ -257,7 +257,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
             }
             else
             {
-                float_to_str((control->value), value_str, sizeof(value_str), 2);
+                float_to_str((control->value), value_str, sizeof(value_str), 6);
             }
         }
 

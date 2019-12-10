@@ -1173,7 +1173,7 @@ static void control_set(uint8_t id, control_t *control)
     buffer[i++] = ' ';
 
     // insert the value on buffer
-    i += float_to_str(control->value, &buffer[i], sizeof(buffer) - i, 3);
+    i += float_to_str(control->value, &buffer[i], sizeof(buffer) - i, 6);
     buffer[i] = 0;
 
     // send the data to GUI
