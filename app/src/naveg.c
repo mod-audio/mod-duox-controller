@@ -2119,17 +2119,17 @@ void naveg_inc_control(uint8_t display)
     control_t *control = g_encoders[display];
     if (!control) return;
 
+    //check/sets the direction
+    if (control->scroll_dir == 0)
+    {
+        control->scroll_dir = 1;
+        control_set(display, control);
+        return;
+    }
+
     if  (((control->properties == CONTROL_PROP_ENUMERATION) || (control->properties == CONTROL_PROP_SCALE_POINTS) 
         || (control->properties == CONTROL_PROP_REVERSE_ENUM)) && (control->scale_points_flag & CONTROL_PAGINATED))
     {
-        //check/sets the direction
-        if (control->scroll_dir == 0)
-        {
-            control->scroll_dir = 1;
-            control_set(display, control);
-            return;
-        }
-
         if (control->scale_points_flag & PAGINATION_FLAG)
         {
         	// increments the step
@@ -2178,17 +2178,17 @@ void naveg_dec_control(uint8_t display)
     control_t *control = g_encoders[display];
     if (!control) return;
 
+    //check/sets the direction
+    if (control->scroll_dir != 0)
+    {
+        control->scroll_dir = 0;
+        control_set(display, control);
+        return;
+    }
+
     if  (((control->properties == CONTROL_PROP_ENUMERATION) || (control->properties == CONTROL_PROP_SCALE_POINTS) ||
      (control->properties == CONTROL_PROP_REVERSE_ENUM)) && (control->scale_points_flag & CONTROL_PAGINATED))
     {
-        //check/sets the direction
-        if (control->scroll_dir != 0)
-        {
-            control->scroll_dir = 0;
-            control_set(display, control);
-            return;
-        }
-
         if (control->scale_points_flag & PAGINATION_FLAG)
         {
 
