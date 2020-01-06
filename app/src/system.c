@@ -19,6 +19,7 @@
 #include "utils.h"
 #include "device.h"
 #include "calibration.h"
+#include "uc1701.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -103,6 +104,7 @@ uint8_t g_cv_in_mode = 0;
 uint8_t g_cv_in_range = 0;
 uint8_t g_exp_mode = 0;
 uint8_t g_cv_out_mode = 0;
+int16_t g_display_contrast = -1; 
 int8_t g_page_mode = -1;
 
 /*
@@ -785,6 +787,53 @@ void system_display_cb(void *arg, int event)
     
     //this setting changes just 1 item
     if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);    
+}
+
+void system_display_contrast_cb(void *arg, int event)
+{
+    menu_item_t *item = arg;
+
+    if (g_display_contrast == -1)
+    {
+        //read EEPROM
+        uint8_t read_buffer = 0;
+        EEPROM_Read(0, DISPLAY_CONTRAST_ADRESS, &read_buffer, MODE_8_BIT, 1);
+
+        g_display_contrast = read_buffer;
+    }
+
+    if (event == MENU_EV_ENTER)
+    {
+        //save to eeprom
+        if (g_display_contrast != -1)
+        {
+            uint8_t write_buffer = g_display_contrast;
+            EEPROM_Write(0, DISPLAY_CONTRAST_ADRESS, &write_buffer, MODE_8_BIT, 1);
+        }
+    }
+    else if (event == MENU_EV_NONE)
+    {
+        //only display value
+        item->data.value = g_display_contrast;
+        item->data.min = UC1701_PM_MIN;
+        item->data.max = UC1701_PM_MAX;
+        item->data.step = 1;
+    }
+    else 
+    {
+        //HMI changes the item, resync
+        g_display_contrast = item->data.value;
+
+        //write to display
+        uc1701_set_custom_value(hardware_glcds(0), g_display_contrast, UC1701_RR_DEFAULT);
+        uc1701_set_custom_value(hardware_glcds(1), g_display_contrast, UC1701_RR_DEFAULT);
+    }
+
+    char str_bfr[8];
+    int value_bfr = MAP(g_display_contrast, UC1701_PM_MIN, UC1701_PM_MAX, 0, 100);
+    int_to_str(value_bfr, str_bfr, 5, 0);
+    strcat(str_bfr, "%");
+    add_chars_to_menu_name(item, str_bfr);
 }
 
 void system_hide_actuator_cb(void *arg, int event)

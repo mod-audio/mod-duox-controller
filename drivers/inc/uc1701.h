@@ -60,8 +60,12 @@
 #define DELAY_ms(time)      delay_ms(time)
 
 // uc1701 register default values
-#define UC1701_PM_DEFAULT   20
-#define UC1701_RR_DEFAULT   8
+#define UC1701_PM_DEFAULT   229
+#define UC1701_RR_DEFAULT   4
+
+//min&max contrast value's
+#define UC1701_PM_MIN   214
+#define UC1701_PM_MAX   254
 
 // display backlight turn on definition
 #define UC1701_BACKLIGHT_TURN_ON_WITH_ONE

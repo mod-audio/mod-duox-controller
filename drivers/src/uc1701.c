@@ -285,8 +285,6 @@ void uc1701_init(uc1701_t *disp)
 #endif
 }
 
-
-//TODO TAKE OUT NOT NEEDED SETS HERE 
 void uc1701_set_custom_value(uc1701_t *disp, uint8_t custom_pm, uint8_t custom_rr)
 {
     // resistor ratio
@@ -294,6 +292,8 @@ void uc1701_set_custom_value(uc1701_t *disp, uint8_t custom_pm, uint8_t custom_r
 
     // set eletronic volume (PM)
     write_double_cmd(disp, UC1701_SET_PM, custom_pm);
+
+    DELAY_ms(2);
 
     uc1701_update(disp);
 }
