@@ -740,9 +740,6 @@ static void set_display_contrast(proto_t *proto)
 {
     uc1701_set_custom_value(hardware_glcds(0), atoi(proto->list[1]), atoi(proto->list[2]));
     uc1701_set_custom_value(hardware_glcds(1), atoi(proto->list[1]), atoi(proto->list[2]));
-
-    //glcd_update(hardware_glcds(0));
-    //glcd_update(hardware_glcds(1));
 }
 
 /*

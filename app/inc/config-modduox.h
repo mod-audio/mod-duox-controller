@@ -454,6 +454,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define DISP_BL_ID          DEVICE_SETTINGS_ID + 2      
 #define ACTU_HIDE_ID        DEVICE_SETTINGS_ID + 3 
 #define POT_LOCK_ID         DEVICE_SETTINGS_ID + 4
+#define DISP_CONTRAST_ID    DEVICE_SETTINGS_ID + 5
 
 #define BLUETOOTH_DISCO_ID  BLUETOOTH_ID+2
 
@@ -510,6 +511,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"DISPLAY BRIGHTNESS",              MENU_TOGGLE,    DISP_BL_ID,           DEVICE_SETTINGS_ID, system_display_cb          , 0},  \
     {"UNASSIGNED ACTUATORS",            MENU_TOGGLE,    ACTU_HIDE_ID,         DEVICE_SETTINGS_ID, system_hide_actuator_cb    , 0},  \
     {"KNOB MODE ",                      MENU_TOGGLE,    POT_LOCK_ID,          DEVICE_SETTINGS_ID, system_lock_pots_cb        , 0},  \
+    {"DISPLAY CONTRAST",                MENU_SET,       DISP_CONTRAST_ID,     DEVICE_SETTINGS_ID, system_display_contrast_cb , 0},  \
     {"INFO",                            MENU_LIST,      INFO_ID,              SYSTEM_ID,          NULL                       , 0},  \
     {"< BACK TO SYSTEM",                MENU_RETURN,    INFO_ID+1,            INFO_ID,            NULL                       , 0},  \
     {"SERVICES",                        MENU_LIST,      SERVICES_ID,          INFO_ID,            system_services_cb         , 1},  \
@@ -634,6 +636,8 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define HIDE_ACTUATOR_ADRESS        0
 #define LOCK_POTENTIOMTERS_ADRESS   1
 #define DISPLAY_BRIGHTNESS_ADRESS   2
+#define DISPLAY_CONTRAST_ADRESS     36
+
 
 // these macros should be used in replacement to default malloc and free functions of stdlib.h
 // The FREE function is NULL safe

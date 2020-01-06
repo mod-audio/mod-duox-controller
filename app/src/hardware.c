@@ -12,6 +12,7 @@
 #include "actuator.h"
 #include "task.h"
 #include "device.h"
+#include "uc1701.h"
 
 /*
 ************************************************************************************************************************
@@ -331,6 +332,19 @@ void hardware_setup(void)
 
     // default glcd brightness
     system_display_cb(NULL, MENU_EV_NONE);
+
+    //check if we have a valid contrast value
+    uint8_t display_contrast = 0;
+    EEPROM_Read(0, DISPLAY_CONTRAST_ADRESS, &display_contrast, MODE_8_BIT, 1);
+    if ((display_contrast < UC1701_PM_MIN) || (display_contrast > UC1701_PM_MAX))
+    {
+        uint8_t write_buffer = UC1701_PM_DEFAULT;
+        EEPROM_Write(0, DISPLAY_CONTRAST_ADRESS, &write_buffer, MODE_8_BIT, 1);
+        display_contrast = write_buffer;      
+    }
+    //set the contrast
+    uc1701_set_custom_value(hardware_glcds(0), display_contrast, UC1701_RR_DEFAULT);
+    uc1701_set_custom_value(hardware_glcds(1), display_contrast, UC1701_RR_DEFAULT);
 
     ////////////////////////////////////////////////////////////////
     // Timer 0 configuration
