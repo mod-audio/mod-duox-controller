@@ -356,9 +356,11 @@ void screen_pot(uint8_t pot_id, control_t *control)
             else
             {
                 value.y += 3;
+                //do not have this extra character
+                value_str_bfr[4] = '\0';
                 strcat(value_str_bfr, unit_str);
                 //terminate the text with line ending, the % was added, so the index is also increased by 1
-                value_str_bfr[6] = '\0';
+                value_str_bfr[5] = '\0';
             }
         }
         else value.y += 3;

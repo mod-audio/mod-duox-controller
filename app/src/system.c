@@ -188,6 +188,8 @@ void set_item_value(char *command, uint16_t value)
     comm_webgui_send(buffer, i);
 }
 
+//This function is in a really messy state. MOD-UI wont awnser to value requests and fully using also takes WAY to long
+//TODO Redo this whole function! (Also on the system side ....)
 static void volume(menu_item_t *item, int event, const char *source, float min, float max, float step)
 {
     char value[8] = {};
@@ -201,16 +203,41 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
         //PGA (input)
         if (!dir)
         {
+            char buffer[128];
+            uint8_t i;
+
+            i = copy_command(buffer, "am in 0 xvol ");
+            // insert the hw_id on buffer
+            i += int_to_str(item->data.value, &buffer[i], sizeof(buffer) - i, 0);
+            buffer[i++] = ' ';
+
+            // send the data to GUI
+            comm_webgui_send(buffer, i);
+            
+            /*
             int_to_str(item->data.value, value, 8, 0);
             cli_command("mod-amixer in 0 xvol ", CLI_CACHE_ONLY);
             cli_command(value, CLI_DISCARD_RESPONSE);
+            */
         }
         //DAC (output)
         else
         {
+            char buffer[128];
+            uint8_t i;
+
+            i = copy_command(buffer, "am in 0 xvol ");
+            // insert the hw_id on buffer
+            i += int_to_str(item->data.value, &buffer[i], sizeof(buffer) - i, 0);
+
+            // send the data to GUI
+            comm_webgui_send(buffer, i);
+
+            /*
             int_to_str(item->data.value, value, 8, 0);
             cli_command("mod-amixer out 0 xvol ", CLI_CACHE_ONLY);
             cli_command(value, CLI_DISCARD_RESPONSE);
+            */
         }
     }
     else
@@ -240,11 +267,24 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
         }
         else if ((event == MENU_EV_UP) ||(event == MENU_EV_DOWN))
         {
+            /*
             float_to_str(item->data.value, value, 8, 1);
             cli_command("mod-amixer ", CLI_CACHE_ONLY);
             cli_command(source, CLI_CACHE_ONLY);
             cli_command(" xvol ", CLI_CACHE_ONLY);
             cli_command(value, CLI_DISCARD_RESPONSE);
+            */
+
+            char buffer[128];
+
+            strcpy (buffer,"am ");
+            strcat (buffer,source);
+            strcat (buffer," xvol ");
+            float_to_str(item->data.value, value, 8, 1);
+            strcat (buffer, value);
+
+            // send the data to GUI
+            comm_webgui_send(buffer, strlen(buffer));
         }
     }
 
