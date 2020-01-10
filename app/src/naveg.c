@@ -248,7 +248,7 @@ void draw_all_foots(uint8_t display)
         }
         else
         {
-            screen_footer(foot + i, NULL, NULL);
+            screen_footer(foot + i, NULL, NULL, 0);
         }
     }
 }
@@ -543,7 +543,7 @@ static void foot_control_add(control_t *control)
 
             // updates the footer
             screen_footer(control->hw_id - ENCODERS_COUNT, control->label,
-                         (control->value <= 0 ? TOGGLED_OFF_FOOTER_TEXT : TOGGLED_ON_FOOTER_TEXT));
+                         (control->value <= 0 ? TOGGLED_OFF_FOOTER_TEXT : TOGGLED_ON_FOOTER_TEXT), control->properties);
             break;
 
         // trigger specification: http://lv2plug.in/ns/ext/port-props/#trigger
@@ -569,7 +569,7 @@ static void foot_control_add(control_t *control)
                 break;
 
             // updates the footer (a getto fix here, the screen.c file did not regognize the NULL pointer so it did not allign the text properly, TODO fix this)
-            screen_footer(control->hw_id - ENCODERS_COUNT, control->label, BYPASS_ON_FOOTER_TEXT);
+            screen_footer(control->hw_id - ENCODERS_COUNT, control->label, BYPASS_ON_FOOTER_TEXT, control->properties);
             break;
 
         case CONTROL_PROP_TAP_TEMPO: ;
@@ -646,7 +646,7 @@ static void foot_control_add(control_t *control)
             strcpy(&value_txt[i], control->unit);
 
             // updates the footer
-            screen_footer(control->hw_id - ENCODERS_COUNT, control->label, value_txt);
+            screen_footer(control->hw_id - ENCODERS_COUNT, control->label, value_txt, control->properties);
             break;
 
         case CONTROL_PROP_BYPASS:
@@ -662,7 +662,7 @@ static void foot_control_add(control_t *control)
 
             // updates the footer
             screen_footer(control->hw_id - ENCODERS_COUNT, control->label,
-                         (control->value ? BYPASS_ON_FOOTER_TEXT : BYPASS_OFF_FOOTER_TEXT));
+                         (control->value ? BYPASS_ON_FOOTER_TEXT : BYPASS_OFF_FOOTER_TEXT), control->properties);
             break;
 
         case CONTROL_PROP_REVERSE_ENUM:
@@ -693,7 +693,7 @@ static void foot_control_add(control_t *control)
                 break;
 
             // updates the footer
-            screen_footer(control->hw_id - ENCODERS_COUNT, control->label, control->scale_points[i]->label);
+            screen_footer(control->hw_id - ENCODERS_COUNT, control->label, control->scale_points[i]->label, control->properties);
             break;
     }
 }
@@ -711,7 +711,7 @@ static void foot_control_rm(uint8_t hw_id)
         if (!g_foots[i])
         {
             if (!display_has_tool_enabled(i))
-                screen_footer(i, NULL, NULL);
+                screen_footer(i, NULL, NULL, 0);
             continue;
         }
 
@@ -728,7 +728,7 @@ static void foot_control_rm(uint8_t hw_id)
             // check if foot isn't being used to bank function
             // update the footer
             if (!display_has_tool_enabled(i))
-                screen_footer(i, NULL, NULL);
+                screen_footer(i, NULL, NULL, 0);
         }
     }
 }
@@ -1096,7 +1096,7 @@ static void control_set(uint8_t id, control_t *control)
                 // updates the value and the screen
                 control->value = control->scale_points[control->step]->value;
                 if (!display_has_tool_enabled(get_display_by_id(id, FOOT)))
-                    screen_footer(control->hw_id - ENCODERS_COUNT, control->label, control->scale_points[control->step]->label);
+                    screen_footer(control->hw_id - ENCODERS_COUNT, control->label, control->scale_points[control->step]->label, control->properties);
             }
             break;
 
@@ -2289,7 +2289,7 @@ void naveg_set_control(uint8_t hw_id, float value)
 
                 // updates the footer
                 screen_footer(control->hw_id - ENCODERS_COUNT, control->label,
-                             (control->value <= 0 ? TOGGLED_OFF_FOOTER_TEXT : TOGGLED_ON_FOOTER_TEXT));
+                             (control->value <= 0 ? TOGGLED_OFF_FOOTER_TEXT : TOGGLED_ON_FOOTER_TEXT), control->properties);
                 break;
 
             // trigger specification: http://lv2plug.in/ns/ext/port-props/#trigger
@@ -2315,7 +2315,7 @@ void naveg_set_control(uint8_t hw_id, float value)
                     break;
 
                 // updates the footer (a getto fix here, the screen.c file did not regognize the NULL pointer so it did not allign the text properly, TODO fix this)
-                screen_footer(control->hw_id - ENCODERS_COUNT, control->label, BYPASS_ON_FOOTER_TEXT);
+                screen_footer(control->hw_id - ENCODERS_COUNT, control->label, BYPASS_ON_FOOTER_TEXT, control->properties);
                 break;
 
             case CONTROL_PROP_TAP_TEMPO: ;
@@ -2377,7 +2377,7 @@ void naveg_set_control(uint8_t hw_id, float value)
                 strcpy(&value_txt[i], control->unit);
 
                 // updates the footer
-                screen_footer(control->hw_id - ENCODERS_COUNT, control->label, value_txt);
+                screen_footer(control->hw_id - ENCODERS_COUNT, control->label, value_txt, control->properties);
                 break;
 
             case CONTROL_PROP_BYPASS:
@@ -2393,7 +2393,7 @@ void naveg_set_control(uint8_t hw_id, float value)
 
                 // updates the footer
                 screen_footer(control->hw_id - ENCODERS_COUNT, control->label,
-                             (control->value ? BYPASS_ON_FOOTER_TEXT : BYPASS_OFF_FOOTER_TEXT));
+                             (control->value ? BYPASS_ON_FOOTER_TEXT : BYPASS_OFF_FOOTER_TEXT), control->properties);
                 break;
 
             case CONTROL_PROP_REVERSE_ENUM:
@@ -2419,7 +2419,7 @@ void naveg_set_control(uint8_t hw_id, float value)
                     break;
 
                 // updates the footer
-                screen_footer(control->hw_id - ENCODERS_COUNT, control->label, control->scale_points[i]->label);
+                screen_footer(control->hw_id - ENCODERS_COUNT, control->label, control->scale_points[i]->label, control->properties);
                 break;
             }
         }

@@ -668,7 +668,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
     glcd_hline(display, 0, 24, DISPLAY_WIDTH, GLCD_BLACK);
 }
 
-void screen_footer(uint8_t id, const char *name, const char *value)
+void screen_footer(uint8_t id, const char *name, const char *value, int16_t property)
 {
     glcd_t *display = hardware_glcds((id < 2)?DISPLAY_LEFT:DISPLAY_RIGHT);
 
@@ -733,7 +733,7 @@ void screen_footer(uint8_t id, const char *name, const char *value)
     }
 
     ///checks if its toggle or a value
-    else if((value[1] == 'F') || (value[1] == 'N') || (value == NULL))
+    else if ((property == CONTROL_PROP_TOGGLED) || (property == CONTROL_PROP_BYPASS))
     {
         // draws the name field
         char *title_str_bfr = (char *) MALLOC(16 * sizeof(char));
