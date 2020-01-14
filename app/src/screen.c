@@ -201,13 +201,20 @@ void screen_pot(uint8_t pot_id, control_t *control)
         //if the value becomes bigger then 9999 (4 characters), then switch to another view 10999 becomes 10.9K
         if (control->value > 9999)
         {
-            int_to_str(control->value/1000, value_str, sizeof(value_str) - 1, 0);
+            float_to_str((control->value/1000), value_str, sizeof(value_str), 1);
             strcat(value_str, "K");
         }
         //else if we have a value bigger then 100, we dont display decimals anymore
         else if (control->value > 99.9)
         {
-            int_to_str(control->value, value_str, sizeof(value_str), 0);
+        	if (control->value > 999.9)
+        	{
+				int_to_str(control->value, value_str, sizeof(value_str), 0);
+        	}
+        	else
+        	{
+            	float_to_str((control->value), value_str, sizeof(value_str), 1);
+        	}
         }
         //else if we have a value bigger then 10 we display just one decimal
         else if (control->value > 9.9)
@@ -239,12 +246,19 @@ void screen_pot(uint8_t pot_id, control_t *control)
             }
             else if (control->value < -9999.9)
             {
-                int_to_str((control->value/1000), value_str, sizeof(value_str) - 1, 0);
+                float_to_str((control->value/1000), value_str, sizeof(value_str), 1);
                 strcat(value_str, "K");
             }
             else
             {
-                int_to_str(control->value, value_str, sizeof(value_str), 0);
+        		if (control->value < -999.9)
+        		{
+					int_to_str(control->value, value_str, sizeof(value_str), 0);
+        		}
+        		else
+        		{
+            		float_to_str((control->value), value_str, sizeof(value_str), 1);
+        		}
             }
         }
         //for values between 0 and 10 display 2 decimals
