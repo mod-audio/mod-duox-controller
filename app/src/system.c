@@ -101,7 +101,6 @@ int8_t g_display_brightness = -1;
 int8_t g_actuator_hide = -1;
 int8_t g_pots_lock = -1;
 uint8_t g_cv_in_mode = 0;
-uint8_t g_cv_in_range = 0;
 uint8_t g_exp_mode = 0;
 uint8_t g_cv_out_mode = 0;
 int16_t g_display_contrast = -1; 
@@ -413,10 +412,6 @@ void system_update_menu_value(uint8_t item_ID, uint16_t value)
         case EXP_CV_INP: 
             g_cv_in_mode = value;
         break;
-        //CV in range
-        case CV_RANGE: 
-            g_cv_in_range = value;
-        break;
         //expression mode
         case EXP_MODE: 
             g_exp_mode = value;
@@ -505,8 +500,7 @@ void system_input_cb(void *arg, int event)
             g_gains_volumes[0] = atoi(items[0]);
             g_gains_volumes[1] = atoi(items[1]);
             g_cv_in_mode = atoi(items[2]);
-            g_cv_in_range = atoi(items[3]);
-            g_exp_mode = atoi(items[4]);
+            g_exp_mode = atoi(items[3]);
         } 
         
     }
@@ -1466,13 +1460,6 @@ void system_cv_exp_cb (void *arg, int event)
         if (g_cv_in_mode == 0) g_cv_in_mode = 1;
         else g_cv_in_mode = 0;
         set_item_value(EXPCV_SET_CMD, g_cv_in_mode);
-
-        //if we have a bias on, we need to turn that off
-        if (g_cv_in_range == 1)
-        {
-            g_cv_in_range = 0;
-            set_item_value(CV_BIAS_SET_CMD, g_cv_in_range);   
-        }
     }
     char str_bfr[15] = {};
     strcat(str_bfr,(g_cv_in_mode ? "EXP" : "CV"));
@@ -1480,24 +1467,6 @@ void system_cv_exp_cb (void *arg, int event)
 
     //this setting changes just 1 item
     if (event == MENU_EV_ENTER) naveg_menu_refresh(DISPLAY_RIGHT);
-}
-
-void system_cv_range_cb (void *arg, int event)
-{
-    menu_item_t *item = arg;
-
-    if (event == MENU_EV_ENTER)
-    {
-        if (g_cv_in_range == 0 && !g_cv_in_mode) g_cv_in_range = 1;
-        else g_cv_in_range = 0;
-        set_item_value(CV_BIAS_SET_CMD, g_cv_in_range);
-    }
-    char str_bfr[15] = {};
-    strcat(str_bfr,(g_cv_in_range ? "-2.5 TO 2.5": "0 TO 5"));
-    add_chars_to_menu_name(item, str_bfr);
-
-    //this setting changes just 1 item
-    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
 }
 
 void system_exp_mode_cb (void *arg, int event)

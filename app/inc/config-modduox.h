@@ -318,10 +318,6 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define CLEAR_SNAPSHOT_COMMAND        "ss_c"
 //the HMI is ready to boot <current_page> <display_brightness>
 #define BOOT_HMI_CMD                  "boot %i %i %s ..."
-//get input cv bias
-#define CV_BIAS_GET_CMD               "g_cvb"
-//set input cv bias
-#define CV_BIAS_SET_CMD               "s_cvb %i"
 //get input EXP mode
 #define EXP_MODE_GET_CMD              "g_exp_m"
 //set input EXP mode
@@ -437,7 +433,6 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define IN2_VOLUME          VOLUME_ID+1
 #define STEREO_LINK_INP     INP_ID+3
 #define EXP_CV_INP          INP_ID+2
-#define CV_RANGE            INP_ID+4
 #define EXP_MODE            INP_ID+5
 
 //output sub menu
@@ -494,7 +489,6 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"INPUT 1 GAIN",                    MENU_VOL,       IN1_VOLUME,           INP_ID,             system_volume_cb           , 0},  \
     {"INPUT 2 GAIN",                    MENU_VOL,       IN2_VOLUME,           INP_ID,             system_volume_cb           , 0},  \
     {"CV / EXP INPUT",                  MENU_TOGGLE,    EXP_CV_INP,           INP_ID,             system_cv_exp_cb           , 0},  \
-    {"CV RANGE",                        MENU_TOGGLE,    CV_RANGE,             INP_ID,             system_cv_range_cb         , 0},  \
     {"EXP MODE",                        MENU_TOGGLE,    EXP_MODE,             INP_ID,             system_exp_mode_cb         , 0},  \
     {"OUTPUTS",                         MENU_LIST,      OUTP_ID,              SYSTEM_ID,          system_output_cb           , 0},  \
     {"< BACK TO SYSTEM",                MENU_RETURN,    OUTP_ID+1,            OUTP_ID,            NULL                       , 0},  \
