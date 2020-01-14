@@ -733,28 +733,28 @@ void screen_footer(uint8_t id, const char *name, const char *value, int16_t prop
         return;
     }
 
-    ///checks if its toggle or a value
-    else if ((property == CONTROL_PROP_TOGGLED) || (property == CONTROL_PROP_BYPASS))
+    ///checks if its toggle/trigger or a value
+    else if ((property & CONTROL_PROP_TOGGLED) || (property & CONTROL_PROP_BYPASS) || (property & CONTROL_PROP_TRIGGER))
     {
-        // draws the name field
-        char *title_str_bfr = (char *) MALLOC(16 * sizeof(char));
-        textbox_t footer;
-        footer.color = GLCD_BLACK;
-        footer.mode = TEXT_SINGLE_LINE;
-        footer.font = SMfont;
-        footer.height = 0;
-        footer.top_margin = 0;
-        footer.bottom_margin = 1;
-        footer.left_margin = 0;
-        footer.width = 0;
-        footer.right_margin = 0;
-        strncpy(title_str_bfr, name, 15);
-        title_str_bfr[15] = '\0';
-        footer.text = title_str_bfr;
-        footer.y = 0;
-        footer.align = align ? ALIGN_RCENTER_BOTTOM : ALIGN_LCENTER_BOTTOM;
-        widget_textbox(display, &footer);
-        FREE(title_str_bfr);
+    	// draws the name field
+    	char *title_str_bfr = (char *) MALLOC(16 * sizeof(char));
+    	textbox_t footer;
+    	footer.color = GLCD_BLACK;
+    	footer.mode = TEXT_SINGLE_LINE;
+    	footer.font = SMfont;
+    	footer.height = 0;
+    	footer.top_margin = 0;
+    	footer.bottom_margin = 1;
+    	footer.left_margin = 0;
+    	footer.width = 0;
+    	footer.right_margin = 0;
+    	strncpy(title_str_bfr, name, 15);
+    	title_str_bfr[15] = '\0';
+    	footer.text = title_str_bfr;
+    	footer.y = 0;
+    	footer.align = align ? ALIGN_RCENTER_BOTTOM : ALIGN_LCENTER_BOTTOM;
+    	widget_textbox(display, &footer);
+    	FREE(title_str_bfr);
 
         if (value[1] == 'N')
         {
@@ -765,7 +765,7 @@ void screen_footer(uint8_t id, const char *name, const char *value, int16_t prop
         }
         return;
     }
-    //other footers
+    //scalepoints
     else
     {
         uint8_t char_cnt_name = strlen(name);
