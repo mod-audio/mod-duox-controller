@@ -513,10 +513,10 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"DEVICE SETTINGS",                 MENU_LIST,      DEVICE_SETTINGS_ID,   SYSTEM_ID,          NULL                       , 0},  \
     {"< BACK TO SYSTEM",                MENU_RETURN,    DEVICE_SETTINGS_ID+1, DEVICE_SETTINGS_ID, NULL                       , 0},  \
     {"DISPLAY BRIGHTNESS",              MENU_TOGGLE,    DISP_BL_ID,           DEVICE_SETTINGS_ID, system_display_cb          , 0},  \
+    {"DISPLAY CONTRAST",                MENU_SET,       DISP_CONTRAST_ID,     DEVICE_SETTINGS_ID, system_display_contrast_cb , 0},  \
     {"UNASSIGNED ACTUATORS",            MENU_TOGGLE,    ACTU_HIDE_ID,         DEVICE_SETTINGS_ID, system_hide_actuator_cb    , 0},  \
     {"KNOB MODE ",                      MENU_TOGGLE,    POT_LOCK_ID,          DEVICE_SETTINGS_ID, system_lock_pots_cb        , 0},  \
     {"PAGES MODE ",                     MENU_TOGGLE,    PAGE_MODE_ID,         DEVICE_SETTINGS_ID, system_page_mode_cb        , 0},  \
-    {"DISPLAY CONTRAST",                MENU_SET,       DISP_CONTRAST_ID,     DEVICE_SETTINGS_ID, system_display_contrast_cb , 0},  \
     {"POT CALIBRATION MODE",            MENU_CONFIRM,   POT_CALL_ID,          DEVICE_SETTINGS_ID, system_pot_callibration    , 0},  \
     {"INFO",                            MENU_LIST,      INFO_ID,              SYSTEM_ID,          NULL                       , 0},  \
     {"< BACK TO SYSTEM",                MENU_RETURN,    INFO_ID+1,            INFO_ID,            NULL                       , 0},  \
