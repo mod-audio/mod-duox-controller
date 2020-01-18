@@ -755,7 +755,7 @@ void system_display_cb(void *arg, int event)
 
         g_display_brightness = read_buffer;
 
-        hardware_glcd_brightness(MAX_BRIGHTNESS); 
+        hardware_glcd_brightness(g_display_brightness); 
     }
 
     if (event == MENU_EV_ENTER)
