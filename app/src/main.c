@@ -784,8 +784,7 @@ static void save_pot_cal_val_cb(proto_t *proto)
 
 static void set_display_contrast(proto_t *proto)
 {
-    uc1701_set_custom_value(hardware_glcds(0), atoi(proto->list[1]), atoi(proto->list[2]));
-    uc1701_set_custom_value(hardware_glcds(1), atoi(proto->list[1]), atoi(proto->list[2]));
+    uc1701_set_custom_value(hardware_glcds(atoi(proto->list[3])), atoi(proto->list[1]), atoi(proto->list[2]));
 }
 
 /*
