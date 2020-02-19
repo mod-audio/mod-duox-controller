@@ -527,7 +527,6 @@ void system_output_cb(void *arg, int event)
             g_gains_volumes[4] = atoi(items[2]);
             g_cv_out_mode = atoi(items[3]);
         } 
-        
     }
 }
 
