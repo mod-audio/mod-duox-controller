@@ -372,14 +372,6 @@ void widget_listbox3(glcd_t *display, listbox_t *listbox)
             glcd_text(display, listbox->x + name_size + listbox->text_left_margin + 16, listbox->y, listbox->list[listbox->selected], SMfont, listbox->color);
             glcd_rect_invert(display, listbox->x + name_size + listbox->text_left_margin + indicator_width,  listbox->y - 1, list_width, 7);
         }
-
-        //draw the arrow
-        glcd_rect_fill(display, (DISPLAY_WIDTH - 8) , (listbox->y-1), 8, 15, ~listbox->color);
-        glcd_rect_fill(display, (DISPLAY_WIDTH - 5)  , (listbox->y + 4),  1, 7, listbox->color);
-        glcd_rect_fill(display, (DISPLAY_WIDTH - 7)  , (listbox->y + 3),  5, 1, listbox->color);
-        glcd_rect_fill(display, (DISPLAY_WIDTH - 6)  , (listbox->y + 2),  3, 1, listbox->color);
-        glcd_rect_fill(display, (DISPLAY_WIDTH - 5)  , (listbox->y + 1),  1, 1, listbox->color);
-    
     }
     else if (listbox->direction ==  1)
     {
@@ -395,13 +387,6 @@ void widget_listbox3(glcd_t *display, listbox_t *listbox)
             glcd_text(display, listbox->x + listbox->text_left_margin + name_size + 16, listbox->y + 7, listbox->list[listbox->selected], SMfont, listbox->color);
             glcd_rect_invert(display, listbox->x +  name_size + listbox->text_left_margin + indicator_width,  listbox->y + 6, list_width, 7);
         }
-
-        //draw the arrow
-        glcd_rect_fill(display, (DISPLAY_WIDTH - 8) , (listbox->y-1), 8, 15, ~listbox->color);
-        glcd_rect_fill(display, (DISPLAY_WIDTH - 5)  , (listbox->y + 1),  1, 7, listbox->color);
-        glcd_rect_fill(display, (DISPLAY_WIDTH - 7)  , (listbox->y + 8),  5, 1, listbox->color);
-        glcd_rect_fill(display, (DISPLAY_WIDTH - 6)  , (listbox->y + 9),  3, 1, listbox->color);
-        glcd_rect_fill(display, (DISPLAY_WIDTH - 5)  , (listbox->y + 10),  1, 1, listbox->color);
     }
 }
 
