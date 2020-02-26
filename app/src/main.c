@@ -780,6 +780,8 @@ static void save_pot_cal_val_cb(proto_t *proto)
     {
         calibration_write_min(atoi(proto->list[2]));
     }
+
+    protocol_response("resp 0", proto);
 }
 
 static void set_display_contrast(proto_t *proto)
