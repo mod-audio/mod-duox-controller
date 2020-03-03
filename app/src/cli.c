@@ -278,39 +278,14 @@ void cli_process(void)
             }
 
             // and already tried login ...
-            else if (g_cli.boot_step == LOGIN)
+            if (g_cli.boot_step == LOGIN)
             {
-                //we cant assume this 
-                /*
                 // assume boot is done
                 g_cli.boot_step = SHELL_CONFIG;
-                // send new line to force interrupt
-                cli_command("echo", CLI_DISCARD_RESPONSE);
-                */
 
-                // retrieve at what point we are now. 
-                cli_command(NULL, CLI_RETRIEVE_RESPONSE);
-
-                uint8_t j = 0;
-                for (j = 0; j < N_BOOT_STEPS; j++)
-                {
-                    if (strncmp(g_cli.received, g_boot_steps[j], strlen(g_boot_steps[j])))
-                    {
-                        // go back to where it went wrong
-
-                        //if we retrieved password, we need to enter first and then go back to the login boot step
-                        if (j == PASSWORD)
-                        {
-                            cli_command(NULL, CLI_RETRIEVE_RESPONSE);
-                            g_cli.boot_step = j - 1;
-                        }
-                        else 
-                        {
-                            g_cli.boot_step = j;
-                        }
-                        break;
-                    }
-                }
+                // send new line to force interrupt, and check response to ensure we actually log in
+                cli_command("echo", CLI_RETRIEVE_RESPONSE);
+                return;
             }
         }
 
