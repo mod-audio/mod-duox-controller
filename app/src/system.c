@@ -81,7 +81,7 @@ char *option_disabled = "[ ]";
 ************************************************************************************************************************
 */
 static uint8_t g_comm_protocol_bussy = 0;
-float g_gains_volumes[5] = {};
+float g_gains_volumes[5] = {-1, -1, -1, -1, -1};
 uint8_t g_master_vol_port = 0;
 uint8_t g_q_bypass = 0;
 uint8_t g_bypass[4] = {};
@@ -100,9 +100,9 @@ uint8_t g_tuner_mute = 0;
 int8_t g_display_brightness = -1;
 int8_t g_actuator_hide = -1;
 int8_t g_pots_lock = -1;
-uint8_t g_cv_in_mode = 0;
-uint8_t g_exp_mode = 0;
-uint8_t g_cv_out_mode = 0;
+int8_t g_cv_in_mode = -1;
+int8_t g_exp_mode = -1;
+int8_t g_cv_out_mode = -1;
 int16_t g_display_contrast = -1; 
 int8_t g_page_mode = -1;
 
@@ -218,24 +218,23 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
     	{
     		char str[LINE_BUFFER_SIZE+1];
 
-    	    if (event == MENU_EV_ENTER)
-        	{
-            	cli_command("mod-amixer ", CLI_CACHE_ONLY);
-            	cli_command(source, CLI_CACHE_ONLY);
-            	cli_command(" xvol", CLI_CACHE_ONLY);
-            	response = cli_command(NULL, CLI_RETRIEVE_RESPONSE);
-            	strcpy(str, response);
-        	}
-        	else 
-        	{
-        		int_to_str(g_gains_volumes[item->desc->id - VOLUME_ID], str, 8, 0);
-        	}
+            if (event == MENU_EV_ENTER)
+            {
+                cli_command("mod-amixer ", CLI_CACHE_ONLY);
+                cli_command(source, CLI_CACHE_ONLY);
+                cli_command(" xvol", CLI_CACHE_ONLY);
+                response = cli_command(NULL, CLI_RETRIEVE_RESPONSE);
+                strcpy(str, response);
+                item->data.value = atoi(str);
+            }
+            else
+            {
+                item->data.value = g_gains_volumes[item->desc->id - VOLUME_ID];
+            }
 
             item->data.min = min;
             item->data.max = max;
             item->data.step = step;
-
-            item->data.value = atoi(str);
         }
         else if ((event == MENU_EV_UP) ||(event == MENU_EV_DOWN))
         {
@@ -496,8 +495,8 @@ void system_input_cb(void *arg, int event)
 
         if (items)
         {
-            g_gains_volumes[0] = atoi(items[0]);
-            g_gains_volumes[1] = atoi(items[1]);
+            g_gains_volumes[0] = atof(items[0]);
+            g_gains_volumes[1] = atof(items[1]);
             g_cv_in_mode = atoi(items[2]);
             g_exp_mode = atoi(items[3]);
         } 
@@ -521,9 +520,9 @@ void system_output_cb(void *arg, int event)
 
         if (items)
         {
-            g_gains_volumes[2] = atoi(items[0]);
-            g_gains_volumes[3] = atoi(items[1]);
-            g_gains_volumes[4] = atoi(items[2]);
+            g_gains_volumes[2] = atof(items[0]);
+            g_gains_volumes[3] = atof(items[1]);
+            g_gains_volumes[4] = atof(items[2]);
             g_cv_out_mode = atoi(items[3]);
         } 
     }
@@ -1453,6 +1452,11 @@ void system_cv_exp_cb (void *arg, int event)
 {
     menu_item_t *item = arg;
 
+    if (g_cv_in_mode == -1)
+    {
+        system_input_cb(NULL, MENU_EV_ENTER);
+    }
+
     if (event == MENU_EV_ENTER && item->data.hover == 0)
     {
         if (g_cv_in_mode == 0) g_cv_in_mode = 1;
@@ -1471,6 +1475,11 @@ void system_exp_mode_cb (void *arg, int event)
 {
     menu_item_t *item = arg;
 
+    if (g_cv_in_mode == -1)
+    {
+        system_input_cb(NULL, MENU_EV_ENTER);
+    }
+
     if (event == MENU_EV_ENTER && item->data.hover == 0)
     {
         if (g_exp_mode == 0) g_exp_mode = 1;
@@ -1488,6 +1497,11 @@ void system_exp_mode_cb (void *arg, int event)
 void system_cv_hp_cb (void *arg, int event)
 {
     menu_item_t *item = arg;
+
+    if (g_cv_in_mode == -1)
+    {
+        system_output_cb(NULL, MENU_EV_ENTER);
+    }
 
     if (event == MENU_EV_ENTER && item->data.hover == 0)
     {

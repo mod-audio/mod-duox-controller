@@ -1518,6 +1518,13 @@ static void menu_enter(uint8_t display_id)
         if (naveg_ui_status()) item->desc->type = MENU_MESSAGE;
     }
 
+    //check if we are entering a volume menu, we need to get the value before printing items in the list
+    if ((item->desc->id == INP_ID) || (item->desc->id == OUTP_ID))
+    {
+        if (item->desc->action_cb)
+            item->desc->action_cb(item, MENU_EV_ENTER);
+    }
+
     // checks the selected item
     if (item->desc->type == MENU_LIST || item->desc->type == MENU_SELECT)
     {
