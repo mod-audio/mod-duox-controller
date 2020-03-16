@@ -725,7 +725,7 @@ static void foot_control_rm(uint8_t hw_id)
             g_foots[i] = NULL;
 
             // turn off the led
-            ledz_set_state(hardware_leds(i), i, LEDZ_ALL_COLORS, 0, 0, 0, 0);
+            ledz_set_state(hardware_leds(i), i, MAX_COLOR_ID, 0, 0, 0, 0);
 
             // check if foot isn't being used to bank function
             // update the footer
@@ -2343,7 +2343,7 @@ void naveg_set_control(uint8_t hw_id, float value)
 
                 // setup the led blink
                 if (time_ms > TAP_TEMPO_TIME_ON)
-                     ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TAP_TEMPO_COLOR, 2, TAP_TEMPO_TIME_ON, time_ms - TAP_TEMPO_TIME_ON, LED_BLINK_INFINIT);
+                    ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TAP_TEMPO_COLOR, 2, TAP_TEMPO_TIME_ON, time_ms - TAP_TEMPO_TIME_ON, LED_BLINK_INFINIT);
                 else
                     ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TAP_TEMPO_COLOR, 2, time_ms / 2, time_ms / 2, LED_BLINK_INFINIT);
 
@@ -2838,7 +2838,7 @@ void naveg_save_snapshot(uint8_t foot)
     i = copy_command(buffer, SAVE_SNAPSHOT_COMMAND);
 
     ledz_set_state(hardware_leds(foot), foot, SNAPSHOT_COLOR, 1, 0, 0, 0);
-    ledz_blink(hardware_leds(foot), RED, 75, 75, 3);
+    ledz_blink(hardware_leds(foot), RED, 85, 85, 3);
 
     i += int_to_str((foot == 6)?1:0, &buffer[i], sizeof(buffer) - i, 0);
 
@@ -2849,7 +2849,7 @@ void naveg_save_snapshot(uint8_t foot)
 void naveg_clear_snapshot(uint8_t foot)
 {
     snapshot_loaded[(foot == 6)?1:0] = 0;
-    ledz_set_state(hardware_leds(foot), foot, LEDZ_ALL_COLORS, 0, 0, 0, 0);
+    ledz_set_state(hardware_leds(foot), foot, MAX_COLOR_ID, 0, 0, 0, 0);
 }
 
 
@@ -3472,34 +3472,34 @@ void naveg_turn_on_pagination_leds(void)
             break;
         }
 
-        if (snapshot_loaded[0]) ledz_set_state(hardware_leds(4), 4, WHITE, 1, 0, 0, 0);
-        else ledz_set_state(hardware_leds(4), 4, LEDZ_ALL_COLORS, 0, 0, 0, 0);
+        if (snapshot_loaded[0]) ledz_set_state(hardware_leds(4), 4, SNAPSHOT_COLOR, 1, 0, 0, 0);
+        else ledz_set_state(hardware_leds(4), 4, SNAPSHOT_COLOR, 0, 0, 0, 0);
 
-        if (snapshot_loaded[1]) ledz_set_state(hardware_leds(6), 6, WHITE, 1, 0, 0, 0);
-        else ledz_set_state(hardware_leds(6), 6, LEDZ_ALL_COLORS, 0, 0, 0, 0);
+        if (snapshot_loaded[1]) ledz_set_state(hardware_leds(6), 6, SNAPSHOT_COLOR, 1, 0, 0, 0);
+        else ledz_set_state(hardware_leds(6), 6, SNAPSHOT_COLOR, 0, 0, 0, 0);
     }
     else 
     {
         //trigger leds acourdingly 
         if (page_available[0])
         {
-            if (page == 0) ledz_set_state(hardware_leds(4), 4, WHITE, 1, 0, 0, 0);
+            if (page == 0) ledz_set_state(hardware_leds(4), 4, SNAPSHOT_COLOR, 1, 0, 0, 0);
             else ledz_set_state(hardware_leds(4), 4, PAGES1_COLOR, 1, 0, 0, 0);
         }
-        else ledz_set_state(hardware_leds(4), 4, LEDZ_ALL_COLORS, 0, 0, 0, 0);
+        else ledz_set_state(hardware_leds(4), 4, SNAPSHOT_COLOR, 0, 0, 0, 0);
 
         if (page_available[1])
         {
-            if (page == 1) ledz_set_state(hardware_leds(5), 5, WHITE, 1, 0, 0, 0);
+            if (page == 1) ledz_set_state(hardware_leds(5), 5, SNAPSHOT_COLOR, 1, 0, 0, 0);
             else ledz_set_state(hardware_leds(5), 5, PAGES2_COLOR, 1, 0, 0, 0);
         }
-        else ledz_set_state(hardware_leds(5), 5, LEDZ_ALL_COLORS, 0, 0, 0, 0);
+        else ledz_set_state(hardware_leds(5), 5, SNAPSHOT_COLOR, 0, 0, 0, 0);
 
         if (page_available[2])
         {
-            if (page == 2)ledz_set_state(hardware_leds(6), 6, WHITE, 1, 0, 0, 0);
+            if (page == 2)ledz_set_state(hardware_leds(6), 6, SNAPSHOT_COLOR, 1, 0, 0, 0);
             else ledz_set_state(hardware_leds(6), 6, PAGES3_COLOR, 1, 0, 0, 0);
         }
-        else ledz_set_state(hardware_leds(6), 6, LEDZ_ALL_COLORS, 0, 0, 0, 0);
+        else ledz_set_state(hardware_leds(6), 6, SNAPSHOT_COLOR, 0, 0, 0, 0);
     }
 }

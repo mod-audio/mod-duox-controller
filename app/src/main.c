@@ -115,6 +115,7 @@ static void page_available_cb(proto_t *proto);
 static void save_pot_cal_val_cb(proto_t *proto);
 
 static void set_display_contrast(proto_t *proto);
+static void set_led_color(proto_t *proto);
 
 /*
 ************************************************************************************************************************
@@ -477,6 +478,7 @@ static void setup_task(void *pvParameters)
     protocol_add_command(PAGE_AVAILABLE_CMD, page_available_cb);
     protocol_add_command(SAVE_POT_CAL_VAL_CMD, save_pot_cal_val_cb);
     protocol_add_command(SET_DISPLAY_COTNRAST_CMD, set_display_contrast);
+    protocol_add_command(SET_LED_COLOR, set_led_color);
 
     // init the navigation
     naveg_init();
@@ -512,12 +514,17 @@ static void led_cb(proto_t *proto)
 {
     ledz_t *led = hardware_leds(atoi(proto->list[1]));
 
-    ledz_set(led, RED,   atoi(proto->list[2]));
-    ledz_set(led, GREEN, atoi(proto->list[3]));
-    ledz_set(led, BLUE,  atoi(proto->list[4]));
+    uint8_t value[3] = {atoi(proto->list[2]), atoi(proto->list[3]), atoi(proto->list[4])}; 
+    ledz_set_color(CMD_COLOR_ID,value);
 
     if (proto->list_count == 7)
-    ledz_blink(led, WHITE, atoi(proto->list[5]), atoi(proto->list[6]), LED_BLINK_INFINIT);
+    {
+        ledz_set_state(led, atoi(proto->list[1]), CMD_COLOR_ID, 1, 0, 0, 0);
+    }
+    else
+    {
+        ledz_set_state(led, atoi(proto->list[1]), CMD_COLOR_ID, 2, atoi(proto->list[5]), atoi(proto->list[6]), LED_BLINK_INFINIT);
+    }
 
     protocol_response("resp 0", proto);
 }
@@ -787,6 +794,24 @@ static void save_pot_cal_val_cb(proto_t *proto)
 static void set_display_contrast(proto_t *proto)
 {
     uc1701_set_custom_value(hardware_glcds(atoi(proto->list[3])), atoi(proto->list[1]), atoi(proto->list[2]));
+}
+
+static void set_led_color(proto_t *proto)
+{
+    //write value to ledz_driver
+    uint8_t value[3] = {atoi(proto->list[2]), atoi(proto->list[3]), atoi(proto->list[4])};
+    ledz_set_color(atoi(proto->list[1]), value);
+
+    //write value to eeprom
+    hardware_change_led_color(atoi(proto->list[1]), value);
+
+    uint8_t j = 0;
+    for (j = 0; j < LEDS_COUNT; j++)
+    {
+    	ledz_restore_state(hardware_leds(j), j);
+    }
+
+    protocol_response("resp 0", proto);
 }
 
 /*

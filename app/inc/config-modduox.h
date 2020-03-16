@@ -336,8 +336,8 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define SAVE_POT_CAL_VAL_CMD          "save_pot_cal %i %i"
 //set display contrast options <PM val> <RR val> <display>
 #define SET_DISPLAY_COTNRAST_CMD          "set_display_contrast %i %i %i"
-
-
+//set LED color <color_id> <r> <g> <b>
+#define SET_LED_COLOR                 "color_s %i %i %i %i"
 
 //// Control propertires definitions
 #define CONTROL_PROP_LINEAR         0
@@ -588,19 +588,34 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 
 #define AMOUNT_OF_MENU_VARS   13
 
-//// Button functions leds colors
-#define TOGGLED_COLOR             RED
-#define TRIGGER_COLOR             WHITE
-#define TRIGGER_PRESSED_COLOR     RED
-#define TAP_TEMPO_COLOR           WHITE
-#define ENUMERATED_COLOR          WHITE
-#define ENUMERATED_PRESSED_COLOR  RED
-#define BYPASS_COLOR              RED
-#define PAGES1_COLOR              RED
-#define PAGES2_COLOR              YELLOW
-#define PAGES3_COLOR              CYAN
-#define SNAPSHOT_COLOR            WHITE
-#define SNAPSHOT_LOAD_COLOR       CYAN
+//// Button functions leds colors, these reflect color ID's which are stored in eeprom. 
+#define TOGGLED_COLOR             0
+#define TRIGGER_COLOR             1
+#define TRIGGER_PRESSED_COLOR     2
+#define TAP_TEMPO_COLOR           3
+#define ENUMERATED_COLOR          4
+#define ENUMERATED_PRESSED_COLOR  5
+#define BYPASS_COLOR              6
+#define PAGES1_COLOR              7
+#define PAGES2_COLOR              8
+#define PAGES3_COLOR              9
+#define SNAPSHOT_COLOR            10
+#define SNAPSHOT_LOAD_COLOR       11
+#define CMD_COLOR_ID              12
+#define MAX_COLOR_ID              13
+
+#define DEFAULT_TOGGLED_COLOR             {50,0,0}
+#define DEFAULT_TRIGGER_COLOR             {50,50,50}
+#define DEFAULT_TRIGGER_PRESSED_COLOR     {50,0,0}
+#define DEFAULT_TAP_TEMPO_COLOR           {50,50,50}
+#define DEFAULT_ENUMERATED_COLOR          {50,50,50}
+#define DEFAULT_ENUMERATED_PRESSED_COLOR  {50,0,0}
+#define DEFAULT_BYPASS_COLOR              {50,0,0}
+#define DEFAULT_PAGES1_COLOR              {50,0,0}
+#define DEFAULT_PAGES2_COLOR              {50,50,0}
+#define DEFAULT_PAGES3_COLOR              {0,50,50}
+#define DEFAULT_SNAPSHOT_COLOR            {50,50,50}
+#define DEFAULT_SNAPSHOT_LOAD_COLOR       {0,50,50}
 
 //// Tap Tempo
 // defines the time that the led will stay turned on (in milliseconds)
@@ -613,7 +628,9 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define TAP_TEMPO_MAXVAL_OVERFLOW 50
 
 //time in us for the display brightness + led tick interupt
-#define LED_DISPL_INTERUPT_TIME     100
+//needs to be this high so that the generated PWM does not leak into the audio path (EMC and shit)
+#define LED_INTERUPT_TIME     40
+#define DISPL_INTERUPT_TIME   20
 
 //// Toggled
 // defines the toggled footer text
@@ -640,7 +657,6 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define CLI_RESPONSE_TIMEOUT        500
 
 ///EEPROM adress page defines
-#define EEPROM_EMPTY_CHECK_ADRESS          62
 #define HIDE_ACTUATOR_ADRESS               0
 #define LOCK_POTENTIOMTERS_ADRESS          1
 #define DISPLAY_BRIGHTNESS_ADRESS          2
@@ -663,6 +679,26 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define POT_8_MAX_CALIBRATION_ADRESS       34
 #define PAGE_MODE_ADRESS                   35
 #define DISPLAY_CONTRAST_ADRESS            36
+
+//default settings
+#define DEFAULT_HIDE_ACTUATOR              0
+#define DEFAULT_LOCK_POTENTIOMTERS         1
+#define DEFAULT_DISPLAY_BRIGHTNESS         2
+#define DEFAULT_PAGE_MODE                  0
+
+//memory used for LED value's 
+#define LED_COLOR_EEMPROM_PAGE             2
+#define LED_COLOR_ADRESS_START             0
+#define LED_COLOR_EEPROM_BYTES             36
+
+//we use the last 2 bytes of page 0 to check the eeprom settings
+#define EEPROM_VERSION_ADRESS              62
+
+//for version control, when increasing they ALWAYS need to be bigger then the previous value
+#define EEPROM_CURRENT_VERSION            (long)1100
+
+//for testing purposes, overwrites the EEPROM regardless of the version
+#define FORCE_WRITE_EEPROM                0
 
 // these macros should be used in replacement to default malloc and free functions of stdlib.h
 // The FREE function is NULL safe
