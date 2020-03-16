@@ -456,6 +456,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define PAGE_MODE_ID        DEVICE_SETTINGS_ID + 5
 #define POT_CALL_ID         DEVICE_SETTINGS_ID + 6
 #define DISP_CONTRAST_ID    DEVICE_SETTINGS_ID + 7
+#define LED_BRIGHTNESS_ID   DEVICE_SETTINGS_ID + 8
 
 #define BLUETOOTH_DISCO_ID  BLUETOOTH_ID+2
 
@@ -517,6 +518,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"UNASSIGNED ACTUATORS",            MENU_TOGGLE,    ACTU_HIDE_ID,         DEVICE_SETTINGS_ID, system_hide_actuator_cb    , 0},  \
     {"KNOB MODE ",                      MENU_TOGGLE,    POT_LOCK_ID,          DEVICE_SETTINGS_ID, system_lock_pots_cb        , 0},  \
     {"PAGES MODE ",                     MENU_TOGGLE,    PAGE_MODE_ID,         DEVICE_SETTINGS_ID, system_page_mode_cb        , 0},  \
+    {"LED BRIGHTNESS ",                 MENU_TOGGLE,    LED_BRIGHTNESS_ID,    DEVICE_SETTINGS_ID, system_led_brightness_cb   , 0},  \
     {"POT CALIBRATION MODE",            MENU_CONFIRM,   POT_CALL_ID,          DEVICE_SETTINGS_ID, system_pot_callibration    , 0},  \
     {"INFO",                            MENU_LIST,      INFO_ID,              SYSTEM_ID,          NULL                       , 0},  \
     {"< BACK TO SYSTEM",                MENU_RETURN,    INFO_ID+1,            INFO_ID,            NULL                       , 0},  \
@@ -604,18 +606,18 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define CMD_COLOR_ID              12
 #define MAX_COLOR_ID              13
 
-#define DEFAULT_TOGGLED_COLOR             {50,0,0}
-#define DEFAULT_TRIGGER_COLOR             {50,50,50}
-#define DEFAULT_TRIGGER_PRESSED_COLOR     {50,0,0}
-#define DEFAULT_TAP_TEMPO_COLOR           {50,50,50}
-#define DEFAULT_ENUMERATED_COLOR          {50,50,50}
-#define DEFAULT_ENUMERATED_PRESSED_COLOR  {50,0,0}
-#define DEFAULT_BYPASS_COLOR              {50,0,0}
-#define DEFAULT_PAGES1_COLOR              {50,0,0}
-#define DEFAULT_PAGES2_COLOR              {50,50,0}
-#define DEFAULT_PAGES3_COLOR              {0,50,50}
-#define DEFAULT_SNAPSHOT_COLOR            {50,50,50}
-#define DEFAULT_SNAPSHOT_LOAD_COLOR       {0,50,50}
+#define DEFAULT_TOGGLED_COLOR             {100,0,0}
+#define DEFAULT_TRIGGER_COLOR             {100,100,100}
+#define DEFAULT_TRIGGER_PRESSED_COLOR     {100,0,0}
+#define DEFAULT_TAP_TEMPO_COLOR           {100,100,100}
+#define DEFAULT_ENUMERATED_COLOR          {100,100,100}
+#define DEFAULT_ENUMERATED_PRESSED_COLOR  {100,0,0}
+#define DEFAULT_BYPASS_COLOR              {100,0,0}
+#define DEFAULT_PAGES1_COLOR              {100,0,0}
+#define DEFAULT_PAGES2_COLOR              {100,100,0}
+#define DEFAULT_PAGES3_COLOR              {0,100,100}
+#define DEFAULT_SNAPSHOT_COLOR            {100,100,100}
+#define DEFAULT_SNAPSHOT_LOAD_COLOR       {0,100,100}
 
 //// Tap Tempo
 // defines the time that the led will stay turned on (in milliseconds)
@@ -679,12 +681,14 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define POT_8_MAX_CALIBRATION_ADRESS       34
 #define PAGE_MODE_ADRESS                   35
 #define DISPLAY_CONTRAST_ADRESS            36
+#define LED_BRIGHTNESS_ADRESS              37
 
 //default settings
 #define DEFAULT_HIDE_ACTUATOR              0
 #define DEFAULT_LOCK_POTENTIOMTERS         1
 #define DEFAULT_DISPLAY_BRIGHTNESS         2
 #define DEFAULT_PAGE_MODE                  0
+#define DEFAULT_LED_BRIGHTNESS             2
 
 //memory used for LED value's 
 #define LED_COLOR_EEMPROM_PAGE             2

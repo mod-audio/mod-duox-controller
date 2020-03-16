@@ -104,6 +104,7 @@ void system_hide_actuator_cb(void *arg, int event);
 void system_lock_pots_cb(void *arg, int event);
 void system_pot_callibration(void *arg, int event);
 void system_page_mode_cb(void *arg, int event);
+void system_led_brightness_cb(void *arg, int event);
 
 /*
 ************************************************************************************************************************

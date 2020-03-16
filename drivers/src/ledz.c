@@ -129,6 +129,7 @@ static ledz_t g_leds[LEDZ_MAX_INSTANCES];
 static unsigned int g_leds_available = LEDZ_MAX_INSTANCES;
 static led_state_t g_led_state[LEDZ_MAX_INSTANCES];
 uint8_t led_colors[MAX_COLOR_ID + 1][3] = {};
+float g_ledz_brightness = 1;
 /*
 ****************************************************************************************************
 *       INTERNAL FUNCTIONS
@@ -204,6 +205,32 @@ void ledz_set_color(uint8_t item, uint8_t value[3])
     led_colors[item][0] = value[0];
     led_colors[item][1] = value[1];
     led_colors[item][2] = value[2];
+}
+
+void ledz_set_brightness(uint8_t brightness)
+{
+    float brightness_calc = 1;
+    switch (brightness)
+    {
+        //low
+        case 0:
+            brightness_calc = 0.3;
+        break;
+
+        //mid
+        case 1:
+            brightness_calc = 0.6;
+        break;
+
+        //high
+        case 2:
+        default:
+            brightness_calc = 1;
+        break;
+    }
+
+    //save globaly
+    g_ledz_brightness = brightness_calc;
 }
 
 ledz_t* ledz_create(ledz_type_t type, const ledz_color_t *colors, const int *pins)
@@ -336,6 +363,8 @@ void ledz_brightness(ledz_t* led, ledz_color_t color, unsigned int value)
 {
     if (value >= 100)
         value = 100;
+
+    value = value * g_ledz_brightness;
 
     int i;
     for (i = 0; led; led = led->next, i++)
