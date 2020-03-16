@@ -22,8 +22,10 @@
 */
 
 // check in hardware_setup() what is the function of each timer
-#define TIMER0_PRIORITY     3
+//0 is highest priority
+#define TIMER0_PRIORITY     4
 #define TIMER1_PRIORITY     2
+#define TIMER2_PRIORITY     3
 
 /*
 ************************************************************************************************************************
@@ -130,6 +132,44 @@ static const uint8_t *POT_PINS[]  = {
 #endif
 };
 
+static const uint8_t *LED_COLORS[]  = {
+#ifdef DEFAULT_TOGGLED_COLOR
+    (const uint8_t []) DEFAULT_TOGGLED_COLOR,
+#endif
+#ifdef DEFAULT_TRIGGER_COLOR
+    (const uint8_t []) DEFAULT_TRIGGER_COLOR,
+#endif
+#ifdef DEFAULT_TRIGGER_PRESSED_COLOR
+    (const uint8_t []) DEFAULT_TRIGGER_PRESSED_COLOR,
+#endif
+#ifdef DEFAULT_TAP_TEMPO_COLOR
+    (const uint8_t []) DEFAULT_TAP_TEMPO_COLOR,
+#endif
+#ifdef DEFAULT_ENUMERATED_COLOR
+    (const uint8_t []) DEFAULT_ENUMERATED_COLOR,
+#endif
+#ifdef DEFAULT_ENUMERATED_PRESSED_COLOR
+    (const uint8_t []) DEFAULT_ENUMERATED_PRESSED_COLOR,
+#endif
+#ifdef DEFAULT_BYPASS_COLOR
+    (const uint8_t []) DEFAULT_BYPASS_COLOR,
+#endif
+#ifdef DEFAULT_PAGES1_COLOR
+    (const uint8_t []) DEFAULT_PAGES1_COLOR,
+#endif
+#ifdef DEFAULT_PAGES2_COLOR
+    (const uint8_t []) DEFAULT_PAGES2_COLOR,
+#endif
+#ifdef DEFAULT_PAGES3_COLOR
+    (const uint8_t []) DEFAULT_PAGES3_COLOR,
+#endif
+#ifdef DEFAULT_SNAPSHOT_COLOR
+    (const uint8_t []) DEFAULT_SNAPSHOT_COLOR,
+#endif
+#ifdef DEFAULT_SNAPSHOT_LOAD_COLOR
+    (const uint8_t []) DEFAULT_SNAPSHOT_LOAD_COLOR,
+#endif
+};
 
 /*
 ************************************************************************************************************************
@@ -187,6 +227,78 @@ static int g_brightness;
 *           LOCAL FUNCTIONS
 ************************************************************************************************************************
 */
+void write_led_defaults()
+{
+    uint8_t i=0;
+    uint8_t j=0;
+    uint8_t write_buffer = 0;
+    for (i=0; i<(MAX_COLOR_ID-1); i++)
+    {
+        for (j=0; j<3; j++)
+        {
+            write_buffer = LED_COLORS[i][j];
+            EEPROM_Write(LED_COLOR_EEMPROM_PAGE, (LED_COLOR_ADRESS_START + (i*3) + j), &write_buffer, MODE_8_BIT, 1);    
+        }
+    }
+}
+
+void write_o_settings_defaults()
+{
+    //set the eeprom default values
+    uint8_t write_buffer = UC1701_PM_DEFAULT;
+    EEPROM_Write(0, DISPLAY_CONTRAST_ADRESS, &write_buffer, MODE_8_BIT, 1);
+    write_buffer = DEFAULT_HIDE_ACTUATOR;
+    EEPROM_Write(0, HIDE_ACTUATOR_ADRESS, &write_buffer, MODE_8_BIT, 1);
+    write_buffer = DEFAULT_LOCK_POTENTIOMTERS;
+    EEPROM_Write(0, LOCK_POTENTIOMTERS_ADRESS, &write_buffer, MODE_8_BIT, 1);
+    write_buffer = DEFAULT_DISPLAY_BRIGHTNESS;
+    EEPROM_Write(0, DISPLAY_BRIGHTNESS_ADRESS, &write_buffer, MODE_8_BIT, 1);
+    write_buffer = 0;
+    EEPROM_Write(DEFAULT_PAGE_MODE, PAGE_MODE_ADRESS, &write_buffer, MODE_8_BIT, 1);
+}
+
+void check_eeprom_defaults(uint16_t current_version)
+{
+	if ((!FORCE_WRITE_EEPROM) && !(current_version > EEPROM_CURRENT_VERSION))
+	{
+    	switch (current_version)
+    	{
+    		//everything before 1.10
+        	case 171:
+        		//leds where introduced here
+        	   	write_led_defaults();
+        	case 1100:
+        	    //not implemented, if new settings are introduced in 1110 of 1120 put here
+        	break;
+
+    	    //nothing saved yet, new unit, write all settings
+    	    default:
+    			write_o_settings_defaults();
+    			calibration_write_default();
+    			write_led_defaults();
+    	    break;
+    	}
+    }
+    //detect downgrade, dont do anything
+    else if (current_version > EEPROM_CURRENT_VERSION)
+    {	
+    	return;
+    }
+    //force defaults
+    else 
+    {
+    	//write all settings
+    	write_o_settings_defaults();
+    	calibration_write_default();
+    	write_led_defaults();
+    }
+
+    //update the version 
+    uint16_t write_buffer_version = EEPROM_CURRENT_VERSION;
+    EEPROM_Write(0, EEPROM_VERSION_ADRESS, &write_buffer_version, MODE_16_BIT, 1);
+
+    return;
+}
 
 void adc_initalisation(void)
 {
@@ -270,26 +382,13 @@ void hardware_setup(void)
     EEPROM_Init();
 
     //check if this unit is being turned on for the first time (empty EEPROM)
-    uint8_t read_buffer = 0;
-    EEPROM_Read(0, EEPROM_EMPTY_CHECK_ADRESS, &read_buffer, MODE_8_BIT, 1);
+    uint16_t read_eeprom_version = 0;
+    EEPROM_Read(0, EEPROM_VERSION_ADRESS, &read_eeprom_version, MODE_16_BIT, 1);
 
     //check if value is 170 (we put that in the last page to detect new units (binary 10101010))
-    if (read_buffer != 170)
+    if ((read_eeprom_version != EEPROM_CURRENT_VERSION) || FORCE_WRITE_EEPROM)
     {
-        //set the eeprom default values
-        uint8_t write_buffer = 170;
-        EEPROM_Write(0, EEPROM_EMPTY_CHECK_ADRESS, &write_buffer, MODE_8_BIT, 1);
-        write_buffer = 0;
-        EEPROM_Write(0, HIDE_ACTUATOR_ADRESS, &write_buffer, MODE_8_BIT, 1);
-        write_buffer = 1;
-        EEPROM_Write(0, LOCK_POTENTIOMTERS_ADRESS, &write_buffer, MODE_8_BIT, 1);
-        write_buffer = 2;
-        EEPROM_Write(0, DISPLAY_BRIGHTNESS_ADRESS, &write_buffer, MODE_8_BIT, 1);
-        write_buffer = 0;
-        EEPROM_Write(0, PAGE_MODE_ADRESS, &write_buffer, MODE_8_BIT, 1);
-
-        //write default pot value's
-        calibration_write_default();
+        check_eeprom_defaults(read_eeprom_version);
     }
 
     //set 3 color leds
@@ -343,18 +442,31 @@ void hardware_setup(void)
     // default glcd brightness
     system_display_cb(NULL, MENU_EV_NONE);
 
-    //check if we have a valid contrast value
+    //set the display contrast
     uint8_t display_contrast = 0;
     EEPROM_Read(0, DISPLAY_CONTRAST_ADRESS, &display_contrast, MODE_8_BIT, 1);
-    if ((display_contrast < UC1701_PM_MIN) || (display_contrast > UC1701_PM_MAX))
-    {
-        uint8_t write_buffer = UC1701_PM_DEFAULT;
-        EEPROM_Write(0, DISPLAY_CONTRAST_ADRESS, &write_buffer, MODE_8_BIT, 1);
-        display_contrast = write_buffer;      
-    }
-    //set the contrast
     uc1701_set_custom_value(hardware_glcds(0), display_contrast, UC1701_RR_DEFAULT);
     uc1701_set_custom_value(hardware_glcds(1), display_contrast, UC1701_RR_DEFAULT);
+
+    //set led colors
+    uint8_t led_color_value[3] = {};
+
+    for (i=0; i<(MAX_COLOR_ID-1); i++)
+    {
+        uint8_t j=0;
+        uint8_t read_buffer = 0;
+        for (j=0; j<3; j++)
+        {
+            EEPROM_Read(LED_COLOR_EEMPROM_PAGE, (LED_COLOR_ADRESS_START + (i*3) + j), &read_buffer, MODE_8_BIT, 1);
+            led_color_value[j] = read_buffer;
+        }
+        ledz_set_color(i, led_color_value);
+    }
+    //set white color for dissables
+    led_color_value[0] = 100;
+    led_color_value[1] = 100;
+    led_color_value[2] = 100;
+    ledz_set_color(MAX_COLOR_ID, led_color_value);
 
     ////////////////////////////////////////////////////////////////
     // Timer 0 configuration
@@ -365,7 +477,7 @@ void hardware_setup(void)
     TIM_MATCHCFG_Type TIM_MatchConfigStruct ;
     // initialize timer 0, prescale count time of 10us
     TIM_ConfigStruct.PrescaleOption = TIM_PRESCALE_USVAL;
-    TIM_ConfigStruct.PrescaleValue = LED_DISPL_INTERUPT_TIME;
+    TIM_ConfigStruct.PrescaleValue = LED_INTERUPT_TIME;
     // use channel 0, MR0
     TIM_MatchConfigStruct.MatchChannel = 0;
     // enable interrupt when MR0 matches the value in TC register
@@ -374,7 +486,7 @@ void hardware_setup(void)
     TIM_MatchConfigStruct.ResetOnMatch = TRUE;
     // stop on MR0 if MR0 matches it
     TIM_MatchConfigStruct.StopOnMatch = FALSE;
-    // set Match value, count value of 1 (1 * 10us = 10us --> 100 kHz)
+    // set Match value, count value of 1 
     TIM_MatchConfigStruct.MatchValue = 1;
     // set configuration for Tim_config and Tim_MatchConfig
     TIM_Init(LPC_TIM0, TIM_TIMER_MODE, &TIM_ConfigStruct);
@@ -385,7 +497,6 @@ void hardware_setup(void)
     NVIC_EnableIRQ(TIMER0_IRQn);
     // to start timer
     TIM_Cmd(LPC_TIM0, ENABLE);
-
 
     ////////////////////////////////////////////////////////////////
     // Timer 1 configuration
@@ -413,6 +524,34 @@ void hardware_setup(void)
     NVIC_EnableIRQ(TIMER1_IRQn);
     // to start timer
     TIM_Cmd(LPC_TIM1, ENABLE);
+
+
+    ////////////////////////////////////////////////////////////////
+    // Timer 2 configuration
+    // this timer is for the display brightness
+
+    // initialize timer 2, prescale count time of 10us
+    TIM_ConfigStruct.PrescaleOption = TIM_PRESCALE_USVAL;
+    TIM_ConfigStruct.PrescaleValue = DISPL_INTERUPT_TIME;
+    // use channel 2, MR2
+    TIM_MatchConfigStruct.MatchChannel = 2;
+    // enable interrupt when MR2 matches the value in TC register
+    TIM_MatchConfigStruct.IntOnMatch = TRUE;
+    // enable reset on MR2: TIMER will reset if MR2 matches it
+    TIM_MatchConfigStruct.ResetOnMatch = TRUE;
+    // stop on MR2 if MR2 matches it
+    TIM_MatchConfigStruct.StopOnMatch = FALSE;
+    // set Match value, count value of 1 
+    TIM_MatchConfigStruct.MatchValue = 1;
+    // set configuration for Tim_config and Tim_MatchConfig
+    TIM_Init(LPC_TIM2, TIM_TIMER_MODE, &TIM_ConfigStruct);
+    TIM_ConfigMatch(LPC_TIM2, &TIM_MatchConfigStruct);
+    // set priority
+    NVIC_SetPriority(TIMER2_IRQn, TIMER2_PRIORITY);
+    // enable interrupt for timer 0
+    NVIC_EnableIRQ(TIMER2_IRQn);
+    // to start timer
+    TIM_Cmd(LPC_TIM2, ENABLE);
 
     ////////////////////////////////////////////////////////////////
     // Serial initialization
@@ -558,6 +697,17 @@ uint16_t hardware_get_pot_value(uint8_t pot)
     return actuator_pot_value(pot);
 }
 
+void hardware_change_led_color(uint8_t item, uint8_t value[3])
+{
+	uint8_t j=0;
+	uint8_t write_buffer = 0;
+	for (j=0; j<3; j++)
+    {
+    	write_buffer = value[j];
+    	EEPROM_Write(LED_COLOR_EEMPROM_PAGE, ((item*3) + j), &write_buffer, MODE_8_BIT, 1);    
+	}
+}
+
 void hardware_coreboard_power(uint8_t state)
 {
     // coreboard sometimes requires 1s pulse to initialize
@@ -584,12 +734,32 @@ void hardware_coreboard_power(uint8_t state)
 
 void TIMER0_IRQHandler(void)
 {
-    static int count = 1, state;
-
     if (TIM_GetIntStatus(LPC_TIM0, TIM_MR0_INT) == SET)
     {
         // LEDs PWM
         ledz_tick();
+    }
+
+    TIM_ClearIntPending(LPC_TIM0, TIM_MR0_INT);
+}
+
+void TIMER1_IRQHandler(void)
+{
+    if (TIM_GetIntStatus(LPC_TIM1, TIM_MR1_INT) == SET)
+    {
+        actuators_clock();
+        g_counter++;
+    }
+
+    TIM_ClearIntPending(LPC_TIM1, TIM_MR1_INT);
+}
+
+void TIMER2_IRQHandler(void)
+{
+    static int count = 1, state;
+
+    if (TIM_GetIntStatus(LPC_TIM2, TIM_MR2_INT) == SET)
+    {
 
         if (g_brightness == 0)
         {
@@ -621,16 +791,5 @@ void TIMER0_IRQHandler(void)
         }
     }
 
-    TIM_ClearIntPending(LPC_TIM0, TIM_MR0_INT);
-}
-
-void TIMER1_IRQHandler(void)
-{
-    if (TIM_GetIntStatus(LPC_TIM1, TIM_MR1_INT) == SET)
-    {
-        actuators_clock();
-        g_counter++;
-    }
-
-    TIM_ClearIntPending(LPC_TIM1, TIM_MR1_INT);
+    TIM_ClearIntPending(LPC_TIM2, TIM_MR2_INT);
 }

@@ -92,6 +92,8 @@ uint32_t hardware_timestamp(void);
 uint8_t hardware_get_acceleration(void);
 
 uint16_t hardware_get_pot_value(uint8_t pot);
+
+void hardware_change_led_color(uint8_t item, uint8_t value[3]);
 // turn on/off coreboard
 void hardware_coreboard_power(uint8_t state);
 

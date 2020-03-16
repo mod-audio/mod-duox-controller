@@ -72,10 +72,10 @@ extern "C"
 
 // enable/disable brightness support
 // disabling the brightness saves RAM and program memory
-//#define LEDZ_BRIGHTNESS_SUPPORT
+#define LEDZ_BRIGHTNESS_SUPPORT
 
 // tick period in us
-#define LEDZ_TICK_PERIOD        LED_DISPL_INTERUPT_TIME
+#define LEDZ_TICK_PERIOD        LED_INTERUPT_TIME
 
 //always blink value
 #define LED_BLINK_INFINIT		-1
@@ -115,12 +115,13 @@ typedef enum ledz_color_t {
     LEDZ_ALL_COLORS = 0xFF,
 } ledz_color_t;
 
-
 /*
 ****************************************************************************************************
 *       FUNCTION PROTOTYPES
 ****************************************************************************************************
 */
+
+void ledz_set_color(uint8_t item, uint8_t value[3]);
 
 /**
  * @defgroup ledz_funcs LED Functions
@@ -307,7 +308,7 @@ void ledz_restore_state(ledz_t* led, uint8_t led_id);
 /**
  * @}
  */
-
+void set_ledz_trigger_by_color_id(ledz_t* led, uint8_t color_id, uint8_t state, uint16_t time_on, uint16_t time_off, int8_t amount_of_blinks);
 
 /*
 ****************************************************************************************************
