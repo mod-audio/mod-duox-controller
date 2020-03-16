@@ -240,6 +240,10 @@ void write_led_defaults()
             EEPROM_Write(LED_COLOR_EEMPROM_PAGE, (LED_COLOR_ADRESS_START + (i*3) + j), &write_buffer, MODE_8_BIT, 1);    
         }
     }
+
+    //write LED brightness
+    uint8_t led_brightness_write_buffer = DEFAULT_LED_BRIGHTNESS;
+    EEPROM_Write(0, LED_BRIGHTNESS_ADRESS, &led_brightness_write_buffer, MODE_8_BIT, 1);
 }
 
 void write_o_settings_defaults()
@@ -280,7 +284,7 @@ void check_eeprom_defaults(uint16_t current_version)
     	}
     }
     //detect downgrade, dont do anything
-    else if (current_version > EEPROM_CURRENT_VERSION)
+    else if ((current_version > EEPROM_CURRENT_VERSION) && (!FORCE_WRITE_EEPROM))
     {	
     	return;
     }
@@ -441,6 +445,9 @@ void hardware_setup(void)
 
     // default glcd brightness
     system_display_cb(NULL, MENU_EV_NONE);
+
+    // default led brightness
+    system_led_brightness_cb(NULL, MENU_EV_NONE);
 
     //set the display contrast
     uint8_t display_contrast = 0;

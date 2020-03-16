@@ -310,6 +310,10 @@ void ledz_restore_state(ledz_t* led, uint8_t led_id);
  */
 void set_ledz_trigger_by_color_id(ledz_t* led, uint8_t color_id, uint8_t state, uint16_t time_on, uint16_t time_off, int8_t amount_of_blinks);
 
+/**
+ * @}
+ */
+void ledz_set_brightness(uint8_t brightness);
 /*
 ****************************************************************************************************
 *       CONFIGURATION ERRORS

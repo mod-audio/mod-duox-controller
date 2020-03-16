@@ -105,7 +105,7 @@ int8_t g_exp_mode = -1;
 int8_t g_cv_out_mode = -1;
 int16_t g_display_contrast = -1; 
 int8_t g_page_mode = -1;
-
+int8_t g_led_brightness = -1;
 /*
 ************************************************************************************************************************
 *           LOCAL FUNCTION PROTOTYPES
@@ -1568,4 +1568,62 @@ void system_page_mode_cb(void *arg, int event)
     
     //this setting changes just 1 item
     if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);    
+}
+
+void system_led_brightness_cb(void *arg, int event)
+{
+    if (g_led_brightness == -1)
+    {
+        //read EEPROM
+        uint8_t read_buffer = 0;
+        EEPROM_Read(0, LED_BRIGHTNESS_ADRESS, &read_buffer, MODE_8_BIT, 1);
+        g_led_brightness = read_buffer;
+
+        //write to driver
+        ledz_set_brightness(g_led_brightness);
+    }
+
+    if (event == MENU_EV_ENTER)
+    {
+        if (g_led_brightness < 2) g_led_brightness++;
+        else g_led_brightness = 0;
+        
+        //also write to EEPROM
+        uint8_t write_buffer = g_led_brightness;
+        EEPROM_Write(0, LED_BRIGHTNESS_ADRESS, &write_buffer, MODE_8_BIT, 1);
+
+        //write to naveg.c
+        ledz_set_brightness(g_led_brightness);
+
+        //update the leds 
+        uint8_t j = 0;
+    	for (j = 0; j < LEDS_COUNT; j++)
+    	{
+    		ledz_restore_state(hardware_leds(j), j);
+    	}        
+    }
+
+    if (arg != NULL)
+    {
+        menu_item_t *item = arg;
+        
+        //get the right char to put on the screen
+		char channel_value[5];
+		switch (g_led_brightness)
+		{
+		    case 0:
+		            strcpy(channel_value, " Low");
+		        break;
+		    case 1:
+		            strcpy(channel_value, " Mid");
+		        break;
+		    case 2:
+		            strcpy(channel_value, "High");
+		        break;
+		}
+		add_chars_to_menu_name(item, channel_value);
+    }
+    
+    //this setting changes just 1 item
+    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);   
 }
