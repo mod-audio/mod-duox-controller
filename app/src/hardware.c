@@ -706,13 +706,13 @@ uint16_t hardware_get_pot_value(uint8_t pot)
 
 void hardware_change_led_color(uint8_t item, uint8_t value[3])
 {
-	uint8_t j=0;
-	uint8_t write_buffer = 0;
-	for (j=0; j<3; j++)
+    uint8_t j=0;
+    uint8_t write_buffer = 0;
+    for (j=0; j<3; j++)
     {
-    	write_buffer = value[j];
-    	EEPROM_Write(LED_COLOR_EEMPROM_PAGE, ((item*3) + j), &write_buffer, MODE_8_BIT, 1);    
-	}
+        write_buffer = value[j];
+        EEPROM_Write(LED_COLOR_EEMPROM_PAGE, ((item*3) + j), &write_buffer, MODE_8_BIT, 1);    
+    }
 }
 
 void hardware_coreboard_power(uint8_t state)

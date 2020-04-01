@@ -128,7 +128,7 @@ typedef struct LED_STATE_T {
 static ledz_t g_leds[LEDZ_MAX_INSTANCES];
 static unsigned int g_leds_available = LEDZ_MAX_INSTANCES;
 static led_state_t g_led_state[LEDZ_MAX_INSTANCES];
-uint8_t led_colors[MAX_COLOR_ID + 1][3] = {};
+static uint8_t led_colors[MAX_COLOR_ID + 1][3];
 float g_ledz_brightness = 1;
 /*
 ****************************************************************************************************
@@ -176,23 +176,27 @@ static inline void ledz_give(ledz_t *led)
 
 static inline ledz_color_t get_color_by_id(uint8_t color_pin_id)
 {
-    //red
-    if (color_pin_id == 0)
-    {
-        return LEDZ_RED;
+    switch(color_pin_id)
+    {   
+        //red
+        case 0:
+            return LEDZ_RED;
+        break;
+
+        //green
+        case 1:
+            return LEDZ_GREEN;
+        break;
+
+        //blue
+        case 2:
+            return LEDZ_BLUE;
+        break;
+
+        default:
+            return LEDZ_ALL_COLORS;
+        break;
     }
-    //green
-    else if (color_pin_id == 1)
-    {
-        return LEDZ_GREEN;
-    } 
-    //blue
-    else if (color_pin_id == 2)
-    {
-        return LEDZ_BLUE;
-    }
-    //should never reach here!
-    else return LEDZ_ALL_COLORS;
 }
 /*
 ****************************************************************************************************
