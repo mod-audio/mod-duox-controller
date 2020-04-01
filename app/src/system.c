@@ -1597,10 +1597,10 @@ void system_led_brightness_cb(void *arg, int event)
 
         //update the leds 
         uint8_t j = 0;
-    	for (j = 0; j < LEDS_COUNT; j++)
-    	{
-    		ledz_restore_state(hardware_leds(j), j);
-    	}        
+        for (j = 0; j < LEDS_COUNT; j++)
+        {
+            ledz_restore_state(hardware_leds(j), j);
+        }        
     }
 
     if (arg != NULL)
@@ -1608,20 +1608,20 @@ void system_led_brightness_cb(void *arg, int event)
         menu_item_t *item = arg;
         
         //get the right char to put on the screen
-		char channel_value[5];
-		switch (g_led_brightness)
-		{
-		    case 0:
-		            strcpy(channel_value, " Low");
-		        break;
-		    case 1:
-		            strcpy(channel_value, " Mid");
-		        break;
-		    case 2:
-		            strcpy(channel_value, "High");
-		        break;
-		}
-		add_chars_to_menu_name(item, channel_value);
+        char channel_value[5];
+        switch (g_led_brightness)
+        {
+            case 0:
+                    strcpy(channel_value, " Low");
+                break;
+            case 1:
+                    strcpy(channel_value, " Mid");
+                break;
+            case 2:
+                    strcpy(channel_value, "High");
+                break;
+        }
+        add_chars_to_menu_name(item, channel_value);
     }
     
     //this setting changes just 1 item
