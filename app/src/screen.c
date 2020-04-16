@@ -111,14 +111,14 @@ void screen_pot(uint8_t pot_id, control_t *control)
     {
         case 0:
         case 4:
-            knob.x = 29;
+            knob.x = 28;
             knob.y = 32;
             knob.orientation = 0;
             glcd_rect_fill(display, 0, knob.y -7, 65, 16, GLCD_WHITE);
             break;
         case 1:
         case 5:
-            knob.x = 29;
+            knob.x = 28;
             knob.y = 47;
             knob.orientation = 0;
             glcd_rect_fill(display, 0, knob.y -6, 65, 14, GLCD_WHITE);
@@ -140,9 +140,6 @@ void screen_pot(uint8_t pot_id, control_t *control)
         default:
             // not handled, trigger no assignment
             control = NULL;
-            knob.x = 0;
-            knob.y = 0;
-            knob.orientation = 0;
             break;
     }
 
@@ -182,6 +179,46 @@ void screen_pot(uint8_t pot_id, control_t *control)
         }
 
         widget_textbox(display, &blank_title);
+    }
+    else if ((control->properties == CONTROL_PROP_TOGGLED) || (control->properties == CONTROL_PROP_TOGGLED))
+    {
+        //convert title
+        char title_str_bfr[8] = {0};
+        strncpy(title_str_bfr, control->label, 7);
+        title_str_bfr[7] = '\0';
+
+        //title:
+        textbox_t title;
+        title.color = GLCD_BLACK;
+        title.mode = TEXT_SINGLE_LINE;
+        title.font = SMfont;
+        if (knob.orientation)
+            title.x = (knob.x - 5 - (strlen(title_str_bfr))*4);
+        else
+            title.x = (knob.x + 7);
+        title.y = knob.y - 2;
+        title.height = 0;
+        title.width = 0;
+        title.top_margin = 0;
+        title.bottom_margin = 0;
+        title.left_margin = 0;
+        title.right_margin = 0;
+        title.text = title_str_bfr;
+        title.align = ALIGN_NONE_NONE;
+        widget_textbox(display, &title);
+
+        //toggle
+        toggle_t toggle;
+        if (knob.orientation)
+        toggle.x = knob.x - 4;
+        else 
+           toggle.x = knob.x - 26;
+        toggle.y = knob.y - 5;
+        toggle.width = 31;
+        toggle.height = 11;
+        toggle.color = GLCD_BLACK;
+        toggle.value = control->value;
+        widget_toggle(display, &toggle);
     }
     else
     {
@@ -674,12 +711,24 @@ void screen_encoder(uint8_t display_id, control_t *control)
 
         FREE(labels_list);
     }
+    else if (control->properties == CONTROL_PROP_TOGGLED ||
+         control->properties == CONTROL_PROP_BYPASS)
+    {
+        toggle_t toggle;
+        toggle.x = 0;
+        toggle.y = 10;
+        toggle.width = DISPLAY_WIDTH;
+        toggle.height = 13;
+        toggle.color = GLCD_BLACK;
+        toggle.value = control->value;
+        toggle.label = control->label;
+        widget_toggle_encoder(display, &toggle);
+    }
     else
     {
         return null_screen_encoded(display, display_id);
     }
 
-    //glcd_hline(display, 0, 7, DISPLAY_WIDTH, GLCD_BLACK);
     glcd_hline(display, 0, 24, DISPLAY_WIDTH, GLCD_BLACK);
 }
 

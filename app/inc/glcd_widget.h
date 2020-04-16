@@ -73,6 +73,14 @@ typedef struct LISTBOX_T {
     const char *name;
 } listbox_t;
 
+typedef struct TOGGLE_T {
+    uint8_t x, y;
+    uint8_t color;
+    uint8_t width, height;
+    int32_t value;
+    const char *label;
+} toggle_t;
+
 typedef struct KNOB_T {
     uint8_t x, y;
     uint8_t color;
@@ -134,6 +142,8 @@ void widget_textbox(glcd_t *display, textbox_t *textbox);
 void widget_listbox(glcd_t *display, listbox_t *listbox);
 void widget_listbox3(glcd_t *display, listbox_t *listbox);
 void widget_peakmeter(glcd_t *display, uint8_t pkm_id, peakmeter_t *pkm);
+void widget_toggle_encoder(glcd_t *display, toggle_t *toggle);
+void widget_toggle(glcd_t *display, toggle_t *toggle); 
 void widget_tuner(glcd_t *display, tuner_t *tuner);
 void widget_popup(glcd_t *display, popup_t *popup);
 void widget_knob(glcd_t *display, knob_t *knob);

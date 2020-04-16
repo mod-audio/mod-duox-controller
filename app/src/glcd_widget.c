@@ -416,6 +416,117 @@ void widget_bar_indicator(glcd_t *display, bar_t *bar)
     glcd_rect_fill(display, (bar->x+1), (bar->y+1), bar_possistion, (bar->height - 2), GLCD_BLACK);
 }
 
+void widget_toggle_encoder(glcd_t *display, toggle_t *toggle) 
+{
+    uint8_t TITLE_LENGTH = 20;
+
+    glcd_rect_fill(display, toggle->x, toggle->y, toggle->width, toggle->height, ~toggle->color);
+
+    //set maximum name size and shorten name in needed
+    uint8_t name_size = (strlen(toggle->label)* 4);
+    if (strlen(toggle->label) > TITLE_LENGTH) 
+    {
+        name_size = TITLE_LENGTH * 4;
+        char short_name[22]= {};
+        memcpy(short_name, toggle->label, (TITLE_LENGTH));
+        short_name[21] = '\0';
+        //draws the name
+        glcd_text(display, toggle->x , (toggle->y + 4),short_name , SMfont, toggle->color);
+    }
+    else
+    {
+        glcd_text(display, toggle->x, (toggle->y + 4),toggle->label , SMfont, toggle->color);
+    }
+
+    //draws the indicator
+    glcd_rect_fill(display, (toggle->x + name_size  + 6 )  , (toggle->y + 2 ),  1, 1, toggle->color);
+    glcd_rect_fill(display, (toggle->x + name_size  + 6 )  , (toggle->y + 10),  1, 1, toggle->color);
+    glcd_rect_fill(display, (toggle->x + name_size  + 5 )  , (toggle->y + 2 ),  1, 9, toggle->color);
+    glcd_rect_fill(display, (toggle->x + name_size  + 2 )  , (toggle->y + 6 ),  4, 1, toggle->color);
+
+    //indicator width
+    uint8_t indicator_width = 8;
+
+    textbox_t label;
+    label.color = GLCD_BLACK;
+    label.mode = TEXT_SINGLE_LINE;
+    label.font = SMfont;
+    label.height = 0;
+    label.width = 0;
+    label.top_margin = 0;
+    label.bottom_margin = 0;
+    label.left_margin = 0;
+    label.right_margin = 0;
+    label.align = ALIGN_NONE_NONE;
+    label.y = toggle->y + 4;
+
+    //draw the square
+    uint8_t toggle_graphic_X = toggle->x + name_size + indicator_width;
+    uint8_t toggle_graphic_width = DISPLAY_WIDTH - toggle_graphic_X -1;
+    glcd_rect(display, toggle_graphic_X, toggle->y, toggle_graphic_width, toggle->height, GLCD_BLACK);
+
+    //draw the toggle
+    if (toggle->value == 1)
+    {
+        label.text = "ON";
+        label.x = toggle_graphic_X + (toggle_graphic_width * 0.75) - 4;
+        widget_textbox(display, &label);
+
+        //color in the position area
+        glcd_rect_invert(display, toggle_graphic_X + (toggle_graphic_width/2), (toggle->y+2), (toggle_graphic_width/2) - 1, (toggle->height - 4));
+    }
+    else 
+    {
+        label.text = "OFF";
+        label.x = toggle_graphic_X + (toggle_graphic_width * 0.25) - 4;
+        widget_textbox(display, &label);
+
+        //color in the position area
+        glcd_rect_invert(display, toggle_graphic_X + 2, (toggle->y+2), (toggle_graphic_width/2) - 2, (toggle->height - 4));
+    }
+}
+
+void widget_toggle(glcd_t *display, toggle_t *toggle) 
+{
+    glcd_rect_fill(display, toggle->x, toggle->y, toggle->width, toggle->height, ~toggle->color);
+
+    textbox_t label;
+    label.color = GLCD_BLACK;
+    label.mode = TEXT_SINGLE_LINE;
+    label.font = SMfont;
+    label.height = 0;
+    label.width = 0;
+    label.top_margin = 0;
+    label.bottom_margin = 0;
+    label.left_margin = 0;
+    label.right_margin = 0;
+    label.align = ALIGN_NONE_NONE;
+    label.y = toggle->y + 3;
+
+    //draw the square;
+    glcd_rect(display, toggle->x, toggle->y, toggle->width, toggle->height, GLCD_BLACK);
+
+    //draw the toggle
+    if (toggle->value == 1)
+    {
+        label.text = "ON";
+        label.x = toggle->x + ( toggle->width * 0.75) - 4;
+        widget_textbox(display, &label);
+
+        //color in the position area
+        glcd_rect_invert(display, toggle->x + (toggle->width/2), (toggle->y+2), (toggle->width/2) - 1, (toggle->height - 4));
+    }
+    else 
+    {
+        label.text = "OFF";
+        label.x = toggle->x + (toggle->width * 0.25) - 4;
+        widget_textbox(display, &label);
+
+        //color in the position area
+        glcd_rect_invert(display, toggle->x+2, (toggle->y+2), (toggle->width/2) - 2, (toggle->height - 4));
+    }
+}
+
 void widget_knob(glcd_t *display, knob_t *knob)
 {
     float NewValue;

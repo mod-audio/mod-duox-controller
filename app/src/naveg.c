@@ -439,14 +439,21 @@ static void display_pot_add(control_t *control)
     }
 
     if (g_lock_potentiometers)
-    {    
-        if ((tmp_value > tmp_control_value ? tmp_value - tmp_control_value : tmp_control_value - tmp_value) < POT_DIFF_THRESHOLD)
+    {   
+        if  ((g_pots[id]->properties == CONTROL_PROP_TOGGLED) || (g_pots[id]->properties == CONTROL_PROP_BYPASS))
         {
-            g_pots[id]->scroll_dir = 0;
+            g_pots[id]->scroll_dir = 1;
         }
         else
         {
-            g_pots[id]->scroll_dir = 1;
+            if ((tmp_value > tmp_control_value ? tmp_value - tmp_control_value : tmp_control_value - tmp_value) < POT_DIFF_THRESHOLD)
+            {
+                g_pots[id]->scroll_dir = 0;
+            }
+            else
+            {
+                g_pots[id]->scroll_dir = 1;
+            }
         }
     }
     else g_pots[id]->scroll_dir = 0;
@@ -1104,11 +1111,27 @@ static void control_set(uint8_t id, control_t *control)
 
         case CONTROL_PROP_TOGGLED:
         case CONTROL_PROP_BYPASS:
-            if (control->value > control->minimum) control->value = control->minimum;
-            else control->value = control->maximum;
+            if (control->hw_id < ENCODERS_COUNT)
+            {
+                // update the screen
+                if (!display_has_tool_enabled(id))
+                    screen_encoder(id, control);
+            }
+            else if ( (ENCODERS_COUNT + FOOTSWITCHES_ACTUATOR_COUNT <= control->hw_id) && (control->hw_id < TOTAL_ACTUATORS))
+            {
+                if (!display_has_tool_enabled(get_display_by_id(id, POTENTIOMETER)))
+                {
+                    screen_pot(id, control);
+                }
+            }
+            else
+            {
+                if (control->value > control->minimum) control->value = control->minimum;
+                else control->value = control->maximum;
 
-            // to update the footer and screen
-            foot_control_add(control);
+                // to update the footer and screen
+                foot_control_add(control);
+            }
             break;
 
         case CONTROL_PROP_TRIGGER:
@@ -2160,6 +2183,13 @@ void naveg_inc_control(uint8_t display)
     		    return;	
     	}
     }
+    else if ((control->properties == CONTROL_PROP_TOGGLED) || (control->properties == CONTROL_PROP_BYPASS) )
+    {
+        if (control->value == 1)
+            return;
+        else 
+            control->value = 1;
+    }
     else
     {
         // increments the step
@@ -2225,6 +2255,13 @@ void naveg_dec_control(uint8_t display)
             else
                 return;
     	}
+    }
+    else if ((control->properties == CONTROL_PROP_TOGGLED) || (control->properties == CONTROL_PROP_BYPASS) )
+    {
+        if (control->value == 0)
+            return;
+        else 
+            control->value = 0;
     }
     else
     {
@@ -2471,14 +2508,21 @@ void naveg_set_control(uint8_t hw_id, float value)
             }
 
             if (g_lock_potentiometers)
-            {
-                if ((tmp_value > tmp_control_value ? tmp_value - tmp_control_value : tmp_control_value - tmp_value) < POT_DIFF_THRESHOLD)
+            {   
+                if  ((g_pots[id]->properties == CONTROL_PROP_TOGGLED) || (g_pots[id]->properties == CONTROL_PROP_BYPASS))
                 {
-                    g_pots[id]->scroll_dir = 0;
+                    g_pots[id]->scroll_dir = 1;
                 }
                 else
                 {
-                    g_pots[id]->scroll_dir = 1;
+                    if ((tmp_value > tmp_control_value ? tmp_value - tmp_control_value : tmp_control_value - tmp_value) < POT_DIFF_THRESHOLD)
+                    {
+                        g_pots[id]->scroll_dir = 0;
+                    }
+                    else
+                    {
+                        g_pots[id]->scroll_dir = 1;
+                    }
                 }
             }
             else g_pots[id]->scroll_dir = 0;
@@ -2545,15 +2589,31 @@ void naveg_pot_change(uint8_t pot)
     //if the actuator is still locked
     if ((g_pots[pot]->scroll_dir == 1) && !g_self_test_mode)
     {
-    	if ((tmp_value > tmp_control_value ? tmp_value - tmp_control_value : tmp_control_value - tmp_value) < POT_DIFF_THRESHOLD)
-    	{
-    	    g_pots[pot]->scroll_dir = 0;
-    	}
-    	else 
-    	{
-    		g_pots[pot]->scroll_dir = 1;
-    		return;
-    	}
+        if  ((g_pots[pot]->properties == CONTROL_PROP_TOGGLED) || (g_pots[pot]->properties == CONTROL_PROP_BYPASS))
+        {
+            uint16_t half_way = (g_pot_calibrations[1][pot] - g_pot_calibrations[0][pot]) /2;
+            if ((tmp_value >= (half_way - 100)) && (tmp_value <= (half_way + 100)))
+            {
+                g_pots[pot]->scroll_dir = 0;
+            }
+            else
+            {
+                g_pots[pot]->scroll_dir = 1;
+                return; 
+            }
+        }
+        else
+        {
+            if ((tmp_value > tmp_control_value ? tmp_value - tmp_control_value : tmp_control_value - tmp_value) < POT_DIFF_THRESHOLD)
+            {
+                g_pots[pot]->scroll_dir = 0;
+            }
+            else
+            {
+                g_pots[pot]->scroll_dir = 1;
+                return;
+            }
+        }
     }
 
     if (g_pots[pot]->properties == CONTROL_PROP_LINEAR)
@@ -2564,6 +2624,19 @@ void naveg_pot_change(uint8_t pot)
     {
     	float p_step = ((float) tmp_value) / ((float) (g_pot_calibrations[1][pot] - 1));
     	g_pots[pot]->value = g_pots[pot]->minimum * pow(g_pots[pot]->maximum / g_pots[pot]->minimum, p_step);
+    }
+    //toggles
+    else if ((g_pots[pot]->properties == CONTROL_PROP_TOGGLED) || (g_pots[pot]->properties == CONTROL_PROP_BYPASS))
+    {
+        uint16_t half_way = (g_pot_calibrations[1][pot] - g_pot_calibrations[0][pot]) /2;
+        if (tmp_value >= half_way)
+        {
+            g_pots[pot]->value = 1;
+        } 
+        else 
+        {
+            g_pots[pot]->value = 0;
+        }
     }
     //default, liniar
     else 
