@@ -180,7 +180,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
 
         widget_textbox(display, &blank_title);
     }
-    else if ((control->properties == CONTROL_PROP_TOGGLED) || (control->properties == CONTROL_PROP_TOGGLED))
+    else if ((control->properties == CONTROL_PROP_TOGGLED) || (control->properties == CONTROL_PROP_BYPASS))
     {
         //convert title
         char title_str_bfr[8] = {0};
@@ -217,7 +217,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         toggle.width = 31;
         toggle.height = 11;
         toggle.color = GLCD_BLACK;
-        toggle.value = control->value;
+        toggle.value = (control->properties == CONTROL_PROP_TOGGLED)?control->value:!control->value;;
         widget_toggle(display, &toggle);
     }
     else
@@ -720,7 +720,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
         toggle.width = DISPLAY_WIDTH;
         toggle.height = 13;
         toggle.color = GLCD_BLACK;
-        toggle.value = control->value;
+        toggle.value = (control->properties == CONTROL_PROP_TOGGLED)?control->value:!control->value;
         toggle.label = control->label;
         widget_toggle_encoder(display, &toggle);
     }

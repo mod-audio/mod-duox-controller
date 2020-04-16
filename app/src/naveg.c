@@ -2183,12 +2183,19 @@ void naveg_inc_control(uint8_t display)
     		    return;	
     	}
     }
-    else if ((control->properties == CONTROL_PROP_TOGGLED) || (control->properties == CONTROL_PROP_BYPASS) )
+    else if (control->properties == CONTROL_PROP_TOGGLED)
     {
         if (control->value == 1)
             return;
         else 
             control->value = 1;
+    }
+    else if (control->properties == CONTROL_PROP_BYPASS)
+    {
+        if (control->value == 0)
+            return;
+        else 
+            control->value = 0;
     }
     else
     {
@@ -2256,12 +2263,19 @@ void naveg_dec_control(uint8_t display)
                 return;
     	}
     }
-    else if ((control->properties == CONTROL_PROP_TOGGLED) || (control->properties == CONTROL_PROP_BYPASS) )
+    else if (control->properties == CONTROL_PROP_TOGGLED)
     {
         if (control->value == 0)
             return;
         else 
             control->value = 0;
+    }
+    else if (control->properties == CONTROL_PROP_BYPASS)
+    {
+        if (control->value == 1)
+            return;
+        else 
+            control->value = 1;
     }
     else
     {
@@ -2631,11 +2645,11 @@ void naveg_pot_change(uint8_t pot)
         uint16_t half_way = (g_pot_calibrations[1][pot] - g_pot_calibrations[0][pot]) /2;
         if (tmp_value >= half_way)
         {
-            g_pots[pot]->value = 1;
+            g_pots[pot]->value = (g_pots[pot]->properties == CONTROL_PROP_TOGGLED)?1:0;
         } 
         else 
         {
-            g_pots[pot]->value = 0;
+            g_pots[pot]->value = (g_pots[pot]->properties == CONTROL_PROP_TOGGLED)?0:1;
         }
     }
     //default, liniar
