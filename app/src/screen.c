@@ -150,7 +150,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
 
         blank_title.color = GLCD_BLACK;
         blank_title.mode = TEXT_SINGLE_LINE;
-        blank_title.font = SMfont;
+        blank_title.font = Terminal3x5;
         blank_title.height = 0;
         blank_title.width = 0;
         blank_title.top_margin = 0;
@@ -191,7 +191,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         textbox_t title;
         title.color = GLCD_BLACK;
         title.mode = TEXT_SINGLE_LINE;
-        title.font = SMfont;
+        title.font = Terminal3x5;
         if (knob.orientation)
             title.x = (knob.x - 5 - (strlen(title_str_bfr))*4);
         else
@@ -355,7 +355,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         //title:
         title.color = GLCD_BLACK;
         title.mode = TEXT_SINGLE_LINE;
-        title.font = SMfont;
+        title.font = Terminal3x5;
         if (knob.orientation)
             title.x = (knob.x - 5 - (strlen(title_str_bfr))*4);
         else
@@ -381,7 +381,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
             {
                 unit.color = GLCD_BLACK;
                 unit.mode = TEXT_SINGLE_LINE;
-                unit.font = SMfont;
+                unit.font = Terminal3x5;
                 if (knob.orientation)
                     unit.x =(knob.x + 8);
                 else
@@ -418,7 +418,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         //value
         value.color = GLCD_BLACK;
         value.mode = TEXT_SINGLE_LINE;
-        value.font = SMfont;
+        value.font = Terminal3x5;
         if (knob.orientation)
             value.x = (knob.x + 8);
         else
@@ -461,7 +461,7 @@ static void null_screen_encoded(glcd_t *display, uint8_t display_id)
     textbox_t blank_title;
     blank_title.color = GLCD_BLACK;
     blank_title.mode = TEXT_SINGLE_LINE;
-    blank_title.font = SMfont;
+    blank_title.font = Terminal3x5;
     blank_title.height = 0;
     blank_title.width = 0;
     blank_title.top_margin = 0;
@@ -565,7 +565,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
         //title:
         title.color = GLCD_BLACK;
         title.mode = TEXT_SINGLE_LINE;
-        title.font = SMfont;
+        title.font = Terminal3x5;
         title.x = 3;
         title.y = 10;
         title.height = 0;
@@ -597,7 +597,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
         //value
         value.color = GLCD_BLACK;
         value.mode = TEXT_SINGLE_LINE;
-        value.font = SMfont;
+        value.font = Terminal3x5;
         value.x = 100;
         value.y = 10;
         value.height = 0;
@@ -631,7 +631,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
         textbox_t title;
         title.color = GLCD_BLACK;
         title.mode = TEXT_SINGLE_LINE;
-        title.font = SMfont;
+        title.font = Terminal3x5;
         title.height = 0;
         title.width = 0;
         title.top_margin = 0;
@@ -697,7 +697,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
         list.y = 10;
         list.height = 13;
         list.color = GLCD_BLACK;
-        list.font = SMfont;
+        list.font = Terminal3x5;
         list.selected = control->step;
         list.count = scalepoint_count_local;
         list.list = labels_list;
@@ -781,7 +781,7 @@ void screen_footer(uint8_t id, const char *name, const char *value, int16_t prop
         textbox_t title;
         title.color = GLCD_BLACK;
         title.mode = TEXT_SINGLE_LINE;
-        title.font = SMfont;
+        title.font = Terminal3x5;
         title.top_margin = 0;
         title.bottom_margin = 1;
         title.left_margin = 0;
@@ -804,7 +804,7 @@ void screen_footer(uint8_t id, const char *name, const char *value, int16_t prop
     	textbox_t footer;
     	footer.color = GLCD_BLACK;
     	footer.mode = TEXT_SINGLE_LINE;
-    	footer.font = SMfont;
+    	footer.font = Terminal3x5;
     	footer.height = 0;
     	footer.top_margin = 0;
     	footer.bottom_margin = 1;
@@ -861,7 +861,7 @@ void screen_footer(uint8_t id, const char *name, const char *value, int16_t prop
         textbox_t footer;
         footer.color = GLCD_BLACK;
         footer.mode = TEXT_SINGLE_LINE;
-        footer.font = SMfont;
+        footer.font = Terminal3x5;
         footer.height = 0;
         footer.top_margin = 0;
         footer.bottom_margin = 1;
@@ -930,7 +930,7 @@ void screen_top_info(const void *data, uint8_t update)
     textbox_t title;
     title.color = GLCD_BLACK;
     title.mode = TEXT_SINGLE_LINE;
-    title.font = SMfont;
+    title.font = Terminal3x5;
     title.top_margin = 1;
     title.bottom_margin = 0;
     title.left_margin = 0;
@@ -997,7 +997,7 @@ void screen_bp_list(const char *title, bp_list_t *list)
     // draws the title
     title_box.color = GLCD_BLACK;
     title_box.mode = TEXT_SINGLE_LINE;
-    title_box.font = SMfont;
+    title_box.font = Terminal3x5;
     title_box.top_margin = 0;
     title_box.bottom_margin = 0;
     title_box.left_margin = 0;
@@ -1024,7 +1024,7 @@ void screen_bp_list(const char *title, bp_list_t *list)
         list_box.selected = list->selected - list->page_min;
         list_box.count = count;
         list_box.list = list->names;
-        list_box.font = SMfont;
+        list_box.font = Terminal3x5;
         list_box.line_space = 2;
         list_box.line_top_margin = 1;
         list_box.line_bottom_margin = 1;
@@ -1081,7 +1081,7 @@ void screen_system_menu(menu_item_t *item)
     textbox_t title_box;
     title_box.color = GLCD_BLACK;
     title_box.mode = TEXT_SINGLE_LINE;
-    title_box.font = SMfont;
+    title_box.font = Terminal3x5;
     title_box.top_margin = 0;
     title_box.bottom_margin = 0;
     title_box.left_margin = 0;
@@ -1117,7 +1117,7 @@ void screen_system_menu(menu_item_t *item)
     list.width = 128;
     list.height = 53;
     list.color = GLCD_BLACK;
-    list.font = SMfont;
+    list.font = Terminal3x5;
     list.line_space = 2;
     list.line_top_margin = 1;
     list.line_bottom_margin = 1;
@@ -1129,7 +1129,7 @@ void screen_system_menu(menu_item_t *item)
     popup.y = 0;
     popup.width = DISPLAY_WIDTH;
     popup.height = DISPLAY_HEIGHT;
-    popup.font = SMfont;
+    popup.font = Terminal3x5;
     switch (item->desc->type)
     {
         case MENU_LIST:
@@ -1239,7 +1239,7 @@ void screen_master_vol(int8_t volume_val)
     textbox_t title;
     title.color = GLCD_BLACK;
     title.mode = TEXT_SINGLE_LINE;
-    title.font = SMfont;
+    title.font = Terminal3x5;
     title.top_margin = 1;
     title.bottom_margin = 0;
     title.left_margin = 1;
