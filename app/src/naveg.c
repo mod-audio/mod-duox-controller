@@ -555,6 +555,22 @@ static void foot_control_add(control_t *control)
                          (control->value <= 0 ? TOGGLED_OFF_FOOTER_TEXT : TOGGLED_ON_FOOTER_TEXT), control->properties);
             break;
 
+        case CONTROL_PROP_MOMENTARY_SW:
+        {
+            if ((control->scroll_dir == 0)||(control->scroll_dir == 2))
+                ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR, 1, 0, 0, 0);
+            else
+                ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TRIGGER_PRESSED_COLOR, 1, 0, 0, 0);
+        
+            // if is in tool mode break
+            if (display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT)))
+                break;
+
+            // updates the footer (a getto fix here, the screen.c file did not regognize the NULL pointer so it did not allign the text properly, TODO fix this)
+            screen_footer(control->hw_id - ENCODERS_COUNT, control->label, BYPASS_ON_FOOTER_TEXT, control->properties);
+            break;
+        }
+
         // trigger specification: http://lv2plug.in/ns/ext/port-props/#trigger
         case CONTROL_PROP_TRIGGER:
             // updates the led
@@ -1141,6 +1157,13 @@ static void control_set(uint8_t id, control_t *control)
 
             if (!control->scroll_dir) return;
             
+            break;
+
+        case CONTROL_PROP_MOMENTARY_SW:
+            control->value = !control->value;
+            // to update the footer and screen
+            foot_control_add(control);
+
             break;
 
         case CONTROL_PROP_TAP_TEMPO:
@@ -2362,6 +2385,10 @@ void naveg_set_control(uint8_t hw_id, float value)
                              (control->value <= 0 ? TOGGLED_OFF_FOOTER_TEXT : TOGGLED_ON_FOOTER_TEXT), control->properties);
                 break;
 
+            //not implemented, not sure if ever needed
+            case CONTROL_PROP_MOMENTARY_SW:
+            break;
+
             // trigger specification: http://lv2plug.in/ns/ext/port-props/#trigger
             case CONTROL_PROP_TRIGGER:
                 // updates the led
@@ -2688,6 +2715,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 //check if we use the release action for this actuator
                 switch(g_foots[foot]->properties)
                 {
+                    case CONTROL_PROP_MOMENTARY_SW:
                     case CONTROL_PROP_TRIGGER:
                         ledz_set_state(hardware_leds(foot), foot, TRIGGER_COLOR, 1, 0, 0, 0); //TRIGGER_COLOR
                     break;
@@ -2703,6 +2731,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 g_foots[foot]->scroll_dir = pressed;
 
                 //we dont actually preform an action here
+                if (g_foots[foot]->properties != CONTROL_PROP_MOMENTARY_SW)
                 return;
             }
 

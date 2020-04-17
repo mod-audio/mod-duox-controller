@@ -217,7 +217,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         toggle.width = 31;
         toggle.height = 11;
         toggle.color = GLCD_BLACK;
-        toggle.value = (control->properties == CONTROL_PROP_TOGGLED)?control->value:!control->value;;
+        toggle.value = (control->properties == CONTROL_PROP_TOGGLED)?control->value:!control->value;
         widget_toggle(display, &toggle);
     }
     else
@@ -797,7 +797,7 @@ void screen_footer(uint8_t id, const char *name, const char *value, int16_t prop
     }
 
     ///checks if its toggle/trigger or a value
-    else if ((property & CONTROL_PROP_TOGGLED) || (property & CONTROL_PROP_BYPASS) || (property & CONTROL_PROP_TRIGGER))
+    else if ((property & CONTROL_PROP_TOGGLED) || (property & CONTROL_PROP_BYPASS) || (property & CONTROL_PROP_TRIGGER) || (property & CONTROL_PROP_MOMENTARY_SW))
     {
     	// draws the name field
     	char *title_str_bfr = (char *) MALLOC(16 * sizeof(char));
