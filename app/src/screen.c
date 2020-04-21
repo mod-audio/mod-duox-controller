@@ -271,31 +271,17 @@ void screen_pot(uint8_t pot_id, control_t *control)
         {
             if (control->value > -99.9)
             {
-                //not for ints
-                if (control->properties == CONTROL_PROP_INTEGER)
-                {
-                    int_to_str(control->value, value_str, sizeof(value_str), 0);
-                }
-                else
-                {
-                    float_to_str((control->value), value_str, sizeof(value_str), 6);
-                }
-            }
-            else if (control->value < -9999.9)
-            {
-                float_to_str((control->value/1000), value_str, sizeof(value_str), 1);
-                strcat(value_str, "K");
+                float_to_str((control->value), value_str, sizeof(value_str), 1);
             }
             else
             {
-        		if (control->value < -999.9)
-        		{
-					int_to_str(control->value, value_str, sizeof(value_str), 0);
-        		}
-        		else
-        		{
-            		float_to_str((control->value), value_str, sizeof(value_str), 1);
-        		}
+                if (control->value < -9999.9)
+                {
+                    int_to_str(control->value/1000, value_str, sizeof(value_str), 0);
+                    strcat(value_str, "K");
+                }
+            	int_to_str(control->value, value_str, sizeof(value_str), 0);
+
             }
         }
         //for values between 0 and 10 display 2 decimals
