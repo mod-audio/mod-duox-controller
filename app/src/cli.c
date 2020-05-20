@@ -189,7 +189,7 @@ static void serial_cb(serial_t *serial)
             }
         }
     }
-    else if (g_cli.waiting_response || g_cli.status == LOGGED_ON_RESTORE)
+    else if (g_cli.waiting_response || g_cli.status == LOGGED_ON_RESTORE || g_cli.status == LOGGED_ON_MASKROM)
     {
         process_response(serial);
     }
@@ -308,7 +308,23 @@ void cli_process(void)
 
                     // boot restore
                     cli_command("run boot_restore", CLI_RETRIEVE_RESPONSE);
+
+                    write_msg("starting restore mode\nplease wait");
                 }
+
+                if (g_cli.status == LOGGED_ON_MASKROM)
+                {
+                    // stop auto boot
+                    cli_command(NULL, CLI_RETRIEVE_RESPONSE);
+
+                    //TODO CHECK IF THESE ARE THE FINAL COMMANDS
+
+                    // boot maskrom
+                    cli_command("run boot_maskrom", CLI_RETRIEVE_RESPONSE);
+
+                    write_msg("starting maskrom mode\nplease wait");
+                }
+
                 break;
 
             case LOGIN:
@@ -329,8 +345,8 @@ void cli_process(void)
         g_cli.boot_step++;
     }
 
-    // restore mode
-    else if (g_cli.status == LOGGED_ON_RESTORE)
+    // restore and maskrom mode
+    else if (g_cli.status == LOGGED_ON_RESTORE || g_cli.status == LOGGED_ON_MASKROM)
     {
         char *msg = &g_cli.received[4];
         if (strncmp(g_cli.received, "hmi:", 4) == 0)
@@ -428,9 +444,6 @@ uint8_t cli_restore(uint8_t action)
             naveg_remove_control(j);
         }
 
-        // disable system menu
-        //naveg_toggle_tool(DISPLAY_TOOL_SYSTEM, DISPLAY_TOOL_SYSTEM);
-
         // clear screens
         uint8_t i;
         for (i = 0; i < SLOTS_COUNT; i++)
@@ -449,17 +462,28 @@ uint8_t cli_restore(uint8_t action)
     }
     else if (action == RESTORE_CHECK_BOOT)
     {
-        button_t *foot = (button_t *) hardware_actuators(FOOTSWITCH0);
+        button_t *foot_restore = (button_t *) hardware_actuators(FOOTSWITCH0);
+        button_t *foot_maskrom = (button_t *) hardware_actuators(FOOTSWITCH3);
         encoder_t *knob = (encoder_t *) hardware_actuators(ENCODER0);
 
-        // check if first footswitch and first encoder is pressed down
-        if (BUTTON_PRESSED(actuator_get_status(foot)) &&
+        // check if first footswitch and first encoder is pressed down if so enter restore mode
+        if (BUTTON_PRESSED(actuator_get_status(foot_restore)) &&
             BUTTON_PRESSED(actuator_get_status(knob)))
         {
             // force entering on restore mode using debug
             g_cli.boot_step = 0;
             g_cli.debug = 1;
             g_cli.status = LOGGED_ON_RESTORE;
+        }
+
+        // check if first footswitch and first encoder is pressed down if so enter maskrom mode
+        if (BUTTON_PRESSED(actuator_get_status(foot_maskrom)) &&
+            BUTTON_PRESSED(actuator_get_status(knob)))
+        {
+            // force entering on restore mode using debug
+            g_cli.boot_step = 0;
+            g_cli.debug = 1;
+            g_cli.status = LOGGED_ON_MASKROM;
         }
     }
 
