@@ -317,12 +317,10 @@ void cli_process(void)
                     // stop auto boot
                     cli_command(NULL, CLI_RETRIEVE_RESPONSE);
 
-                    //TODO CHECK IF THESE ARE THE FINAL COMMANDS
-
                     // boot maskrom
                     cli_command("run boot_maskrom", CLI_RETRIEVE_RESPONSE);
 
-                    write_msg("starting maskrom mode\nplease wait");
+                    write_msg("maskrom mode active");
                 }
 
                 break;
@@ -463,12 +461,14 @@ uint8_t cli_restore(uint8_t action)
     else if (action == RESTORE_CHECK_BOOT)
     {
         button_t *foot_restore = (button_t *) hardware_actuators(FOOTSWITCH0);
+        encoder_t *knob_restore = (encoder_t *) hardware_actuators(ENCODER0);
+
         button_t *foot_maskrom = (button_t *) hardware_actuators(FOOTSWITCH3);
-        encoder_t *knob = (encoder_t *) hardware_actuators(ENCODER0);
+        encoder_t *knob_maskrom = (encoder_t *) hardware_actuators(ENCODER1);
 
         // check if first footswitch and first encoder is pressed down if so enter restore mode
         if (BUTTON_PRESSED(actuator_get_status(foot_restore)) &&
-            BUTTON_PRESSED(actuator_get_status(knob)))
+            BUTTON_PRESSED(actuator_get_status(knob_restore)))
         {
             // force entering on restore mode using debug
             g_cli.boot_step = 0;
@@ -478,7 +478,7 @@ uint8_t cli_restore(uint8_t action)
 
         // check if first footswitch and first encoder is pressed down if so enter maskrom mode
         if (BUTTON_PRESSED(actuator_get_status(foot_maskrom)) &&
-            BUTTON_PRESSED(actuator_get_status(knob)))
+            BUTTON_PRESSED(actuator_get_status(knob_maskrom)))
         {
             // force entering on restore mode using debug
             g_cli.boot_step = 0;
