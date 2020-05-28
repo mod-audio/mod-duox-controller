@@ -461,7 +461,7 @@ void system_bluetooth_cb(void *arg, int event)
         {
             response = cli_command("mod-bluetooth hmi", CLI_RETRIEVE_RESPONSE);
             
-            strncpy(resp, response, sizeof(resp));
+            strncpy(resp, response, sizeof(resp)-1);
             char **items = strarr_split(resp, '|');;
 
             if (items)
@@ -491,7 +491,7 @@ void system_input_cb(void *arg, int event)
 
         response = cli_command("mod-amixer in xall", CLI_RETRIEVE_RESPONSE);
             
-        strncpy(resp, response, sizeof(resp));
+        strncpy(resp, response, sizeof(resp)-1);
         char **items = strarr_split(resp, '|');;
 
         if (items)
@@ -516,7 +516,7 @@ void system_output_cb(void *arg, int event)
 
         response = cli_command("mod-amixer out xall", CLI_RETRIEVE_RESPONSE);
             
-        strncpy(resp, response, sizeof(resp));
+        strncpy(resp, response, sizeof(resp)-1);
         char **items = strarr_split(resp, '|');;
 
         if (items)
