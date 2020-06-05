@@ -1218,3 +1218,24 @@ void screen_master_vol(int8_t volume_val)
     if (naveg_is_master_vol()) glcd_rect_invert (display, 0, 0, DISPLAY_WIDTH, 7);
 
 }
+
+void screen_text_box(uint8_t display, uint8_t x, uint8_t y, const char *text)
+{
+    glcd_t *hardware_display = hardware_glcds(display);
+
+    textbox_t text_box;
+    text_box.color = GLCD_BLACK;
+    text_box.mode = TEXT_MULTI_LINES;
+    text_box.font = SMfont;
+    text_box.top_margin = 1;
+    text_box.bottom_margin = 0;
+    text_box.left_margin = 1;
+    text_box.right_margin = 0;
+    text_box.height = 63;
+    text_box.width = 127;
+    text_box.text = text;
+    text_box.align = ALIGN_LEFT_TOP;
+    text_box.y = y;
+    text_box.x = x;
+    widget_textbox(hardware_display, &text_box);
+}
