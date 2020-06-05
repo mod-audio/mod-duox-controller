@@ -538,7 +538,7 @@ static void glcd_text_cb(proto_t *proto)
 
     if (glcd_id >= GLCD_COUNT) return;
 
-    glcd_text(hardware_glcds(glcd_id), x, y, proto->list[4], NULL, GLCD_BLACK);
+    screen_text_box(glcd_id, x, y, proto->list[4]);
     protocol_response("resp 0", proto);
 }
 

@@ -74,6 +74,7 @@ void screen_tuner_input(uint8_t input);
 void screen_image(uint8_t display, const uint8_t *image);
 void screen_top_info(const void *data, uint8_t update);
 void screen_master_vol(int8_t volume_val);
+void screen_text_box(uint8_t display, uint8_t x, uint8_t y, const char *text);
 
 /*
 ************************************************************************************************************************
