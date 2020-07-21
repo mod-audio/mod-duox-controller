@@ -128,7 +128,9 @@ control_t *data_parse_control(char **data)
         control->properties = CONTROL_PROP_LOGARITHMIC;
     else if (CONTROL_PROP_INTEGER & properties_mask)
         control->properties = CONTROL_PROP_INTEGER;
-    else if (CONTROL_PROP_MOMENTARY_SW & properties_mask)
+    
+    //overwrites the toggle/bypass property internally
+    if (CONTROL_PROP_MOMENTARY_SW & properties_mask)
         control->properties = CONTROL_PROP_MOMENTARY_SW;
 
     // checks if has scale points
