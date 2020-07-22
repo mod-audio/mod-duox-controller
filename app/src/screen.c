@@ -1261,7 +1261,7 @@ void screen_text_box(uint8_t display, uint8_t x, uint8_t y, const char *text)
     textbox_t text_box;
     text_box.color = GLCD_BLACK;
     text_box.mode = TEXT_MULTI_LINES;
-    text_box.font = SMfont;
+    text_box.font = Terminal3x5;
     text_box.top_margin = 1;
     text_box.bottom_margin = 0;
     text_box.left_margin = 1;

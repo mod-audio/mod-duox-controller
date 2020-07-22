@@ -575,8 +575,9 @@ static void foot_control_add(control_t *control)
             if (display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT)))
                 break;
 
-            // updates the footer (a getto fix here, the screen.c file did not regognize the NULL pointer so it did not allign the text properly, TODO fix this)
-            screen_footer(control->hw_id - ENCODERS_COUNT, control->label, BYPASS_ON_FOOTER_TEXT, control->properties);
+            // updates the footer
+            screen_footer(control->hw_id - ENCODERS_COUNT, control->label,
+                         (control->value <= 0 ? TOGGLED_OFF_FOOTER_TEXT : TOGGLED_ON_FOOTER_TEXT), control->properties);
             break;
         }
 
@@ -2444,8 +2445,10 @@ void naveg_set_control(uint8_t hw_id, float value)
                              (control->value <= 0 ? TOGGLED_OFF_FOOTER_TEXT : TOGGLED_ON_FOOTER_TEXT), control->properties);
                 break;
 
-            //not implemented, not sure if ever needed
             case CONTROL_PROP_MOMENTARY_SW:
+                // updates the footer
+                    screen_footer(control->hw_id - ENCODERS_COUNT, control->label,
+                                 (control->value <= 0 ? TOGGLED_OFF_FOOTER_TEXT : TOGGLED_ON_FOOTER_TEXT), control->properties);
             break;
 
             // trigger specification: http://lv2plug.in/ns/ext/port-props/#trigger
