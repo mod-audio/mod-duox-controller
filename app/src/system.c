@@ -189,10 +189,13 @@ void set_item_value(char *command, uint16_t value)
 
 static void volume(menu_item_t *item, int event, const char *source, float min, float max, float step)
 {
+    static uint32_t last_message_time = 0; 
     char value[8] = {};
     static const char *response = NULL;
     cli_command(NULL, CLI_DISCARD_RESPONSE);
     uint8_t dir = (source[0] == 'i') ? 0 : 1;
+
+    uint32_t message_time = hardware_timestamp();
 
     if (((event == MENU_EV_UP) || (event == MENU_EV_DOWN)) && (dir ? g_sl_out : g_sl_in) && (item->desc->id != HP_VOLUME))
     {
@@ -200,16 +203,26 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
         //PGA (input)
         if (!dir)
         {
-            int_to_str(item->data.value, value, 8, 0);
-            cli_command("mod-amixer in 0 xvol ", CLI_CACHE_ONLY);
-            cli_command(value, CLI_DISCARD_RESPONSE);
+            if (message_time - last_message_time > VOL_MESSAGE_TIMEOUT)
+            {
+                int_to_str(item->data.value, value, 8, 0);
+                cli_command("mod-amixer in 0 xvol ", CLI_CACHE_ONLY);
+                cli_command(value, CLI_DISCARD_RESPONSE);
+
+                last_message_time = message_time;
+            }
         }
         //DAC (output)
         else
         {
-            int_to_str(item->data.value, value, 8, 0);
-            cli_command("mod-amixer out 0 xvol ", CLI_CACHE_ONLY);
-            cli_command(value, CLI_DISCARD_RESPONSE);
+            if (message_time - last_message_time > VOL_MESSAGE_TIMEOUT)
+            {
+                int_to_str(item->data.value, value, 8, 0);
+                cli_command("mod-amixer out 0 xvol ", CLI_CACHE_ONLY);
+                cli_command(value, CLI_DISCARD_RESPONSE);
+
+                last_message_time = message_time;
+            }
         }
     }
     else
@@ -250,7 +263,16 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
     g_gains_volumes[item->desc->id - VOLUME_ID] = item->data.value;
 
     char str_bfr[8] = {};
-    int value_bfr = MAP(item->data.value, min, max, 0, 100);
+    float value_bfr;
+    if (!dir)
+    {
+        value_bfr = MAP(item->data.value, min, max, 0, 135);
+        value_bfr -= 35;
+    }
+    else 
+    {
+        value_bfr = MAP(item->data.value, min, max, 0, 100);
+    }
     int_to_str(value_bfr, str_bfr, 8, 0);
     strcpy(item->name, item->desc->name);
     uint8_t q;
@@ -267,9 +289,9 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
     if ((((event == MENU_EV_UP) || (event == MENU_EV_DOWN)) && (dir ? g_sl_out : g_sl_in))&& (item->desc->id != HP_VOLUME))
     {
         if (strchr(source, '1'))
-            naveg_update_gain(DISPLAY_RIGHT, item->desc->id + 1, item->data.value, min, max);
+            naveg_update_gain(DISPLAY_RIGHT, item->desc->id + 1, item->data.value, min, max, dir);
         else
-            naveg_update_gain(DISPLAY_RIGHT, item->desc->id - 1, item->data.value, min, max);
+            naveg_update_gain(DISPLAY_RIGHT, item->desc->id - 1, item->data.value, min, max, dir);
     }
     
     naveg_settings_refresh(DISPLAY_RIGHT);
@@ -635,14 +657,14 @@ void system_volume_cb(void *arg, int event)
             case IN1_VOLUME:
                 source = "in 1";
                 min = 0;
-                max = 78.0;
+                max = 76.0;
                 step = 1.0;
                 break;
 
             case IN2_VOLUME:
                 source = "in 2";
                 min = 0.0;
-                max = 78.0;
+                max = 76.0;
                 step = 1.0;
                 break;
 
@@ -706,7 +728,7 @@ void system_master_vol_link_cb(void *arg, int event)
             //keep everything in sync
             g_gains_volumes[OUT2_VOLUME - VOLUME_ID] = g_gains_volumes[OUT1_VOLUME - VOLUME_ID];
 
-            naveg_update_gain(DISPLAY_RIGHT, OUT2_VOLUME, g_gains_volumes[OUT1_VOLUME - VOLUME_ID], 0, 78);
+            naveg_update_gain(DISPLAY_RIGHT, OUT2_VOLUME, g_gains_volumes[OUT1_VOLUME - VOLUME_ID], 0, 78, 1);
 
             system_save_gains_cb(NULL, MENU_EV_ENTER);
         }
@@ -922,7 +944,7 @@ void system_sl_in_cb (void *arg, int event)
             //keep everything in sync
             g_gains_volumes[IN2_VOLUME - VOLUME_ID] = g_gains_volumes[IN1_VOLUME - VOLUME_ID];
 
-            naveg_update_gain(DISPLAY_RIGHT, IN2_VOLUME, g_gains_volumes[IN1_VOLUME - VOLUME_ID], 0, 78);
+            naveg_update_gain(DISPLAY_RIGHT, IN2_VOLUME, g_gains_volumes[IN1_VOLUME - VOLUME_ID], 0, 76, 0);
 
             system_save_gains_cb(NULL, MENU_EV_ENTER);
         }
@@ -958,7 +980,7 @@ void system_sl_out_cb (void *arg, int event)
             //we also need to change the master volume link to 0 (1&2)
             g_master_vol_port = 0;
 
-            naveg_update_gain(DISPLAY_RIGHT, OUT2_VOLUME, g_gains_volumes[OUT1_VOLUME - VOLUME_ID], 0, 78);
+            naveg_update_gain(DISPLAY_RIGHT, OUT2_VOLUME, g_gains_volumes[OUT1_VOLUME - VOLUME_ID], 0, 78, 1);
 
             system_save_gains_cb(NULL, MENU_EV_ENTER);
         }
