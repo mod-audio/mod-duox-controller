@@ -51,7 +51,7 @@ enum {UI_DISCONNECTED, UI_CONNECTED};
 *           GLOBAL VARIABLES
 ************************************************************************************************************************
 */
-
+bool g_protocol_busy;
 bool g_self_test_mode;
 float g_pot_calibrations[2][POTS_COUNT];
 /*

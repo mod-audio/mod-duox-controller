@@ -197,7 +197,16 @@ static void display_disable_all_tools(uint8_t display)
     int i;
 
     if (tool_is_on(DISPLAY_TOOL_TUNER))
+    {
+        //lock actuators
+        g_protocol_busy = true;
+        system_lock_comm_serial(g_protocol_busy);
+
         comm_webgui_send(TUNER_OFF_CMD, strlen(TUNER_OFF_CMD));
+
+        g_protocol_busy = false;
+        system_lock_comm_serial(g_protocol_busy);
+    }
 
     for (i = 0; i < MAX_TOOLS; i++)
     {
@@ -439,14 +448,21 @@ static void display_pot_add(control_t *control)
     }
 
     if (g_lock_potentiometers)
-    {    
-        if ((tmp_value > tmp_control_value ? tmp_value - tmp_control_value : tmp_control_value - tmp_value) < POT_DIFF_THRESHOLD)
+    {   
+        if  ((g_pots[id]->properties == CONTROL_PROP_TOGGLED) || (g_pots[id]->properties == CONTROL_PROP_BYPASS))
         {
-            g_pots[id]->scroll_dir = 0;
+            g_pots[id]->scroll_dir = 1;
         }
         else
         {
-            g_pots[id]->scroll_dir = 1;
+            if ((tmp_value > tmp_control_value ? tmp_value - tmp_control_value : tmp_control_value - tmp_value) < POT_DIFF_THRESHOLD)
+            {
+                g_pots[id]->scroll_dir = 0;
+            }
+            else
+            {
+                g_pots[id]->scroll_dir = 1;
+            }
         }
     }
     else g_pots[id]->scroll_dir = 0;
@@ -547,6 +563,22 @@ static void foot_control_add(control_t *control)
             screen_footer(control->hw_id - ENCODERS_COUNT, control->label,
                          (control->value <= 0 ? TOGGLED_OFF_FOOTER_TEXT : TOGGLED_ON_FOOTER_TEXT), control->properties);
             break;
+
+        case CONTROL_PROP_MOMENTARY_SW:
+        {
+            if ((control->scroll_dir == 0)||(control->scroll_dir == 2))
+                ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR, 1, 0, 0, 0);
+            else
+                ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TRIGGER_PRESSED_COLOR, 1, 0, 0, 0);
+        
+            // if is in tool mode break
+            if (display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT)))
+                break;
+
+            // updates the footer (a getto fix here, the screen.c file did not regognize the NULL pointer so it did not allign the text properly, TODO fix this)
+            screen_footer(control->hw_id - ENCODERS_COUNT, control->label, BYPASS_ON_FOOTER_TEXT, control->properties);
+            break;
+        }
 
         // trigger specification: http://lv2plug.in/ns/ext/port-props/#trigger
         case CONTROL_PROP_TRIGGER:
@@ -769,11 +801,18 @@ static void request_control_page(control_t *control, uint8_t dir)
     // insert the direction on buffer
     i += int_to_str(bitmask, &buffer[i], sizeof(buffer) - i, 0);
 
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
     // sends the data to GUI
     comm_webgui_send(buffer, i);
 
     // waits the banks list be received
     comm_webgui_wait_response();
+
+   g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
 
 static void parse_banks_list(void *data, menu_item_t *item)
@@ -824,11 +863,18 @@ static void request_banks_list(uint8_t dir)
     //insert current bank, because first time we are entering the menu
     i += int_to_str(g_current_bank, &buffer[i], sizeof(buffer) - i, 0);
 
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
     // sends the data to GUI
     comm_webgui_send(buffer, i);
 
     // waits the banks list be received
     comm_webgui_wait_response();
+
+   g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 
     g_banks->hover = g_current_bank;
     g_banks->selected = g_current_bank;
@@ -861,11 +907,18 @@ static void request_next_bank_page(uint8_t dir)
 
     i += int_to_str(g_banks->hover, &buffer[i], sizeof(buffer) - i, 0);
 
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
     // sends the data to GUI
     comm_webgui_send(buffer, i);
 
     // waits the banks list be received
     comm_webgui_wait_response();
+
+   g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 
     //restore our previous hover / selected bank
     g_banks->hover = prev_hover;
@@ -947,11 +1000,19 @@ static void request_pedalboards(uint8_t dir, uint16_t bank_uid)
         prev_selected = g_naveg_pedalboards->selected;
     }
     
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
     // sends the data to GUI
     comm_webgui_send(buffer, i);
 
     // waits the pedalboards list be received
     comm_webgui_wait_response();
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
+
 
     if (g_naveg_pedalboards)
     {
@@ -993,11 +1054,18 @@ static void send_load_pedalboard(uint16_t bank_id, const char *pedalboard_uid)
     // sets the response callback
     comm_webgui_set_response_cb(NULL, NULL);
 
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
     // send the data to GUI
     comm_webgui_send(buffer, i);
 
     // waits the pedalboard loaded message to be received
     comm_webgui_wait_response();
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
 
 static void control_set(uint8_t id, control_t *control)
@@ -1104,11 +1172,27 @@ static void control_set(uint8_t id, control_t *control)
 
         case CONTROL_PROP_TOGGLED:
         case CONTROL_PROP_BYPASS:
-            if (control->value > control->minimum) control->value = control->minimum;
-            else control->value = control->maximum;
+            if (control->hw_id < ENCODERS_COUNT)
+            {
+                // update the screen
+                if (!display_has_tool_enabled(id))
+                    screen_encoder(id, control);
+            }
+            else if ( (ENCODERS_COUNT + FOOTSWITCHES_ACTUATOR_COUNT <= control->hw_id) && (control->hw_id < TOTAL_ACTUATORS))
+            {
+                if (!display_has_tool_enabled(get_display_by_id(id, POTENTIOMETER)))
+                {
+                    screen_pot(id, control);
+                }
+            }
+            else
+            {
+                if (control->value > control->minimum) control->value = control->minimum;
+                else control->value = control->maximum;
 
-            // to update the footer and screen
-            foot_control_add(control);
+                // to update the footer and screen
+                foot_control_add(control);
+            }
             break;
 
         case CONTROL_PROP_TRIGGER:
@@ -1118,6 +1202,13 @@ static void control_set(uint8_t id, control_t *control)
 
             if (!control->scroll_dir) return;
             
+            break;
+
+        case CONTROL_PROP_MOMENTARY_SW:
+            control->value = !control->value;
+            // to update the footer and screen
+            foot_control_add(control);
+
             break;
 
         case CONTROL_PROP_TAP_TEMPO:
@@ -1176,6 +1267,10 @@ static void control_set(uint8_t id, control_t *control)
     i += float_to_str(control->value, &buffer[i], sizeof(buffer) - i, 6);
     buffer[i] = 0;
 
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
     // send the data to GUI
     comm_webgui_send(buffer, i);
 
@@ -1183,6 +1278,9 @@ static void control_set(uint8_t id, control_t *control)
     if (!g_self_test_mode) {
         comm_webgui_wait_response();
     }
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
 
 static void bp_enter(void)
@@ -1834,11 +1932,18 @@ static void tuner_enter(void)
     i += int_to_str(input, &buffer[i], sizeof(buffer) - i, 0);
     buffer[i] = 0;
 
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
     // send the data to GUI
     comm_webgui_send(buffer, i);
 
     // updates the screen
     screen_tuner_input(input);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
 
 static void create_menu_tree(node_t *parent, const menu_desc_t *desc)
@@ -2160,6 +2265,20 @@ void naveg_inc_control(uint8_t display)
     		    return;	
     	}
     }
+    else if (control->properties == CONTROL_PROP_TOGGLED)
+    {
+        if (control->value == 1)
+            return;
+        else 
+            control->value = 1;
+    }
+    else if (control->properties == CONTROL_PROP_BYPASS)
+    {
+        if (control->value == 0)
+            return;
+        else 
+            control->value = 0;
+    }
     else
     {
         // increments the step
@@ -2225,6 +2344,20 @@ void naveg_dec_control(uint8_t display)
             else
                 return;
     	}
+    }
+    else if (control->properties == CONTROL_PROP_TOGGLED)
+    {
+        if (control->value == 0)
+            return;
+        else 
+            control->value = 0;
+    }
+    else if (control->properties == CONTROL_PROP_BYPASS)
+    {
+        if (control->value == 1)
+            return;
+        else 
+            control->value = 1;
     }
     else
     {
@@ -2310,6 +2443,10 @@ void naveg_set_control(uint8_t hw_id, float value)
                 screen_footer(control->hw_id - ENCODERS_COUNT, control->label,
                              (control->value <= 0 ? TOGGLED_OFF_FOOTER_TEXT : TOGGLED_ON_FOOTER_TEXT), control->properties);
                 break;
+
+            //not implemented, not sure if ever needed
+            case CONTROL_PROP_MOMENTARY_SW:
+            break;
 
             // trigger specification: http://lv2plug.in/ns/ext/port-props/#trigger
             case CONTROL_PROP_TRIGGER:
@@ -2471,14 +2608,21 @@ void naveg_set_control(uint8_t hw_id, float value)
             }
 
             if (g_lock_potentiometers)
-            {
-                if ((tmp_value > tmp_control_value ? tmp_value - tmp_control_value : tmp_control_value - tmp_value) < POT_DIFF_THRESHOLD)
+            {   
+                if  ((g_pots[id]->properties == CONTROL_PROP_TOGGLED) || (g_pots[id]->properties == CONTROL_PROP_BYPASS))
                 {
-                    g_pots[id]->scroll_dir = 0;
+                    g_pots[id]->scroll_dir = 1;
                 }
                 else
                 {
-                    g_pots[id]->scroll_dir = 1;
+                    if ((tmp_value > tmp_control_value ? tmp_value - tmp_control_value : tmp_control_value - tmp_value) < POT_DIFF_THRESHOLD)
+                    {
+                        g_pots[id]->scroll_dir = 0;
+                    }
+                    else
+                    {
+                        g_pots[id]->scroll_dir = 1;
+                    }
                 }
             }
             else g_pots[id]->scroll_dir = 0;
@@ -2545,15 +2689,31 @@ void naveg_pot_change(uint8_t pot)
     //if the actuator is still locked
     if ((g_pots[pot]->scroll_dir == 1) && !g_self_test_mode)
     {
-    	if ((tmp_value > tmp_control_value ? tmp_value - tmp_control_value : tmp_control_value - tmp_value) < POT_DIFF_THRESHOLD)
-    	{
-    	    g_pots[pot]->scroll_dir = 0;
-    	}
-    	else 
-    	{
-    		g_pots[pot]->scroll_dir = 1;
-    		return;
-    	}
+        if  ((g_pots[pot]->properties == CONTROL_PROP_TOGGLED) || (g_pots[pot]->properties == CONTROL_PROP_BYPASS))
+        {
+            uint16_t half_way = (g_pot_calibrations[1][pot] - g_pot_calibrations[0][pot]) /2;
+            if ((tmp_value >= (half_way - 100)) && (tmp_value <= (half_way + 100)))
+            {
+                g_pots[pot]->scroll_dir = 0;
+            }
+            else
+            {
+                g_pots[pot]->scroll_dir = 1;
+                return; 
+            }
+        }
+        else
+        {
+            if ((tmp_value > tmp_control_value ? tmp_value - tmp_control_value : tmp_control_value - tmp_value) < POT_DIFF_THRESHOLD)
+            {
+                g_pots[pot]->scroll_dir = 0;
+            }
+            else
+            {
+                g_pots[pot]->scroll_dir = 1;
+                return;
+            }
+        }
     }
 
     if (g_pots[pot]->properties == CONTROL_PROP_LINEAR)
@@ -2564,6 +2724,19 @@ void naveg_pot_change(uint8_t pot)
     {
     	float p_step = ((float) tmp_value) / ((float) (g_pot_calibrations[1][pot] - 1));
     	g_pots[pot]->value = g_pots[pot]->minimum * pow(g_pots[pot]->maximum / g_pots[pot]->minimum, p_step);
+    }
+    //toggles
+    else if ((g_pots[pot]->properties == CONTROL_PROP_TOGGLED) || (g_pots[pot]->properties == CONTROL_PROP_BYPASS))
+    {
+        uint16_t half_way = (g_pot_calibrations[1][pot] - g_pot_calibrations[0][pot]) /2;
+        if (tmp_value >= half_way)
+        {
+            g_pots[pot]->value = (g_pots[pot]->properties == CONTROL_PROP_TOGGLED)?1:0;
+        } 
+        else 
+        {
+            g_pots[pot]->value = (g_pots[pot]->properties == CONTROL_PROP_TOGGLED)?0:1;
+        }
     }
     //default, liniar
     else 
@@ -2601,6 +2774,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 //check if we use the release action for this actuator
                 switch(g_foots[foot]->properties)
                 {
+                    case CONTROL_PROP_MOMENTARY_SW:
                     case CONTROL_PROP_TRIGGER:
                         ledz_set_state(hardware_leds(foot), foot, TRIGGER_COLOR, 1, 0, 0, 0); //TRIGGER_COLOR
                     break;
@@ -2616,6 +2790,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 g_foots[foot]->scroll_dir = pressed;
 
                 //we dont actually preform an action here
+                if (g_foots[foot]->properties != CONTROL_PROP_MOMENTARY_SW)
                 return;
             }
 
@@ -2653,10 +2828,18 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                             reset_queue();
 
                             comm_webgui_clear();
+                            //lock actuators
+                            g_protocol_busy = true;
+                            system_lock_comm_serial(g_protocol_busy);
+
                             comm_webgui_send(buffer, i);
                             if (!g_self_test_mode) {
                                 comm_webgui_wait_response();
                             }
+                            
+                            g_protocol_busy = false;
+                            system_lock_comm_serial(g_protocol_busy);
+
                         }
                         else
                         {
@@ -2705,11 +2888,19 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 
                 comm_webgui_clear();
 
+                //lock actuators
+                g_protocol_busy = true;
+                system_lock_comm_serial(g_protocol_busy);
+
                 comm_webgui_send(buffer, i);
 
                 if (!g_self_test_mode) {
                     comm_webgui_wait_response();
                 }
+
+                g_protocol_busy = false;
+                system_lock_comm_serial(g_protocol_busy);
+
             }
         break;
 
@@ -2801,11 +2992,18 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 
             comm_webgui_clear();
 
+            //lock actuators
+            g_protocol_busy = true;
+            system_lock_comm_serial(g_protocol_busy);
+
             comm_webgui_send(buffer, i);
 
             if (!g_self_test_mode) {
                 comm_webgui_wait_response();
             }
+
+            g_protocol_busy = false;
+            system_lock_comm_serial(g_protocol_busy);            
         break;
     }
 }
@@ -2842,7 +3040,14 @@ void naveg_save_snapshot(uint8_t foot)
 
     i += int_to_str((foot == 6)?1:0, &buffer[i], sizeof(buffer) - i, 0);
 
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
     comm_webgui_send(buffer, i);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 	snapshot_loaded[(foot == 6)?1:0] = 2;
 }
 
@@ -2876,7 +3081,14 @@ void naveg_toggle_tool(uint8_t tool, uint8_t display)
                 break;
             case DISPLAY_TOOL_TUNER:
             	display_disable_all_tools(display);
+                //lock actuators
+                g_protocol_busy = true;
+                system_lock_comm_serial(g_protocol_busy);
+
                 comm_webgui_send(TUNER_ON_CMD, strlen(TUNER_ON_CMD));
+
+                g_protocol_busy = false;
+                system_lock_comm_serial(g_protocol_busy);
                 break;
             case DISPLAY_TOOL_SYSTEM:
             	screen_clear(1);
@@ -3096,8 +3308,15 @@ void naveg_enter(uint8_t display)
         // insert the hw_id on buffer
         i += int_to_str(display, &buffer[i], sizeof(buffer) - i, 0);
 
+        //lock actuators
+        g_protocol_busy = true;
+        system_lock_comm_serial(g_protocol_busy);
+
         // send the data to GUI
         comm_webgui_send(buffer, i);
+
+        g_protocol_busy = false;
+        system_lock_comm_serial(g_protocol_busy);
 
         return;
     }

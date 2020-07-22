@@ -181,7 +181,7 @@ void display_calibration_text(uint8_t display)
     textbox_t explanation_text;
     explanation_text.color = GLCD_BLACK;
     explanation_text.mode = TEXT_MULTI_LINES;
-    explanation_text.font = SMfont;
+    explanation_text.font = Terminal3x5;
     explanation_text.top_margin = 1;
     explanation_text.bottom_margin = 0;
     explanation_text.left_margin = 0;
@@ -261,7 +261,7 @@ void display_error_message(uint8_t display, uint8_t error_message)
     textbox_t explanation_text;
     explanation_text.color = GLCD_BLACK;
     explanation_text.mode = TEXT_SINGLE_LINE;
-    explanation_text.font = SMfont;
+    explanation_text.font = Terminal3x5;
     explanation_text.top_margin = 1;
     explanation_text.bottom_margin = 0;
     explanation_text.left_margin = 0;

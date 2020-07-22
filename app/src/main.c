@@ -70,8 +70,6 @@
 static volatile xQueueHandle g_actuators_queue;
 static uint8_t g_msg_buffer[WEBGUI_COMM_RX_BUFF_SIZE];
 static uint8_t g_ui_communication_started;
-static uint8_t g_protocol_bussy = 0;
-
 
 /*
 ************************************************************************************************************************
@@ -169,7 +167,7 @@ void serial_error(uint8_t uart_id, uint32_t error)
 // this callback is called from a ISR
 static void actuators_cb(void *actuator)
 {
-    if (g_protocol_bussy)
+    if (g_protocol_busy)
     {
         if (!naveg_dialog_status()) return;
     }  
@@ -227,8 +225,8 @@ static void procotol_task(void *pvParameters)
     while (1)
     {
         uint32_t msg_size;
-        g_protocol_bussy = 0;
-        system_lock_comm_serial(g_protocol_bussy);
+        g_protocol_busy = false;
+        system_lock_comm_serial(g_protocol_busy);
         // blocks until receive a new message
         ringbuff_t *rb = comm_webgui_read();
         msg_size = ringbuff_read_until(rb, g_msg_buffer, WEBGUI_COMM_RX_BUFF_SIZE, 0);
@@ -236,8 +234,8 @@ static void procotol_task(void *pvParameters)
         if (msg_size > 0)
         {
             //if parsing messages block the actuator messages. 
-            g_protocol_bussy = 1;
-            system_lock_comm_serial(g_protocol_bussy);
+            g_protocol_busy = true;
+            system_lock_comm_serial(g_protocol_busy);
             msg_t msg;
             msg.sender_id = 0;
             msg.data = (char *) g_msg_buffer;
@@ -570,8 +568,8 @@ static void glcd_draw_cb(proto_t *proto)
 static void gui_connection_cb(proto_t *proto)
 {
 	//lock actuators
-	g_protocol_bussy = 1;
-    system_lock_comm_serial(g_protocol_bussy);
+	g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
 	//clear the buffer so we dont send any messages
 	comm_webgui_clear();
 
@@ -580,31 +578,37 @@ static void gui_connection_cb(proto_t *proto)
     else
         naveg_ui_connection(UI_DISCONNECTED);
 
-    //we are done supposedly closing the menu, we can unlock the actuators
-    g_protocol_bussy = 0;
-    system_lock_comm_serial(g_protocol_bussy);
     protocol_response("resp 0", proto);
+
+    //we are done supposedly closing the menu, we can unlock the actuators
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
 
 static void control_add_cb(proto_t *proto)
 {
     //lock actuators
-    g_protocol_bussy = 1;
-    system_lock_comm_serial(g_protocol_bussy);
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
 
     control_t *control = data_parse_control(proto->list);
     naveg_add_control(control, 1);
 
-    g_protocol_bussy = 0;
-    system_lock_comm_serial(g_protocol_bussy);
-
     protocol_response("resp 0", proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
 
 static void control_rm_cb(proto_t *proto)
 {
+
     g_ui_communication_started = 1;
     
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
     naveg_remove_control(atoi(proto->list[1]));
 
     uint8_t i;
@@ -618,23 +622,30 @@ static void control_rm_cb(proto_t *proto)
     }
     
     protocol_response("resp 0", proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
 
 static void control_set_cb(proto_t *proto)
 {
     //lock actuators
-    g_protocol_bussy = 1;
-    system_lock_comm_serial(g_protocol_bussy);
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
 
     naveg_set_control(atoi(proto->list[1]), atof(proto->list[2]));
     protocol_response("resp 0", proto);
 
-    g_protocol_bussy = 0;
-    system_lock_comm_serial(g_protocol_bussy);
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
 
 static void control_get_cb(proto_t *proto)
 {
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
     float value;
     value = naveg_get_control(atoi(proto->list[1]));
 
@@ -643,13 +654,23 @@ static void control_get_cb(proto_t *proto)
 
     float_to_str(value, &resp[strlen(resp)], 8, 3);
     protocol_response(resp, proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
 
 static void initial_state_cb(proto_t *proto)
 {
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
     g_ui_communication_started = 1;
     naveg_initial_state(atoi(proto->list[1]), atoi(proto->list[2]), atoi(proto->list[3]), proto->list[4], proto->list[5], &(proto->list[6]));
     protocol_response("resp 0", proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
 
 static void bank_config_cb(proto_t *proto)
@@ -660,8 +681,15 @@ static void bank_config_cb(proto_t *proto)
 
 static void tuner_cb(proto_t *proto)
 {
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
     screen_tuner(atof(proto->list[1]), proto->list[2], atoi(proto->list[3]));
     protocol_response("resp 0", proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
 
 static void resp_cb(proto_t *proto)
@@ -681,8 +709,15 @@ static void restore_cb(proto_t *proto)
 
 static void pedalboard_name_cb(proto_t *proto)
 {
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
 	screen_top_info(&proto->list[1] , 1);
     protocol_response("resp 0", proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
 
 static void boot_cb(proto_t *proto)
@@ -723,6 +758,10 @@ static void boot_cb(proto_t *proto)
 
 static void menu_item_changed_cb(proto_t *proto)
 {
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
     naveg_menu_item_changed_cb(atoi(proto->list[1]), atoi(proto->list[2]));
     
     uint8_t i;
@@ -736,19 +775,33 @@ static void menu_item_changed_cb(proto_t *proto)
     }
 
     protocol_response("resp 0", proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
 
 static void snapshot_clear_cb(proto_t *proto)
 {
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
     //we dont care yet about which snapshot, thats why hardcoded
     naveg_clear_snapshot(6);
     naveg_clear_snapshot(4);
 
     protocol_response("resp 0", proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
 
 static void  pedalboard_clear_cb(proto_t *proto)
 {
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
     //clear controls
     uint8_t i;
     for (i = 0; i < TOTAL_ACTUATORS; i++)
@@ -765,15 +818,25 @@ static void  pedalboard_clear_cb(proto_t *proto)
     naveg_reset_page();
 
     protocol_response("resp 0", proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
 
 static void  page_available_cb(proto_t *proto)
 {
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
     naveg_pages_available(atoi(proto->list[1]), atoi(proto->list[2]), atoi(proto->list[3]));
 
     naveg_turn_on_pagination_leds();
 
     protocol_response("resp 0", proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
 
 static void save_pot_cal_val_cb(proto_t *proto)

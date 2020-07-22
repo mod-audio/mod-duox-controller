@@ -111,14 +111,14 @@ void screen_pot(uint8_t pot_id, control_t *control)
     {
         case 0:
         case 4:
-            knob.x = 29;
+            knob.x = 28;
             knob.y = 32;
             knob.orientation = 0;
             glcd_rect_fill(display, 0, knob.y -7, 65, 16, GLCD_WHITE);
             break;
         case 1:
         case 5:
-            knob.x = 29;
+            knob.x = 28;
             knob.y = 47;
             knob.orientation = 0;
             glcd_rect_fill(display, 0, knob.y -6, 65, 14, GLCD_WHITE);
@@ -140,9 +140,6 @@ void screen_pot(uint8_t pot_id, control_t *control)
         default:
             // not handled, trigger no assignment
             control = NULL;
-            knob.x = 0;
-            knob.y = 0;
-            knob.orientation = 0;
             break;
     }
 
@@ -153,7 +150,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
 
         blank_title.color = GLCD_BLACK;
         blank_title.mode = TEXT_SINGLE_LINE;
-        blank_title.font = SMfont;
+        blank_title.font = Terminal3x5;
         blank_title.height = 0;
         blank_title.width = 0;
         blank_title.top_margin = 0;
@@ -182,6 +179,46 @@ void screen_pot(uint8_t pot_id, control_t *control)
         }
 
         widget_textbox(display, &blank_title);
+    }
+    else if ((control->properties == CONTROL_PROP_TOGGLED) || (control->properties == CONTROL_PROP_BYPASS))
+    {
+        //convert title
+        char title_str_bfr[8] = {0};
+        strncpy(title_str_bfr, control->label, 7);
+        title_str_bfr[7] = '\0';
+
+        //title:
+        textbox_t title;
+        title.color = GLCD_BLACK;
+        title.mode = TEXT_SINGLE_LINE;
+        title.font = Terminal3x5;
+        if (knob.orientation)
+            title.x = (knob.x - 5 - (strlen(title_str_bfr))*4);
+        else
+            title.x = (knob.x + 7);
+        title.y = knob.y - 2;
+        title.height = 0;
+        title.width = 0;
+        title.top_margin = 0;
+        title.bottom_margin = 0;
+        title.left_margin = 0;
+        title.right_margin = 0;
+        title.text = title_str_bfr;
+        title.align = ALIGN_NONE_NONE;
+        widget_textbox(display, &title);
+
+        //toggle
+        toggle_t toggle;
+        if (knob.orientation)
+        toggle.x = knob.x - 4;
+        else 
+           toggle.x = knob.x - 26;
+        toggle.y = knob.y - 5;
+        toggle.width = 31;
+        toggle.height = 11;
+        toggle.color = GLCD_BLACK;
+        toggle.value = (control->properties == CONTROL_PROP_TOGGLED)?control->value:!control->value;
+        widget_toggle(display, &toggle);
     }
     else
     {
@@ -234,31 +271,17 @@ void screen_pot(uint8_t pot_id, control_t *control)
         {
             if (control->value > -99.9)
             {
-                //not for ints
-                if (control->properties == CONTROL_PROP_INTEGER)
-                {
-                    int_to_str(control->value, value_str, sizeof(value_str), 0);
-                }
-                else
-                {
-                    float_to_str((control->value), value_str, sizeof(value_str), 6);
-                }
-            }
-            else if (control->value < -9999.9)
-            {
-                float_to_str((control->value/1000), value_str, sizeof(value_str), 1);
-                strcat(value_str, "K");
+                float_to_str((control->value), value_str, sizeof(value_str), 1);
             }
             else
             {
-        		if (control->value < -999.9)
-        		{
-					int_to_str(control->value, value_str, sizeof(value_str), 0);
-        		}
-        		else
-        		{
-            		float_to_str((control->value), value_str, sizeof(value_str), 1);
-        		}
+                if (control->value < -9999.9)
+                {
+                    int_to_str(control->value/1000, value_str, sizeof(value_str), 0);
+                    strcat(value_str, "K");
+                }
+            	int_to_str(control->value, value_str, sizeof(value_str), 0);
+
             }
         }
         //for values between 0 and 10 display 2 decimals
@@ -318,7 +341,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         //title:
         title.color = GLCD_BLACK;
         title.mode = TEXT_SINGLE_LINE;
-        title.font = SMfont;
+        title.font = Terminal3x5;
         if (knob.orientation)
             title.x = (knob.x - 5 - (strlen(title_str_bfr))*4);
         else
@@ -344,7 +367,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
             {
                 unit.color = GLCD_BLACK;
                 unit.mode = TEXT_SINGLE_LINE;
-                unit.font = SMfont;
+                unit.font = Terminal3x5;
                 if (knob.orientation)
                     unit.x =(knob.x + 8);
                 else
@@ -381,7 +404,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         //value
         value.color = GLCD_BLACK;
         value.mode = TEXT_SINGLE_LINE;
-        value.font = SMfont;
+        value.font = Terminal3x5;
         if (knob.orientation)
             value.x = (knob.x + 8);
         else
@@ -424,7 +447,7 @@ static void null_screen_encoded(glcd_t *display, uint8_t display_id)
     textbox_t blank_title;
     blank_title.color = GLCD_BLACK;
     blank_title.mode = TEXT_SINGLE_LINE;
-    blank_title.font = SMfont;
+    blank_title.font = Terminal3x5;
     blank_title.height = 0;
     blank_title.width = 0;
     blank_title.top_margin = 0;
@@ -528,7 +551,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
         //title:
         title.color = GLCD_BLACK;
         title.mode = TEXT_SINGLE_LINE;
-        title.font = SMfont;
+        title.font = Terminal3x5;
         title.x = 3;
         title.y = 10;
         title.height = 0;
@@ -560,7 +583,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
         //value
         value.color = GLCD_BLACK;
         value.mode = TEXT_SINGLE_LINE;
-        value.font = SMfont;
+        value.font = Terminal3x5;
         value.x = 100;
         value.y = 10;
         value.height = 0;
@@ -594,7 +617,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
         textbox_t title;
         title.color = GLCD_BLACK;
         title.mode = TEXT_SINGLE_LINE;
-        title.font = SMfont;
+        title.font = Terminal3x5;
         title.height = 0;
         title.width = 0;
         title.top_margin = 0;
@@ -660,7 +683,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
         list.y = 10;
         list.height = 13;
         list.color = GLCD_BLACK;
-        list.font = SMfont;
+        list.font = Terminal3x5;
         list.selected = control->step;
         list.count = scalepoint_count_local;
         list.list = labels_list;
@@ -674,12 +697,24 @@ void screen_encoder(uint8_t display_id, control_t *control)
 
         FREE(labels_list);
     }
+    else if (control->properties == CONTROL_PROP_TOGGLED ||
+         control->properties == CONTROL_PROP_BYPASS)
+    {
+        toggle_t toggle;
+        toggle.x = 0;
+        toggle.y = 10;
+        toggle.width = DISPLAY_WIDTH;
+        toggle.height = 13;
+        toggle.color = GLCD_BLACK;
+        toggle.value = (control->properties == CONTROL_PROP_TOGGLED)?control->value:!control->value;
+        toggle.label = control->label;
+        widget_toggle_encoder(display, &toggle);
+    }
     else
     {
         return null_screen_encoded(display, display_id);
     }
 
-    //glcd_hline(display, 0, 7, DISPLAY_WIDTH, GLCD_BLACK);
     glcd_hline(display, 0, 24, DISPLAY_WIDTH, GLCD_BLACK);
 }
 
@@ -732,7 +767,7 @@ void screen_footer(uint8_t id, const char *name, const char *value, int16_t prop
         textbox_t title;
         title.color = GLCD_BLACK;
         title.mode = TEXT_SINGLE_LINE;
-        title.font = SMfont;
+        title.font = Terminal3x5;
         title.top_margin = 0;
         title.bottom_margin = 1;
         title.left_margin = 0;
@@ -748,14 +783,14 @@ void screen_footer(uint8_t id, const char *name, const char *value, int16_t prop
     }
 
     ///checks if its toggle/trigger or a value
-    else if ((property & CONTROL_PROP_TOGGLED) || (property & CONTROL_PROP_BYPASS) || (property & CONTROL_PROP_TRIGGER))
+    else if ((property & CONTROL_PROP_TOGGLED) || (property & CONTROL_PROP_BYPASS) || (property & CONTROL_PROP_TRIGGER) || (property & CONTROL_PROP_MOMENTARY_SW))
     {
     	// draws the name field
     	char *title_str_bfr = (char *) MALLOC(16 * sizeof(char));
     	textbox_t footer;
     	footer.color = GLCD_BLACK;
     	footer.mode = TEXT_SINGLE_LINE;
-    	footer.font = SMfont;
+    	footer.font = Terminal3x5;
     	footer.height = 0;
     	footer.top_margin = 0;
     	footer.bottom_margin = 1;
@@ -812,7 +847,7 @@ void screen_footer(uint8_t id, const char *name, const char *value, int16_t prop
         textbox_t footer;
         footer.color = GLCD_BLACK;
         footer.mode = TEXT_SINGLE_LINE;
-        footer.font = SMfont;
+        footer.font = Terminal3x5;
         footer.height = 0;
         footer.top_margin = 0;
         footer.bottom_margin = 1;
@@ -881,7 +916,7 @@ void screen_top_info(const void *data, uint8_t update)
     textbox_t title;
     title.color = GLCD_BLACK;
     title.mode = TEXT_SINGLE_LINE;
-    title.font = SMfont;
+    title.font = Terminal3x5;
     title.top_margin = 1;
     title.bottom_margin = 0;
     title.left_margin = 0;
@@ -948,7 +983,7 @@ void screen_bp_list(const char *title, bp_list_t *list)
     // draws the title
     title_box.color = GLCD_BLACK;
     title_box.mode = TEXT_SINGLE_LINE;
-    title_box.font = SMfont;
+    title_box.font = Terminal3x5;
     title_box.top_margin = 0;
     title_box.bottom_margin = 0;
     title_box.left_margin = 0;
@@ -975,7 +1010,7 @@ void screen_bp_list(const char *title, bp_list_t *list)
         list_box.selected = list->selected - list->page_min;
         list_box.count = count;
         list_box.list = list->names;
-        list_box.font = SMfont;
+        list_box.font = Terminal3x5;
         list_box.line_space = 2;
         list_box.line_top_margin = 1;
         list_box.line_bottom_margin = 1;
@@ -1032,7 +1067,7 @@ void screen_system_menu(menu_item_t *item)
     textbox_t title_box;
     title_box.color = GLCD_BLACK;
     title_box.mode = TEXT_SINGLE_LINE;
-    title_box.font = SMfont;
+    title_box.font = Terminal3x5;
     title_box.top_margin = 0;
     title_box.bottom_margin = 0;
     title_box.left_margin = 0;
@@ -1068,7 +1103,7 @@ void screen_system_menu(menu_item_t *item)
     list.width = 128;
     list.height = 53;
     list.color = GLCD_BLACK;
-    list.font = SMfont;
+    list.font = Terminal3x5;
     list.line_space = 2;
     list.line_top_margin = 1;
     list.line_bottom_margin = 1;
@@ -1080,7 +1115,7 @@ void screen_system_menu(menu_item_t *item)
     popup.y = 0;
     popup.width = DISPLAY_WIDTH;
     popup.height = DISPLAY_HEIGHT;
-    popup.font = SMfont;
+    popup.font = Terminal3x5;
     switch (item->desc->type)
     {
         case MENU_LIST:
@@ -1190,7 +1225,7 @@ void screen_master_vol(int8_t volume_val)
     textbox_t title;
     title.color = GLCD_BLACK;
     title.mode = TEXT_SINGLE_LINE;
-    title.font = SMfont;
+    title.font = Terminal3x5;
     title.top_margin = 1;
     title.bottom_margin = 0;
     title.left_margin = 1;
