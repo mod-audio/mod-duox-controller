@@ -3578,7 +3578,7 @@ void naveg_menu_refresh(uint8_t display_id)
 }
 
 //the menu refresh is to slow for the gains so this one is added that only updates the set value.
-void naveg_update_gain(uint8_t display_id, uint8_t update_id, float value, float min, float max, uint8_t dir)
+void naveg_update_gain(uint8_t display_id, uint8_t update_id, float value, float min, float max)
 {
     node_t *node = display_id ? g_current_menu : g_current_main_menu;
 
@@ -3595,15 +3595,7 @@ void naveg_update_gain(uint8_t display_id, uint8_t update_id, float value, float
 
             char str_buf[8];
             float value_bfr;
-            if (!dir)
-            {
-                value_bfr = MAP(item->data.value, min, max, 0, 135);
-                value_bfr -= 35;
-            }
-            else 
-            {
-                value_bfr = MAP(item->data.value, min, max, 0, 100);
-            }
+            value_bfr = MAP(item->data.value, min, max, 0, 100);
             int_to_str(value_bfr, str_buf, sizeof(str_buf), 0);
             strcpy(item->name, item->desc->name);
             uint8_t q;
