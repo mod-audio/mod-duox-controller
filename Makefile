@@ -22,18 +22,19 @@ endif
 TARGET_ADDR = root@modduox.local
 
 # project directories
-DEVICE_INC	= ./nxp-lpc
-CMSIS_INC	= ./nxp-lpc/CMSISv2p00_$(CPU_SERIE)/inc
-CMSIS_SRC	= ./nxp-lpc/CMSISv2p00_$(CPU_SERIE)/src
-CDL_INC 	= ./nxp-lpc/$(CPU_SERIE)Lib/inc
-CDL_SRC 	= ./nxp-lpc/$(CPU_SERIE)Lib/src
-APP_INC 	= ./app/inc
-APP_SRC 	= ./app/src
-RTOS_SRC	= ./freertos/src
-RTOS_INC	= ./freertos/inc
-DRIVERS_INC	= ./drivers/inc
-DRIVERS_SRC	= ./drivers/src
-OUT_DIR		= ./out
+DEVICE_INC	 = ./nxp-lpc
+CMSIS_INC	 = ./nxp-lpc/CMSISv2p00_$(CPU_SERIE)/inc
+CMSIS_SRC	 = ./nxp-lpc/CMSISv2p00_$(CPU_SERIE)/src
+CDL_INC 	 = ./nxp-lpc/$(CPU_SERIE)Lib/inc
+CDL_SRC 	 = ./nxp-lpc/$(CPU_SERIE)Lib/src
+APP_INC 	 = ./app/inc
+APP_SRC 	 = ./app/src
+RTOS_SRC	 = ./freertos/src
+RTOS_INC	 = ./freertos/inc
+DRIVERS_INC	 = ./drivers/inc
+DRIVERS_SRC	 = ./drivers/src
+PROTOCOL_INC = ./mod-controller-proto
+OUT_DIR		 = ./out
 
 CDL_LIBS = lpc177x_8x_clkpwr.c
 CDL_LIBS += lpc177x_8x_adc.c lpc177x_8x_gpio.c  lpc177x_8x_pinsel.c
@@ -49,7 +50,7 @@ OBJ = $(SRC:.c=.o)
 ALL_OBJ = `find -name "*.o"`
 
 # include directories
-INC = $(DEVICE_INC) $(CMSIS_INC) $(CDL_INC) $(RTOS_INC) $(DRIVERS_INC) $(APP_INC) $(USB_INC)
+INC = $(DEVICE_INC) $(CMSIS_INC) $(CDL_INC) $(RTOS_INC) $(DRIVERS_INC) $(APP_INC) $(USB_INC) $(PROTOCOL_INC)
 
 # C flags
 ifeq ($(CCC_ANALYZER_OUTPUT_FORMAT),)

@@ -53,7 +53,9 @@ enum {UI_DISCONNECTED, UI_CONNECTED};
 */
 bool g_protocol_busy;
 bool g_self_test_mode;
+bool g_ui_communication_started;
 float g_pot_calibrations[2][POTS_COUNT];
+
 /*
 ************************************************************************************************************************
 *           MACRO'S

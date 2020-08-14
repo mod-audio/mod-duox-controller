@@ -5,6 +5,10 @@
 ************************************************************************************************************************
 */
 
+#include <string.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
 #include "system.h"
 #include "config.h"
 #include "data.h"
@@ -20,9 +24,7 @@
 #include "device.h"
 #include "calibration.h"
 #include "uc1701.h"
-#include <string.h>
-#include <stdlib.h>
-#include <stdbool.h>
+#include "mod-protocol.h"
 
 /*
 ************************************************************************************************************************
@@ -177,6 +179,46 @@ void set_item_value(char *command, uint16_t value)
     {
         buffer[i++] = *p;
         p++;
+    }
+    buffer[i] = 0;
+
+    // sets the response callback
+    comm_webgui_set_response_cb(NULL, NULL);
+
+    // sends the data to GUI
+    comm_webgui_send(buffer, i);
+}
+
+static void set_menu_item_value(uint16_t menu_id, uint16_t value)
+{
+    if (g_comm_protocol_bussy) return;
+
+    uint8_t i;
+    char buffer[50];
+
+    i = copy_command((char *)buffer, CMD_MENU_ITEM_CHANGE);
+
+    // copy the id
+    char id_buf[3];
+    int_to_str(menu_id, id_buf, 2, 0);
+    const char *p = id_buf;
+    while (*p)
+    {
+        buffer[i++] = *p;
+        p++;
+    }
+
+    strcat(buffer, " ");
+    i++;
+
+    // copy the value
+    char str_buf[8];
+    int_to_str(value, str_buf, 4, 0);
+    const char *q = str_buf;
+    while (*q)
+    {
+        buffer[i++] = *q;
+        q++;
     }
     buffer[i] = 0;
 
@@ -343,80 +385,80 @@ void system_update_menu_value(uint8_t item_ID, uint16_t value)
     switch(item_ID)
     {
         //play status
-        case PLAY_STATUS_ID:
+        case MENU_ID_PLAY_STATUS:
             g_play_status = value;
         break;
         //global tempo
-        case GLOBAL_TEMPO_ID:
+        case MENU_ID_TEMPO:
             g_beats_per_minute = value;
         break;
         //global tempo status
-        case BEATS_PER_BAR_ID:
+        case MENU_ID_BEATS_PER_BAR:
             g_beats_per_bar = value;
         break;
         //tuner mute
-        case TUNER_MUTE_ID: 
+        case MENU_ID_TUNER_MUTE: 
             g_tuner_mute = value;
         break;
         //bypass channel 1
-        case BYPASS1_ID: 
+        case MENU_ID_BYPASS1: 
             g_bypass[0] = value;
         break;
         //bypass channel 2
-        case BYPASS2_ID: 
+        case MENU_ID_BYPASS2: 
             g_bypass[1] = value;
         break;
         //quick bypass channel
-        case QUICK_BYPASS_ID: 
+        case MENU_ID_QUICK_BYPASS: 
             g_q_bypass = value;
         break;
         //sl input
-        case STEREOLINK_INP_ID: 
+        case MENU_ID_SL_IN: 
             g_sl_in = value;
         break;
         //master volume target 
-        case MASTER_VOL_PORT_ID: 
+        case MENU_ID_MASTER_VOL_PORT: 
             g_master_vol_port = value;
         break;
         //stereo link output
-        case STEREOLINK_OUTP_ID: 
+        case MENU_ID_SL_OUT: 
             g_sl_out = value;
         break;
         //MIDI clock source
-        case MIDI_CLK_SOURCE_ID: 
+        case MENU_ID_MIDI_CLK_SOURCE: 
             g_MIDI_clk_src = value;
         break;
         //send midi clock
-        case MIDI_CLK_SEND_ID: 
+        case MENU_ID_MIDI_CLK_SEND: 
             g_MIDI_clk_send = value;
         break;
         //snapshot prog change 
-        case SNAPSHOT_PRGCHGE_ID: 
+        case MENU_ID_SNAPSHOT_PRGCHGE: 
             g_snapshot_prog_change = value;
         break;
         //pedalboard prog change 
-        case PB_PRGCHNGE_ID: 
+        case MENU_ID_PB_PRGCHNGE: 
             g_pedalboard_prog_change = value;
         break;
         //user profile change 
-        case PROFILES_ID: 
+        case MENU_ID_CURRENT_PROFILE: 
             g_current_profile = value;
         break;
         //display brightness
-        case DISPLAY_BRIGHTNESS_ID: 
+        case MENU_ID_BRIGHTNESS: 
             g_display_brightness = value;
             hardware_glcd_brightness(g_display_brightness); 
         break;
         //CV in mode
-        case EXP_CV_INP: 
+        case MENU_ID_EXP_CV_INPUT: 
             g_cv_in_mode = value;
         break;
         //expression mode
-        case EXP_MODE: 
+        case MENU_ID_EXP_MODE: 
             g_exp_mode = value;
         break;
         //CV out mode
-        case HP_CV_OUTP: 
+        case MENU_ID_HP_CV_OUTPUT: 
             g_cv_out_mode = value;
         break;
         default:
@@ -439,11 +481,11 @@ void system_pedalboard_cb(void *arg, int event)
         switch (item->desc->id)
         {
             case PEDALBOARD_SAVE_ID:
-                comm_webgui_send(PEDALBOARD_SAVE_CMD, strlen(PEDALBOARD_SAVE_CMD));
+                comm_webgui_send(CMD_PEDALBOARD_SAVE, strlen(CMD_PEDALBOARD_SAVE));
                 break;
 
             case PEDALBOARD_RESET_ID:
-                comm_webgui_send(PEDALBOARD_RESET_CMD, strlen(PEDALBOARD_RESET_CMD));
+                comm_webgui_send(CMD_PEDALBOARD_RESET, strlen(CMD_PEDALBOARD_RESET));
                 break;
         }
     }
@@ -688,7 +730,7 @@ void system_master_vol_link_cb(void *arg, int event)
             if (g_sl_out == 1)
             {
                 g_sl_out = 0;
-                set_item_value(SL_OUT_SET_CMD, g_sl_out);
+                set_menu_item_value(MENU_ID_SL_IN, g_sl_in);
             }
         }
         else
@@ -696,7 +738,7 @@ void system_master_vol_link_cb(void *arg, int event)
             g_master_vol_port = 0;
             //if value is 0 (link to 1&2) we must also turn on stereo link fo the output
             g_sl_out = 1;
-            set_item_value(SL_OUT_SET_CMD, g_sl_out);
+            set_menu_item_value(MENU_ID_SL_OUT, g_sl_out);
 
             //also set the gains to the same value
             char value_bfr[8] = {};
@@ -710,7 +752,7 @@ void system_master_vol_link_cb(void *arg, int event)
 
             system_save_gains_cb(NULL, MENU_EV_ENTER);
         }
-        set_item_value(MASTER_VOL_SET_LINK_CMD, g_master_vol_port);
+        set_menu_item_value(MENU_ID_MASTER_VOL_PORT, g_master_vol_port);
     }
 
     char str_bfr[4];
@@ -910,7 +952,7 @@ void system_sl_in_cb (void *arg, int event)
         if (g_sl_in == 0) g_sl_in = 1;
         else g_sl_in = 0;
 
-        set_item_value(SL_IN_SET_CMD, g_sl_in);
+        set_menu_item_value(MENU_ID_SL_IN, g_sl_in);
 
         //if we toggled to 1, we need to change gain 2 to  gain 1
         char value_bfr[8] = {};
@@ -969,8 +1011,8 @@ void system_sl_out_cb (void *arg, int event)
             //we must change the master volume link as wel to channel 1 =1 
             g_master_vol_port = 1;
         }
-        set_item_value(MASTER_VOL_SET_LINK_CMD, g_master_vol_port);
-        set_item_value(SL_OUT_SET_CMD, g_sl_out);
+        set_menu_item_value(MENU_ID_MASTER_VOL_PORT, g_master_vol_port);
+        set_menu_item_value(MENU_ID_SL_OUT, g_sl_out);
     }
 
     char str_bfr[4] = {};
@@ -990,7 +1032,7 @@ void system_tuner_cb (void *arg, int event)
     {
         if (g_tuner_mute == 0) g_tuner_mute= 1;
         else g_tuner_mute = 0;
-        set_item_value(TUNER_MUTE_SET_CMD, g_tuner_mute);
+        set_menu_item_value(MENU_ID_TUNER_MUTE, g_tuner_mute);
     }
     char str_bfr[15] = {};
     strcpy(str_bfr,"MUTE ");
@@ -1009,7 +1051,7 @@ void system_play_cb (void *arg, int event)
     {
         if (g_play_status == 0) g_play_status = 1;
         else g_play_status = 0;
-        set_item_value(PLAY_SET_CMD, g_play_status);
+        set_menu_item_value(MENU_ID_PLAY_STATUS, g_play_status);
     }
     char str_bfr[15] = {};
     strcpy(str_bfr,"PLAY ");
@@ -1028,7 +1070,7 @@ void system_midi_src_cb (void *arg, int event)
     {
         if (g_MIDI_clk_src < 2) g_MIDI_clk_src++;
         else g_MIDI_clk_src = 0;
-        set_item_value(MIDI_SRC_SET_CMD, g_MIDI_clk_src);
+        set_menu_item_value(MENU_ID_MIDI_CLK_SOURCE, g_MIDI_clk_src);
     }
 
     //translate the int to string value for the menu
@@ -1048,7 +1090,7 @@ void system_midi_send_cb (void *arg, int event)
     {
         if (g_MIDI_clk_send == 0) g_MIDI_clk_send = 1;
         else g_MIDI_clk_send = 0;
-        set_item_value(SEND_MIDI_CLK_CMD, g_MIDI_clk_send);
+        set_menu_item_value(MENU_ID_MIDI_CLK_SEND, g_MIDI_clk_send);
     }
 
     add_chars_to_menu_name(item, (g_MIDI_clk_send? option_enabled : option_disabled));
@@ -1060,7 +1102,7 @@ void system_ss_prog_change_cb (void *arg, int event)
 
     if (event == MENU_EV_ENTER)
     {
-        set_item_value(MIDI_SNAPSHOT_SET_CMD, item->data.value);
+        set_menu_item_value(MENU_ID_SNAPSHOT_PRGCHGE, item->data.value);
     }
     else if (event == MENU_EV_NONE)
     {
@@ -1075,7 +1117,7 @@ void system_ss_prog_change_cb (void *arg, int event)
         //HMI changes the item, resync
         g_snapshot_prog_change = item->data.value;
         //let mod-ui know
-        set_item_value(MIDI_SNAPSHOT_SET_CMD, g_snapshot_prog_change);
+        set_menu_item_value(MENU_ID_SNAPSHOT_PRGCHGE, g_snapshot_prog_change);
     }
 
     char str_bfr[8] = {};
@@ -1091,7 +1133,7 @@ void system_pb_prog_change_cb (void *arg, int event)
 
     if (event == MENU_EV_ENTER)
     {
-        set_item_value(MIDI_PRGCH_SET_CMD, item->data.value);
+        set_menu_item_value(MENU_ID_PB_PRGCHNGE, item->data.value);
     }
     else if (event == MENU_EV_NONE)
     {
@@ -1107,7 +1149,7 @@ void system_pb_prog_change_cb (void *arg, int event)
         //HMI changes the item, resync
         g_pedalboard_prog_change = item->data.value;
         //let mod-ui know
-        set_item_value(MIDI_PRGCH_SET_CMD, g_pedalboard_prog_change);
+        set_menu_item_value(MENU_ID_PB_PRGCHNGE, g_pedalboard_prog_change);
     }
 
     char str_bfr[8] = {};
@@ -1124,7 +1166,7 @@ void system_tempo_cb (void *arg, int event)
     if (event == MENU_EV_ENTER)
     {
         //we can only change tempo when not linked to MIDI
-        if (g_MIDI_clk_src != 1) set_item_value(TEMPO_SET_CMD, item->data.value);
+        if (g_MIDI_clk_src != 1) set_menu_item_value(MENU_ID_TEMPO, item->data.value);
     }
     else if (event == MENU_EV_NONE)
     {
@@ -1143,7 +1185,7 @@ void system_tempo_cb (void *arg, int event)
             //HMI changes the item, resync
             g_beats_per_minute = item->data.value;
             //let mod-ui know
-            set_item_value(TEMPO_SET_CMD, g_beats_per_minute);
+            set_menu_item_value(MENU_ID_TEMPO, g_beats_per_minute);
         }
         else 
         {
@@ -1163,7 +1205,7 @@ void system_bpb_cb (void *arg, int event)
 
     if (event == MENU_EV_ENTER)
     {
-        set_item_value(BPB_SET_CMD, item->data.value);
+        set_menu_item_value(MENU_ID_BEATS_PER_BAR, item->data.value);
     }
     else if (event == MENU_EV_NONE)
     {
@@ -1179,7 +1221,7 @@ void system_bpb_cb (void *arg, int event)
         //HMI changes the item, resync
         g_beats_per_bar = item->data.value;
         //let mod-ui know
-        set_item_value(BPB_SET_CMD, g_beats_per_bar);
+        set_menu_item_value(MENU_ID_BEATS_PER_BAR, g_beats_per_bar);
     }
 
     //add the items to the 
@@ -1192,8 +1234,6 @@ void system_bpb_cb (void *arg, int event)
 void system_bypass_cb (void *arg, int event)
 {
     menu_item_t *item = arg; 
-    char cmd_bfr[32];
-    char channel[8];
 
     //0=in1, 1=in2, 2=in1&2
     switch (item->desc->id)
@@ -1203,14 +1243,9 @@ void system_bypass_cb (void *arg, int event)
             //we need to toggle the bypass
             if (event == MENU_EV_ENTER)
             {
-                //add channel to the command 
-                strcpy(cmd_bfr, BYPASS_SET_CMD);
-                int_to_str(0, channel, 4, 0);
-                strcat(cmd_bfr, channel);
-                strcat(cmd_bfr, " ");
                 //we toggle the bypass 
                 g_bypass[0] = !g_bypass[0];
-                set_item_value(cmd_bfr, g_bypass[0]);
+                set_menu_item_value(MENU_ID_BYPASS1, g_bypass[0]);
             }
             add_chars_to_menu_name(item, (g_bypass[0]? option_enabled : option_disabled));
         break;
@@ -1220,14 +1255,9 @@ void system_bypass_cb (void *arg, int event)
             //we need to toggle the bypass
             if (event == MENU_EV_ENTER)
             {
-                //add channel to the command 
-                strcpy(cmd_bfr, BYPASS_SET_CMD);
-                int_to_str(1, channel, 4, 0);
-                strcat(cmd_bfr, channel);
-                strcat(cmd_bfr, " ");
                 //we toggle the bypass 
                 g_bypass[1] = !g_bypass[1];
-                set_item_value(cmd_bfr, g_bypass[1]);
+                set_menu_item_value(MENU_ID_BYPASS2, g_bypass[1]);
             }
             add_chars_to_menu_name(item, (g_bypass[1]? option_enabled : option_disabled));
         break;
@@ -1235,14 +1265,10 @@ void system_bypass_cb (void *arg, int event)
         case BP12_ID:
             if (event == MENU_EV_ENTER)
             {
-                //add channel to the command 
-                strcpy(cmd_bfr, BYPASS_SET_CMD);
-                int_to_str(2, channel, 4, 0);
-                strcat(cmd_bfr, channel);
-                strcat(cmd_bfr, " ");
                 //toggle the bypasses
                 g_bypass[2] = !g_bypass[2];
-                set_item_value(cmd_bfr, g_bypass[2]);
+                set_menu_item_value(MENU_ID_BYPASS1, g_bypass[2]);
+                set_menu_item_value(MENU_ID_BYPASS2, g_bypass[2]);
                 g_bypass[0] = g_bypass[2];
                 g_bypass[1] = g_bypass[2];
             }
@@ -1277,7 +1303,7 @@ void system_qbp_channel_cb (void *arg, int event)
         //count from 0 to 2 
         if (g_q_bypass < 2) g_q_bypass++;
         else g_q_bypass = 0;
-        set_item_value(QBP_SET_CMD, g_q_bypass);
+        set_menu_item_value(MENU_ID_QUICK_BYPASS, g_q_bypass);
     }
     
     //get the right char to put on the screen
@@ -1305,9 +1331,6 @@ void system_qbp_channel_cb (void *arg, int event)
 
 void system_quick_bypass_cb (void *arg, int event)
 {
-    char cmd_bfr[32];
-    char channel[8];
-
     menu_item_t *item = arg;
 
     char str_bfr[15] = {};
@@ -1319,14 +1342,9 @@ void system_quick_bypass_cb (void *arg, int event)
         case (0):
             if (event == MENU_EV_ENTER)
             {
-                //add channel to the command 
-                strcpy(cmd_bfr, BYPASS_SET_CMD);
-                int_to_str(0, channel, 4, 0);
-                strcat(cmd_bfr, channel);
-                strcat(cmd_bfr, " ");
                 //we toggle the bypass 
                 g_bypass[0] = !g_bypass[0];
-                set_item_value(cmd_bfr, g_bypass[0]);
+                set_menu_item_value(MENU_ID_BYPASS1, g_bypass[0]);
             }
             strcpy(str_bfr,"BYPASS ");
             strcat(str_bfr, (g_bypass[0]? option_enabled : option_disabled));
@@ -1336,14 +1354,9 @@ void system_quick_bypass_cb (void *arg, int event)
         case (1):
             if (event == MENU_EV_ENTER)
             {
-                //add channel to the command 
-                strcpy(cmd_bfr, BYPASS_SET_CMD);
-                int_to_str(1, channel, 4, 0);
-                strcat(cmd_bfr, channel);
-                strcat(cmd_bfr, " ");
                 //we toggle the bypass 
                 g_bypass[1] = !g_bypass[1];
-                set_item_value(cmd_bfr, g_bypass[1]);
+                set_menu_item_value(MENU_ID_BYPASS2, g_bypass[1]);
             }
             strcpy(str_bfr,"BYPASS ");
             strcat(str_bfr, (g_bypass[1]? option_enabled : option_disabled));
@@ -1353,14 +1366,10 @@ void system_quick_bypass_cb (void *arg, int event)
         case (2):
             if (event == MENU_EV_ENTER)
             {
-                //add channel to the command 
-                strcpy(cmd_bfr, BYPASS_SET_CMD);
-                int_to_str(2, channel, 4, 0);
-                strcat(cmd_bfr, channel);
-                strcat(cmd_bfr, " ");
                 //we toggle the bypass
                 g_bypass[2] = !g_bypass[2];
-                set_item_value(cmd_bfr, g_bypass[2]);
+                set_menu_item_value(MENU_ID_BYPASS1, g_bypass[2]);
+                set_menu_item_value(MENU_ID_BYPASS2, g_bypass[2]);
                 g_bypass[0] = g_bypass[2];
                 g_bypass[1] = g_bypass[2];
             }
@@ -1397,7 +1406,7 @@ void system_load_pro_cb(void *arg, int event)
         g_current_profile = item->desc->id - item->desc->parent_id;
         item->data.value = 1;
 
-        set_item_value(LOAD_PROFILE_CMD, g_current_profile);
+        set_item_value(CMD_PROFILE_LOAD, g_current_profile);
     }
 
     else if (event == MENU_EV_NONE)
@@ -1426,7 +1435,7 @@ void system_save_pro_cb(void *arg, int event)
     //if clicked and YES was selected from the pop-up
     if (event == MENU_EV_ENTER && item->data.hover == 0)
     {
-        set_item_value(STORE_PROFILE_CMD, g_current_profile);
+        set_item_value(CMD_PROFILE_STORE, g_current_profile);
         //since the current profile value cant change because of a menu enter here we do not need to update the name.
     }
 
@@ -1461,7 +1470,7 @@ void system_cv_exp_cb (void *arg, int event)
     {
         if (g_cv_in_mode == 0) g_cv_in_mode = 1;
         else g_cv_in_mode = 0;
-        set_item_value(EXPCV_SET_CMD, g_cv_in_mode);
+        set_menu_item_value(MENU_ID_EXP_CV_INPUT, g_cv_in_mode);
     }
     char str_bfr[15] = {};
     strcat(str_bfr,(g_cv_in_mode ? "EXP" : "CV"));
@@ -1484,7 +1493,7 @@ void system_exp_mode_cb (void *arg, int event)
     {
         if (g_exp_mode == 0) g_exp_mode = 1;
         else g_exp_mode = 0;
-        set_item_value(EXP_MODE_SET_CMD, g_exp_mode);
+        set_menu_item_value(MENU_ID_EXP_MODE, g_exp_mode);
     }
     char str_bfr[15] = {};
     strcat(str_bfr,(g_exp_mode ? "Signal on Ring" : "Signal on Tip"));
@@ -1507,7 +1516,7 @@ void system_cv_hp_cb (void *arg, int event)
     {
         if (g_cv_out_mode == 0) g_cv_out_mode = 1;
         else g_cv_out_mode = 0;
-        set_item_value(HPCV_SET_CMD, g_cv_out_mode);
+        set_menu_item_value(MENU_ID_HP_CV_OUTPUT, g_cv_out_mode);
     }
     char str_bfr[15] = {};
     strcat(str_bfr,(g_cv_out_mode ? "CV" : "Headphone"));

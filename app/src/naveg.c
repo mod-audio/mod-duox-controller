@@ -16,6 +16,7 @@
 #include "semphr.h"
 #include "actuator.h"
 #include "calibration.h"
+#include "mod-protocol.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -107,7 +108,7 @@ static uint16_t g_bp_state, g_current_pedalboard, g_bp_first;
 static node_t *g_menu, *g_current_menu, *g_current_main_menu;
 static menu_item_t *g_current_item, *g_current_main_item;
 static uint8_t g_max_items_list;
-static bank_config_t g_bank_functions[BANK_FUNC_AMOUNT];
+static bank_config_t g_bank_functions[BANK_FUNC_COUNT];
 static uint8_t g_initialized, g_ui_connected;
 static void (*g_update_cb)(void *data, int event);
 static void *g_update_data;
@@ -202,7 +203,7 @@ static void display_disable_all_tools(uint8_t display)
         g_protocol_busy = true;
         system_lock_comm_serial(g_protocol_busy);
 
-        comm_webgui_send(TUNER_OFF_CMD, strlen(TUNER_OFF_CMD));
+        comm_webgui_send(CMD_TUNER_OFF, strlen(CMD_TUNER_OFF));
 
         g_protocol_busy = false;
         system_lock_comm_serial(g_protocol_busy);
@@ -292,18 +293,18 @@ static void step_to_value(control_t *control)
     float p_step = ((float) control->step) / ((float) (control->steps - 1));
     switch (control->properties)
     {
-        case CONTROL_PROP_LINEAR:
-        case CONTROL_PROP_INTEGER:
+        case FLAG_CONTROL_LINEAR:
+        case FLAG_CONTROL_INTEGER:
             control->value = (p_step * (control->maximum - control->minimum)) + control->minimum;
             break;
 
-        case CONTROL_PROP_LOGARITHMIC:
+        case FLAG_CONTROL_LOGARITHMIC:
             control->value = control->minimum * pow(control->maximum / control->minimum, p_step);
             break;
 
-        case CONTROL_PROP_REVERSE_ENUM:
-        case CONTROL_PROP_ENUMERATION:
-        case CONTROL_PROP_SCALE_POINTS:
+        case FLAG_CONTROL_REVERSE_ENUM:
+        case FLAG_CONTROL_ENUMERATION:
+        case FLAG_CONTROL_SCALE_POINTS:
             control->value = control->scale_points[control->step]->value;
             break;
     }
@@ -331,12 +332,12 @@ static void display_encoder_add(control_t *control)
     // calculates initial step
     switch (control->properties)
     {
-        case CONTROL_PROP_LINEAR:
+        case FLAG_CONTROL_LINEAR:
             control->step =
                 (control->value - control->minimum) / ((control->maximum - control->minimum) / control->steps);
             break;
 
-        case CONTROL_PROP_LOGARITHMIC:
+        case FLAG_CONTROL_LOGARITHMIC:
             if (control->minimum == 0.0)
                 control->minimum = FLT_MIN;
 
@@ -350,9 +351,9 @@ static void display_encoder_add(control_t *control)
                 (control->steps - 1) * log(control->value / control->minimum) / log(control->maximum / control->minimum);
             break;
 
-        case CONTROL_PROP_REVERSE_ENUM:
-        case CONTROL_PROP_ENUMERATION:
-        case CONTROL_PROP_SCALE_POINTS:
+        case FLAG_CONTROL_REVERSE_ENUM:
+        case FLAG_CONTROL_ENUMERATION:
+        case FLAG_CONTROL_SCALE_POINTS:
             control->step = 0;
             uint8_t i;
             control->scroll_dir = g_scroll_dir;
@@ -368,7 +369,7 @@ static void display_encoder_add(control_t *control)
             control->steps = control->scale_points_count;
             break;
 
-        case CONTROL_PROP_INTEGER:
+        case FLAG_CONTROL_INTEGER:
             control->steps = (control->maximum - control->minimum) + 1;
             control->step =
                 (control->value - control->minimum) / ((control->maximum - control->minimum) / control->steps);
@@ -431,12 +432,12 @@ static void display_pot_add(control_t *control)
     //within this range the difference should be smaller then 50 before the pot starts turning
     uint32_t tmp_control_value = 0;
 
-    if (g_pots[id]->properties == CONTROL_PROP_LINEAR)
+    if (g_pots[id]->properties == FLAG_CONTROL_LINEAR)
     {
     	//map the current value to the ADC range
     	tmp_control_value = MAP(g_pots[id]->value, g_pots[id]->minimum,  g_pots[id]->maximum, g_pot_calibrations[0][id], g_pot_calibrations[1][id]);
     }
-    else if (g_pots[id]->properties == CONTROL_PROP_LOGARITHMIC)
+    else if (g_pots[id]->properties == FLAG_CONTROL_LOGARITHMIC)
     {
     	//map the current value to the ADC range logarithmicly 
     	tmp_control_value = (g_pot_calibrations[1][id] - g_pot_calibrations[0][id]) * log(g_pots[id]->value / g_pots[id]->minimum) / log(g_pots[id]->maximum / g_pots[id]->minimum);
@@ -449,7 +450,7 @@ static void display_pot_add(control_t *control)
 
     if (g_lock_potentiometers)
     {   
-        if  ((g_pots[id]->properties == CONTROL_PROP_TOGGLED) || (g_pots[id]->properties == CONTROL_PROP_BYPASS))
+        if  ((g_pots[id]->properties == FLAG_CONTROL_TOGGLED) || (g_pots[id]->properties == FLAG_CONTROL_BYPASS))
         {
             g_pots[id]->scroll_dir = 1;
         }
@@ -470,12 +471,12 @@ static void display_pot_add(control_t *control)
     // calculates initial step
     switch (control->properties)
     {
-        case CONTROL_PROP_LINEAR:
+        case FLAG_CONTROL_LINEAR:
             control->step =
                 (control->value - control->minimum) / ((control->maximum - control->minimum) / control->steps);
             break;
 
-        case CONTROL_PROP_LOGARITHMIC:
+        case FLAG_CONTROL_LOGARITHMIC:
             if (control->minimum == 0.0)
                 control->minimum = FLT_MIN;
 
@@ -548,7 +549,7 @@ static void foot_control_add(control_t *control)
     switch (control->properties)
     {
         // toggled specification: http://lv2plug.in/ns/lv2core/#toggled
-        case CONTROL_PROP_TOGGLED:
+        case FLAG_CONTROL_TOGGLED:
             // updates the led
             if (control->value <= 0)
                 ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TOGGLED_COLOR, 0, 0, 0, 0);
@@ -564,7 +565,7 @@ static void foot_control_add(control_t *control)
                          (control->value <= 0 ? TOGGLED_OFF_FOOTER_TEXT : TOGGLED_ON_FOOTER_TEXT), control->properties);
             break;
 
-        case CONTROL_PROP_MOMENTARY_SW:
+        case FLAG_CONTROL_MOMENTARY:
         {
             if ((control->scroll_dir == 0)||(control->scroll_dir == 2))
                 ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR, 1, 0, 0, 0);
@@ -582,7 +583,7 @@ static void foot_control_add(control_t *control)
         }
 
         // trigger specification: http://lv2plug.in/ns/ext/port-props/#trigger
-        case CONTROL_PROP_TRIGGER:
+        case FLAG_CONTROL_TRIGGER:
             // updates the led
             //check if its assigned to a trigger and if the button is released
             if (control->scroll_dir == 2) ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR, 1, 0, 0, 0);
@@ -607,7 +608,7 @@ static void foot_control_add(control_t *control)
             screen_footer(control->hw_id - ENCODERS_COUNT, control->label, BYPASS_ON_FOOTER_TEXT, control->properties);
             break;
 
-        case CONTROL_PROP_TAP_TEMPO: ;
+        case FLAG_CONTROL_TAP_TEMPO: ;
             // convert the time unit
             uint16_t time_ms = (uint16_t)(convert_to_ms(control->unit, control->value) + 0.5);
 
@@ -684,7 +685,7 @@ static void foot_control_add(control_t *control)
             screen_footer(control->hw_id - ENCODERS_COUNT, control->label, value_txt, control->properties);
             break;
 
-        case CONTROL_PROP_BYPASS:
+        case FLAG_CONTROL_BYPASS:
             // updates the led
             if (control->value <= 0)
                 ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), BYPASS_COLOR, 1, 0, 0, 0);
@@ -700,9 +701,9 @@ static void foot_control_add(control_t *control)
                          (control->value ? BYPASS_ON_FOOTER_TEXT : BYPASS_OFF_FOOTER_TEXT), control->properties);
             break;
 
-        case CONTROL_PROP_REVERSE_ENUM:
-        case CONTROL_PROP_ENUMERATION:
-        case CONTROL_PROP_SCALE_POINTS:
+        case FLAG_CONTROL_REVERSE_ENUM:
+        case FLAG_CONTROL_ENUMERATION:
+        case FLAG_CONTROL_SCALE_POINTS:
             // updates the led
             //check if its assigned to a trigger and if the button is released
             if (control->scroll_dir == 2) ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_COLOR, 1, 0, 0, 0);
@@ -786,7 +787,7 @@ static void request_control_page(control_t *control, uint8_t dir)
     char buffer[40];
     uint8_t i;
 
-    i = copy_command(buffer, CONTROL_PAGE_CMD); 
+    i = copy_command(buffer, CMD_CONTROL_PAGE); 
 
     // insert the hw_id on buffer
     i += int_to_str(control->hw_id, &buffer[i], sizeof(buffer) - i, 0);
@@ -853,7 +854,7 @@ static void request_banks_list(uint8_t dir)
     memset(buffer, 0, 20);
     uint8_t i;
 
-    i = copy_command(buffer, BANKS_CMD); 
+    i = copy_command(buffer, CMD_BANKS); 
 
     // insert the direction on buffer
     i += int_to_str(dir, &buffer[i], sizeof(buffer) - i, 0);
@@ -898,7 +899,7 @@ static void request_next_bank_page(uint8_t dir)
     memset(buffer, 0, sizeof buffer);
     uint8_t i;
 
-    i = copy_command(buffer, BANKS_CMD); 
+    i = copy_command(buffer, CMD_BANKS); 
 
     // insert the direction on buffer
     i += int_to_str(dir, &buffer[i], sizeof(buffer) - i, 0);
@@ -961,7 +962,7 @@ static void request_pedalboards(uint8_t dir, uint16_t bank_uid)
     // sets the response callback
     comm_webgui_set_response_cb(parse_pedalboards_list, NULL);
 
-    i = copy_command((char *)buffer, PEDALBOARDS_CMD);
+    i = copy_command((char *)buffer, CMD_PEDALBOARDS);
 
     uint8_t bitmask = 0;
     if (dir == 1) {bitmask |= LIST_PAGE_UP;}
@@ -1028,7 +1029,7 @@ static void send_load_pedalboard(uint16_t bank_id, const char *pedalboard_uid)
     char buffer[40];
     memset(buffer, 0, sizeof buffer);
 
-    i = copy_command((char *)buffer, PEDALBOARD_CMD);
+    i = copy_command((char *)buffer, CMD_PEDALBOARD_LOAD);
 
     // copy the bank id
     i += int_to_str(bank_id, &buffer[i], 8, 0);
@@ -1075,9 +1076,9 @@ static void control_set(uint8_t id, control_t *control)
 
     switch (control->properties)
     {
-        case CONTROL_PROP_LINEAR:
-        case CONTROL_PROP_INTEGER:
-        case CONTROL_PROP_LOGARITHMIC:
+        case FLAG_CONTROL_LINEAR:
+        case FLAG_CONTROL_INTEGER:
+        case FLAG_CONTROL_LOGARITHMIC:
             if (control->hw_id < ENCODERS_COUNT)
             {
                 // update the screen
@@ -1093,9 +1094,9 @@ static void control_set(uint8_t id, control_t *control)
             }
             break;
 
-        case CONTROL_PROP_REVERSE_ENUM:
-        case CONTROL_PROP_ENUMERATION:
-        case CONTROL_PROP_SCALE_POINTS:
+        case FLAG_CONTROL_REVERSE_ENUM:
+        case FLAG_CONTROL_ENUMERATION:
+        case FLAG_CONTROL_SCALE_POINTS:
             if (control->hw_id < ENCODERS_COUNT)
             {
                 // update the screen
@@ -1112,7 +1113,7 @@ static void control_set(uint8_t id, control_t *control)
                     ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_PRESSED_COLOR, 1, 0, 0, 0);
                 }
 
-                if (control->properties != CONTROL_PROP_REVERSE_ENUM)
+                if (control->properties != FLAG_CONTROL_REVERSE_ENUM)
                 {
                     // increments the step
                     if (control->step < (control->steps - 1))
@@ -1171,8 +1172,8 @@ static void control_set(uint8_t id, control_t *control)
             }
             break;
 
-        case CONTROL_PROP_TOGGLED:
-        case CONTROL_PROP_BYPASS:
+        case FLAG_CONTROL_TOGGLED:
+        case FLAG_CONTROL_BYPASS:
             if (control->hw_id < ENCODERS_COUNT)
             {
                 // update the screen
@@ -1196,7 +1197,7 @@ static void control_set(uint8_t id, control_t *control)
             }
             break;
 
-        case CONTROL_PROP_TRIGGER:
+        case FLAG_CONTROL_TRIGGER:
             control->value = control->maximum;
             // to update the footer and screen
             foot_control_add(control);
@@ -1205,14 +1206,14 @@ static void control_set(uint8_t id, control_t *control)
             
             break;
 
-        case CONTROL_PROP_MOMENTARY_SW:
+        case FLAG_CONTROL_MOMENTARY:
             control->value = !control->value;
             // to update the footer and screen
             foot_control_add(control);
 
             break;
 
-        case CONTROL_PROP_TAP_TEMPO:
+        case FLAG_CONTROL_TAP_TEMPO:
             now = hardware_timestamp();
             delta = now - g_tap_tempo[control->hw_id - ENCODERS_COUNT].time;
             g_tap_tempo[control->hw_id - ENCODERS_COUNT].time = now;
@@ -1258,7 +1259,7 @@ static void control_set(uint8_t id, control_t *control)
     char buffer[128];
     uint8_t i;
 
-    i = copy_command(buffer, CONTROL_SET_CMD);
+    i = copy_command(buffer, CMD_CONTROL_SET);
 
     // insert the hw_id on buffer
     i += int_to_str(control->hw_id, &buffer[i], sizeof(buffer) - i, 0);
@@ -1924,7 +1925,7 @@ static void tuner_enter(void)
     static uint8_t input = 1;
 
     char buffer[128];
-    uint32_t i = copy_command(buffer, TUNER_INPUT_CMD);
+    uint32_t i = copy_command(buffer, CMD_TUNER_INPUT);
 
     // toggle the input
     input = (input == 1 ? 2 : 1);
@@ -2026,7 +2027,7 @@ void naveg_init(void)
     g_bp_state = BANKS_LIST;
 
     // initializes the bank functions
-    for (i = 0; i < BANK_FUNC_AMOUNT; i++)
+    for (i = 0; i < BANK_FUNC_COUNT; i++)
     {
         g_bank_functions[i].function = BANK_FUNC_NONE;
         g_bank_functions[i].hw_id = 0xFF;
@@ -2232,8 +2233,8 @@ void naveg_inc_control(uint8_t display)
     control_t *control = g_encoders[display];
     if (!control) return;
 
-    if  (((control->properties == CONTROL_PROP_ENUMERATION) || (control->properties == CONTROL_PROP_SCALE_POINTS) 
-        || (control->properties == CONTROL_PROP_REVERSE_ENUM)) && (control->scale_points_flag & CONTROL_PAGINATED))
+    if  (((control->properties == FLAG_CONTROL_ENUMERATION) || (control->properties == FLAG_CONTROL_SCALE_POINTS) 
+        || (control->properties == FLAG_CONTROL_REVERSE_ENUM)) && (control->scale_points_flag & CONTROL_PAGINATED))
     {
     	//check/sets the direction
 		if (control->scroll_dir == 0)
@@ -2266,14 +2267,14 @@ void naveg_inc_control(uint8_t display)
     		    return;	
     	}
     }
-    else if (control->properties == CONTROL_PROP_TOGGLED)
+    else if (control->properties == FLAG_CONTROL_TOGGLED)
     {
         if (control->value == 1)
             return;
         else 
             control->value = 1;
     }
-    else if (control->properties == CONTROL_PROP_BYPASS)
+    else if (control->properties == FLAG_CONTROL_BYPASS)
     {
         if (control->value == 0)
             return;
@@ -2305,8 +2306,8 @@ void naveg_dec_control(uint8_t display)
     control_t *control = g_encoders[display];
     if (!control) return;
 
-    if  (((control->properties == CONTROL_PROP_ENUMERATION) || (control->properties == CONTROL_PROP_SCALE_POINTS) ||
-     (control->properties == CONTROL_PROP_REVERSE_ENUM)) && (control->scale_points_flag & CONTROL_PAGINATED))
+    if  (((control->properties == FLAG_CONTROL_ENUMERATION) || (control->properties == FLAG_CONTROL_SCALE_POINTS) ||
+     (control->properties == FLAG_CONTROL_REVERSE_ENUM)) && (control->scale_points_flag & CONTROL_PAGINATED))
     {
 		//check/sets the direction
 		if (control->scroll_dir != 0)
@@ -2346,14 +2347,14 @@ void naveg_dec_control(uint8_t display)
                 return;
     	}
     }
-    else if (control->properties == CONTROL_PROP_TOGGLED)
+    else if (control->properties == FLAG_CONTROL_TOGGLED)
     {
         if (control->value == 0)
             return;
         else 
             control->value = 0;
     }
-    else if (control->properties == CONTROL_PROP_BYPASS)
+    else if (control->properties == FLAG_CONTROL_BYPASS)
     {
         if (control->value == 1)
             return;
@@ -2429,7 +2430,7 @@ void naveg_set_control(uint8_t hw_id, float value)
             switch (control->properties)
             {
             // toggled specification: http://lv2plug.in/ns/lv2core/#toggled
-            case CONTROL_PROP_TOGGLED:
+            case FLAG_CONTROL_TOGGLED:
                 // updates the led
                 if (control->value <= 0)
                     ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TOGGLED_COLOR, 0, 0, 0, 0);
@@ -2445,14 +2446,14 @@ void naveg_set_control(uint8_t hw_id, float value)
                              (control->value <= 0 ? TOGGLED_OFF_FOOTER_TEXT : TOGGLED_ON_FOOTER_TEXT), control->properties);
                 break;
 
-            case CONTROL_PROP_MOMENTARY_SW:
+            case FLAG_CONTROL_MOMENTARY:
                 // updates the footer
                     screen_footer(control->hw_id - ENCODERS_COUNT, control->label,
                                  (control->value <= 0 ? TOGGLED_OFF_FOOTER_TEXT : TOGGLED_ON_FOOTER_TEXT), control->properties);
             break;
 
             // trigger specification: http://lv2plug.in/ns/ext/port-props/#trigger
-            case CONTROL_PROP_TRIGGER:
+            case FLAG_CONTROL_TRIGGER:
                 // updates the led
                 //check if its assigned to a trigger and if the button is released
                 if (!control->scroll_dir)
@@ -2477,7 +2478,7 @@ void naveg_set_control(uint8_t hw_id, float value)
                 screen_footer(control->hw_id - ENCODERS_COUNT, control->label, BYPASS_ON_FOOTER_TEXT, control->properties);
                 break;
 
-            case CONTROL_PROP_TAP_TEMPO: ;
+            case FLAG_CONTROL_TAP_TEMPO: ;
                 // convert the time unit
                 uint16_t time_ms = (uint16_t)(convert_to_ms(control->unit, control->value) + 0.5);
 
@@ -2539,7 +2540,7 @@ void naveg_set_control(uint8_t hw_id, float value)
                 screen_footer(control->hw_id - ENCODERS_COUNT, control->label, value_txt, control->properties);
                 break;
 
-            case CONTROL_PROP_BYPASS:
+            case FLAG_CONTROL_BYPASS:
                 // updates the led
                 if (control->value <= 0)
                     ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), BYPASS_COLOR, 1, 0, 0, 0);
@@ -2555,9 +2556,9 @@ void naveg_set_control(uint8_t hw_id, float value)
                              (control->value ? BYPASS_ON_FOOTER_TEXT : BYPASS_OFF_FOOTER_TEXT), control->properties);
                 break;
 
-            case CONTROL_PROP_REVERSE_ENUM:
-            case CONTROL_PROP_ENUMERATION:
-            case CONTROL_PROP_SCALE_POINTS:
+            case FLAG_CONTROL_REVERSE_ENUM:
+            case FLAG_CONTROL_ENUMERATION:
+            case FLAG_CONTROL_SCALE_POINTS:
                 // updates the led
                 ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_COLOR, 1, 0, 0, 0);
 
@@ -2594,12 +2595,12 @@ void naveg_set_control(uint8_t hw_id, float value)
 
             uint16_t tmp_control_value = 0;
 
-            if (g_pots[id]->properties == CONTROL_PROP_LINEAR)
+            if (g_pots[id]->properties == FLAG_CONTROL_LINEAR)
             {
             	//map the current value to the ADC range
             	tmp_control_value = MAP(g_pots[id]->value, g_pots[id]->minimum,  g_pots[id]->maximum, g_pot_calibrations[0][id], g_pot_calibrations[1][id]);
             }
-            else if (g_pots[id]->properties == CONTROL_PROP_LOGARITHMIC)
+            else if (g_pots[id]->properties == FLAG_CONTROL_LOGARITHMIC)
             {
             	//map the current value to the ADC range logarithmicly 
             	tmp_control_value = (g_pot_calibrations[1][id] - g_pot_calibrations[0][id]) * log(g_pots[id]->value / g_pots[id]->minimum) / log(g_pots[id]->maximum / g_pots[id]->minimum);
@@ -2612,7 +2613,7 @@ void naveg_set_control(uint8_t hw_id, float value)
 
             if (g_lock_potentiometers)
             {   
-                if  ((g_pots[id]->properties == CONTROL_PROP_TOGGLED) || (g_pots[id]->properties == CONTROL_PROP_BYPASS))
+                if  ((g_pots[id]->properties == FLAG_CONTROL_TOGGLED) || (g_pots[id]->properties == FLAG_CONTROL_BYPASS))
                 {
                     g_pots[id]->scroll_dir = 1;
                 }
@@ -2672,12 +2673,12 @@ void naveg_pot_change(uint8_t pot)
 
     float tmp_control_value;
 
-    if (g_pots[pot]->properties == CONTROL_PROP_LINEAR)
+    if (g_pots[pot]->properties == FLAG_CONTROL_LINEAR)
     {
     	//map the current value to the ADC range
     	tmp_control_value = MAP(g_pots[pot]->value, g_pots[pot]->minimum,  g_pots[pot]->maximum, g_pot_calibrations[0][pot], g_pot_calibrations[1][pot]);
     }
-    else if (g_pots[pot]->properties == CONTROL_PROP_LOGARITHMIC)
+    else if (g_pots[pot]->properties == FLAG_CONTROL_LOGARITHMIC)
     {
     	//map the current value to the ADC range logarithmicly 
     	tmp_control_value = (g_pot_calibrations[1][pot] - g_pot_calibrations[0][pot]) * log(g_pots[pot]->value / g_pots[pot]->minimum) / log(g_pots[pot]->maximum / g_pots[pot]->minimum);
@@ -2692,7 +2693,7 @@ void naveg_pot_change(uint8_t pot)
     //if the actuator is still locked
     if ((g_pots[pot]->scroll_dir == 1) && !g_self_test_mode)
     {
-        if  ((g_pots[pot]->properties == CONTROL_PROP_TOGGLED) || (g_pots[pot]->properties == CONTROL_PROP_BYPASS))
+        if  ((g_pots[pot]->properties == FLAG_CONTROL_TOGGLED) || (g_pots[pot]->properties == FLAG_CONTROL_BYPASS))
         {
             uint16_t half_way = (g_pot_calibrations[1][pot] - g_pot_calibrations[0][pot]) /2;
             if ((tmp_value >= (half_way - 100)) && (tmp_value <= (half_way + 100)))
@@ -2719,26 +2720,26 @@ void naveg_pot_change(uint8_t pot)
         }
     }
 
-    if (g_pots[pot]->properties == CONTROL_PROP_LINEAR)
+    if (g_pots[pot]->properties == FLAG_CONTROL_LINEAR)
   	{
     	g_pots[pot]->value = MAP(tmp_value, g_pot_calibrations[0][pot], g_pot_calibrations[1][pot],  g_pots[pot]->minimum,  g_pots[pot]->maximum);
     }
-    else if (g_pots[pot]->properties == CONTROL_PROP_LOGARITHMIC)
+    else if (g_pots[pot]->properties == FLAG_CONTROL_LOGARITHMIC)
     {
     	float p_step = ((float) tmp_value) / ((float) (g_pot_calibrations[1][pot] - 1));
     	g_pots[pot]->value = g_pots[pot]->minimum * pow(g_pots[pot]->maximum / g_pots[pot]->minimum, p_step);
     }
     //toggles
-    else if ((g_pots[pot]->properties == CONTROL_PROP_TOGGLED) || (g_pots[pot]->properties == CONTROL_PROP_BYPASS))
+    else if ((g_pots[pot]->properties == FLAG_CONTROL_TOGGLED) || (g_pots[pot]->properties == FLAG_CONTROL_BYPASS))
     {
         uint16_t half_way = (g_pot_calibrations[1][pot] - g_pot_calibrations[0][pot]) /2;
         if (tmp_value >= half_way)
         {
-            g_pots[pot]->value = (g_pots[pot]->properties == CONTROL_PROP_TOGGLED)?1:0;
+            g_pots[pot]->value = (g_pots[pot]->properties == FLAG_CONTROL_TOGGLED)?1:0;
         } 
         else 
         {
-            g_pots[pot]->value = (g_pots[pot]->properties == CONTROL_PROP_TOGGLED)?0:1;
+            g_pots[pot]->value = (g_pots[pot]->properties == FLAG_CONTROL_TOGGLED)?0:1;
         }
     }
     //default, liniar
@@ -2777,14 +2778,14 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 //check if we use the release action for this actuator
                 switch(g_foots[foot]->properties)
                 {
-                    case CONTROL_PROP_MOMENTARY_SW:
-                    case CONTROL_PROP_TRIGGER:
+                    case FLAG_CONTROL_MOMENTARY:
+                    case FLAG_CONTROL_TRIGGER:
                         ledz_set_state(hardware_leds(foot), foot, TRIGGER_COLOR, 1, 0, 0, 0); //TRIGGER_COLOR
                     break;
 
-                    case CONTROL_PROP_SCALE_POINTS:
-                    case CONTROL_PROP_REVERSE_ENUM:
-                    case CONTROL_PROP_ENUMERATION:
+                    case FLAG_CONTROL_SCALE_POINTS:
+                    case FLAG_CONTROL_REVERSE_ENUM:
+                    case FLAG_CONTROL_ENUMERATION:
                         ledz_set_state(hardware_leds(foot), foot, ENUMERATED_COLOR, 1, 0, 0, 0); //ENUMERATED_COLOR
                     break;
                 }
@@ -2793,7 +2794,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 g_foots[foot]->scroll_dir = pressed;
 
                 //we dont actually preform an action here
-                if (g_foots[foot]->properties != CONTROL_PROP_MOMENTARY_SW)
+                if (g_foots[foot]->properties != FLAG_CONTROL_MOMENTARY)
                 return;
             }
 
@@ -2823,7 +2824,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                             char buffer[10];
                             uint8_t i;
 
-                            i = copy_command(buffer, LOAD_SNAPSHOT_COMMAND);
+                            i = copy_command(buffer, CMD_DUOX_SNAPSHOT_LOAD);
 
                             i += int_to_str((foot == 6)?1:0, &buffer[i], sizeof(buffer) - i, 0);
 
@@ -2858,7 +2859,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 
                 char buffer[10];
                 uint8_t i;
-                i = copy_command(buffer, NEXT_PAGE_COMMAND);
+                i = copy_command(buffer, CMD_DUOX_NEXT_PAGE);
 
                 if (foot == 4)
                 {
@@ -2913,7 +2914,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 
             char buffer[10];
             uint8_t i;
-            i = copy_command(buffer, NEXT_PAGE_COMMAND);
+            i = copy_command(buffer, CMD_DUOX_NEXT_PAGE);
 
             if (!g_page_mode)
             {
@@ -3036,7 +3037,7 @@ void naveg_save_snapshot(uint8_t foot)
     //if in menu return
     if (display_has_tool_enabled(DISPLAY_LEFT)) return;
 
-    i = copy_command(buffer, SAVE_SNAPSHOT_COMMAND);
+    i = copy_command(buffer, CMD_DUOX_SNAPSHOT_SAVE);
 
     ledz_set_state(hardware_leds(foot), foot, SNAPSHOT_COLOR, 1, 0, 0, 0);
     ledz_blink(hardware_leds(foot), RED, 85, 85, 3);
@@ -3088,7 +3089,7 @@ void naveg_toggle_tool(uint8_t tool, uint8_t display)
                 g_protocol_busy = true;
                 system_lock_comm_serial(g_protocol_busy);
 
-                comm_webgui_send(TUNER_ON_CMD, strlen(TUNER_ON_CMD));
+                comm_webgui_send(CMD_TUNER_ON, strlen(CMD_TUNER_ON));
 
                 g_protocol_busy = false;
                 system_lock_comm_serial(g_protocol_busy);
@@ -3134,7 +3135,7 @@ void naveg_toggle_tool(uint8_t tool, uint8_t display)
             	break;
 
             case DISPLAY_TOOL_TUNER:
-                comm_webgui_send(TUNER_OFF_CMD, strlen(TUNER_OFF_CMD));
+                comm_webgui_send(CMD_TUNER_OFF, strlen(CMD_TUNER_OFF));
                 tool_off(DISPLAY_TOOL_TUNER);
                 tool_on(DISPLAY_TOOL_SYSTEM_SUBMENU, 1);
                 return;
@@ -3306,7 +3307,7 @@ void naveg_enter(uint8_t display)
         char buffer[30];
         uint8_t i;
 
-        i = copy_command(buffer, ENCODER_CLICKED_CMD);
+        i = copy_command(buffer, CMD_DUOX_ENCODER_CLICKED);
 
         // insert the hw_id on buffer
         i += int_to_str(display, &buffer[i], sizeof(buffer) - i, 0);

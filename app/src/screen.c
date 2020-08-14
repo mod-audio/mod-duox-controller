@@ -5,16 +5,17 @@
 ************************************************************************************************************************
 */
 
+#include <string.h>
+#include <stdlib.h>
+
 #include "screen.h"
 #include "utils.h"
 #include "glcd.h"
 #include "glcd_widget.h"
 #include "naveg.h"
 #include "hardware.h"
-#include <string.h>
-#include <stdlib.h>
 #include "cli.h"
-
+#include "mod-protocol.h"
 #include "ledz.h"
 
 /*
@@ -180,7 +181,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
 
         widget_textbox(display, &blank_title);
     }
-    else if ((control->properties == CONTROL_PROP_TOGGLED) || (control->properties == CONTROL_PROP_BYPASS))
+    else if ((control->properties == FLAG_CONTROL_TOGGLED) || (control->properties == FLAG_CONTROL_BYPASS))
     {
         //convert title
         char title_str_bfr[8] = {0};
@@ -217,7 +218,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         toggle.width = 31;
         toggle.height = 11;
         toggle.color = GLCD_BLACK;
-        toggle.value = (control->properties == CONTROL_PROP_TOGGLED)?control->value:!control->value;
+        toggle.value = (control->properties == FLAG_CONTROL_TOGGLED)?control->value:!control->value;
         widget_toggle(display, &toggle);
     }
     else
@@ -257,7 +258,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         else if (control->value > 9.9)
         {
             //not for ints
-            if (control->properties == CONTROL_PROP_INTEGER)
+            if (control->properties == FLAG_CONTROL_INTEGER)
             {
                 int_to_str(control->value, value_str, sizeof(value_str), 0);
             }
@@ -288,7 +289,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         else
         {
             //not for ints
-            if (control->properties == CONTROL_PROP_INTEGER)
+            if (control->properties == FLAG_CONTROL_INTEGER)
             {
                 int_to_str(control->value, value_str, sizeof(value_str), 0);
             }
@@ -327,11 +328,11 @@ void screen_pot(uint8_t pot_id, control_t *control)
         knob.max = control->maximum;
         knob.min_cal = g_pot_calibrations[0][pot_id];
         knob.max_cal = g_pot_calibrations[1][pot_id];
-        if (control->properties == CONTROL_PROP_LINEAR)
+        if (control->properties == FLAG_CONTROL_LINEAR)
         {
             knob.mode = 0;
         }
-        else if (control->properties == CONTROL_PROP_LOGARITHMIC)
+        else if (control->properties == FLAG_CONTROL_LOGARITHMIC)
         {
             knob.mode = 1;
         }
@@ -486,8 +487,8 @@ void screen_encoder(uint8_t display_id, control_t *control)
         return null_screen_encoded(display, display_id);
 
     //liniar/logaritmic control type, Bar graphic
-    if (control->properties == CONTROL_PROP_LINEAR ||
-        control->properties == CONTROL_PROP_LOGARITHMIC)
+    if (control->properties == FLAG_CONTROL_LINEAR ||
+        control->properties == FLAG_CONTROL_LOGARITHMIC)
     {
         textbox_t value, title;
 
@@ -608,7 +609,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
     }
 
     // integer type control
-    else if (control->properties == CONTROL_PROP_INTEGER)
+    else if (control->properties == FLAG_CONTROL_INTEGER)
     {
         char *title_str_bfr = (char *) MALLOC(15 * sizeof(char));
         strncpy(title_str_bfr, control->label, 14);
@@ -655,8 +656,8 @@ void screen_encoder(uint8_t display_id, control_t *control)
     }
 
     // list type control
-    else if (control->properties == CONTROL_PROP_ENUMERATION ||
-             control->properties == CONTROL_PROP_SCALE_POINTS)
+    else if (control->properties == FLAG_CONTROL_ENUMERATION ||
+             control->properties == FLAG_CONTROL_SCALE_POINTS)
     {
         uint8_t scalepoint_count_local = control->scale_points_count > 64 ? 64 : control->scale_points_count;
 
@@ -697,8 +698,8 @@ void screen_encoder(uint8_t display_id, control_t *control)
 
         FREE(labels_list);
     }
-    else if (control->properties == CONTROL_PROP_TOGGLED ||
-         control->properties == CONTROL_PROP_BYPASS)
+    else if (control->properties == FLAG_CONTROL_TOGGLED ||
+         control->properties == FLAG_CONTROL_BYPASS)
     {
         toggle_t toggle;
         toggle.x = 0;
@@ -706,7 +707,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
         toggle.width = DISPLAY_WIDTH;
         toggle.height = 13;
         toggle.color = GLCD_BLACK;
-        toggle.value = (control->properties == CONTROL_PROP_TOGGLED)?control->value:!control->value;
+        toggle.value = (control->properties == FLAG_CONTROL_TOGGLED)?control->value:!control->value;
         toggle.label = control->label;
         widget_toggle_encoder(display, &toggle);
     }
@@ -783,7 +784,7 @@ void screen_footer(uint8_t id, const char *name, const char *value, int16_t prop
     }
 
     ///checks if its toggle/trigger or a value
-    else if ((property & CONTROL_PROP_TOGGLED) || (property & CONTROL_PROP_BYPASS) || (property & CONTROL_PROP_TRIGGER) || (property & CONTROL_PROP_MOMENTARY_SW))
+    else if ((property & FLAG_CONTROL_TOGGLED) || (property & FLAG_CONTROL_BYPASS) || (property & FLAG_CONTROL_TRIGGER) || (property & FLAG_CONTROL_MOMENTARY))
     {
     	// draws the name field
     	char *title_str_bfr = (char *) MALLOC(16 * sizeof(char));
