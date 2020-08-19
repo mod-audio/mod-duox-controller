@@ -6,9 +6,18 @@
 */
 
 #include <string.h>
+#include <stdlib.h>
 
 #include "protocol.h"
 #include "utils.h"
+#include "naveg.h"
+#include "ledz.h"
+#include "hardware.h"
+#include "glcd.h"
+#include "utils.h"
+#include "screen.h"
+#include "cli.h"
+#include "mod-protocol.h"
 
 /*
 ************************************************************************************************************************
@@ -224,6 +233,19 @@ void protocol_response(const char *response, proto_t *proto)
     response_buffer[proto->response_size] = 0;
 }
 
+void protocol_send_response(const char *response, const uint8_t value ,proto_t *proto)
+{
+    char buffer[20];
+    uint8_t i = 0;
+    memset(buffer, 0, sizeof buffer);
+
+    i = copy_command(buffer, response); 
+
+    // insert the value on buffer
+    i += int_to_str(value, &buffer[i], sizeof(buffer) - i, 0);
+
+    protocol_response(&buffer[0], proto);
+}
 
 void protocol_remove_commands(void)
 {
@@ -234,4 +256,326 @@ void protocol_remove_commands(void)
         FREE(g_commands[i].command);
         FREE(g_commands[i].list);
     }
+}
+
+//initialize all protocol commands
+void protocol_init(void)
+{
+    // protocol definitions
+    protocol_add_command(CMD_PING, cb_ping);
+    protocol_add_command(CMD_SAY, cb_say);
+    protocol_add_command(CMD_LED, cb_led);
+    protocol_add_command(CMD_GLCD_TEXT, cb_glcd_text);
+    protocol_add_command(CMD_GLCD_DIALOG, cb_glcd_dialog);
+    protocol_add_command(CMD_GLCD_DRAW, cb_glcd_draw);
+    protocol_add_command(CMD_GUI_CONNECTED, cb_gui_connection);
+    protocol_add_command(CMD_GUI_DISCONNECTED, cb_gui_connection);
+    protocol_add_command(CMD_CONTROL_ADD, cb_control_add);
+    protocol_add_command(CMD_CONTROL_REMOVE, cb_control_rm);
+    protocol_add_command(CMD_CONTROL_SET, cb_control_set);
+    protocol_add_command(CMD_CONTROL_GET, cb_control_get);
+    protocol_add_command(CMD_INITIAL_STATE, cb_initial_state);
+    protocol_add_command(CMD_BANKS, cb_bank_config);
+    protocol_add_command(CMD_TUNER, cb_tuner);
+    protocol_add_command(CMD_RESPONSE, cb_resp);
+    protocol_add_command(CMD_RESTORE, cb_restore);
+    protocol_add_command(CMD_DUO_BOOT, cb_boot);
+    protocol_add_command(CMD_MENU_ITEM_CHANGE, cb_menu_item_changed);
+    protocol_add_command(CMD_PEDALBOARD_CLEAR, cb_pedalboard_clear);
+}
+
+/*
+************************************************************************************************************************
+*           PROTOCOL CALLBACKS
+************************************************************************************************************************
+*/
+
+void cb_ping(proto_t *proto)
+{
+    g_ui_communication_started = 1;
+    g_protocol_busy = false;
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+}
+
+void cb_say(proto_t *proto)
+{
+    protocol_response(proto->list[1], proto);
+}
+
+void cb_led(proto_t *proto)
+{
+    ledz_t *led = hardware_leds(atoi(proto->list[1]));
+
+    uint8_t value[3] = {atoi(proto->list[2]), atoi(proto->list[3]), atoi(proto->list[4])}; 
+    ledz_set_color(CMD_COLOR_ID,value);
+
+    if (proto->list_count == 7)
+    {
+        ledz_set_state(led, atoi(proto->list[1]), CMD_COLOR_ID, 1, 0, 0, 0);
+    }
+    else
+    {
+        ledz_set_state(led, atoi(proto->list[1]), CMD_COLOR_ID, 2, atoi(proto->list[5]), atoi(proto->list[6]), LED_BLINK_INFINIT);
+    }
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+}
+
+void cb_glcd_text(proto_t *proto)
+{
+    uint8_t glcd_id, x, y;
+    glcd_id = atoi(proto->list[1]);
+    x = atoi(proto->list[2]);
+    y = atoi(proto->list[3]);
+
+    if (glcd_id >= GLCD_COUNT) return;
+
+    screen_text_box(glcd_id, x, y, proto->list[4]);
+    protocol_response("resp 0", proto);
+}
+
+void cb_glcd_dialog(proto_t *proto)
+{
+    uint8_t val = naveg_dialog(proto->list[1]);
+    protocol_send_response(CMD_RESPONSE, val, proto);
+}
+
+void cb_glcd_draw(proto_t *proto)
+{
+    uint8_t glcd_id, x, y;
+    glcd_id = atoi(proto->list[1]);
+    x = atoi(proto->list[2]);
+    y = atoi(proto->list[3]);
+
+    if (glcd_id >= GLCD_COUNT) return;
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+
+    uint8_t msg_buffer[WEBGUI_COMM_RX_BUFF_SIZE];
+
+    str_to_hex(proto->list[4], msg_buffer, sizeof(msg_buffer));
+    glcd_draw_image(hardware_glcds(glcd_id), x, y, msg_buffer, GLCD_BLACK);
+}
+
+void cb_gui_connection(proto_t *proto)
+{
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+    //clear the buffer so we dont send any messages
+    comm_webgui_clear();
+
+    if (strcmp(proto->list[0], CMD_GUI_CONNECTED) == 0)
+        naveg_ui_connection(UI_CONNECTED);
+    else
+        naveg_ui_connection(UI_DISCONNECTED);
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+
+    //we are done supposedly closing the menu, we can unlock the actuators
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
+}
+
+void cb_control_add(proto_t *proto)
+{
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
+    control_t *control = data_parse_control(proto->list);
+    naveg_add_control(control, 1);
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
+}
+
+void cb_control_rm(proto_t *proto)
+{
+    g_ui_communication_started = 1;
+    
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
+    naveg_remove_control(atoi(proto->list[1]));
+
+    uint8_t i;
+    for (i = 2; i < TOTAL_ACTUATORS + 1; i++)
+    {
+        if ((proto->list[i]) != NULL)
+        {
+            naveg_remove_control(atoi(proto->list[i]));
+        }
+        else break;
+    }
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
+}
+
+void cb_control_set(proto_t *proto)
+{
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
+    naveg_set_control(atoi(proto->list[1]), atof(proto->list[2]));
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
+}
+
+void cb_control_get(proto_t *proto)
+{
+     //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
+    float value;
+    value = naveg_get_control(atoi(proto->list[1]));
+
+    protocol_send_response(CMD_RESPONSE, value, proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
+}
+
+void cb_initial_state(proto_t *proto)
+{;
+    
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
+    g_ui_communication_started = 1;
+    naveg_initial_state(atoi(proto->list[1]), atoi(proto->list[2]), atoi(proto->list[3]), proto->list[4], proto->list[5], &(proto->list[6]));
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
+}
+
+void cb_bank_config(proto_t *proto)
+{
+    //we dont support this on the DuoX
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+}
+
+void cb_tuner(proto_t *proto)
+{
+        //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
+    screen_tuner(atof(proto->list[1]), proto->list[2], atoi(proto->list[3]));
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
+}
+
+void cb_resp(proto_t *proto)
+{
+    comm_webgui_response_cb(proto->list);
+}
+
+void cb_restore(proto_t *proto)
+{
+    //clear all screens 
+    screen_clear(DISPLAY_LEFT);
+    screen_clear(DISPLAY_RIGHT);
+
+    cli_restore(RESTORE_INIT);
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+}
+
+void cb_boot(proto_t *proto)
+{
+    g_self_test_mode = false;
+
+    //set the quick bypass link
+    system_update_menu_value(MENU_ID_QUICK_BYPASS, atoi(proto->list[2]));
+
+    //set the tuner mute state 
+    system_update_menu_value(MENU_ID_TUNER_MUTE, atoi(proto->list[3]));
+
+    //set the current user profile 
+    system_update_menu_value(PROFILES_ID, atoi(proto->list[4]));
+
+    //set the master volume link
+    system_update_menu_value(MENU_ID_MASTER_VOL_PORT, atoi(proto->list[5]));
+    
+    //set the master volume value
+    float master_vol_value = atof(proto->list[6]);
+    //-60 is our 0, we dont use lower values right now (doesnt make sense because of log scale)
+    if (master_vol_value < -60) master_vol_value = -60;
+    //convert value for screen
+    uint8_t screen_val =  ( ( master_vol_value - -60 ) / (0 - -60) ) * (100 - 0) + 0;
+    screen_master_vol(screen_val);
+
+    //by default
+    naveg_pages_available(atoi(proto->list[7]), atoi(proto->list[8]), atoi(proto->list[9]));
+
+    naveg_turn_on_pagination_leds();
+
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+}
+
+void cb_menu_item_changed(proto_t *proto)
+{
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
+    naveg_menu_item_changed_cb(atoi(proto->list[1]), atoi(proto->list[2]));
+    
+    uint8_t i;
+    for (i = 3; i < ((MENU_ID_TOP+1) * 2); i+=2)
+    {
+        if (atoi(proto->list[i]) != 0)
+        {
+            naveg_menu_item_changed_cb(atoi(proto->list[i]), atoi(proto->list[i+1]));
+        }
+        else break;
+    }
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
+}
+
+void cb_pedalboard_clear(proto_t *proto)
+{
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
+    //clear controls
+    uint8_t i;
+    for (i = 0; i < TOTAL_ACTUATORS; i++)
+    {
+        naveg_remove_control(i);
+    }
+
+    //clear snapshots
+    //we dont care yet about which snapshot, thats why hardcoded
+    naveg_clear_snapshot(6);
+    naveg_clear_snapshot(4);
+
+    //reset the page to page 1
+    naveg_reset_page();
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
