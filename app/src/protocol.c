@@ -275,7 +275,6 @@ void protocol_init(void)
     protocol_add_command(CMD_CONTROL_SET, cb_control_set);
     protocol_add_command(CMD_CONTROL_GET, cb_control_get);
     protocol_add_command(CMD_INITIAL_STATE, cb_initial_state);
-    protocol_add_command(CMD_BANKS, cb_bank_config);
     protocol_add_command(CMD_TUNER, cb_tuner);
     protocol_add_command(CMD_RESPONSE, cb_resp);
     protocol_add_command(CMD_RESTORE, cb_restore);
@@ -461,12 +460,6 @@ void cb_initial_state(proto_t *proto)
 
     g_protocol_busy = false;
     system_lock_comm_serial(g_protocol_busy);
-}
-
-void cb_bank_config(proto_t *proto)
-{
-    //we dont support this on the DuoX
-    protocol_send_response(CMD_RESPONSE, 0, proto);
 }
 
 void cb_tuner(proto_t *proto)
