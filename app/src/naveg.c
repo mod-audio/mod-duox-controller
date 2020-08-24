@@ -955,7 +955,7 @@ static void parse_pedalboards_list(void *data, menu_item_t *item)
 //requested when clicked on a back
 static void request_pedalboards(uint8_t dir, uint16_t bank_uid)
 {
-    uint8_t i;
+    uint8_t i = 0;
     char buffer[40];
     memset(buffer, 0, sizeof buffer);
 
