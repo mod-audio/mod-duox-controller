@@ -17,6 +17,7 @@
 #include "utils.h"
 #include "screen.h"
 #include "cli.h"
+#include "calibration.h"
 #include "mod-protocol.h"
 
 /*
@@ -282,6 +283,8 @@ void protocol_init(void)
     protocol_add_command(CMD_MENU_ITEM_CHANGE, cb_menu_item_changed);
     protocol_add_command(CMD_PEDALBOARD_CLEAR, cb_pedalboard_clear);
     protocol_add_command(CMD_PEDALBOARD_NAME_SET, cb_pedalboard_name);
+    protocol_add_command(CMD_DUOX_PAGES_AVAILABLE, cb_pages_available);
+    protocol_add_command(CMD_DUOX_SAVE_POT_CALIBRATION, cb_save_pot_cal_val);
 }
 
 /*
@@ -331,7 +334,7 @@ void cb_glcd_text(proto_t *proto)
     if (glcd_id >= GLCD_COUNT) return;
 
     screen_text_box(glcd_id, x, y, proto->list[4]);
-    protocol_response("resp 0", proto);
+    protocol_send_response(CMD_RESPONSE, 0, proto);
 }
 
 void cb_glcd_dialog(proto_t *proto)
@@ -519,7 +522,6 @@ void cb_boot(proto_t *proto)
 
     naveg_turn_on_pagination_leds();
 
-
     protocol_send_response(CMD_RESPONSE, 0, proto);
 }
 
@@ -586,4 +588,28 @@ void cb_pedalboard_name(proto_t *proto)
 
     g_protocol_busy = false;
     system_lock_comm_serial(g_protocol_busy);
+}
+
+void cb_pages_available(proto_t *proto)
+{
+	naveg_pages_available(atoi(proto->list[1]), atoi(proto->list[2]), atoi(proto->list[3]));
+
+    naveg_turn_on_pagination_leds();
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+}
+
+void cb_save_pot_cal_val(proto_t *proto)
+{
+    //if the first argument == 1, we save the max value, if ==0 we save the min value
+    if(atoi(proto->list[1]) == 1)
+    {
+        calibration_write_max(atoi(proto->list[2]));
+    } 
+    else 
+    {
+        calibration_write_min(atoi(proto->list[2]));
+    }
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
 }

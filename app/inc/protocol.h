@@ -107,6 +107,8 @@ void cb_boot(proto_t *proto);
 void cb_menu_item_changed(proto_t *proto);
 void cb_pedalboard_clear(proto_t *proto);
 void cb_pedalboard_name(proto_t *proto);
+void cb_pages_available(proto_t *proto);
+void cb_save_pot_cal_val(proto_t *proto);
 
 /*
 ************************************************************************************************************************
