@@ -163,6 +163,15 @@ static const uint8_t *LED_COLORS[]  = {
 #ifdef DEFAULT_PAGES3_COLOR
     (const uint8_t []) DEFAULT_PAGES3_COLOR,
 #endif
+#ifdef DEFAULT_PAGES4_COLOR
+    (const uint8_t []) DEFAULT_PAGES4_COLOR,
+#endif
+#ifdef DEFAULT_PAGES5_COLOR
+    (const uint8_t []) DEFAULT_PAGES5_COLOR,
+#endif
+#ifdef DEFAULT_PAGES6_COLOR
+    (const uint8_t []) DEFAULT_PAGES6_COLOR,
+#endif
 #ifdef DEFAULT_SNAPSHOT_COLOR
     (const uint8_t []) DEFAULT_SNAPSHOT_COLOR,
 #endif
@@ -263,6 +272,7 @@ void write_o_settings_defaults()
 
 void check_eeprom_defaults(uint16_t current_version)
 {
+    //if not force update, and not downgrading, check defaults
 	if ((!FORCE_WRITE_EEPROM) && !(current_version > EEPROM_CURRENT_VERSION))
 	{
     	switch (current_version)
@@ -272,7 +282,8 @@ void check_eeprom_defaults(uint16_t current_version)
         		//leds where introduced here
         	   	write_led_defaults();
         	case 1100:
-        	    //not implemented, if new settings are introduced in 1110 of 1120 put here
+        	   //new led colors came here
+                write_led_defaults();
         	break;
 
     	    //nothing saved yet, new unit, write all settings
@@ -389,7 +400,7 @@ void hardware_setup(void)
     uint16_t read_eeprom_version = 0;
     EEPROM_Read(0, EEPROM_VERSION_ADRESS, &read_eeprom_version, MODE_16_BIT, 1);
 
-    //check if value is 170 (we put that in the last page to detect new units (binary 10101010))
+    //check if value is the same (we put that in the last page to detect new units (binary 10101010))
     if ((read_eeprom_version != EEPROM_CURRENT_VERSION) || FORCE_WRITE_EEPROM)
     {
         check_eeprom_defaults(read_eeprom_version);

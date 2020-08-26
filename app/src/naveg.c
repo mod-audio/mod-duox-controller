@@ -118,7 +118,7 @@ static float master_vol_value;
 static uint8_t snapshot_loaded[2] = {};
 static uint8_t page = 0;
 static int16_t g_current_bank;
-static uint8_t page_available[3] = {1, 1, 1};
+static uint8_t page_available[6] = {1, 1, 1, 1, 1, 1};
 static uint8_t g_lock_potentiometers = 1;
 //default scrolling direction, will only change and set back once needed
 static uint8_t g_scroll_dir = 1;
@@ -2855,7 +2855,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
             else 
             {
                 //we dont use the release option in 3 button pagination mode
-                if (!pressed) return;
+                /*if (!pressed) return;
 
                 char buffer[10];
                 uint8_t i;
@@ -2903,7 +2903,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 }
 
                 g_protocol_busy = false;
-                system_lock_comm_serial(g_protocol_busy);
+                system_lock_comm_serial(g_protocol_busy);*/
 
             }
         break;
@@ -2913,80 +2913,53 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
         	if (!pressed) return;
 
             char buffer[10];
-            uint8_t i;
+            uint8_t i, j;
             i = copy_command(buffer, CMD_DUOX_NEXT_PAGE);
 
             if (!g_page_mode)
             {
-                if (page == 2)
+                uint8_t pagefound = 0;
+                j = page;
+                while (!pagefound)
                 {
-                    if (page_available[0] == 1)
-                        page = 0;
-                    else if (page_available[1] == 1)
-                        page = 1;
-                    else return;
-                }
-                else if (page == 1)
-                {
-                    if (page_available[2] == 1)
-                        page = 2;
-                    else if (page_available[0] == 1)
-                        page = 0;
-                    else return;
-                }
-                else if (page == 0)
-                {
-                    if (page_available[1] == 1)
-                        page = 1;
-                    else if (page_available[2] == 1)
-                        page = 2;
-                    else return;
+                    j++;
+                    if (j >= PAGES_COUNT)
+                    {
+                        j = 0;
+                    }
+
+                    //page found
+                    if (page_available[j] == 1)
+                    {
+                        page = j;
+                        pagefound = 1;
+                    }
+
+                    //we went in a loop, only one page
+                    if (j == page)
+                    {
+                        break;
+                    }
                 }
 
-                //out of bounds
-                else return;
-
-                switch (page)
-                {
-                    case 0:
-                        ledz_set_state(hardware_leds(5), 5, PAGES1_COLOR, 1, 0, 0, 0);
-
-                        // sends the request next page command
-                        // insert the page number on buffer
-                        i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
-                    break;
-                    case 1:
-                        ledz_set_state(hardware_leds(5), 5, PAGES2_COLOR, 1, 0, 0, 0);
-
-                        // sends the request next page command
-                        // insert the page number on buffer
-                        i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
-                    break;
-                    case 2:
-                        ledz_set_state(hardware_leds(5), 5, PAGES3_COLOR, 1, 0, 0, 0);
-
-                        // sends the request next page command
-                        // insert the page number on buffer
-                        i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
-                    break;
-                }
+                i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
             }
             else 
             {
-                if (!page_available[1])
+               /* if (!page_available[1])
                     return;
                 
                 page = 1;
                 i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
-
+                */
 
             }
             
             //clear controls            
-            uint8_t j;
-            for (j = 0; j < TOTAL_ACTUATORS; j++)
+            uint8_t q;
+            for (q = 0; q < TOTAL_ACTUATORS; q++)
             {
-                naveg_remove_control(j);
+                naveg_remove_control(q);
             }
 
             naveg_turn_on_pagination_leds();
@@ -3020,6 +2993,9 @@ void naveg_reset_page(void)
     page_available[0] = 1;
     page_available[1] = 0;
     page_available[2] = 0;
+    page_available[3] = 0;
+    page_available[4] = 0;
+    page_available[5] = 0;
 
     naveg_turn_on_pagination_leds();
 
@@ -3218,24 +3194,16 @@ void naveg_master_volume(uint8_t set)
 
 }
 
-void naveg_pages_available(uint8_t page_1, uint8_t page_2, uint8_t page_3)
+void naveg_pages_available(uint8_t page_1, uint8_t page_2, uint8_t page_3, uint8_t page_4, uint8_t page_5, uint8_t page_6)
 {
     page_available[0] = page_1;
     page_available[1] = page_2;
     page_available[2] = page_3;
+    page_available[3] = page_4;
+    page_available[4] = page_5;
+    page_available[5] = page_6;
 
-    //if we are in 3 button page mode, we need to update the LED's
-    if (g_page_mode)
-    {
-       if (page_1) ledz_set_state(hardware_leds(4), 4, PAGES1_COLOR, 1, 0, 0, 0);
-       else ledz_set_state(hardware_leds(4), 4, PAGES1_COLOR, 0, 0, 0, 0);
-
-       if (page_2) ledz_set_state(hardware_leds(5), 5, PAGES2_COLOR, 1, 0, 0, 0);
-       else ledz_set_state(hardware_leds(5), 5, PAGES2_COLOR, 0, 0, 0, 0);
-
-       if (page_3) ledz_set_state(hardware_leds(6), 6, PAGES3_COLOR, 1, 0, 0, 0);
-       else ledz_set_state(hardware_leds(6), 6, PAGES3_COLOR, 0, 0, 0, 0);
-    }
+    naveg_turn_on_pagination_leds();
 }
 
 void naveg_print_pb_name(uint8_t display)
@@ -3690,6 +3658,21 @@ void naveg_turn_on_pagination_leds(void)
                 ledz_set_state(hardware_leds(5), 5, PAGES3_COLOR, 1, 0, 0, 0);
             break;
 
+            case 3:
+                //just trigger LED 5 cyan
+                ledz_set_state(hardware_leds(5), 5, PAGES4_COLOR, 1, 0, 0, 0);
+            break;
+
+            case 4:
+                //just trigger LED 5 cyan
+                ledz_set_state(hardware_leds(5), 5, PAGES5_COLOR, 1, 0, 0, 0);
+            break;
+
+            case 5:
+                //just trigger LED 5 cyan
+                ledz_set_state(hardware_leds(5), 5, PAGES6_COLOR, 1, 0, 0, 0);
+            break;
+
             default:
                 //just trigger LED 5 red
                 ledz_set_state(hardware_leds(5), 5, PAGES1_COLOR, 1, 0, 0, 0);
@@ -3702,7 +3685,7 @@ void naveg_turn_on_pagination_leds(void)
         if (snapshot_loaded[1]) ledz_set_state(hardware_leds(6), 6, SNAPSHOT_COLOR, 1, 0, 0, 0);
         else ledz_set_state(hardware_leds(6), 6, SNAPSHOT_COLOR, 0, 0, 0, 0);
     }
-    else 
+  /*  else 
     {
         //trigger leds acourdingly 
         if (page_available[0])
@@ -3725,5 +3708,5 @@ void naveg_turn_on_pagination_leds(void)
             else ledz_set_state(hardware_leds(6), 6, PAGES3_COLOR, 1, 0, 0, 0);
         }
         else ledz_set_state(hardware_leds(6), 6, SNAPSHOT_COLOR, 0, 0, 0, 0);
-    }
+    }*/
 }

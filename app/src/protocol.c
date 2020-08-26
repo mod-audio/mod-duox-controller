@@ -518,7 +518,7 @@ void cb_boot(proto_t *proto)
     screen_master_vol(screen_val);
 
     //by default
-    naveg_pages_available(atoi(proto->list[7]), atoi(proto->list[8]), atoi(proto->list[9]));
+    naveg_pages_available(atoi(proto->list[7]), atoi(proto->list[8]), atoi(proto->list[9]), 1, 1, 1);
 
     naveg_turn_on_pagination_leds();
 
@@ -592,7 +592,8 @@ void cb_pedalboard_name(proto_t *proto)
 
 void cb_pages_available(proto_t *proto)
 {
-	naveg_pages_available(atoi(proto->list[1]), atoi(proto->list[2]), atoi(proto->list[3]));
+	naveg_pages_available(atoi(proto->list[1]), atoi(proto->list[2]), atoi(proto->list[3]), 1, 1, 1);
+	//naveg_pages_available(atoi(proto->list[1]), atoi(proto->list[2]), atoi(proto->list[3]), atoi(proto->list[4]), atoi(proto->list[5]), atoi(proto->list[6]));
 
     naveg_turn_on_pagination_leds();
 
