@@ -518,7 +518,7 @@ void cb_boot(proto_t *proto)
     screen_master_vol(screen_val);
 
     //by default
-    naveg_pages_available(atoi(proto->list[7]), atoi(proto->list[8]), atoi(proto->list[9]));
+    //naveg_pages_available(atoi(proto->list[7]), atoi(proto->list[8]), atoi(proto->list[9]));
 
     naveg_turn_on_pagination_leds();
 
