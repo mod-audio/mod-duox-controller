@@ -516,38 +516,67 @@ static void display_pot_rm(uint8_t hw_id)
     }
 }
 
-static void set_alternated_led_list_colour(uint8_t id)
+static void set_alternated_led_list_colour(control_t *control)
 {
-    uint8_t color_id = g_foots[id]->scale_point_index % LED_LIST_AMOUNT_OF_COLORS;
+    uint8_t color_id = control->scale_point_index % LED_LIST_AMOUNT_OF_COLORS;
+
+    char buffer[40];
+    uint8_t i;
+
+    i = copy_command(buffer, "TESTING LEDS"); 
+
+    // insert the hw_id on buffer
+    i += int_to_str(control->scale_point_index, &buffer[i], sizeof(buffer) - i, 0);
+
+    // inserts one space
+    buffer[i++] = ' ';
+
+    // insert the hw_id on buffer
+    i += int_to_str(color_id, &buffer[i], sizeof(buffer) - i, 0);
+
+
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
+    // sends the data to GUI
+    comm_webgui_send(buffer, i);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 
     switch (color_id)
     {
         case 0:
-            ledz_set_state(hardware_leds(id), id, LED_LIST_COLOR_1, 1, 0, 0, 0);
+            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_1, 1, 0, 0, 0);
         break;
 
         case 1:
-            ledz_set_state(hardware_leds(id), id, LED_LIST_COLOR_2, 1, 0, 0, 0);
+            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_2, 1, 0, 0, 0);
         break;
 
         case 2:
-            ledz_set_state(hardware_leds(id), id, LED_LIST_COLOR_3, 1, 0, 0, 0);
+            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_3, 1, 0, 0, 0);
         break;
 
         case 3:
-            ledz_set_state(hardware_leds(id), id, LED_LIST_COLOR_4, 1, 0, 0, 0);
+            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_4, 1, 0, 0, 0);
         break;
 
         case 4:
-            ledz_set_state(hardware_leds(id), id, LED_LIST_COLOR_5, 1, 0, 0, 0);
+            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_5, 1, 0, 0, 0);
         break;
 
         case 5:
-            ledz_set_state(hardware_leds(id), id, LED_LIST_COLOR_6, 1, 0, 0, 0);
+            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_6, 1, 0, 0, 0);
         break;
 
         case 6:
-            ledz_set_state(hardware_leds(id), id, LED_LIST_COLOR_7, 1, 0, 0, 0);
+            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_7, 1, 0, 0, 0);
+        break;
+
+        default:
+            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_1, 1, 0, 0, 0);
         break;
     }
 }
@@ -729,7 +758,7 @@ static void foot_control_add(control_t *control)
             {
                 if (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR)
                 {
-                    set_alternated_led_list_colour((control->hw_id - ENCODERS_COUNT));
+                    set_alternated_led_list_colour(control);
                 }
                 else
                 {
@@ -1140,7 +1169,7 @@ static void control_set(uint8_t id, control_t *control)
                 {
                     if (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR)
                     {
-                        set_alternated_led_list_colour((control->hw_id - ENCODERS_COUNT));
+                        set_alternated_led_list_colour(control);
                     }
                     else
                     {
@@ -2608,7 +2637,7 @@ void naveg_set_control(uint8_t hw_id, float value)
                 // updates the led
                 if (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR)
                 {
-                    set_alternated_led_list_colour((control->hw_id - ENCODERS_COUNT));
+                    set_alternated_led_list_colour(control);
                 }
                 else
                 {
@@ -2841,7 +2870,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                     case FLAG_CONTROL_ENUMERATION:
                         if (g_foots[foot]->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR)
                         {
-                            set_alternated_led_list_colour(foot);
+                            set_alternated_led_list_colour(g_foots[foot]);
                         }
                         else
                         {
@@ -2855,7 +2884,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 
                 //we dont actually preform an action here
                 if (g_foots[foot]->properties != FLAG_CONTROL_MOMENTARY)
-                return;
+                    return;
             }
 
             g_foots[foot]->scroll_dir = pressed;

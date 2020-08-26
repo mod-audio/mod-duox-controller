@@ -405,8 +405,15 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define PAGES3_COLOR              9
 #define SNAPSHOT_COLOR            10
 #define SNAPSHOT_LOAD_COLOR       11
-#define CMD_COLOR_ID              12
-#define MAX_COLOR_ID              13
+#define LED_LIST_COLOR_1          12   
+#define LED_LIST_COLOR_2          13  
+#define LED_LIST_COLOR_3          14  
+#define LED_LIST_COLOR_4          15  
+#define LED_LIST_COLOR_5          16  
+#define LED_LIST_COLOR_6          17  
+#define LED_LIST_COLOR_7          18    
+#define CMD_COLOR_ID              19
+#define MAX_COLOR_ID              20
 
 #define DEFAULT_TOGGLED_COLOR             {100,0,0}
 #define DEFAULT_TRIGGER_COLOR             {100,100,100}
@@ -420,16 +427,16 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define DEFAULT_PAGES3_COLOR              {0,100,100}
 #define DEFAULT_SNAPSHOT_COLOR            {100,100,100}
 #define DEFAULT_SNAPSHOT_LOAD_COLOR       {0,100,100}
+#define DEFAULT_LED_LIST_COLOR_1          {100,100,100}
+#define DEFAULT_LED_LIST_COLOR_2          {100,0,0} 
+#define DEFAULT_LED_LIST_COLOR_3          {100,100,0} 
+#define DEFAULT_LED_LIST_COLOR_4          {0,100,100}  
+#define DEFAULT_LED_LIST_COLOR_5          {0,100,0}  
+#define DEFAULT_LED_LIST_COLOR_6          {100,0,100}  
+#define DEFAULT_LED_LIST_COLOR_7          {0,0,100} 
 
 //alternate LED colors for lists
 #define LED_LIST_AMOUNT_OF_COLORS         7
-#define LED_LIST_COLOR_1                  WHITE     
-#define LED_LIST_COLOR_2                  RED  
-#define LED_LIST_COLOR_3                  YELLOW  
-#define LED_LIST_COLOR_4                  CYAN  
-#define LED_LIST_COLOR_5                  GREEN  
-#define LED_LIST_COLOR_6                  MAGENTA  
-#define LED_LIST_COLOR_7                  BLUE      
 
 //// Tap Tempo
 // defines the time that the led will stay turned on (in milliseconds)
@@ -514,10 +521,10 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define EEPROM_VERSION_ADRESS              62
 
 //for version control, when increasing they ALWAYS need to be bigger then the previous value
-#define EEPROM_CURRENT_VERSION             1101L
+#define EEPROM_CURRENT_VERSION             1100L
 
 //for testing purposes, overwrites the EEPROM regardless of the version
-#define FORCE_WRITE_EEPROM                0
+#define FORCE_WRITE_EEPROM                1
 
 // these macros should be used in replacement to default malloc and free functions of stdlib.h
 // The FREE function is NULL safe
