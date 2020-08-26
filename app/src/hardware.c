@@ -163,6 +163,12 @@ static const uint8_t *LED_COLORS[]  = {
 #ifdef DEFAULT_PAGES3_COLOR
     (const uint8_t []) DEFAULT_PAGES3_COLOR,
 #endif
+#ifdef DEFAULT_SNAPSHOT_COLOR
+    (const uint8_t []) DEFAULT_SNAPSHOT_COLOR,
+#endif
+#ifdef DEFAULT_SNAPSHOT_LOAD_COLOR
+    (const uint8_t []) DEFAULT_SNAPSHOT_LOAD_COLOR,
+#endif
 #ifdef DEFAULT_PAGES4_COLOR
     (const uint8_t []) DEFAULT_PAGES4_COLOR,
 #endif
@@ -171,12 +177,6 @@ static const uint8_t *LED_COLORS[]  = {
 #endif
 #ifdef DEFAULT_PAGES6_COLOR
     (const uint8_t []) DEFAULT_PAGES6_COLOR,
-#endif
-#ifdef DEFAULT_SNAPSHOT_COLOR
-    (const uint8_t []) DEFAULT_SNAPSHOT_COLOR,
-#endif
-#ifdef DEFAULT_SNAPSHOT_LOAD_COLOR
-    (const uint8_t []) DEFAULT_SNAPSHOT_LOAD_COLOR,
 #endif
 };
 
@@ -437,7 +437,7 @@ void hardware_setup(void)
         actuator_create(BUTTON, i, hardware_actuators(FOOTSWITCH0 + i));
         actuator_set_pins(hardware_actuators(FOOTSWITCH0 + i), FOOTSWITCH_PINS[i]);
 
-        if ((i > 3) && (i != 5)) actuator_set_prop(hardware_actuators(FOOTSWITCH0 + i), BUTTON_HOLD_TIME, (TOOL_MODE_TIME));
+        if (i > 3) actuator_set_prop(hardware_actuators(FOOTSWITCH0 + i), BUTTON_HOLD_TIME, (TOOL_MODE_TIME));
         else actuator_set_prop(hardware_actuators(FOOTSWITCH0 + i), BUTTON_HOLD_TIME, (TOOL_MODE_TIME * 10));
     }
     for (i = 0; i < POTS_COUNT; i++)

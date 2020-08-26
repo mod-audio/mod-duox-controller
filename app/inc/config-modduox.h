@@ -421,8 +421,8 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define DEFAULT_PAGES1_COLOR              {100,0,0}
 #define DEFAULT_PAGES2_COLOR              {100,100,0}
 #define DEFAULT_PAGES3_COLOR              {0,100,100}
-#define DEFAULT_PAGES4_COLOR              {93,72,98}
-#define DEFAULT_PAGES5_COLOR              {100,43,18}
+#define DEFAULT_PAGES4_COLOR              {53,22,61}
+#define DEFAULT_PAGES5_COLOR              {100,30,1}
 #define DEFAULT_PAGES6_COLOR              {0,100,0}
 #define DEFAULT_SNAPSHOT_COLOR            {100,100,100}
 #define DEFAULT_SNAPSHOT_LOAD_COLOR       {0,100,100}

@@ -115,7 +115,7 @@ static void *g_update_data;
 static xSemaphoreHandle g_dialog_sem;
 static uint8_t dialog_active = 0;
 static float master_vol_value;
-static uint8_t snapshot_loaded[2] = {};
+static uint8_t snapshot_loaded[3] = {};
 static uint8_t page = 0;
 static int16_t g_current_bank;
 static uint8_t page_available[6] = {1, 1, 1, 1, 1, 1};
@@ -2809,7 +2809,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 
             if (!g_page_mode)
             {
-                if (snapshot_loaded[(foot == 6)?1:0] > 0)
+                if (snapshot_loaded[foot - FOOTSWITCHES_ACTUATOR_COUNT] > 0)
                 {
                 	if (pressed == 1)
                 	{
@@ -2817,7 +2817,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                     }
                     else
                    	{
-                        if ( snapshot_loaded[(foot == 6)?1:0] == 1)
+                        if ( snapshot_loaded[foot - FOOTSWITCHES_ACTUATOR_COUNT] == 1)
                     	{
                     	   ledz_set_state(hardware_leds(foot), foot, SNAPSHOT_COLOR, 1, 0, 0, 0);
 
@@ -2826,7 +2826,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 
                             i = copy_command(buffer, CMD_DUOX_SNAPSHOT_LOAD);
 
-                            i += int_to_str((foot == 6)?1:0, &buffer[i], sizeof(buffer) - i, 0);
+                            i += int_to_str(foot - FOOTSWITCHES_ACTUATOR_COUNT, &buffer[i], sizeof(buffer) - i, 0);
 
                             //do not do actuators here
                             reset_queue();
@@ -2847,42 +2847,83 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                         }
                         else
                         {
-                            snapshot_loaded[(foot == 6)?1:0] = 1;
+                            snapshot_loaded[foot - FOOTSWITCHES_ACTUATOR_COUNT] = 1;
                         }
             	    }
                 }
             }
+            //up and down pages mode
             else 
             {
-                //we dont use the release option in 3 button pagination mode
-                /*if (!pressed) return;
+                if (!pressed) return;
 
                 char buffer[10];
                 uint8_t i;
+                int8_t j;
                 i = copy_command(buffer, CMD_DUOX_NEXT_PAGE);
+                uint8_t pagefound = 0;
 
-                if (foot == 4)
+                //up
+                if (foot == 6)
                 {
-                    if (!page_available[0])
-                        return;
+                    j = page;
+                    while (!pagefound)
+                    {
+                        j++;
+                        if (j >= PAGES_COUNT)
+                        {
+                            j = 0;
+                        }
 
-                    page = 0;
+                        //page found
+                        if (page_available[j] == 1)
+                        {
+                            page = j;
+                            pagefound = 1;
+                        }
+
+                        //we went in a loop, only one page
+                        if (j == page)
+                        {
+                            break;
+                        }
+                    }
                 }
+
+                //down
                 else
                 {
-                    if (!page_available[2])
-                        return;
+                    j = page;
+                    while (!pagefound)
+                    {
+                        j--;
+                        if (j < 0)
+                        {
+                            j = PAGES_COUNT-1;
+                        }
 
-                    page = 2;
+                        //page found
+                        if (page_available[j] == 1)
+                        {
+                            page = j;
+                            pagefound = 1;
+                        }
+
+                        //we went in a loop, only one page
+                        if (j == page)
+                        {
+                            break;
+                        }
+                    }
                 }
 
                 i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
 
                 //clear controls            
-                uint8_t j;
-                for (j = 0; j < TOTAL_ACTUATORS; j++)
+                uint8_t q;
+                for (q = 0; q < TOTAL_ACTUATORS; q++)
                 {
-                    naveg_remove_control(j);
+                    naveg_remove_control(q);
                 }
 
                 naveg_turn_on_pagination_leds();
@@ -2903,21 +2944,20 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 }
 
                 g_protocol_busy = false;
-                system_lock_comm_serial(g_protocol_busy);*/
-
+                system_lock_comm_serial(g_protocol_busy);
             }
         break;
 
         //pagination
-        case 5:
-        	if (!pressed) return;
-
+        case 5:;
             char buffer[10];
             uint8_t i, j;
             i = copy_command(buffer, CMD_DUOX_NEXT_PAGE);
 
             if (!g_page_mode)
             {
+                if (!pressed) return;
+
                 uint8_t pagefound = 0;
                 j = page;
                 while (!pagefound)
@@ -2943,44 +2983,80 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 }
 
                 i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
+
+                //clear controls            
+                uint8_t q;
+                for (q = 0; q < TOTAL_ACTUATORS; q++)
+                {
+                    naveg_remove_control(q);
+                }
+
+                naveg_turn_on_pagination_leds();
+
+                //clear actuator queue
+                reset_queue();
+
+                comm_webgui_clear();
+
+                //lock actuators
+                g_protocol_busy = true;
+                system_lock_comm_serial(g_protocol_busy);
+
+                comm_webgui_send(buffer, i);
+
+                if (!g_self_test_mode) {
+                    comm_webgui_wait_response();
+                }
+
+                g_protocol_busy = false;
+                system_lock_comm_serial(g_protocol_busy);      
             }
+            //other navigation mode, we are a snapshot button now
             else 
             {
-               /* if (!page_available[1])
-                    return;
-                
-                page = 1;
-                i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
-                */
+                if (snapshot_loaded[foot - FOOTSWITCHES_ACTUATOR_COUNT] > 0)
+                {
+                    if (pressed == 1)
+                    {
+                        ledz_set_state(hardware_leds(foot), foot, SNAPSHOT_LOAD_COLOR, 1, 0, 0, 0);
+                    }
+                    else
+                    {
+                        if ( snapshot_loaded[foot - FOOTSWITCHES_ACTUATOR_COUNT] == 1)
+                        {
+                           ledz_set_state(hardware_leds(foot), foot, SNAPSHOT_COLOR, 1, 0, 0, 0);
 
-            }
-            
-            //clear controls            
-            uint8_t q;
-            for (q = 0; q < TOTAL_ACTUATORS; q++)
-            {
-                naveg_remove_control(q);
-            }
+                            char buffer[10];
+                            uint8_t i;
 
-            naveg_turn_on_pagination_leds();
+                            i = copy_command(buffer, CMD_DUOX_SNAPSHOT_LOAD);
 
-            //clear actuator queue
-            reset_queue();
+                            i += int_to_str(foot - FOOTSWITCHES_ACTUATOR_COUNT, &buffer[i], sizeof(buffer) - i, 0);
 
-            comm_webgui_clear();
+                            //do not do actuators here
+                            reset_queue();
 
-            //lock actuators
-            g_protocol_busy = true;
-            system_lock_comm_serial(g_protocol_busy);
+                            comm_webgui_clear();
+                            //lock actuators
+                            g_protocol_busy = true;
+                            system_lock_comm_serial(g_protocol_busy);
 
-            comm_webgui_send(buffer, i);
+                            comm_webgui_send(buffer, i);
+                            if (!g_self_test_mode) {
+                                comm_webgui_wait_response();
+                            }
+                            
+                            g_protocol_busy = false;
+                            system_lock_comm_serial(g_protocol_busy);
 
-            if (!g_self_test_mode) {
-                comm_webgui_wait_response();
-            }
-
-            g_protocol_busy = false;
-            system_lock_comm_serial(g_protocol_busy);            
+                        }
+                        else
+                        {
+                            snapshot_loaded[foot - FOOTSWITCHES_ACTUATOR_COUNT] = 1;
+                        }
+                    }
+                }
+            }      
         break;
     }
 }
@@ -3004,8 +3080,9 @@ void naveg_reset_page(void)
 
 void naveg_save_snapshot(uint8_t foot)
 {
-    //this function is disabled in 3 button pagination mode
-    if (g_page_mode) return;
+    //depending on the mode we support this function
+    if ((!g_page_mode)&&(foot ==5)) return;
+    else if (foot !=5) return;
 
     char buffer[128];
     uint8_t i;
@@ -3018,7 +3095,7 @@ void naveg_save_snapshot(uint8_t foot)
     ledz_set_state(hardware_leds(foot), foot, SNAPSHOT_COLOR, 1, 0, 0, 0);
     ledz_blink(hardware_leds(foot), RED, 85, 85, 3);
 
-    i += int_to_str((foot == 6)?1:0, &buffer[i], sizeof(buffer) - i, 0);
+    i += int_to_str(foot - FOOTSWITCHES_ACTUATOR_COUNT, &buffer[i], sizeof(buffer) - i, 0);
 
     //lock actuators
     g_protocol_busy = true;
@@ -3028,12 +3105,12 @@ void naveg_save_snapshot(uint8_t foot)
 
     g_protocol_busy = false;
     system_lock_comm_serial(g_protocol_busy);
-	snapshot_loaded[(foot == 6)?1:0] = 2;
+	snapshot_loaded[foot - FOOTSWITCHES_ACTUATOR_COUNT] = 2;
 }
 
 void naveg_clear_snapshot(uint8_t foot)
 {
-    snapshot_loaded[(foot == 6)?1:0] = 0;
+    snapshot_loaded[foot - FOOTSWITCHES_ACTUATOR_COUNT] = 0;
     ledz_set_state(hardware_leds(foot), foot, MAX_COLOR_ID, 0, 0, 0, 0);
 }
 
@@ -3682,31 +3759,57 @@ void naveg_turn_on_pagination_leds(void)
         if (snapshot_loaded[0]) ledz_set_state(hardware_leds(4), 4, SNAPSHOT_COLOR, 1, 0, 0, 0);
         else ledz_set_state(hardware_leds(4), 4, SNAPSHOT_COLOR, 0, 0, 0, 0);
 
-        if (snapshot_loaded[1]) ledz_set_state(hardware_leds(6), 6, SNAPSHOT_COLOR, 1, 0, 0, 0);
+        if (snapshot_loaded[2]) ledz_set_state(hardware_leds(6), 6, SNAPSHOT_COLOR, 1, 0, 0, 0);
         else ledz_set_state(hardware_leds(6), 6, SNAPSHOT_COLOR, 0, 0, 0, 0);
     }
-  /*  else 
+    else 
     {
-        //trigger leds acourdingly 
-        if (page_available[0])
+        switch (page)
         {
-            if (page == 0) ledz_set_state(hardware_leds(4), 4, SNAPSHOT_COLOR, 1, 0, 0, 0);
-            else ledz_set_state(hardware_leds(4), 4, PAGES1_COLOR, 1, 0, 0, 0);
-        }
-        else ledz_set_state(hardware_leds(4), 4, SNAPSHOT_COLOR, 0, 0, 0, 0);
+            case 0:
+                //just trigger LED 4 & LED 6 red
+                ledz_set_state(hardware_leds(4), 4, PAGES1_COLOR, 1, 0, 0, 0);
+                ledz_set_state(hardware_leds(6), 6, PAGES1_COLOR, 1, 0, 0, 0);
+            break;
 
-        if (page_available[1])
-        {
-            if (page == 1) ledz_set_state(hardware_leds(5), 5, SNAPSHOT_COLOR, 1, 0, 0, 0);
-            else ledz_set_state(hardware_leds(5), 5, PAGES2_COLOR, 1, 0, 0, 0);
+            case 1:
+                //just trigger LED 4 & LED 6 red
+                ledz_set_state(hardware_leds(4), 4, PAGES2_COLOR, 1, 0, 0, 0);
+                ledz_set_state(hardware_leds(6), 6, PAGES2_COLOR, 1, 0, 0, 0);
+            break;
+
+            case 2:
+                //just trigger LED 4 & LED 6 red
+                ledz_set_state(hardware_leds(4), 4, PAGES3_COLOR, 1, 0, 0, 0);
+                ledz_set_state(hardware_leds(6), 6, PAGES3_COLOR, 1, 0, 0, 0);
+            break;
+
+            case 3:
+                //just trigger LED 4 & LED 6 red
+                ledz_set_state(hardware_leds(4), 4, PAGES4_COLOR, 1, 0, 0, 0);
+                ledz_set_state(hardware_leds(6), 6, PAGES4_COLOR, 1, 0, 0, 0);
+            break;
+
+            case 4:
+                //just trigger LED 4 & LED 6 red
+                ledz_set_state(hardware_leds(4), 4, PAGES5_COLOR, 1, 0, 0, 0);
+                ledz_set_state(hardware_leds(6), 6, PAGES5_COLOR, 1, 0, 0, 0);
+            break;
+
+            case 5:
+                //just trigger LED 4 & LED 6 red
+                ledz_set_state(hardware_leds(4), 4, PAGES6_COLOR, 1, 0, 0, 0);
+                ledz_set_state(hardware_leds(6), 6, PAGES6_COLOR, 1, 0, 0, 0);
+            break;
+
+            default:
+                //just trigger LED 4 & LED 6 red
+                ledz_set_state(hardware_leds(4), 4, PAGES1_COLOR, 1, 0, 0, 0);
+                ledz_set_state(hardware_leds(6), 6, PAGES1_COLOR, 1, 0, 0, 0);
+            break;
         }
+
+        if (snapshot_loaded[1]) ledz_set_state(hardware_leds(5), 5, SNAPSHOT_COLOR, 1, 0, 0, 0);
         else ledz_set_state(hardware_leds(5), 5, SNAPSHOT_COLOR, 0, 0, 0, 0);
-
-        if (page_available[2])
-        {
-            if (page == 2)ledz_set_state(hardware_leds(6), 6, SNAPSHOT_COLOR, 1, 0, 0, 0);
-            else ledz_set_state(hardware_leds(6), 6, PAGES3_COLOR, 1, 0, 0, 0);
-        }
-        else ledz_set_state(hardware_leds(6), 6, SNAPSHOT_COLOR, 0, 0, 0, 0);
-    }*/
+    }
 }

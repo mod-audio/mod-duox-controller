@@ -356,7 +356,7 @@ static void actuators_task(void *pvParameters)
                    	//we dont use these button events in callibration mode
                     if (!g_calibration_mode)
                     {
-                        if ((id == 4)||(id == 6)) naveg_save_snapshot(id);
+                        if (id > 3) naveg_save_snapshot(id);
                     }
                 }
 
