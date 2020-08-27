@@ -520,6 +520,31 @@ static void set_alternated_led_list_colour(control_t *control)
 {
     uint8_t color_id = control->scale_point_index % LED_LIST_AMOUNT_OF_COLORS;
 
+    char buffer[40];
+    uint8_t i;
+
+    i = copy_command(buffer, "TESTING LEDS"); 
+
+    // insert the hw_id on buffer
+    i += int_to_str(control->scale_point_index, &buffer[i], sizeof(buffer) - i, 0);
+
+    // inserts one space
+    buffer[i++] = ' ';
+
+    // insert the hw_id on buffer
+    i += int_to_str(color_id, &buffer[i], sizeof(buffer) - i, 0);
+
+
+    //lock actuators
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+
+    // sends the data to GUI
+    comm_webgui_send(buffer, i);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
+
     switch (color_id)
     {
         case 0:
@@ -3149,8 +3174,8 @@ void naveg_reset_page(void)
 void naveg_save_snapshot(uint8_t foot)
 {
     //depending on the mode we support this function
-    if ((!g_page_mode)&&(foot ==5)) return;
-    else if (foot !=5) return;
+    if ((!g_page_mode)&&(foot == 5)) return;
+    if ((g_page_mode)&&(foot !=5)) return;
 
     char buffer[128];
     uint8_t i;

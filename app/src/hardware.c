@@ -189,6 +189,7 @@ static const uint8_t *LED_COLORS[]  = {
 #endif
 #ifdef DEFAULT_LED_LIST_COLOR_7
     (const uint8_t []) DEFAULT_LED_LIST_COLOR_7,
+#endif
 #ifdef DEFAULT_PAGES4_COLOR
     (const uint8_t []) DEFAULT_PAGES4_COLOR,
 #endif
@@ -258,16 +259,30 @@ static int g_brightness;
 */
 void write_led_defaults()
 {
-    uint8_t i=0;
+    uint8_t eeprom_index, eeprom_page;
+    uint8_t i = 0;
     uint8_t j=0;
     uint8_t write_buffer = 0;
+
+    eeprom_page = LED_COLOR_EEMPROM_PAGE;
+    eeprom_index = 0;
+
     for (i=0; i<(MAX_COLOR_ID-1); i++)
-    {
+    {   
+        //second eeprom page
+        if (eeprom_index > 20)
+        {
+            eeprom_page++;
+            eeprom_index = 0;
+        }
+
         for (j=0; j<3; j++)
         {
             write_buffer = LED_COLORS[i][j];
-            EEPROM_Write(LED_COLOR_EEMPROM_PAGE, (LED_COLOR_ADRESS_START + (i*3) + j), &write_buffer, MODE_8_BIT, 1);    
+            EEPROM_Write(eeprom_page, (LED_COLOR_ADRESS_START + (eeprom_index*3) + j), &write_buffer, MODE_8_BIT, 1);    
         }
+
+        eeprom_index++;
     }
 
     //write LED brightness
@@ -489,17 +504,28 @@ void hardware_setup(void)
 
     //set led colors
     uint8_t led_color_value[3] = {};
-
+    uint8_t eeprom_index, eeprom_page;
+    eeprom_page = LED_COLOR_EEMPROM_PAGE;
+    eeprom_index = 0;
     for (i=0; i<(MAX_COLOR_ID-1); i++)
     {
+        //second eeprom page
+        if (eeprom_index > 21)
+        {
+            eeprom_page++;
+            eeprom_index = 0;
+        }
+
         uint8_t j=0;
         uint8_t read_buffer = 0;
         for (j=0; j<3; j++)
         {
-            EEPROM_Read(LED_COLOR_EEMPROM_PAGE, (LED_COLOR_ADRESS_START + (i*3) + j), &read_buffer, MODE_8_BIT, 1);
+            EEPROM_Read(eeprom_page, (LED_COLOR_ADRESS_START + (eeprom_index*3) + j), &read_buffer, MODE_8_BIT, 1);
             led_color_value[j] = read_buffer;
         }
         ledz_set_color(i, led_color_value);
+    
+        eeprom_index++;
     }
     //set white color for dissables
     led_color_value[0] = 100;
