@@ -520,31 +520,6 @@ static void set_alternated_led_list_colour(control_t *control)
 {
     uint8_t color_id = control->scale_point_index % LED_LIST_AMOUNT_OF_COLORS;
 
-    char buffer[40];
-    uint8_t i;
-
-    i = copy_command(buffer, "TESTING LEDS"); 
-
-    // insert the hw_id on buffer
-    i += int_to_str(control->scale_point_index, &buffer[i], sizeof(buffer) - i, 0);
-
-    // inserts one space
-    buffer[i++] = ' ';
-
-    // insert the hw_id on buffer
-    i += int_to_str(color_id, &buffer[i], sizeof(buffer) - i, 0);
-
-
-    //lock actuators
-    g_protocol_busy = true;
-    system_lock_comm_serial(g_protocol_busy);
-
-    // sends the data to GUI
-    comm_webgui_send(buffer, i);
-
-    g_protocol_busy = false;
-    system_lock_comm_serial(g_protocol_busy);
-
     switch (color_id)
     {
         case 0:
