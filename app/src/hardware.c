@@ -281,6 +281,7 @@ void check_eeprom_defaults(uint16_t current_version)
         	case 171:
         		//leds where introduced here
         	   	write_led_defaults();
+                // fall through
         	case 1100:
         	   //new led colors came here
                 write_led_defaults();
