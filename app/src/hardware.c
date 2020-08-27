@@ -189,6 +189,7 @@ static const uint8_t *LED_COLORS[]  = {
 #endif
 #ifdef DEFAULT_LED_LIST_COLOR_7
     (const uint8_t []) DEFAULT_LED_LIST_COLOR_7,
+#endif
 #ifdef DEFAULT_PAGES4_COLOR
     (const uint8_t []) DEFAULT_PAGES4_COLOR,
 #endif
