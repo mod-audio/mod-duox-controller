@@ -1574,7 +1574,7 @@ void system_page_mode_cb(void *arg, int event)
     if (arg != NULL)
     {
         menu_item_t *item = arg;
-        add_chars_to_menu_name(item, g_page_mode ? "3 BUTTONS" : "1 BUTTON");
+        add_chars_to_menu_name(item, g_page_mode ? "2 BUTTONS" : "1 BUTTON");
     }
     
     //this setting changes just 1 item

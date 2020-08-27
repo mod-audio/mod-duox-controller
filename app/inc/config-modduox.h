@@ -159,7 +159,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define POT6_PINS        {0, 26, 1, 3} //pot 6
 #define POT7_PINS        {0, 13, 3, 7} //pot 7
 
-#define PAGES_COUNT 3
+#define PAGES_COUNT 6
 
 //total amount of actuators
 #define TOTAL_ACTUATORS (ENCODERS_COUNT + FOOTSWITCHES_COUNT + POTS_COUNT)
@@ -405,8 +405,11 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define PAGES3_COLOR              9
 #define SNAPSHOT_COLOR            10
 #define SNAPSHOT_LOAD_COLOR       11
-#define CMD_COLOR_ID              12
-#define MAX_COLOR_ID              13
+#define PAGES4_COLOR              12
+#define PAGES5_COLOR              13
+#define PAGES6_COLOR              14
+#define CMD_COLOR_ID              15
+#define MAX_COLOR_ID              16
 
 #define DEFAULT_TOGGLED_COLOR             {100,0,0}
 #define DEFAULT_TRIGGER_COLOR             {100,100,100}
@@ -418,6 +421,9 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define DEFAULT_PAGES1_COLOR              {100,0,0}
 #define DEFAULT_PAGES2_COLOR              {100,100,0}
 #define DEFAULT_PAGES3_COLOR              {0,100,100}
+#define DEFAULT_PAGES4_COLOR              {53,22,61}
+#define DEFAULT_PAGES5_COLOR              {100,30,1}
+#define DEFAULT_PAGES6_COLOR              {0,100,0}
 #define DEFAULT_SNAPSHOT_COLOR            {100,100,100}
 #define DEFAULT_SNAPSHOT_LOAD_COLOR       {0,100,100}
 
@@ -498,13 +504,12 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 //memory used for LED value's 
 #define LED_COLOR_EEMPROM_PAGE             2
 #define LED_COLOR_ADRESS_START             0
-#define LED_COLOR_EEPROM_BYTES             36
 
 //we use the last 2 bytes of page 0 to check the eeprom settings
 #define EEPROM_VERSION_ADRESS              62
 
 //for version control, when increasing they ALWAYS need to be bigger then the previous value
-#define EEPROM_CURRENT_VERSION             1100L
+#define EEPROM_CURRENT_VERSION             1110L
 
 //for testing purposes, overwrites the EEPROM regardless of the version
 #define FORCE_WRITE_EEPROM                0

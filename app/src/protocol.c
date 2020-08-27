@@ -517,9 +517,6 @@ void cb_boot(proto_t *proto)
     uint8_t screen_val =  ( ( master_vol_value - -60 ) / (0 - -60) ) * (100 - 0) + 0;
     screen_master_vol(screen_val);
 
-    //by default
-    naveg_pages_available(atoi(proto->list[7]), atoi(proto->list[8]), atoi(proto->list[9]));
-
     naveg_turn_on_pagination_leds();
 
     protocol_send_response(CMD_RESPONSE, 0, proto);
@@ -592,7 +589,7 @@ void cb_pedalboard_name(proto_t *proto)
 
 void cb_pages_available(proto_t *proto)
 {
-	naveg_pages_available(atoi(proto->list[1]), atoi(proto->list[2]), atoi(proto->list[3]));
+	naveg_pages_available(atoi(proto->list[1]), atoi(proto->list[2]), atoi(proto->list[3]), atoi(proto->list[4]), atoi(proto->list[5]), atoi(proto->list[6]));
 
     naveg_turn_on_pagination_leds();
 
