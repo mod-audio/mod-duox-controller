@@ -589,7 +589,7 @@ void cb_pedalboard_name(proto_t *proto)
 
 void cb_pages_available(proto_t *proto)
 {
-	naveg_pages_available(atoi(proto->list[1]), atoi(proto->list[2]), atoi(proto->list[3]));
+	naveg_pages_available(atoi(proto->list[1]), atoi(proto->list[2]), atoi(proto->list[3]), atoi(proto->list[4]), atoi(proto->list[5]), atoi(proto->list[6]));
 
     naveg_turn_on_pagination_leds();
 

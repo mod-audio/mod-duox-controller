@@ -127,7 +127,7 @@ void naveg_update(void);
 int naveg_need_update(void);
 uint8_t naveg_dialog(const char *msg);
 uint8_t naveg_ui_status(void);
-void naveg_pages_available(uint8_t page_1, uint8_t page_2, uint8_t page_3);
+void naveg_pages_available(uint8_t page_1, uint8_t page_2, uint8_t page_3, uint8_t page_4, uint8_t page_5, uint8_t page_6);
 //refreshes screen with current menu item
 void naveg_settings_refresh(uint8_t display_id);
 //returns if tap tempo enabled 
