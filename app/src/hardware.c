@@ -169,6 +169,26 @@ static const uint8_t *LED_COLORS[]  = {
 #ifdef DEFAULT_SNAPSHOT_LOAD_COLOR
     (const uint8_t []) DEFAULT_SNAPSHOT_LOAD_COLOR,
 #endif
+#ifdef DEFAULT_LED_LIST_COLOR_1
+    (const uint8_t []) DEFAULT_LED_LIST_COLOR_1,
+#endif
+#ifdef DEFAULT_LED_LIST_COLOR_2
+    (const uint8_t []) DEFAULT_LED_LIST_COLOR_2,
+#endif
+#ifdef DEFAULT_LED_LIST_COLOR_3
+    (const uint8_t []) DEFAULT_LED_LIST_COLOR_3,
+#endif
+#ifdef DEFAULT_LED_LIST_COLOR_4
+    (const uint8_t []) DEFAULT_LED_LIST_COLOR_4,
+#endif
+#ifdef DEFAULT_LED_LIST_COLOR_5
+    (const uint8_t []) DEFAULT_LED_LIST_COLOR_5,
+#endif
+#ifdef DEFAULT_LED_LIST_COLOR_6
+    (const uint8_t []) DEFAULT_LED_LIST_COLOR_6,
+#endif
+#ifdef DEFAULT_LED_LIST_COLOR_7
+    (const uint8_t []) DEFAULT_LED_LIST_COLOR_7,
 #ifdef DEFAULT_PAGES4_COLOR
     (const uint8_t []) DEFAULT_PAGES4_COLOR,
 #endif

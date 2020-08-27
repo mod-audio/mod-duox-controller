@@ -42,20 +42,9 @@ enum {BANKS_LIST, PEDALBOARD_LIST};
 
 #define DIALOG_MAX_SEM_COUNT   1
 
-#define LIST_PAGE_UP         (1 << 1)
-#define LIST_WRAP_AROUND     (1 << 2)
-#define LIST_INITIAL_REQ     (1 << 3)
-
 #define PAGE_DIR_DOWN       0
 #define PAGE_DIR_UP         1
 #define PAGE_DIR_INIT       2
-
-#define PAGINATION_FLAG     1
-#define WRAP_AROUND_FLAG    2
-
-#define CONTROL_PAGINATED   1
-#define CONTROL_WRAP_AROUND 2
-#define CONTROL_END_PAGE    4
 
 /*
 ************************************************************************************************************************
@@ -527,6 +516,46 @@ static void display_pot_rm(uint8_t hw_id)
     }
 }
 
+static void set_alternated_led_list_colour(control_t *control)
+{
+    uint8_t color_id = control->scale_point_index % LED_LIST_AMOUNT_OF_COLORS;
+
+    switch (color_id)
+    {
+        case 0:
+            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_1, 1, 0, 0, 0);
+        break;
+
+        case 1:
+            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_2, 1, 0, 0, 0);
+        break;
+
+        case 2:
+            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_3, 1, 0, 0, 0);
+        break;
+
+        case 3:
+            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_4, 1, 0, 0, 0);
+        break;
+
+        case 4:
+            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_5, 1, 0, 0, 0);
+        break;
+
+        case 5:
+            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_6, 1, 0, 0, 0);
+        break;
+
+        case 6:
+            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_7, 1, 0, 0, 0);
+        break;
+
+        default:
+            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_1, 1, 0, 0, 0);
+        break;
+    }
+}
+
 // control assigned to foot
 static void foot_control_add(control_t *control)
 {
@@ -587,12 +616,6 @@ static void foot_control_add(control_t *control)
             // updates the led
             //check if its assigned to a trigger and if the button is released
             if (control->scroll_dir == 2) ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR, 1, 0, 0, 0);
-            //unless this is the first time a control is assigned, we always make the LED the pressed color here, this means we can turn it off right away at the naveg_foot_change function    
-            /*else if (!control->scroll_dir)
-            {
-                ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR, 1, 0, 0, 0); //TRIGGER_COLOR
-                return;
-            }*/
             else
             {
                 ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TRIGGER_PRESSED_COLOR, 1, 0, 0, 0);
@@ -706,7 +729,17 @@ static void foot_control_add(control_t *control)
         case FLAG_CONTROL_SCALE_POINTS:
             // updates the led
             //check if its assigned to a trigger and if the button is released
-            if (control->scroll_dir == 2) ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_COLOR, 1, 0, 0, 0);
+            if ((control->scroll_dir == 2) || (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR))
+            {
+                if (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR)
+                {
+                    set_alternated_led_list_colour(control);
+                }
+                else
+                {
+                    ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_COLOR, 1, 0, 0, 0);
+                }
+            }
             else
             {
                 ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_PRESSED_COLOR, 1, 0, 0, 0);
@@ -797,8 +830,8 @@ static void request_control_page(control_t *control, uint8_t dir)
 
     //bitmask for the page direction and wrap around
     uint8_t bitmask = 0;
-    if (dir) bitmask |= LIST_PAGE_UP;
-    if ((control->hw_id >= ENCODERS_COUNT) && (control->scale_points_flag & CONTROL_WRAP_AROUND)) bitmask |= LIST_WRAP_AROUND;
+    if (dir) bitmask |= FLAG_PAGINATION_PAGE_UP;
+    if ((control->hw_id >= ENCODERS_COUNT) && (control->scale_points_flag & FLAG_SCALEPOINT_WRAP_AROUND)) bitmask |= FLAG_PAGINATION_WRAP_AROUND;
 
     // insert the direction on buffer
     i += int_to_str(bitmask, &buffer[i], sizeof(buffer) - i, 0);
@@ -965,8 +998,8 @@ static void request_pedalboards(uint8_t dir, uint16_t bank_uid)
     i = copy_command((char *)buffer, CMD_PEDALBOARDS);
 
     uint8_t bitmask = 0;
-    if (dir == 1) {bitmask |= LIST_PAGE_UP;}
-    else if (dir == 2) bitmask |= LIST_INITIAL_REQ;
+    if (dir == 1) {bitmask |= FLAG_PAGINATION_PAGE_UP;}
+    else if (dir == 2) bitmask |= FLAG_PAGINATION_INITIAL_REQ;
 
     // insert the direction on buffer
     i += int_to_str(bitmask, &buffer[i], sizeof(buffer) - i, 0);
@@ -1105,9 +1138,20 @@ static void control_set(uint8_t id, control_t *control)
             }
             else if ((ENCODERS_COUNT <= control->hw_id) && ( control->hw_id < FOOTSWITCHES_ACTUATOR_COUNT + ENCODERS_COUNT))
             {
+                uint8_t trigger_led_change = 0;
                 // updates the led
                 //check if its assigned to a trigger and if the button is released
-                if (control->scroll_dir == 2) ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_COLOR, 1, 0, 0, 0);
+                if ((control->scroll_dir == 2) || (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR))
+                {
+                    if (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR)
+                    {
+                        trigger_led_change = 1;
+                    }
+                    else
+                    {
+                        ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_COLOR, 1, 0, 0, 0);
+                    }
+                }
                 else
                 {
                     ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_PRESSED_COLOR, 1, 0, 0, 0);
@@ -1117,14 +1161,17 @@ static void control_set(uint8_t id, control_t *control)
                 {
                     // increments the step
                     if (control->step < (control->steps - 1))
+                    {
                         control->step++;
+                        control->scale_point_index++;
+                    }
                     //if we are reaching the end of the control
-                    else if (control->scale_points_flag & CONTROL_END_PAGE)
+                    else if (control->scale_points_flag & FLAG_SCALEPOINT_END_PAGE)
                     {
                         //we wrap around so the step becomes 0 again
-                        if (control->scale_points_flag & CONTROL_WRAP_AROUND)
+                        if (control->scale_points_flag & FLAG_SCALEPOINT_WRAP_AROUND)
                         {
-                        	if (control->scale_points_flag & CONTROL_PAGINATED)
+                        	if (control->scale_points_flag & FLAG_SCALEPOINT_PAGINATED)
                         	{
                             	request_control_page(control, 1);
                             	return;
@@ -1132,13 +1179,14 @@ static void control_set(uint8_t id, control_t *control)
                         	else
                         	{
                         		control->step = 0;
-                        	}
+                        	    control->scale_point_index = 0;
+                            }
                         }
                         //we are at max and dont wrap around
                         else return; 
                     }
                     //we need to request a new page
-                    else if (control->scale_points_flag & CONTROL_PAGINATED) 
+                    else if (control->scale_points_flag & FLAG_SCALEPOINT_PAGINATED) 
                     {
                         //request new data, a new control we be assigned after
                         request_control_page(control, 1);
@@ -1152,9 +1200,12 @@ static void control_set(uint8_t id, control_t *control)
                 {
                     // decrements the step
                     if (control->step > 0)
+                    {
                         control->step--;
+                        control->scale_point_index--;
+                    }
                     //we are at the end of our list ask for more data
-                    else if ((control->scale_points_flag & CONTROL_PAGINATED) || (control->scale_points_flag & CONTROL_WRAP_AROUND))
+                    else if ((control->scale_points_flag & FLAG_SCALEPOINT_PAGINATED) || (control->scale_points_flag & FLAG_SCALEPOINT_WRAP_AROUND))
                     {
                         //request new data, a new control we be assigned after
                         request_control_page(control, 0);
@@ -1169,6 +1220,9 @@ static void control_set(uint8_t id, control_t *control)
                 control->value = control->scale_points[control->step]->value;
                 if (!display_has_tool_enabled(get_display_by_id(id, FOOT)))
                     screen_footer(control->hw_id - ENCODERS_COUNT, control->label, control->scale_points[control->step]->label, control->properties);
+
+                if (trigger_led_change == 1)
+                    set_alternated_led_list_colour(control);
             }
             break;
 
@@ -2234,7 +2288,7 @@ void naveg_inc_control(uint8_t display)
     if (!control) return;
 
     if  (((control->properties == FLAG_CONTROL_ENUMERATION) || (control->properties == FLAG_CONTROL_SCALE_POINTS) 
-        || (control->properties == FLAG_CONTROL_REVERSE_ENUM)) && (control->scale_points_flag & CONTROL_PAGINATED))
+        || (control->properties == FLAG_CONTROL_REVERSE_ENUM)) && (control->scale_points_flag & FLAG_SCALEPOINT_PAGINATED))
     {
     	//check/sets the direction
 		if (control->scroll_dir == 0)
@@ -2244,7 +2298,7 @@ void naveg_inc_control(uint8_t display)
 		    return;
 		}
 
-        if (control->scale_points_flag & PAGINATION_FLAG)
+        if (control->scale_points_flag & FLAG_SCALEPOINT_PAGINATED)
         {
         	// increments the step
         	if (control->step < (control->steps - 2))
@@ -2307,7 +2361,7 @@ void naveg_dec_control(uint8_t display)
     if (!control) return;
 
     if  (((control->properties == FLAG_CONTROL_ENUMERATION) || (control->properties == FLAG_CONTROL_SCALE_POINTS) ||
-     (control->properties == FLAG_CONTROL_REVERSE_ENUM)) && (control->scale_points_flag & CONTROL_PAGINATED))
+     (control->properties == FLAG_CONTROL_REVERSE_ENUM)) && (control->scale_points_flag & FLAG_SCALEPOINT_PAGINATED))
     {
 		//check/sets the direction
 		if (control->scroll_dir != 0)
@@ -2317,7 +2371,7 @@ void naveg_dec_control(uint8_t display)
 		    return;
 		}
 
-        if (control->scale_points_flag & PAGINATION_FLAG)
+        if (control->scale_points_flag & FLAG_SCALEPOINT_PAGINATED)
         {
 
         	// decrements the step
@@ -2560,7 +2614,14 @@ void naveg_set_control(uint8_t hw_id, float value)
             case FLAG_CONTROL_ENUMERATION:
             case FLAG_CONTROL_SCALE_POINTS:
                 // updates the led
-                ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_COLOR, 1, 0, 0, 0);
+                if (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR)
+                {
+                    set_alternated_led_list_colour(control);
+                }
+                else
+                {
+                    ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_COLOR, 1, 0, 0, 0);
+                }
 
                 // locates the current value
                 control->step = 0;
@@ -2786,7 +2847,14 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                     case FLAG_CONTROL_SCALE_POINTS:
                     case FLAG_CONTROL_REVERSE_ENUM:
                     case FLAG_CONTROL_ENUMERATION:
-                        ledz_set_state(hardware_leds(foot), foot, ENUMERATED_COLOR, 1, 0, 0, 0); //ENUMERATED_COLOR
+                        if (g_foots[foot]->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR)
+                        {
+                            set_alternated_led_list_colour(g_foots[foot]);
+                        }
+                        else
+                        {
+                            ledz_set_state(hardware_leds(foot), foot, ENUMERATED_COLOR, 1, 0, 0, 0); //ENUMERATED_COLOR
+                        }
                     break;
                 }
 
@@ -2795,7 +2863,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 
                 //we dont actually preform an action here
                 if (g_foots[foot]->properties != FLAG_CONTROL_MOMENTARY)
-                return;
+                    return;
             }
 
             g_foots[foot]->scroll_dir = pressed;
