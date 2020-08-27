@@ -729,7 +729,7 @@ static void foot_control_add(control_t *control)
         case FLAG_CONTROL_SCALE_POINTS:
             // updates the led
             //check if its assigned to a trigger and if the button is released
-            if (control->scroll_dir == 2)
+            if ((control->scroll_dir == 2) || (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR))
             {
                 if (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR)
                 {
@@ -1138,13 +1138,14 @@ static void control_set(uint8_t id, control_t *control)
             }
             else if ((ENCODERS_COUNT <= control->hw_id) && ( control->hw_id < FOOTSWITCHES_ACTUATOR_COUNT + ENCODERS_COUNT))
             {
+                uint8_t trigger_led_change = 0;
                 // updates the led
                 //check if its assigned to a trigger and if the button is released
-                if (control->scroll_dir == 2) 
+                if ((control->scroll_dir == 2) || (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR))
                 {
                     if (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR)
                     {
-                        set_alternated_led_list_colour(control);
+                        trigger_led_change = 1;
                     }
                     else
                     {
@@ -1219,6 +1220,9 @@ static void control_set(uint8_t id, control_t *control)
                 control->value = control->scale_points[control->step]->value;
                 if (!display_has_tool_enabled(get_display_by_id(id, FOOT)))
                     screen_footer(control->hw_id - ENCODERS_COUNT, control->label, control->scale_points[control->step]->label, control->properties);
+
+                if (trigger_led_change == 1)
+                    set_alternated_led_list_colour(control);
             }
             break;
 
