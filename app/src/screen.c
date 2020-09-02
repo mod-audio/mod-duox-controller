@@ -181,7 +181,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
 
         widget_textbox(display, &blank_title);
     }
-    else if ((control->properties & FLAG_CONTROL_TOGGLED) || (control->properties & FLAG_CONTROL_BYPASS))
+    else if (control->properties & (FLAG_CONTROL_TOGGLED | FLAG_CONTROL_BYPASS))
     {
         //convert title
         char title_str_bfr[8] = {0};
@@ -487,8 +487,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
         return null_screen_encoded(display, display_id);
 
     // list type control
-    if (control->properties & FLAG_CONTROL_ENUMERATION ||
-             control->properties & FLAG_CONTROL_SCALE_POINTS)
+    if (control->properties & (FLAG_CONTROL_ENUMERATION | FLAG_CONTROL_SCALE_POINTS))
     {
         uint8_t scalepoint_count_local = control->scale_points_count > 64 ? 64 : control->scale_points_count;
 
@@ -529,8 +528,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
 
         FREE(labels_list);
     }
-    else if (control->properties & FLAG_CONTROL_TOGGLED ||
-         control->properties & FLAG_CONTROL_BYPASS)
+    else if (control->properties & (FLAG_CONTROL_TOGGLED | FLAG_CONTROL_BYPASS))
     {
         toggle_t toggle;
         toggle.x = 0;
@@ -590,8 +588,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
         widget_textbox(display, &int_box);
     }
         //liniar/logaritmic control type, Bar graphic
-    else if (control->properties == FLAG_CONTROL_LINEAR ||
-        control->properties & FLAG_CONTROL_LOGARITHMIC)
+    else
     {
         textbox_t value, title;
 
@@ -710,10 +707,6 @@ void screen_encoder(uint8_t display_id, control_t *control)
         volume_bar.steps = control->steps - 1;
         widget_bar_indicator(display, &volume_bar);
     }
-    else
-    {
-        return null_screen_encoded(display, display_id);
-    }
 
     glcd_hline(display, 0, 24, DISPLAY_WIDTH, GLCD_BLACK);
 }
@@ -783,7 +776,7 @@ void screen_footer(uint8_t id, const char *name, const char *value, int16_t prop
     }
 
     ///checks if its toggle/trigger or a value
-    else if ((property & FLAG_CONTROL_TOGGLED) || (property & FLAG_CONTROL_BYPASS) || (property & FLAG_CONTROL_TRIGGER) || (property & FLAG_CONTROL_MOMENTARY))
+    else if (property & (FLAG_CONTROL_TOGGLED | FLAG_CONTROL_BYPASS | FLAG_CONTROL_TRIGGER | FLAG_CONTROL_MOMENTARY))
     {
     	// draws the name field
     	char *title_str_bfr = (char *) MALLOC(16 * sizeof(char));

@@ -285,11 +285,11 @@ static void step_to_value(control_t *control)
     {
         control->value = control->minimum * pow(control->maximum / control->minimum, p_step);
     }
-    else if ((control->properties & FLAG_CONTROL_REVERSE_ENUM) || (control->properties & FLAG_CONTROL_ENUMERATION) || (control->properties & FLAG_CONTROL_SCALE_POINTS))
+    else if (control->properties & (FLAG_CONTROL_REVERSE_ENUM | FLAG_CONTROL_ENUMERATION | FLAG_CONTROL_SCALE_POINTS))
     {
         control->value = control->scale_points[control->step]->value;
     }
-    else if ((!(control->properties & FLAG_CONTROL_TRIGGER)) && (!(control->properties & FLAG_CONTROL_TOGGLED)) && (!(control->properties & FLAG_CONTROL_BYPASS)))
+    else if (!(control->properties & (FLAG_CONTROL_TRIGGER | FLAG_CONTROL_TOGGLED | FLAG_CONTROL_BYPASS)))
     {
         control->value = (p_step * (control->maximum - control->minimum)) + control->minimum;
     }
@@ -329,7 +329,7 @@ static void display_encoder_add(control_t *control)
         control->step =
             (control->steps - 1) * log(control->value / control->minimum) / log(control->maximum / control->minimum);
     }
-    else if ((control->properties & FLAG_CONTROL_REVERSE_ENUM) || (control->properties & FLAG_CONTROL_ENUMERATION) || (control->properties & FLAG_CONTROL_SCALE_POINTS))
+    else if (control->properties & (FLAG_CONTROL_REVERSE_ENUM | FLAG_CONTROL_ENUMERATION | FLAG_CONTROL_SCALE_POINTS))
     {
         control->step = 0;
         uint8_t i;
@@ -425,7 +425,7 @@ static void display_pot_add(control_t *control)
 
     if (g_lock_potentiometers)
     {   
-        if  ((g_pots[id]->properties & FLAG_CONTROL_TOGGLED) || (g_pots[id]->properties & FLAG_CONTROL_BYPASS))
+        if  (g_pots[id]->properties & (FLAG_CONTROL_TOGGLED | FLAG_CONTROL_BYPASS))
         {
             g_pots[id]->scroll_dir = 1;
         }
@@ -704,7 +704,7 @@ static void foot_control_add(control_t *control)
                          (control->value ? BYPASS_ON_FOOTER_TEXT : BYPASS_OFF_FOOTER_TEXT), control->properties);
         }
     }
-    else if ((control->properties & FLAG_CONTROL_REVERSE_ENUM) || (control->properties & FLAG_CONTROL_ENUMERATION) || (control->properties & FLAG_CONTROL_SCALE_POINTS))
+    else if (control->properties & (FLAG_CONTROL_REVERSE_ENUM | FLAG_CONTROL_ENUMERATION | FLAG_CONTROL_SCALE_POINTS))
     {
         // updates the led
         //check if its assigned to a trigger and if the button is released
@@ -1085,7 +1085,7 @@ static void control_set(uint8_t id, control_t *control)
 {
     uint32_t now, delta;
 
-    if ((control->properties & FLAG_CONTROL_REVERSE_ENUM) || (control->properties & FLAG_CONTROL_ENUMERATION) || (control->properties & FLAG_CONTROL_SCALE_POINTS))
+    if (control->properties & (FLAG_CONTROL_REVERSE_ENUM | FLAG_CONTROL_ENUMERATION | FLAG_CONTROL_SCALE_POINTS))
     {
         if (control->hw_id < ENCODERS_COUNT)
         {
@@ -1162,7 +1162,7 @@ static void control_set(uint8_t id, control_t *control)
                     control->scale_point_index--;
                 }
                 //we are at the end of our list ask for more data
-                else if ((control->scale_points_flag & FLAG_SCALEPOINT_PAGINATED) || (control->scale_points_flag & FLAG_SCALEPOINT_WRAP_AROUND))
+                else if (control->scale_points_flag & (FLAG_SCALEPOINT_PAGINATED | FLAG_SCALEPOINT_WRAP_AROUND))
                 {
                     //request new data, a new control we be assigned after
                     request_control_page(control, 0);
@@ -1196,7 +1196,7 @@ static void control_set(uint8_t id, control_t *control)
             // to update the footer and screen
             foot_control_add(control);
     }
-    else if ((control->properties & FLAG_CONTROL_TOGGLED) || (control->properties & FLAG_CONTROL_BYPASS))
+    else if (control->properties & (FLAG_CONTROL_TOGGLED | FLAG_CONTROL_BYPASS))
     {
         if (control->hw_id < ENCODERS_COUNT)
         {
@@ -2257,8 +2257,8 @@ void naveg_inc_control(uint8_t display)
     control_t *control = g_encoders[display];
     if (!control) return;
 
-    if  (((control->properties & FLAG_CONTROL_ENUMERATION) || (control->properties & FLAG_CONTROL_SCALE_POINTS) 
-        || (control->properties & FLAG_CONTROL_REVERSE_ENUM)) && (control->scale_points_flag & FLAG_SCALEPOINT_PAGINATED))
+    if  ((control->properties & (FLAG_CONTROL_ENUMERATION | FLAG_CONTROL_SCALE_POINTS | FLAG_CONTROL_REVERSE_ENUM)) 
+        && (control->scale_points_flag & FLAG_SCALEPOINT_PAGINATED))
     {
     	//check/sets the direction
 		if (control->scroll_dir == 0)
@@ -2330,8 +2330,8 @@ void naveg_dec_control(uint8_t display)
     control_t *control = g_encoders[display];
     if (!control) return;
 
-    if  (((control->properties & FLAG_CONTROL_ENUMERATION) || (control->properties & FLAG_CONTROL_SCALE_POINTS) ||
-     (control->properties & FLAG_CONTROL_REVERSE_ENUM)) && (control->scale_points_flag & FLAG_SCALEPOINT_PAGINATED))
+    if  ((control->properties & (FLAG_CONTROL_ENUMERATION | FLAG_CONTROL_SCALE_POINTS | FLAG_CONTROL_REVERSE_ENUM)) 
+        && (control->scale_points_flag & FLAG_SCALEPOINT_PAGINATED))
     {
 		//check/sets the direction
 		if (control->scroll_dir != 0)
@@ -2578,7 +2578,7 @@ void naveg_set_control(uint8_t hw_id, float value)
                                  (control->value ? BYPASS_ON_FOOTER_TEXT : BYPASS_OFF_FOOTER_TEXT), control->properties);
                 }
             }
-            else if ((control->properties & FLAG_CONTROL_REVERSE_ENUM) || (control->properties & FLAG_CONTROL_ENUMERATION) || (control->properties & FLAG_CONTROL_SCALE_POINTS))
+            else if (control->properties & (FLAG_CONTROL_REVERSE_ENUM | FLAG_CONTROL_ENUMERATION | FLAG_CONTROL_SCALE_POINTS))
             {
                 // updates the led
                 if (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR)
@@ -2635,7 +2635,7 @@ void naveg_set_control(uint8_t hw_id, float value)
 
             if (g_lock_potentiometers)
             {   
-                if  ((g_pots[id]->properties & FLAG_CONTROL_TOGGLED) || (g_pots[id]->properties & FLAG_CONTROL_BYPASS))
+                if  (g_pots[id]->properties & (FLAG_CONTROL_TOGGLED | FLAG_CONTROL_BYPASS))
                 {
                     g_pots[id]->scroll_dir = 1;
                 }
@@ -2710,7 +2710,7 @@ void naveg_pot_change(uint8_t pot)
     //if the actuator is still locked
     if ((g_pots[pot]->scroll_dir == 1) && !g_self_test_mode)
     {
-        if  ((g_pots[pot]->properties & FLAG_CONTROL_TOGGLED) || (g_pots[pot]->properties & FLAG_CONTROL_BYPASS))
+        if  (g_pots[pot]->properties & (FLAG_CONTROL_TOGGLED | FLAG_CONTROL_BYPASS))
         {
             uint16_t half_way = (g_pot_calibrations[1][pot] - g_pot_calibrations[0][pot]) /2;
             if ((tmp_value >= (half_way - 100)) && (tmp_value <= (half_way + 100)))
@@ -2743,7 +2743,7 @@ void naveg_pot_change(uint8_t pot)
     	g_pots[pot]->value = g_pots[pot]->minimum * pow(g_pots[pot]->maximum / g_pots[pot]->minimum, p_step);
     }
     //toggles
-    else if ((g_pots[pot]->properties & FLAG_CONTROL_TOGGLED) || (g_pots[pot]->properties & FLAG_CONTROL_BYPASS))
+    else if (g_pots[pot]->properties & (FLAG_CONTROL_TOGGLED | FLAG_CONTROL_BYPASS))
     {
         uint16_t half_way = (g_pot_calibrations[1][pot] - g_pot_calibrations[0][pot]) /2;
         if (tmp_value >= half_way)
@@ -2789,11 +2789,11 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
  			if (!pressed)
             {
                 //check if we use the release action for this actuator
-                if ((g_foots[foot]->properties & FLAG_CONTROL_MOMENTARY) || (g_foots[foot]->properties & FLAG_CONTROL_TRIGGER))
+                if (g_foots[foot]->properties & (FLAG_CONTROL_MOMENTARY | FLAG_CONTROL_TRIGGER))
                 {
                     ledz_set_state(hardware_leds(foot), foot, TRIGGER_COLOR, 1, 0, 0, 0); //TRIGGER_COLOR
                 }
-                else if ((g_foots[foot]->properties & FLAG_CONTROL_SCALE_POINTS) || (g_foots[foot]->properties & FLAG_CONTROL_REVERSE_ENUM) || (g_foots[foot]->properties & FLAG_CONTROL_ENUMERATION))  
+                else if (g_foots[foot]->properties & (FLAG_CONTROL_SCALE_POINTS | FLAG_CONTROL_REVERSE_ENUM | FLAG_CONTROL_ENUMERATION))  
                 {
                         if (g_foots[foot]->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR)
                         {
