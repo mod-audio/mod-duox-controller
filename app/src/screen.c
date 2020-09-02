@@ -328,11 +328,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         knob.max = control->maximum;
         knob.min_cal = g_pot_calibrations[0][pot_id];
         knob.max_cal = g_pot_calibrations[1][pot_id];
-        if (control->properties == FLAG_CONTROL_LINEAR)
-        {
-            knob.mode = 0;
-        }
-        else if (control->properties & FLAG_CONTROL_LOGARITHMIC)
+        if (control->properties & FLAG_CONTROL_LOGARITHMIC)
         {
             knob.mode = 1;
         }
