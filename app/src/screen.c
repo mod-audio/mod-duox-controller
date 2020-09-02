@@ -181,7 +181,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
 
         widget_textbox(display, &blank_title);
     }
-    else if ((control->properties == FLAG_CONTROL_TOGGLED) || (control->properties == FLAG_CONTROL_BYPASS))
+    else if ((control->properties & FLAG_CONTROL_TOGGLED) || (control->properties & FLAG_CONTROL_BYPASS))
     {
         //convert title
         char title_str_bfr[8] = {0};
@@ -218,7 +218,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         toggle.width = 31;
         toggle.height = 11;
         toggle.color = GLCD_BLACK;
-        toggle.value = (control->properties == FLAG_CONTROL_TOGGLED)?control->value:!control->value;
+        toggle.value = (control->properties & FLAG_CONTROL_TOGGLED)?control->value:!control->value;
         widget_toggle(display, &toggle);
     }
     else
@@ -258,7 +258,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         else if (control->value > 9.9)
         {
             //not for ints
-            if (control->properties == FLAG_CONTROL_INTEGER)
+            if (control->properties & FLAG_CONTROL_INTEGER)
             {
                 int_to_str(control->value, value_str, sizeof(value_str), 0);
             }
@@ -289,7 +289,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         else
         {
             //not for ints
-            if (control->properties == FLAG_CONTROL_INTEGER)
+            if (control->properties & FLAG_CONTROL_INTEGER)
             {
                 int_to_str(control->value, value_str, sizeof(value_str), 0);
             }
@@ -332,7 +332,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         {
             knob.mode = 0;
         }
-        else if (control->properties == FLAG_CONTROL_LOGARITHMIC)
+        else if (control->properties & FLAG_CONTROL_LOGARITHMIC)
         {
             knob.mode = 1;
         }
@@ -486,9 +486,112 @@ void screen_encoder(uint8_t display_id, control_t *control)
     if (!control)
         return null_screen_encoded(display, display_id);
 
-    //liniar/logaritmic control type, Bar graphic
-    if (control->properties == FLAG_CONTROL_LINEAR ||
-        control->properties == FLAG_CONTROL_LOGARITHMIC)
+    // list type control
+    if (control->properties & FLAG_CONTROL_ENUMERATION ||
+             control->properties & FLAG_CONTROL_SCALE_POINTS)
+    {
+        uint8_t scalepoint_count_local = control->scale_points_count > 64 ? 64 : control->scale_points_count;
+
+        char **labels_list = MALLOC(sizeof(char*) * scalepoint_count_local);
+
+        if (labels_list == NULL)
+        {
+            return null_screen_encoded(display, display_id);
+        }
+
+        if (control->scroll_dir)
+            control->scroll_dir = 1;
+        else
+            control->scroll_dir = 0;
+
+        uint8_t i;
+        for (i = 0; i < scalepoint_count_local; i++)
+        {
+            labels_list[i] = control->scale_points[i]->label;
+        }
+
+        listbox_t list;
+        list.x = 0;
+        list.y = 10;
+        list.height = 13;
+        list.color = GLCD_BLACK;
+        list.font = Terminal3x5;
+        list.selected = control->step;
+        list.count = scalepoint_count_local;
+        list.list = labels_list;
+        list.direction = control->scroll_dir;
+        list.line_space = 1;
+        list.line_top_margin = 1;
+        list.line_bottom_margin = 0;
+        list.text_left_margin = 1;
+        list.name = control->label;
+        widget_listbox3(display, &list);
+
+        FREE(labels_list);
+    }
+    else if (control->properties & FLAG_CONTROL_TOGGLED ||
+         control->properties & FLAG_CONTROL_BYPASS)
+    {
+        toggle_t toggle;
+        toggle.x = 0;
+        toggle.y = 10;
+        toggle.width = DISPLAY_WIDTH;
+        toggle.height = 13;
+        toggle.color = GLCD_BLACK;
+        toggle.value = (control->properties & FLAG_CONTROL_TOGGLED)?control->value:!control->value;
+        toggle.label = control->label;
+        widget_toggle_encoder(display, &toggle);
+    }
+    
+    // integer type control
+    else if (control->properties & FLAG_CONTROL_INTEGER)
+    {
+        char *title_str_bfr = (char *) MALLOC(15 * sizeof(char));
+        strncpy(title_str_bfr, control->label, 14);
+        title_str_bfr[14] = '\0';
+
+        textbox_t title;
+        title.color = GLCD_BLACK;
+        title.mode = TEXT_SINGLE_LINE;
+        title.font = Terminal3x5;
+        title.height = 0;
+        title.width = 0;
+        title.top_margin = 0;
+        title.bottom_margin = 0;
+        title.left_margin = 0;
+        title.right_margin = 0;
+        title.text = title_str_bfr;
+        title.align = ALIGN_NONE_NONE;
+        title.x = ((DISPLAY_WIDTH / 4) - (strlen(title_str_bfr) * 1.5));
+        title.y = 14;
+        widget_textbox(display, &title);
+        FREE(title_str_bfr);
+
+        textbox_t int_box;
+        char *value_str = (char *) MALLOC(16 * sizeof(char));
+        char value_str_bfr[5] = {0};
+        int_to_str(control->value, value_str, sizeof(value_str), 0);
+        int_box.color = GLCD_BLACK;
+        int_box.mode = TEXT_SINGLE_LINE;
+        int_box.font = alterebro15nums;
+        int_box.height = 0;
+        int_box.width = 0;
+        int_box.top_margin = 0;
+        int_box.bottom_margin = 0;
+        int_box.left_margin = 0;
+        int_box.right_margin = 0;
+        strncpy(value_str_bfr, value_str, 4);
+        value_str_bfr[4] = '\0';
+        FREE(value_str);
+        int_box.text = value_str_bfr;
+        int_box.align = ALIGN_NONE_NONE;
+        int_box.x = (((DISPLAY_WIDTH / 4) + (DISPLAY_WIDTH / 2) )- (strlen(value_str_bfr) * 1.5));
+        int_box.y = 13;
+        widget_textbox(display, &int_box);
+    }
+        //liniar/logaritmic control type, Bar graphic
+    else if (control->properties == FLAG_CONTROL_LINEAR ||
+        control->properties & FLAG_CONTROL_LOGARITHMIC)
     {
         textbox_t value, title;
 
@@ -606,110 +709,6 @@ void screen_encoder(uint8_t display_id, control_t *control)
         volume_bar.step = control->step;
         volume_bar.steps = control->steps - 1;
         widget_bar_indicator(display, &volume_bar);
-    }
-
-    // integer type control
-    else if (control->properties == FLAG_CONTROL_INTEGER)
-    {
-        char *title_str_bfr = (char *) MALLOC(15 * sizeof(char));
-        strncpy(title_str_bfr, control->label, 14);
-        title_str_bfr[14] = '\0';
-
-        textbox_t title;
-        title.color = GLCD_BLACK;
-        title.mode = TEXT_SINGLE_LINE;
-        title.font = Terminal3x5;
-        title.height = 0;
-        title.width = 0;
-        title.top_margin = 0;
-        title.bottom_margin = 0;
-        title.left_margin = 0;
-        title.right_margin = 0;
-        title.text = title_str_bfr;
-        title.align = ALIGN_NONE_NONE;
-        title.x = ((DISPLAY_WIDTH / 4) - (strlen(title_str_bfr) * 1.5));
-        title.y = 14;
-        widget_textbox(display, &title);
-        FREE(title_str_bfr);
-
-        textbox_t int_box;
-        char *value_str = (char *) MALLOC(16 * sizeof(char));
-        char value_str_bfr[5] = {0};
-        int_to_str(control->value, value_str, sizeof(value_str), 0);
-        int_box.color = GLCD_BLACK;
-        int_box.mode = TEXT_SINGLE_LINE;
-        int_box.font = alterebro15nums;
-        int_box.height = 0;
-        int_box.width = 0;
-        int_box.top_margin = 0;
-        int_box.bottom_margin = 0;
-        int_box.left_margin = 0;
-        int_box.right_margin = 0;
-        strncpy(value_str_bfr, value_str, 4);
-        value_str_bfr[4] = '\0';
-        FREE(value_str);
-        int_box.text = value_str_bfr;
-        int_box.align = ALIGN_NONE_NONE;
-        int_box.x = (((DISPLAY_WIDTH / 4) + (DISPLAY_WIDTH / 2) )- (strlen(value_str_bfr) * 1.5));
-        int_box.y = 13;
-        widget_textbox(display, &int_box);
-    }
-
-    // list type control
-    else if (control->properties == FLAG_CONTROL_ENUMERATION ||
-             control->properties == FLAG_CONTROL_SCALE_POINTS)
-    {
-        uint8_t scalepoint_count_local = control->scale_points_count > 64 ? 64 : control->scale_points_count;
-
-        char **labels_list = MALLOC(sizeof(char*) * scalepoint_count_local);
-
-        if (labels_list == NULL)
-        {
-            return null_screen_encoded(display, display_id);
-        }
-
-        if (control->scroll_dir)
-            control->scroll_dir = 1;
-        else
-            control->scroll_dir = 0;
-
-        uint8_t i;
-        for (i = 0; i < scalepoint_count_local; i++)
-        {
-            labels_list[i] = control->scale_points[i]->label;
-        }
-
-        listbox_t list;
-        list.x = 0;
-        list.y = 10;
-        list.height = 13;
-        list.color = GLCD_BLACK;
-        list.font = Terminal3x5;
-        list.selected = control->step;
-        list.count = scalepoint_count_local;
-        list.list = labels_list;
-        list.direction = control->scroll_dir;
-        list.line_space = 1;
-        list.line_top_margin = 1;
-        list.line_bottom_margin = 0;
-        list.text_left_margin = 1;
-        list.name = control->label;
-        widget_listbox3(display, &list);
-
-        FREE(labels_list);
-    }
-    else if (control->properties == FLAG_CONTROL_TOGGLED ||
-         control->properties == FLAG_CONTROL_BYPASS)
-    {
-        toggle_t toggle;
-        toggle.x = 0;
-        toggle.y = 10;
-        toggle.width = DISPLAY_WIDTH;
-        toggle.height = 13;
-        toggle.color = GLCD_BLACK;
-        toggle.value = (control->properties == FLAG_CONTROL_TOGGLED)?control->value:!control->value;
-        toggle.label = control->label;
-        widget_toggle_encoder(display, &toggle);
     }
     else
     {

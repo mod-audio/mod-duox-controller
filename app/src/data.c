@@ -82,7 +82,6 @@ control_t *data_parse_control(char **data)
     control_t *control = NULL;
     uint32_t len = strarr_length(data);
     const uint32_t min_params = 11;
-    uint16_t properties_mask = 0;
 
     // checks if all data was received
     if (len < min_params - 2)
@@ -95,7 +94,7 @@ control_t *data_parse_control(char **data)
     // fills the control struct
     control->hw_id = atoi(data[1]);
     control->label = str_duplicate(data[2]);
-    properties_mask = atoi(data[3]);
+    control->properties = atoi(data[3]);
     control->unit = str_duplicate(data[4]);
     control->value = atof(data[5]);
     control->maximum = atof(data[6]);
@@ -111,7 +110,7 @@ control_t *data_parse_control(char **data)
     if (!control->label || !control->unit)
         goto error;
 
-    control->properties = 0;
+  /*  control->properties = 0;
     if (FLAG_CONTROL_REVERSE_ENUM & properties_mask)
         control->properties = FLAG_CONTROL_REVERSE_ENUM;
     else if (FLAG_CONTROL_ENUMERATION & properties_mask)
@@ -132,12 +131,12 @@ control_t *data_parse_control(char **data)
         control->properties = FLAG_CONTROL_INTEGER;
 
     if (FLAG_CONTROL_MOMENTARY & properties_mask)
-        control->properties = FLAG_CONTROL_MOMENTARY;
+        control->properties = FLAG_CONTROL_MOMENTARY;*/
 
     // checks if has scale points
     uint8_t i = 0;
-    if (len >= (min_params+1) && (control->properties == FLAG_CONTROL_ENUMERATION ||
-        control->properties == FLAG_CONTROL_SCALE_POINTS || control->properties == FLAG_CONTROL_REVERSE_ENUM))
+    if (len >= (min_params+1) && (control->properties & FLAG_CONTROL_ENUMERATION ||
+        control->properties & FLAG_CONTROL_SCALE_POINTS || control->properties & FLAG_CONTROL_REVERSE_ENUM))
     {
         control->scale_points_count = atoi(data[min_params - 2]);
         if (control->scale_points_count == 0) return control;
