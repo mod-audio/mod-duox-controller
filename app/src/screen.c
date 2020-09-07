@@ -794,7 +794,7 @@ void screen_footer(uint8_t id, const char *name, const char *value, int16_t prop
     	widget_textbox(display, &footer);
     	FREE(title_str_bfr);
 
-        if (property & FLAG_CONTROL_REVERSE_ENUM)
+        if ((property & FLAG_CONTROL_REVERSE_ENUM) && !(property & FLAG_CONTROL_BYPASS))
         {
             if (value[1] != 'N')
             {
