@@ -456,8 +456,8 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define TAP_TEMPO_MAXVAL_OVERFLOW 50
 
 //time in us for the display brightness + led tick interupt
-//needs to be this high so that the generated PWM does not leak into the audio path (EMC and shit)
-#define LED_INTERUPT_TIME     40
+//needs to be this high so that the generated PWM does not leak into the audio path (EMC and stuff)
+#define LED_INTERUPT_TIME     10
 #define DISPL_INTERUPT_TIME   20
 
 //// Toggled
