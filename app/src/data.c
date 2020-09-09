@@ -111,8 +111,8 @@ control_t *data_parse_control(char **data)
         goto error;
 
   /*  control->properties = 0;
-    if (FLAG_CONTROL_REVERSE_ENUM & properties_mask)
-        control->properties = FLAG_CONTROL_REVERSE_ENUM;
+    if (FLAG_CONTROL_REVERSE & properties_mask)
+        control->properties = FLAG_CONTROL_REVERSE;
     else if (FLAG_CONTROL_ENUMERATION & properties_mask)
         control->properties = FLAG_CONTROL_ENUMERATION;
     else if (FLAG_CONTROL_SCALE_POINTS & properties_mask)
@@ -136,7 +136,7 @@ control_t *data_parse_control(char **data)
     // checks if has scale points
     uint8_t i = 0;
     if (len >= (min_params+1) && (control->properties & FLAG_CONTROL_ENUMERATION ||
-        control->properties & FLAG_CONTROL_SCALE_POINTS || control->properties & FLAG_CONTROL_REVERSE_ENUM))
+        control->properties & FLAG_CONTROL_SCALE_POINTS || control->properties & FLAG_CONTROL_REVERSE))
     {
         control->scale_points_count = atoi(data[min_params - 2]);
         if (control->scale_points_count == 0) return control;

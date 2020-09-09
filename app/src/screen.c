@@ -797,7 +797,7 @@ void screen_footer(uint8_t id, const char *name, const char *value, int16_t prop
         if (property & FLAG_CONTROL_MOMENTARY)
         {
             //reverse
-            if (property & FLAG_CONTROL_REVERSE_ENUM)
+            if (property & FLAG_CONTROL_REVERSE)
             {
                 if ((value[1] != 'N') && !(property & FLAG_CONTROL_BYPASS))
                 {
