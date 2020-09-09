@@ -794,14 +794,48 @@ void screen_footer(uint8_t id, const char *name, const char *value, int16_t prop
     	widget_textbox(display, &footer);
     	FREE(title_str_bfr);
 
-        if ((property & FLAG_CONTROL_REVERSE_ENUM) && !(property & FLAG_CONTROL_BYPASS))
+        if (property & FLAG_CONTROL_MOMENTARY)
         {
-            if (value[1] != 'N')
+            //reverse
+            if (property & FLAG_CONTROL_REVERSE_ENUM)
             {
-                if (align)
-                    glcd_rect_invert(display, 66, 57, 62, 7);
-                else
-                    glcd_rect_invert(display, 0, 57, 63, 7);
+                if ((value[1] != 'N') && !(property & FLAG_CONTROL_BYPASS))
+                {
+                    if (align)
+                        glcd_rect_invert(display, 66, 57, 62, 7);
+                    else
+                        glcd_rect_invert(display, 0, 57, 63, 7);
+                }
+                else if (property & FLAG_CONTROL_BYPASS)
+                {
+                    if (value[1] == 'N')
+                    {
+                        if (align)
+                            glcd_rect_invert(display, 66, 57, 62, 7);
+                        else
+                            glcd_rect_invert(display, 0, 57, 63, 7);
+                    }
+                }
+            }
+            else 
+            {
+                if ((value[1] == 'N') && !(property & FLAG_CONTROL_BYPASS))
+                {
+                    if (align)
+                        glcd_rect_invert(display, 66, 57, 62, 7);
+                    else
+                        glcd_rect_invert(display, 0, 57, 63, 7);
+                }
+                else if (property & FLAG_CONTROL_BYPASS)
+                {
+                    if (value[1] != 'N')
+                    {
+                        if (align)
+                            glcd_rect_invert(display, 66, 57, 62, 7);
+                        else
+                            glcd_rect_invert(display, 0, 57, 63, 7);
+                    }
+                } 
             }
         }
         else if (value[1] == 'N')
@@ -811,6 +845,7 @@ void screen_footer(uint8_t id, const char *name, const char *value, int16_t prop
             else
                 glcd_rect_invert(display, 0, 57, 63, 7);
         }
+
         return;
     }
     //scalepoints
