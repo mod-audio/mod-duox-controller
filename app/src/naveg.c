@@ -2761,6 +2761,10 @@ void naveg_pot_change(uint8_t pot)
     	g_pots[pot]->value = MAP(tmp_value, g_pot_calibrations[0][pot], g_pot_calibrations[1][pot],  g_pots[pot]->minimum,  g_pots[pot]->maximum);
     }
 
+    //catch any inacuracy's in for example log calculation. 
+    if (g_pots[pot]->value < g_pots[pot]->minimum) g_pots[pot]->value = g_pots[pot]->minimum;
+    if (g_pots[pot]->value > g_pots[pot]->maximum) g_pots[pot]->value = g_pots[pot]->maximum;
+
    	// send the pot value
    	control_set(pot, g_pots[pot]);
 }
@@ -2994,7 +2998,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                     {
                         break;
                     }
-                    
+
                     //page found
                     if (page_available[j] == 1)
                     {
