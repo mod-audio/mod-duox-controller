@@ -251,7 +251,15 @@ void screen_pot(uint8_t pot_id, control_t *control)
         	}
         	else
         	{
-            	float_to_str((control->value), value_str, sizeof(value_str), 1);
+                //not for ints or percantages
+                if ((control->properties & FLAG_CONTROL_INTEGER) || (!strcmp(control->unit, "%")))
+                {
+                    int_to_str(control->value, value_str, sizeof(value_str), 0);
+                }
+                else 
+                {    
+                	float_to_str((control->value), value_str, sizeof(value_str), 1);
+                }
         	}
         }
         //else if we have a value bigger then 10 we display just one decimal
