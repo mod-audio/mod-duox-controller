@@ -308,7 +308,7 @@ void write_o_settings_defaults()
 void check_eeprom_defaults(uint16_t current_version)
 {
     //if not force update, and not downgrading, check defaults
-	if ((!FORCE_WRITE_EEPROM) && !(current_version > EEPROM_CURRENT_VERSION))
+	if ((!FORCE_WRITE_EEPROM) && (current_version < EEPROM_CURRENT_VERSION))
 	{
     	switch (current_version)
     	{

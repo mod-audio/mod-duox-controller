@@ -2891,16 +2891,17 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                             j = 0;
                         }
 
+                        //we went in a loop, only one page
+                        if (j == page)
+                        {
+                            break;
+                        }
+
                         //page found
                         if (page_available[j] == 1)
                         {
                             page = j;
                             pagefound = 1;
-                        }
-
-                        //we went in a loop, only one page
-                        if (j == page)
-                        {
                             break;
                         }
                     }
@@ -2918,20 +2919,24 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                             j = PAGES_COUNT-1;
                         }
 
-                        //page found
-                        if (page_available[j] == 1)
-                        {
-                            page = j;
-                            pagefound = 1;
-                        }
-
                         //we went in a loop, only one page
                         if (j == page)
                         {
                             break;
                         }
+
+                        //page found
+                        if (page_available[j] == 1)
+                        {
+                            page = j;
+                            pagefound = 1;
+                            break;
+                        }
                     }
                 }
+
+                if (!pagefound)
+                    return;
 
                 i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
 
@@ -2984,19 +2989,23 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                         j = 0;
                     }
 
-                    //page found
-                    if (page_available[j] == 1)
-                    {
-                        page = j;
-                        pagefound = 1;
-                    }
-
                     //we went in a loop, only one page
                     if (j == page)
                     {
                         break;
                     }
+                    
+                    //page found
+                    if (page_available[j] == 1)
+                    {
+                        page = j;
+                        pagefound = 1;
+                        break;
+                    }
                 }
+
+                if (!pagefound)
+                    return;
 
                 i += int_to_str(page, &buffer[i], sizeof(buffer) - i, 0);
 
