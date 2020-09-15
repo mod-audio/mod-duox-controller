@@ -527,7 +527,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define EEPROM_VERSION_ADRESS              62
 
 //for version control, when increasing they ALWAYS need to be bigger then the previous value
-#define EEPROM_CURRENT_VERSION             1110L
+#define EEPROM_CURRENT_VERSION             1111L
 
 //for testing purposes, overwrites the EEPROM regardless of the version
 #define FORCE_WRITE_EEPROM                0

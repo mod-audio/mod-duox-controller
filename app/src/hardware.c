@@ -318,6 +318,8 @@ void check_eeprom_defaults(uint16_t current_version)
         	   	write_led_defaults();
                 // fall through
         	case 1100:
+            // fall through
+            case 1110:
         	   //new led colors came here
                 write_led_defaults();
         	break;
