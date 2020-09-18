@@ -2740,8 +2740,14 @@ void naveg_pot_change(uint8_t pot)
 
     if (g_pots[pot]->properties & FLAG_CONTROL_LOGARITHMIC)
     {
-    	float p_step = ((float) tmp_value) / ((float) (g_pot_calibrations[1][pot] - 1));
-    	g_pots[pot]->value = g_pots[pot]->minimum * pow(g_pots[pot]->maximum / g_pots[pot]->minimum, p_step);
+        //n = current ADC value (linear range value)
+        //x = ADC min = g_pot_calibrations[0][pot]
+        //y = ADC max = g_pot_calibrations[1][pot]
+        //p = log min = g_pots[pot]->minimum
+        //q = log max = g_pots[pot]->maximum
+        //to transpose from a linear range to another log range we can use: 
+        // log_value = 10 ^ (log(p) + ((n - x)/(y - x) * (log(q) - log(p))) ))
+        g_pots[pot]->value = pow(10, log10(g_pots[pot]->minimum)  + (((float)tmp_value - (float)g_pot_calibrations[0][pot]) / ((float)g_pot_calibrations[1][pot] - (float)g_pot_calibrations[0][pot])) * (log10(g_pots[pot]->maximum) - log10(g_pots[pot]->minimum)) );
     }
     //toggles
     else if (g_pots[pot]->properties & (FLAG_CONTROL_TOGGLED | FLAG_CONTROL_BYPASS))
