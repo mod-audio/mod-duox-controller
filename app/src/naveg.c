@@ -280,14 +280,13 @@ static void step_to_value(control_t *control)
     // about the calculation: http://lv2plug.in/ns/ext/port-props/#rangeSteps
 
     float p_step = ((float) control->step) / ((float) (control->steps - 1));
-
-    if (control->properties & FLAG_CONTROL_LOGARITHMIC)
-    {
-        control->value = control->minimum * pow(control->maximum / control->minimum, p_step);
-    }
-    else if (control->properties & (FLAG_CONTROL_REVERSE | FLAG_CONTROL_ENUMERATION | FLAG_CONTROL_SCALE_POINTS))
+    if (control->properties & (FLAG_CONTROL_REVERSE | FLAG_CONTROL_ENUMERATION | FLAG_CONTROL_SCALE_POINTS))
     {
         control->value = control->scale_points[control->step]->value;
+    }
+    else if (control->properties & FLAG_CONTROL_LOGARITHMIC)
+    {
+        control->value = control->minimum * pow(control->maximum / control->minimum, p_step);
     }
     else if (!(control->properties & (FLAG_CONTROL_TRIGGER | FLAG_CONTROL_TOGGLED | FLAG_CONTROL_BYPASS)))
     {
@@ -315,21 +314,7 @@ static void display_encoder_add(control_t *control)
     g_encoders[display] = control;
 
     // calculates initial step
-    if (control->properties & FLAG_CONTROL_LOGARITHMIC)
-    {
-        if (control->minimum == 0.0)
-            control->minimum = FLT_MIN;
-
-        if (control->maximum == 0.0)
-            control->maximum = FLT_MIN;
-
-        if (control->value == 0.0)
-            control->value = FLT_MIN;
-
-        control->step =
-            (control->steps - 1) * log(control->value / control->minimum) / log(control->maximum / control->minimum);
-    }
-    else if (control->properties & (FLAG_CONTROL_REVERSE | FLAG_CONTROL_ENUMERATION | FLAG_CONTROL_SCALE_POINTS))
+    if (control->properties & (FLAG_CONTROL_REVERSE | FLAG_CONTROL_ENUMERATION | FLAG_CONTROL_SCALE_POINTS))
     {
         control->step = 0;
         uint8_t i;
@@ -343,6 +328,20 @@ static void display_encoder_add(control_t *control)
             }
         }
         control->steps = control->scale_points_count;
+    }
+    else if (control->properties & FLAG_CONTROL_LOGARITHMIC)
+    {
+        if (control->minimum == 0.0)
+            control->minimum = FLT_MIN;
+
+        if (control->maximum == 0.0)
+            control->maximum = FLT_MIN;
+
+        if (control->value == 0.0)
+            control->value = FLT_MIN;
+
+        control->step =
+            (control->steps - 1) * log(control->value / control->minimum) / log(control->maximum / control->minimum);
     }
     else if (control->properties & FLAG_CONTROL_INTEGER)
     {
@@ -2258,8 +2257,7 @@ void naveg_inc_control(uint8_t display)
     control_t *control = g_encoders[display];
     if (!control) return;
 
-    if  ((control->properties & (FLAG_CONTROL_ENUMERATION | FLAG_CONTROL_SCALE_POINTS | FLAG_CONTROL_REVERSE)) 
-        && (control->scale_points_flag & FLAG_SCALEPOINT_PAGINATED))
+    if  ((control->properties & (FLAG_CONTROL_ENUMERATION | FLAG_CONTROL_SCALE_POINTS | FLAG_CONTROL_REVERSE)))
     {
     	//check/sets the direction
 		if (control->scroll_dir == 0)
@@ -2331,8 +2329,7 @@ void naveg_dec_control(uint8_t display)
     control_t *control = g_encoders[display];
     if (!control) return;
 
-    if  ((control->properties & (FLAG_CONTROL_ENUMERATION | FLAG_CONTROL_SCALE_POINTS | FLAG_CONTROL_REVERSE)) 
-        && (control->scale_points_flag & FLAG_SCALEPOINT_PAGINATED))
+    if  ((control->properties & (FLAG_CONTROL_ENUMERATION | FLAG_CONTROL_SCALE_POINTS | FLAG_CONTROL_REVERSE)))
     {
 		//check/sets the direction
 		if (control->scroll_dir != 0)
