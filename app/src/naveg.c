@@ -2687,10 +2687,6 @@ void naveg_pot_change(uint8_t pot)
     //set the new value as tmp
     float tmp_value = hardware_get_pot_value(pot);
 
-    //if the pot is lower then its upper and lower thresholds, they are the same
-    if (tmp_value < g_pot_calibrations[0][pot]) tmp_value = g_pot_calibrations[0][pot];
-    else if (tmp_value > g_pot_calibrations[1][pot]) tmp_value = g_pot_calibrations[1][pot];
-
     float tmp_control_value;
 
     if (g_pots[pot]->properties & FLAG_CONTROL_LOGARITHMIC)
@@ -2762,7 +2758,7 @@ void naveg_pot_change(uint8_t pot)
     //default, liniar
     else 
     {
-    	g_pots[pot]->value = MAP(tmp_value, g_pot_calibrations[0][pot], g_pot_calibrations[1][pot],  g_pots[pot]->minimum,  g_pots[pot]->maximum);
+    	g_pots[pot]->value = MAP(tmp_value, (float)g_pot_calibrations[0][pot], (float)g_pot_calibrations[1][pot],  g_pots[pot]->minimum,  g_pots[pot]->maximum);
     }
 
     //catch any inacuracy's in for example log calculation. 
@@ -3727,7 +3723,7 @@ void naveg_menu_item_changed_cb(uint8_t item_ID, uint16_t value)
         //TODO update the master volume link widget
 }
 
-//function used to update the calibration value's adn restore the LED states
+//function used to update the calibration value's and restore the LED states
 //function is toggled after the calibration is exited
 void naveg_update_calibration(void)
 {

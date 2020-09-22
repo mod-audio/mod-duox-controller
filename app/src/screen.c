@@ -1311,7 +1311,7 @@ void screen_text_box(uint8_t display, uint8_t x, uint8_t y, const char *text)
     text_box.height = 63;
     text_box.width = 127;
     text_box.text = text;
-    text_box.align = ALIGN_LEFT_TOP;
+    text_box.align = ALIGN_NONE_NONE;
     text_box.y = y;
     text_box.x = x;
     widget_textbox(hardware_display, &text_box);
