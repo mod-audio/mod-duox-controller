@@ -2519,10 +2519,6 @@ void naveg_pot_change(uint8_t pot)
     //set the new value as tmp
     float tmp_value = hardware_get_pot_value(pot);
 
-    //if the pot is lower then its upper and lower thresholds, they are the same
-    if (tmp_value < g_pot_calibrations[0][pot]) tmp_value = g_pot_calibrations[0][pot];
-    else if (tmp_value > g_pot_calibrations[1][pot]) tmp_value = g_pot_calibrations[1][pot];
-
     float tmp_control_value;
 
     if (g_pots[pot]->properties == CONTROL_PROP_LINEAR)
@@ -2562,14 +2558,24 @@ void naveg_pot_change(uint8_t pot)
     }
     else if (g_pots[pot]->properties == CONTROL_PROP_LOGARITHMIC)
     {
-    	float p_step = ((float) tmp_value) / ((float) (g_pot_calibrations[1][pot] - 1));
-    	g_pots[pot]->value = g_pots[pot]->minimum * pow(g_pots[pot]->maximum / g_pots[pot]->minimum, p_step);
+        //n = current ADC value (linear range value)
+        //x = ADC min = g_pot_calibrations[0][pot]
+        //y = ADC max = g_pot_calibrations[1][pot]
+        //p = log min = g_pots[pot]->minimum
+        //q = log max = g_pots[pot]->maximum
+        //to transpose from a linear range to another log range we can use: 
+        // log_value = 10 ^ (log(p) + ((n - x)/(y - x) * (log(q) - log(p))) ))
+        g_pots[pot]->value = pow(10, log10(g_pots[pot]->minimum)  + (((float)tmp_value - (float)g_pot_calibrations[0][pot]) / ((float)g_pot_calibrations[1][pot] - (float)g_pot_calibrations[0][pot])) * (log10(g_pots[pot]->maximum) - log10(g_pots[pot]->minimum)) );
     }
     //default, liniar
     else 
     {
     	g_pots[pot]->value = MAP(tmp_value, g_pot_calibrations[0][pot], g_pot_calibrations[1][pot],  g_pots[pot]->minimum,  g_pots[pot]->maximum);
     }
+
+    //catch any inacuracy's in for example log calculation. 
+    if (g_pots[pot]->value < g_pots[pot]->minimum) g_pots[pot]->value = g_pots[pot]->minimum;
+    if (g_pots[pot]->value > g_pots[pot]->maximum) g_pots[pot]->value = g_pots[pot]->maximum;
 
    	// send the pot value
    	control_set(pot, g_pots[pot]);

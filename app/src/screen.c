@@ -207,7 +207,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         //else if we have a value bigger then 100, we dont display decimals anymore
         else if (control->value > 99.9)
         {
-        	if (control->value > 999.9)
+        	if ((control->value > 999.9) || (control->properties == CONTROL_PROP_INTEGER) || (!strcmp(control->unit, "%")))
         	{
 				int_to_str(control->value, value_str, sizeof(value_str), 0);
         	}
@@ -235,7 +235,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
             if (control->value > -99.9)
             {
                 //not for ints
-                if (control->properties == CONTROL_PROP_INTEGER)
+                if ((control->properties == CONTROL_PROP_INTEGER)|| (!strcmp(control->unit, "%")))
                 {
                     int_to_str(control->value, value_str, sizeof(value_str), 0);
                 }
@@ -257,7 +257,15 @@ void screen_pot(uint8_t pot_id, control_t *control)
         		}
         		else
         		{
-            		float_to_str((control->value), value_str, sizeof(value_str), 1);
+                    //not for ints or percantages
+                    if ((control->properties & CONTROL_PROP_INTEGER) || (!strcmp(control->unit, "%")))
+                    {
+                        int_to_str(control->value, value_str, sizeof(value_str), 0);
+                    }
+                    else 
+                    {    
+                        float_to_str((control->value), value_str, sizeof(value_str), 1);
+                    }
         		}
             }
         }

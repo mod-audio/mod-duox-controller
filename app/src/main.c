@@ -429,8 +429,8 @@ static void setup_task(void *pvParameters)
 
     // create the tasks
     xTaskCreate(procotol_task, TASK_NAME("pro"), 512, NULL, 4, NULL);
-    xTaskCreate(actuators_task, TASK_NAME("act"), 256, NULL, 3, NULL);
-    xTaskCreate(cli_task, TASK_NAME("cli"), 128, NULL, 2, NULL);
+    xTaskCreate(actuators_task, TASK_NAME("act"), 256, NULL, 2, NULL);
+    xTaskCreate(cli_task, TASK_NAME("cli"), 128, NULL, 3, NULL);
     xTaskCreate(displays_task, TASK_NAME("disp"), 128, NULL, 1, NULL);
 
     // actuators callbacks

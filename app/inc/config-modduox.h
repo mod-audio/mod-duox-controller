@@ -633,6 +633,9 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 // defines the previous pedalboard footer text
 #define PEDALBOARD_PREV_FOOTER_TEXT "-"
 
+//timeout in between CLI volume messages
+#define VOL_MESSAGE_TIMEOUT         200
+
 //// Command line interface configurations
 // defines the cli serial
 #define CLI_SERIAL                  2
