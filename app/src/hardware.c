@@ -313,6 +313,8 @@ void check_eeprom_defaults(uint16_t current_version)
     	switch (current_version)
     	{
     		//everything before 1.10
+            case 170:
+            // fall through
         	case 171:
         		//leds where introduced here
         	   	write_led_defaults();
