@@ -3147,6 +3147,14 @@ void naveg_clear_snapshot(uint8_t foot)
 void naveg_toggle_tool(uint8_t tool, uint8_t display)
 {
     if (!g_initialized) return;
+
+    //no tools in selftest
+    if (g_self_test_mode)
+    {
+        naveg_enter(set);
+        return;
+    }
+
     static uint8_t banks_loaded = 0;
     // clears the display
     screen_clear(display);
