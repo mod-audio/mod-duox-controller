@@ -2251,8 +2251,8 @@ void naveg_inc_control(uint8_t display)
 {
     if (!g_initialized) return;
 
-    // if is in tool mode return
-    if (display_has_tool_enabled(display)) return;
+    // if is in tool or selftest mode return
+    if ((display_has_tool_enabled(display)) || g_self_test_mode) return;
 
     control_t *control = g_encoders[display];
     if (!control) return;
@@ -2323,8 +2323,8 @@ void naveg_dec_control(uint8_t display)
 {
     if (!g_initialized) return;
 
-    // if is in tool mode return
-    if (display_has_tool_enabled(display)) return;
+    // if is in tool or selftest mode return
+    if ((display_has_tool_enabled(display)) || g_self_test_mode) return;
 
     control_t *control = g_encoders[display];
     if (!control) return;
@@ -3441,6 +3441,31 @@ void naveg_enter(uint8_t display)
 void naveg_up(uint8_t display)
 {
     if (!g_initialized) return;
+
+    //if in selftest mode, we just send if we are working or not
+    if ((g_self_test_mode) && !dialog_active)
+    {
+        char buffer[30];
+        uint8_t i;
+
+        i = copy_command(buffer, CMD_SELFTEST_ENCODER_RIGHT);
+
+        // insert the hw_id on buffer
+        i += int_to_str(display, &buffer[i], sizeof(buffer) - i, 0);
+
+        //lock actuators
+        g_protocol_busy = true;
+        system_lock_comm_serial(g_protocol_busy);
+
+        // send the data to GUI
+        comm_webgui_send(buffer, i);
+
+        g_protocol_busy = false;
+        system_lock_comm_serial(g_protocol_busy);
+
+        return;
+    }
+
     if (display_has_tool_enabled(display))
     {
         if (display == 0)
@@ -3484,6 +3509,30 @@ void naveg_up(uint8_t display)
 void naveg_down(uint8_t display)
 {
     if (!g_initialized) return;
+
+    //if in selftest mode, we just send if we are working or not
+    if ((g_self_test_mode) && !dialog_active)
+    {
+        char buffer[30];
+        uint8_t i;
+
+        i = copy_command(buffer, CMD_SELFTEST_ENCODER_LEFT);
+
+        // insert the hw_id on buffer
+        i += int_to_str(display, &buffer[i], sizeof(buffer) - i, 0);
+
+        //lock actuators
+        g_protocol_busy = true;
+        system_lock_comm_serial(g_protocol_busy);
+
+        // send the data to GUI
+        comm_webgui_send(buffer, i);
+
+        g_protocol_busy = false;
+        system_lock_comm_serial(g_protocol_busy);
+
+        return;
+    }
 
     if (display_has_tool_enabled(display))
     {
