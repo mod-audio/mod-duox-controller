@@ -3151,7 +3151,7 @@ void naveg_toggle_tool(uint8_t tool, uint8_t display)
     //no tools in selftest
     if (g_self_test_mode)
     {
-        naveg_enter(set);
+        naveg_enter(display);
         return;
     }
 
@@ -3389,7 +3389,7 @@ void naveg_enter(uint8_t display)
         char buffer[30];
         uint8_t i;
 
-        i = copy_command(buffer, CMD_DUOX_ENCODER_CLICKED);
+        i = copy_command(buffer, CMD_SELFTEST_ENCODER_CLICKED);
 
         // insert the hw_id on buffer
         i += int_to_str(display, &buffer[i], sizeof(buffer) - i, 0);
@@ -3448,7 +3448,7 @@ void naveg_up(uint8_t display)
         char buffer[30];
         uint8_t i;
 
-        i = copy_command(buffer, CMD_SELFTEST_ENCODER_RIGHT);
+        i = copy_command(buffer, CMD_SELFTEST_ENCODER_LEFT);
 
         // insert the hw_id on buffer
         i += int_to_str(display, &buffer[i], sizeof(buffer) - i, 0);
@@ -3516,7 +3516,7 @@ void naveg_down(uint8_t display)
         char buffer[30];
         uint8_t i;
 
-        i = copy_command(buffer, CMD_SELFTEST_ENCODER_LEFT);
+        i = copy_command(buffer, CMD_SELFTEST_ENCODER_RIGHT);
 
         // insert the hw_id on buffer
         i += int_to_str(display, &buffer[i], sizeof(buffer) - i, 0);
