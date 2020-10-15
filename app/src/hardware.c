@@ -269,12 +269,6 @@ void hardware_setup(void)
 
     EEPROM_Init();
 
-    uint8_t q;
-    for (q= 0; q<63; q++)
-    {
-        EEPROM_Erase(q);
-    }
-
     //check if this unit is being turned on for the first time (empty EEPROM)
     uint8_t read_buffer = 0;
     EEPROM_Read(0, EEPROM_EMPTY_CHECK_ADRESS, &read_buffer, MODE_8_BIT, 1);
