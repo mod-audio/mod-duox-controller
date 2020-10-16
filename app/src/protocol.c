@@ -284,7 +284,9 @@ void protocol_init(void)
     protocol_add_command(CMD_PEDALBOARD_CLEAR, cb_pedalboard_clear);
     protocol_add_command(CMD_PEDALBOARD_NAME_SET, cb_pedalboard_name);
     protocol_add_command(CMD_DUOX_PAGES_AVAILABLE, cb_pages_available);
-    protocol_add_command(CMD_DUOX_SAVE_POT_CALIBRATION, cb_save_pot_cal_val);
+    protocol_add_command(CMD_SELFTEST_SAVE_POT_CALIBRATION, cb_save_pot_cal_val);
+    protocol_add_command(CMD_SELFTEST_ENABLE_SKIP, cb_set_selftest_control_skip);
+    protocol_add_command(CMD_SELFTEST_CHECK_CALIBRATION, cb_check_cal);
 }
 
 /*
@@ -496,6 +498,7 @@ void cb_restore(proto_t *proto)
 void cb_boot(proto_t *proto)
 {
     g_self_test_mode = false;
+    g_self_test_cancel_button = false;
 
     //set the quick bypass link
     system_update_menu_value(MENU_ID_QUICK_BYPASS, atoi(proto->list[2]));
@@ -607,6 +610,26 @@ void cb_save_pot_cal_val(proto_t *proto)
     {
         calibration_write_min(atoi(proto->list[2]));
     }
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+}
+
+void cb_check_cal(proto_t *proto)
+{
+    if (calibration_check_valid_pot(atoi(proto->list[1])))
+    {
+        protocol_send_response(CMD_RESPONSE, 1, proto);
+    }
+    //range not good
+    else
+    {
+        protocol_send_response(CMD_RESPONSE, 0, proto);
+    }
+}
+
+void cb_set_selftest_control_skip(proto_t *proto)
+{
+    g_self_test_cancel_button = true; 
 
     protocol_send_response(CMD_RESPONSE, 0, proto);
 }

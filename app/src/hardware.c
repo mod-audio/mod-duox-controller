@@ -489,7 +489,9 @@ void hardware_setup(void)
     
     //check if the calibration value's are valid, if not write defualts
     if (!calibration_check_valid())
+    {
         calibration_write_default();
+    }
 
     //start ADC burst mode
     adc_initalisation();

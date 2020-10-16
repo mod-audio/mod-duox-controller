@@ -81,6 +81,7 @@ uint16_t calibration_get_min(uint8_t pot);
 uint16_t calibration_get_max(uint8_t pot);
 void calibration_write_default(void);
 uint8_t calibration_check_valid(void);
+uint8_t calibration_check_valid_pot(uint8_t pot);
 void calibration_write_max(uint8_t pot);
 void calibration_write_min(uint8_t pot);
 /*
