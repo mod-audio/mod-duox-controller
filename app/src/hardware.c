@@ -779,6 +779,18 @@ void hardware_change_led_color(uint8_t item, uint8_t value[3])
     }
 }
 
+void hardware_reset_eeprom(void)
+{
+    //write all settings
+    write_o_settings_defaults();
+    calibration_write_default();
+    write_led_defaults();
+
+    //update the version 
+    uint16_t write_buffer_version = EEPROM_CURRENT_VERSION;
+    EEPROM_Write(0, EEPROM_VERSION_ADRESS, &write_buffer_version, MODE_16_BIT, 1);
+}
+
 void hardware_coreboard_power(uint8_t state)
 {
     // coreboard sometimes requires 1s pulse to initialize

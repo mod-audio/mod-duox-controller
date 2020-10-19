@@ -90,10 +90,12 @@ void *hardware_actuators(uint8_t actuator_id);
 uint32_t hardware_timestamp(void);
 //get encoder acceleration
 uint8_t hardware_get_acceleration(void);
-
+//get current ADC value of potentiometer
 uint16_t hardware_get_pot_value(uint8_t pot);
-
+//change a LED color definition in eeprom
 void hardware_change_led_color(uint8_t item, uint8_t value[3]);
+//write back EEPROM defaults
+void hardware_reset_eeprom(void);
 // turn on/off coreboard
 void hardware_coreboard_power(uint8_t state);
 

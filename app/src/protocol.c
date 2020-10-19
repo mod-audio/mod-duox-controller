@@ -287,6 +287,8 @@ void protocol_init(void)
     protocol_add_command(CMD_SELFTEST_SAVE_POT_CALIBRATION, cb_save_pot_cal_val);
     protocol_add_command(CMD_SELFTEST_ENABLE_SKIP, cb_set_selftest_control_skip);
     protocol_add_command(CMD_SELFTEST_CHECK_CALIBRATION, cb_check_cal);
+    protocol_add_command(CMD_DUOX_RESET_EEPROM, cb_clear_eeprom);
+    
 }
 
 /*
@@ -630,6 +632,15 @@ void cb_check_cal(proto_t *proto)
 void cb_set_selftest_control_skip(proto_t *proto)
 {
     g_self_test_cancel_button = true; 
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+}
+
+void cb_clear_eeprom(proto_t *proto)
+{
+    hardware_reset_eeprom();    
+
+    //!! THIS NEEDS AN HMI RESET TO TAKE PROPER EFFECT
 
     protocol_send_response(CMD_RESPONSE, 0, proto);
 }
