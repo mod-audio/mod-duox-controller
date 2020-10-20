@@ -489,7 +489,9 @@ void hardware_setup(void)
     
     //check if the calibration value's are valid, if not write defualts
     if (!calibration_check_valid())
+    {
         calibration_write_default();
+    }
 
     //start ADC burst mode
     adc_initalisation();
@@ -775,6 +777,18 @@ void hardware_change_led_color(uint8_t item, uint8_t value[3])
         write_buffer = value[j];
         EEPROM_Write(LED_COLOR_EEMPROM_PAGE, ((item*3) + j), &write_buffer, MODE_8_BIT, 1);    
     }
+}
+
+void hardware_reset_eeprom(void)
+{
+    //write all settings
+    write_o_settings_defaults();
+    calibration_write_default();
+    write_led_defaults();
+
+    //update the version 
+    uint16_t write_buffer_version = EEPROM_CURRENT_VERSION;
+    EEPROM_Write(0, EEPROM_VERSION_ADRESS, &write_buffer_version, MODE_16_BIT, 1);
 }
 
 void hardware_coreboard_power(uint8_t state)
