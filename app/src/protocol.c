@@ -285,7 +285,7 @@ void protocol_init(void)
     protocol_add_command(CMD_PEDALBOARD_NAME_SET, cb_pedalboard_name);
     protocol_add_command(CMD_DUOX_PAGES_AVAILABLE, cb_pages_available);
     protocol_add_command(CMD_SELFTEST_SAVE_POT_CALIBRATION, cb_save_pot_cal_val);
-    protocol_add_command(CMD_SELFTEST_ENABLE_SKIP, cb_set_selftest_control_skip);
+    protocol_add_command(CMD_SELFTEST_SKIP_CONTROL_ENABLE, cb_set_selftest_control_skip);
     protocol_add_command(CMD_SELFTEST_CHECK_CALIBRATION, cb_check_cal);
     protocol_add_command(CMD_DUOX_RESET_EEPROM, cb_clear_eeprom);
     
