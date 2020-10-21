@@ -382,8 +382,6 @@ uint32_t serial_send(uint8_t uart_id, const uint8_t *data, uint32_t data_size)
     // with the index values
     UART_IntConfig(uart, UART_INTCFG_THRE, DISABLE);
 
-    ringbuff_flush(serial->tx_buffer);
-
     uint32_t written, to_write, index;
     written = ringbuff_write(serial->tx_buffer, data, data_size);
     to_write = data_size - written;
@@ -453,6 +451,13 @@ void serial_set_callback(uint8_t uart_id, void (*receive_cb)(serial_t *serial))
     {
         g_serial_instances[uart_id]->rx_callback = receive_cb;
     }
+}
+
+void serial_flush_tx_buffer(uint8_t uart_id)
+{
+    serial_t *serial = g_serial_instances[uart_id];
+
+    ringbuff_flush(serial->tx_buffer);
 }
 
 void UART0_IRQHandler(void)
