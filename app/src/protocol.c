@@ -369,8 +369,10 @@ void cb_gui_connection(proto_t *proto)
     //lock actuators
     g_protocol_busy = true;
     system_lock_comm_serial(g_protocol_busy);
+    
     //clear the buffer so we dont send any messages
-    comm_webgui_clear();
+    comm_webgui_clear_rx_buffer();
+    comm_webgui_clear_tx_buffer();
 
     if (strcmp(proto->list[0], CMD_GUI_CONNECTED) == 0)
         naveg_ui_connection(UI_CONNECTED);
@@ -603,6 +605,11 @@ void cb_pages_available(proto_t *proto)
 
 void cb_save_pot_cal_val(proto_t *proto)
 {
+    //lock actuators and clear tx buffer
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+    comm_webgui_clear_tx_buffer();
+
     //if the first argument == 1, we save the max value, if ==0 we save the min value
     if(atoi(proto->list[1]) == 1)
     {
@@ -614,10 +621,18 @@ void cb_save_pot_cal_val(proto_t *proto)
     }
 
     protocol_send_response(CMD_RESPONSE, 0, proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
 
 void cb_check_cal(proto_t *proto)
 {
+    //lock actuators and clear tx buffer
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+    comm_webgui_clear_tx_buffer();
+
     if (calibration_check_valid_pot(atoi(proto->list[1])))
     {
         protocol_send_response(CMD_RESPONSE, 1, proto);
@@ -627,20 +642,39 @@ void cb_check_cal(proto_t *proto)
     {
         protocol_send_response(CMD_RESPONSE, 0, proto);
     }
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
 
 void cb_set_selftest_control_skip(proto_t *proto)
 {
+    //lock actuators and clear tx buffer
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+    comm_webgui_clear_tx_buffer();
+
     g_self_test_cancel_button = true; 
 
     protocol_send_response(CMD_RESPONSE, 0, proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
 
 void cb_clear_eeprom(proto_t *proto)
 {
+    //lock actuators and clear tx buffer
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+    comm_webgui_clear_tx_buffer();
+
     hardware_reset_eeprom();    
 
     //!! THIS NEEDS AN HMI RESET TO TAKE PROPER EFFECT
 
     protocol_send_response(CMD_RESPONSE, 0, proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }

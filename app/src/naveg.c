@@ -1299,7 +1299,7 @@ static void control_set(uint8_t id, control_t *control)
     system_lock_comm_serial(g_protocol_busy);
 
     if (g_self_test_mode) {
-        comm_webgui_clear();
+        comm_webgui_clear_tx_buffer();
     }
 
     // send the data to GUI
@@ -2796,7 +2796,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
             i += int_to_str(foot, &buffer[i], sizeof(buffer) - i, 0);
         }
 
-        comm_webgui_clear();
+        comm_webgui_clear_tx_buffer();
 
         //lock actuators
         g_protocol_busy = true;
@@ -2889,7 +2889,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                             //do not do actuators here
                             reset_queue();
 
-                            comm_webgui_clear();
+                            comm_webgui_clear_rx_buffer();
                             //lock actuators
                             g_protocol_busy = true;
                             system_lock_comm_serial(g_protocol_busy);
@@ -2994,7 +2994,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 //clear actuator queue
                 reset_queue();
 
-                comm_webgui_clear();
+                comm_webgui_clear_rx_buffer();
 
                 //lock actuators
                 g_protocol_busy = true;
@@ -3063,7 +3063,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 //clear actuator queue
                 reset_queue();
 
-                comm_webgui_clear();
+                comm_webgui_clear_rx_buffer();
 
                 //lock actuators
                 g_protocol_busy = true;
@@ -3103,7 +3103,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                             //do not do actuators here
                             reset_queue();
 
-                            comm_webgui_clear();
+                            comm_webgui_clear_rx_buffer();
                             //lock actuators
                             g_protocol_busy = true;
                             system_lock_comm_serial(g_protocol_busy);
@@ -3274,7 +3274,7 @@ void naveg_toggle_tool(uint8_t tool, uint8_t display)
         }
 
         //clear previous commands in the buffer
-        comm_webgui_clear();
+        comm_webgui_clear_rx_buffer();
 
         control_t *control = g_encoders[display];
 
@@ -3435,7 +3435,7 @@ void naveg_enter(uint8_t display)
         // insert the hw_id on buffer
         i += int_to_str(display, &buffer[i], sizeof(buffer) - i, 0);
 
-        comm_webgui_clear();
+        comm_webgui_clear_tx_buffer();
 
         //lock actuators
         g_protocol_busy = true;
@@ -3496,7 +3496,7 @@ void naveg_up(uint8_t display)
         // insert the hw_id on buffer
         i += int_to_str(display, &buffer[i], sizeof(buffer) - i, 0);
 
-        comm_webgui_clear();
+        comm_webgui_clear_tx_buffer();
 
         //lock actuators
         g_protocol_busy = true;
@@ -3566,7 +3566,7 @@ void naveg_down(uint8_t display)
         // insert the hw_id on buffer
         i += int_to_str(display, &buffer[i], sizeof(buffer) - i, 0);
 
-        comm_webgui_clear();
+        comm_webgui_clear_tx_buffer();
 
         //lock actuators
         g_protocol_busy = true;

@@ -153,8 +153,13 @@ void comm_webgui_wait_response(void)
 }
 
 //clear the ringbuffer
-void comm_webgui_clear(void)
+void comm_webgui_clear_rx_buffer(void)
+{
+    ringbuff_flush(g_webgui_rx_rb);
+}
+
+//clear the ringbuffer
+void comm_webgui_clear_tx_buffer(void)
 {
     serial_flush_tx_buffer(WEBGUI_SERIAL);
-    ringbuff_flush(g_webgui_rx_rb);
 }
