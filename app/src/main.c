@@ -114,6 +114,10 @@ static void pedalboard_clear_cb(proto_t *proto);
 static void page_available_cb(proto_t *proto);
 static void save_pot_cal_val_cb(proto_t *proto);
 
+//backported from 1.10
+static void cb_check_cal(proto_t *proto);
+static void cb_set_selftest_control_skip(proto_t *proto);
+
 static void set_display_contrast(proto_t *proto);
 
 /*
@@ -478,6 +482,10 @@ static void setup_task(void *pvParameters)
     protocol_add_command(SAVE_POT_CAL_VAL_CMD, save_pot_cal_val_cb);
     protocol_add_command(SET_DISPLAY_COTNRAST_CMD, set_display_contrast);
 
+    //backport 1.10
+    protocol_add_command(CMD_SELFTEST_SKIP_CONTROL_ENABLE, cb_set_selftest_control_skip);
+    protocol_add_command(CMD_SELFTEST_CHECK_CALIBRATION, cb_check_cal);
+
     // init the navigation
     naveg_init();
 
@@ -566,7 +574,8 @@ static void gui_connection_cb(proto_t *proto)
 	g_protocol_bussy = 1;
     system_lock_comm_serial(g_protocol_bussy);
 	//clear the buffer so we dont send any messages
-	comm_webgui_clear();
+    comm_webgui_clear_rx_buffer();
+    comm_webgui_clear_tx_buffer();
 
     if (strcmp(proto->list[0], GUI_CONNECTED_CMD) == 0)
         naveg_ui_connection(UI_CONNECTED);
@@ -681,6 +690,7 @@ static void pedalboard_name_cb(proto_t *proto)
 static void boot_cb(proto_t *proto)
 {
     g_self_test_mode = false;
+    g_self_test_cancel_button = false;
 
     //set the quick bypass link
     system_update_menu_value(QUICK_BYPASS_ID, atoi(proto->list[2]));
@@ -771,6 +781,10 @@ static void  page_available_cb(proto_t *proto)
 
 static void save_pot_cal_val_cb(proto_t *proto)
 {
+	g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+    comm_webgui_clear_tx_buffer();
+
     //if the first argument == 1, we save the max value, if ==0 we save the min value
     if(atoi(proto->list[1]) == 1)
     {
@@ -782,12 +796,52 @@ static void save_pot_cal_val_cb(proto_t *proto)
     }
 
     protocol_response("resp 0", proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
 }
 
 static void set_display_contrast(proto_t *proto)
 {
     uc1701_set_custom_value(hardware_glcds(atoi(proto->list[3])), atoi(proto->list[1]), atoi(proto->list[2]));
 }
+
+void cb_check_cal(proto_t *proto)
+{
+	//lock actuators and clear tx buffer
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+    comm_webgui_clear_tx_buffer();
+
+    if (calibration_check_valid_pot(atoi(proto->list[1])))
+    {
+        protocol_response("resp 1", proto);
+    }
+    //range not good
+    else
+    {
+        protocol_response("resp 0", proto);
+    }
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
+}
+
+void cb_set_selftest_control_skip(proto_t *proto)
+{
+	//lock actuators and clear tx buffer
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+    comm_webgui_clear_tx_buffer();
+
+    g_self_test_cancel_button = true; 
+
+    protocol_response("resp 0", proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
+}
+
 
 /*
 ************************************************************************************************************************

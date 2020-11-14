@@ -122,10 +122,13 @@ static uint8_t g_lock_potentiometers = 1;
 //default scrolling direction, will only change and set back once needed
 static uint8_t g_scroll_dir = 1;
 static uint8_t g_page_mode = 0;
+bool g_self_test_cancel_button = false;
 
 // only disabled after "boot" command received
 bool g_self_test_mode = true;
 float g_pot_calibrations[2][POTS_COUNT] = {{0}};
+
+bool g_protocol_busy = false;
 
 /*
 ************************************************************************************************************************
@@ -1176,6 +1179,10 @@ static void control_set(uint8_t id, control_t *control)
     i += float_to_str(control->value, &buffer[i], sizeof(buffer) - i, 6);
     buffer[i] = 0;
 
+    if (g_self_test_mode) {
+        comm_webgui_clear_tx_buffer();
+    }
+
     // send the data to GUI
     comm_webgui_send(buffer, i);
 
@@ -2120,8 +2127,8 @@ void naveg_inc_control(uint8_t display)
 {
     if (!g_initialized) return;
 
-    // if is in tool mode return
-    if (display_has_tool_enabled(display)) return;
+    // if is in tool or selftest mode return
+    if ((display_has_tool_enabled(display)) || g_self_test_mode) return;
 
     control_t *control = g_encoders[display];
     if (!control) return;
@@ -2179,8 +2186,8 @@ void naveg_dec_control(uint8_t display)
 {
     if (!g_initialized) return;
 
-    // if is in tool mode return
-    if (display_has_tool_enabled(display)) return;
+    // if is in tool or selftest mode return
+    if ((display_has_tool_enabled(display)) || g_self_test_mode) return;
 
     control_t *control = g_encoders[display];
     if (!control) return;
@@ -2585,6 +2592,40 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 {
     if (!g_initialized) return;
 
+    //if in selftest mode, we just send if we are working or not
+    if ((g_self_test_mode) && !dialog_active)
+    {
+        char buffer[30];
+        uint8_t i;
+        //skip control action
+        if (g_self_test_cancel_button && (foot == 5))
+        {
+            i = copy_command(buffer, CMD_SELFTEST_SKIP_CONTROL);
+        }
+        else 
+        {
+            i = copy_command(buffer, CMD_SELFTEST_BUTTON_CLICKED);
+
+            // insert the hw_id on buffer
+            i += int_to_str(foot, &buffer[i], sizeof(buffer) - i, 0);
+        }
+
+        //lock actuators
+        g_protocol_busy = true;
+        system_lock_comm_serial(g_protocol_busy);
+
+
+        comm_webgui_clear_tx_buffer();
+        
+        // send the data to GUI
+        comm_webgui_send(buffer, i);
+
+        g_protocol_busy = false;
+        system_lock_comm_serial(g_protocol_busy);
+
+        return;
+    }
+
     // checks the foot id
     if (foot >= FOOTSWITCHES_COUNT) return;
 
@@ -2658,7 +2699,8 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                             //do not do actuators here
                             reset_queue();
 
-                            comm_webgui_clear();
+                            comm_webgui_clear_rx_buffer();
+
                             comm_webgui_send(buffer, i);
                             if (!g_self_test_mode) {
                                 comm_webgui_wait_response();
@@ -2709,7 +2751,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 //clear actuator queue
                 reset_queue();
 
-                comm_webgui_clear();
+                comm_webgui_clear_rx_buffer();
 
                 comm_webgui_send(buffer, i);
 
@@ -2805,7 +2847,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
             //clear actuator queue
             reset_queue();
 
-            comm_webgui_clear();
+            comm_webgui_clear_rx_buffer();
 
             comm_webgui_send(buffer, i);
 
@@ -2832,6 +2874,9 @@ void naveg_reset_page(void)
 
 void naveg_save_snapshot(uint8_t foot)
 {
+    // if is in tool or selftest mode return
+    if (g_self_test_mode) return;
+
     //this function is disabled in 3 button pagination mode
     if (g_page_mode) return;
 
@@ -2862,6 +2907,14 @@ void naveg_clear_snapshot(uint8_t foot)
 void naveg_toggle_tool(uint8_t tool, uint8_t display)
 {
     if (!g_initialized) return;
+
+    //no tools in selftest
+    if (g_self_test_mode)
+    {
+        naveg_enter(display);
+        return;
+    }
+
     static uint8_t banks_loaded = 0;
     // clears the display
     screen_clear(display);
@@ -2933,7 +2986,7 @@ void naveg_toggle_tool(uint8_t tool, uint8_t display)
         }
 
         //clear previous commands in the buffer
-        comm_webgui_clear();
+        comm_webgui_clear_rx_buffer();
 
         control_t *control = g_encoders[display];
 
@@ -3097,13 +3150,22 @@ void naveg_enter(uint8_t display)
         char buffer[30];
         uint8_t i;
 
-        i = copy_command(buffer, ENCODER_CLICKED_CMD);
+        i = copy_command(buffer, CMD_SELFTEST_ENCODER_CLICKED);
 
         // insert the hw_id on buffer
         i += int_to_str(display, &buffer[i], sizeof(buffer) - i, 0);
 
+        //lock actuators
+        g_protocol_busy = true;
+        system_lock_comm_serial(g_protocol_busy);
+
+        comm_webgui_clear_tx_buffer();
+
         // send the data to GUI
         comm_webgui_send(buffer, i);
+
+        g_protocol_busy = false;
+        system_lock_comm_serial(g_protocol_busy);
 
         return;
     }
@@ -3142,6 +3204,33 @@ void naveg_enter(uint8_t display)
 void naveg_up(uint8_t display)
 {
     if (!g_initialized) return;
+
+    //if in selftest mode, we just send if we are working or not
+    if ((g_self_test_mode) && !dialog_active)
+    {
+        char buffer[30];
+        uint8_t i;
+
+        i = copy_command(buffer, CMD_SELFTEST_ENCODER_LEFT);
+
+        // insert the hw_id on buffer
+        i += int_to_str(display, &buffer[i], sizeof(buffer) - i, 0);
+
+        //lock actuators
+        g_protocol_busy = true;
+        system_lock_comm_serial(g_protocol_busy);
+
+        comm_webgui_clear_tx_buffer();
+
+        // send the data to GUI
+        comm_webgui_send(buffer, i);
+
+        g_protocol_busy = false;
+        system_lock_comm_serial(g_protocol_busy);
+
+        return;
+    }
+
     if (display_has_tool_enabled(display))
     {
         if (display == 0)
@@ -3185,6 +3274,32 @@ void naveg_up(uint8_t display)
 void naveg_down(uint8_t display)
 {
     if (!g_initialized) return;
+
+    //if in selftest mode, we just send if we are working or not
+    if ((g_self_test_mode) && !dialog_active)
+    {
+        char buffer[30];
+        uint8_t i;
+
+        i = copy_command(buffer, CMD_SELFTEST_ENCODER_RIGHT);
+
+        // insert the hw_id on buffer
+        i += int_to_str(display, &buffer[i], sizeof(buffer) - i, 0);
+
+        //lock actuators
+        g_protocol_busy = true;
+        system_lock_comm_serial(g_protocol_busy);
+
+        comm_webgui_clear_tx_buffer();
+
+        // send the data to GUI
+        comm_webgui_send(buffer, i);
+
+        g_protocol_busy = false;
+        system_lock_comm_serial(g_protocol_busy);
+
+        return;
+    }
 
     if (display_has_tool_enabled(display))
     {

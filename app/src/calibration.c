@@ -331,10 +331,23 @@ uint8_t check_range_sufficient(uint8_t pot)
 
     }
 
-    //if range is not good, return 0. if the range is bug eneugh return 1 
-    if ((read_buffer_max - read_buffer_min) < 1000)
-        return 0;
-    else return 1; 
+ if (read_buffer_max > read_buffer_min)
+    {
+        if ((read_buffer_max - read_buffer_min) < 2000)
+        {
+            return 0;
+        }
+    }
+    else 
+    {
+        if ((read_buffer_min - read_buffer_max) < 2000)
+        {
+            return 0;        
+        }
+    }
+
+    //range is good
+    return 1; 
 }
 
 /*
@@ -638,10 +651,30 @@ uint8_t calibration_check_valid(void)
     return 1; 
 }
 
+//function to check if specific value is value
+uint8_t calibration_check_valid_pot(uint8_t pot)
+{
+    uint8_t valid = 0;
+
+    //check all pots 1 by 1
+    valid = check_range_sufficient(pot);
+
+    //if one is not valid exit loop
+    if (!valid) 
+    {
+        return 0;
+    }
+
+    return 1; 
+}
+
 void calibration_write_max(uint8_t pot)
 {
     //substract 10 because ADC value's fluctuate. 
-    uint16_t write_buffer = (hardware_get_pot_value(pot) - 10);
+    uint16_t write_buffer = hardware_get_pot_value(pot);
+
+    if (hardware_get_pot_value(pot) > 10)
+        write_buffer -= 10;
 
     switch(pot)
     {
@@ -694,8 +727,10 @@ void calibration_write_max(uint8_t pot)
 void calibration_write_min(uint8_t pot)
 {
     //add 10 because ADC value's fluctuate. 
-    uint16_t write_buffer = (hardware_get_pot_value(pot) + 10);
-
+    uint16_t write_buffer = hardware_get_pot_value(pot);
+    if (hardware_get_pot_value(pot) < 4084)
+        write_buffer += 10;
+    
     switch(pot)
     {
         case 0: 

@@ -42,7 +42,7 @@
 #define SERIAL2
 #define SERIAL2_BAUD_RATE       115200
 #define SERIAL2_PRIORITY        2
-#define SERIAL2_RX_PORT         2
+#define SERIAL2_RX_PORT         5
 #define SERIAL2_RX_PIN          9
 #define SERIAL2_RX_FUNC         2
 #define SERIAL2_RX_BUFF_SIZE    64
@@ -337,7 +337,66 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 //set display contrast options <PM val> <RR val> <display>
 #define SET_DISPLAY_COTNRAST_CMD          "set_display_contrast %i %i %i"
 
-
+//1.10 backported commands
+  /*
+  ********************************
+      Selftest Specific commands
+  ********************************
+  */
+  
+  //send if an encoder is clicked (used in selftest) <encoder_id>
+  //response: -
+  //HMI action: -
+  //HOST action: -
+  #define CMD_SELFTEST_ENCODER_CLICKED      "enc_clicked %i"
+  
+  //send if an encoder is turned left (used in selftest) <encoder_id>
+  //response: -
+  //HMI action: -
+  //HOST action: -
+  #define CMD_SELFTEST_ENCODER_LEFT         "enc_left %i"
+  
+  //send if an encoder is turned right (used in selftest) <encoder_id>
+  //response: -
+  //HMI action: -
+  //HOST action: -
+  #define CMD_SELFTEST_ENCODER_RIGHT      "enc_right %i"
+  
+  //send if an button is clicked (used in selftest) <button_id>
+  //response: -
+  //HMI action: -
+  //HOST action: -
+  #define CMD_SELFTEST_BUTTON_CLICKED      "button_clicked %i"
+  
+  //send so HMI can check calibration (used in selftest) <pot_id>
+  //response: -
+  //HMI action: check call and return id when ok
+  //HOST action: -
+  #define CMD_SELFTEST_CHECK_CALIBRATION   "pot_call_check %i"
+  
+  //send if an button is clicked (used in selftest) <pot_id>
+  //response: -
+  //HMI action: -
+  //HOST action: -
+  #define CMD_SELFTEST_CALLIBRATION_OK   "pot_call_ok %i"
+  
+  //send if the selftest hangs on a control to continue
+  //response: -
+  //HMI action: -
+  //HOST action: -
+  #define CMD_SELFTEST_SKIP_CONTROL_ENABLE   "control_skip_enable"
+  
+  //send if the selftest hangs on a control to continue
+  //response: -
+  //HMI action: -
+  //HOST action: -
+  #define CMD_SELFTEST_SKIP_CONTROL   "control_bad_skip"
+  
+  //send to the HMI to save the current value of a pot as the calibration value (used in selftest) <min/max> <pot_id>
+  //response: -
+  //HMI action: save current pot value as min/max calibration value
+  //HOST action: -
+  #define CMD_SELFTEST_SAVE_POT_CALIBRATION "save_pot_cal %i %i"
 
 //// Control propertires definitions
 #define CONTROL_PROP_LINEAR         0

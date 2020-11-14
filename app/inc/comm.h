@@ -75,7 +75,8 @@ void comm_webgui_response_cb(void *data);
 // blocks the execution until the webgui response be received
 void comm_webgui_wait_response(void);
 // clear the data in the buffer
-void comm_webgui_clear(void);
+void comm_webgui_clear_rx_buffer(void);
+void comm_webgui_clear_tx_buffer(void);
 
 /*
 ************************************************************************************************************************
