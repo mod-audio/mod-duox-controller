@@ -71,6 +71,7 @@ static volatile xQueueHandle g_actuators_queue;
 static uint8_t g_msg_buffer[WEBGUI_COMM_RX_BUFF_SIZE];
 static uint8_t g_ui_communication_started;
 static uint8_t g_protocol_bussy = 0;
+static uint8_t g_boot_priorities = 0;
 
 
 /*
@@ -88,6 +89,12 @@ static void displays_task(void *pvParameters);
 static void actuators_task(void *pvParameters);
 static void cli_task(void *pvParameters);
 static void setup_task(void *pvParameters);
+
+//task handle's
+TaskHandle_t g_xHandle_protocol = NULL;
+TaskHandle_t g_xHandle_actuator = NULL;
+TaskHandle_t g_xHandle_cli = NULL;
+TaskHandle_t g_xHandle_display = NULL;
 
 // protocol callbacks
 static void ping_cb(proto_t *proto);
@@ -409,6 +416,14 @@ static void cli_task(void *pvParameters)
     while (1)
     {
         cli_process();
+
+        if (g_boot_priorities && cli_restore(RESTORE_STATUS) == LOGGED_ON_SYSTEM)
+        {
+			//change own priority
+			vTaskPrioritySet(NULL, 2);
+
+			g_boot_priorities = 0;
+        }
     }
 }
 
@@ -425,17 +440,20 @@ static void setup_task(void *pvParameters)
     // CLI initialization
     cli_init();
 
-    // initialize the communication resources
+    // Comm initialization
     comm_init();
 
     // create the queues
     g_actuators_queue = xQueueCreate(ACTUATORS_QUEUE_SIZE, sizeof(uint8_t *));
 
     // create the tasks
-    xTaskCreate(procotol_task, TASK_NAME("pro"), 512, NULL, 3, NULL);
-    xTaskCreate(actuators_task, TASK_NAME("act"), 256, NULL, 2, NULL);
-    xTaskCreate(cli_task, TASK_NAME("cli"), 128, NULL, 4, NULL);
-    xTaskCreate(displays_task, TASK_NAME("disp"), 128, NULL, 1, NULL);
+    xTaskCreate(procotol_task, TASK_NAME("pro"), 512, NULL, 4, g_xHandle_protocol);
+    xTaskCreate(actuators_task, TASK_NAME("act"), 256, NULL, 3, g_xHandle_actuator);
+    xTaskCreate(cli_task, TASK_NAME("cli"), 128, NULL, 4, g_xHandle_cli);
+    xTaskCreate(displays_task, TASK_NAME("disp"), 128, NULL, 1, g_xHandle_display);
+
+    //we need to change the priorities later once the system is live
+    g_boot_priorities = 1;
 
     // actuators callbacks
     uint8_t i;
