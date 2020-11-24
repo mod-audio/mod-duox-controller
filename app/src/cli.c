@@ -37,7 +37,7 @@
 
 #define PEEK_SIZE           3
 #define RESPONSE_TIMEOUT    (CLI_RESPONSE_TIMEOUT / portTICK_RATE_MS)
-#define BOOT_TIMEOUT        (5000 / portTICK_RATE_MS)
+#define BOOT_TIMEOUT        (4000 / portTICK_RATE_MS)
 
 
 /*

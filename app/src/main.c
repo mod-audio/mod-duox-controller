@@ -71,8 +71,6 @@ static volatile xQueueHandle g_actuators_queue;
 static uint8_t g_msg_buffer[WEBGUI_COMM_RX_BUFF_SIZE];
 static uint8_t g_ui_communication_started;
 static uint8_t g_protocol_bussy = 0;
-static uint8_t g_boot_priorities = 0;
-
 
 /*
 ************************************************************************************************************************
@@ -422,7 +420,7 @@ static void cli_task(void *pvParameters)
 			//change own priority
 			vTaskPrioritySet(NULL, 2);
 
-			g_boot_priorities = 0;
+			g_boot_priorities = false;
         }
     }
 }

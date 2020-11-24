@@ -27,7 +27,7 @@
 // SERIAL1
 #define SERIAL3
 #define SERIAL3_BAUD_RATE       1500000
-#define SERIAL3_PRIORITY        1
+#define SERIAL3_PRIORITY        3
 #define SERIAL3_RX_PORT         0
 #define SERIAL3_RX_PIN          3
 #define SERIAL3_RX_FUNC         2
