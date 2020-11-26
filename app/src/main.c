@@ -451,7 +451,7 @@ static void setup_task(void *pvParameters)
     xTaskCreate(displays_task, TASK_NAME("disp"), 128, NULL, 1, g_xHandle_display);
 
     //we need to change the priorities later once the system is live
-    g_boot_priorities = 1;
+    g_boot_priorities = true;
 
     // actuators callbacks
     uint8_t i;

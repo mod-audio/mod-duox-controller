@@ -3517,7 +3517,7 @@ void naveg_menu_item_changed_cb(uint8_t item_ID, uint16_t value)
     system_update_menu_value(item_ID, value);
 
     //are we inside the menu? if so we need to update
-    if (!g_boot_priorities && (tool_is_on(DISPLAY_TOOL_SYSTEM)))
+    if (tool_is_on(DISPLAY_TOOL_SYSTEM))
     {
         //menu update for left or right? or both? 
 
