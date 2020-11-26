@@ -92,7 +92,6 @@ static void setup_task(void *pvParameters);
 ************************************************************************************************************************
 */
 
-
 /*
 ************************************************************************************************************************
 *           LOCAL FUNCTIONS
@@ -377,6 +376,14 @@ static void cli_task(void *pvParameters)
     while (1)
     {
         cli_process();
+
+        if (g_boot_priorities && cli_restore(RESTORE_STATUS) == LOGGED_ON_SYSTEM)
+        {
+            //change own priority
+            vTaskPrioritySet(NULL, 2);
+
+            g_boot_priorities = false;
+        }
     }
 }
 
@@ -398,12 +405,15 @@ static void setup_task(void *pvParameters)
 
     // create the queues
     g_actuators_queue = xQueueCreate(ACTUATORS_QUEUE_SIZE, sizeof(uint8_t *));
-
+    
     // create the tasks
-    xTaskCreate(procotol_task, TASK_NAME("pro"), 512, NULL, 3, NULL);
-    xTaskCreate(actuators_task, TASK_NAME("act"), 256, NULL, 2, NULL);
+    xTaskCreate(procotol_task, TASK_NAME("pro"), 512, NULL, 4, NULL);
+    xTaskCreate(actuators_task, TASK_NAME("act"), 256, NULL, 3, NULL);
     xTaskCreate(cli_task, TASK_NAME("cli"), 128, NULL, 4, NULL);
     xTaskCreate(displays_task, TASK_NAME("disp"), 128, NULL, 1, NULL);
+
+    //we need to change the priorities later once the system is live
+    g_boot_priorities = true;
 
     // actuators callbacks
     uint8_t i;
