@@ -117,7 +117,6 @@ static uint8_t g_page_mode = 0;
 bool g_self_test_mode = true;
 bool g_self_test_cancel_button = false;
 float g_pot_calibrations[2][POTS_COUNT] = {{0}};
-bool g_boot_priorities = true;
 
 /*
 ************************************************************************************************************************

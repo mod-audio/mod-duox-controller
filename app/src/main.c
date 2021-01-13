@@ -377,12 +377,10 @@ static void cli_task(void *pvParameters)
     {
         cli_process();
 
-        if (g_boot_priorities && cli_restore(RESTORE_STATUS) == LOGGED_ON_SYSTEM)
+        if ((uxTaskPriorityGet(NULL) > 2) && (cli_restore(RESTORE_STATUS) == LOGGED_ON_SYSTEM))
         {
             //change own priority
             vTaskPrioritySet(NULL, 2);
-
-            g_boot_priorities = false;
         }
     }
 }
@@ -411,9 +409,6 @@ static void setup_task(void *pvParameters)
     xTaskCreate(actuators_task, TASK_NAME("act"), 256, NULL, 3, NULL);
     xTaskCreate(cli_task, TASK_NAME("cli"), 128, NULL, 4, NULL);
     xTaskCreate(displays_task, TASK_NAME("disp"), 128, NULL, 1, NULL);
-
-    //we need to change the priorities later once the system is live
-    g_boot_priorities = true;
 
     // actuators callbacks
     uint8_t i;
