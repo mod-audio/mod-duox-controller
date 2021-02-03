@@ -58,7 +58,7 @@ CFLAGS += -mcpu=$(MCU)
 else
 CFLAGS += -DCCC_ANALYZER -Wshadow -Wno-attributes
 endif
-CFLAGS += -Wall -Wextra -Wpointer-arith -Wredundant-decls
+CFLAGS += -Wall -Wextra -Wpointer-arith -Wredundant-decls -Wsizeof-pointer-memaccess
 CFLAGS += -Wa,-adhlns=$(addprefix $(OUT_DIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
 CFLAGS += -MMD -MP -MF $(OUT_DIR)/dep/$(@F).d
 CFLAGS += -I. $(patsubst %,-I%,$(INC))
