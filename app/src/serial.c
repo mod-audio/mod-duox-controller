@@ -325,30 +325,30 @@ void serial_enable_interupt(serial_t *serial)
     IRQn_Type irq;
 
     switch (serial->uart_id)
-        {
-            case 0:
-                uart = UART0;
-                irq = UART0_IRQn;
-                break;
+    {
+        case 0:
+            uart = UART0;
+            irq = UART0_IRQn;
+            break;
 
-            case 1:
-                uart = UART1;
-                irq = UART1_IRQn;
-                break;
+        case 1:
+            uart = UART1;
+            irq = UART1_IRQn;
+            break;
 
-            case 2:
-                uart = UART2;
-                irq = UART2_IRQn;
-                break;
+        case 2:
+            uart = UART2;
+            irq = UART2_IRQn;
+            break;
 
-            case 3:
-                uart = UART3;
-                irq = UART3_IRQn;
-                break;
-            default:
-                uart = UART0;
-                irq = UART0_IRQn;
-                break;
+        case 3:
+            uart = UART3;
+            irq = UART3_IRQn;
+            break;
+        default:
+            uart = UART0;
+            irq = UART0_IRQn;
+            break;
     }
 
     ringbuff_flush(serial->rx_buffer);
@@ -362,6 +362,45 @@ void serial_enable_interupt(serial_t *serial)
 
     // Enable UART line status interrupt
     UART_IntConfig(uart, UART_INTCFG_RLS, ENABLE);
+
+    // set priority
+    NVIC_SetPriority(irq, serial->priority);
+
+    // Enable Interrupt for UART channel
+    NVIC_EnableIRQ(irq);
+}
+
+void serial_change_interupt_priority(serial_t *serial)
+{
+    IRQn_Type irq;
+
+    switch (serial->uart_id)
+    {
+        case 0:
+            irq = UART0_IRQn;
+            break;
+
+        case 1:
+            irq = UART1_IRQn;
+            break;
+
+        case 2:
+            irq = UART2_IRQn;
+            break;
+
+        case 3:
+            irq = UART3_IRQn;
+            break;
+        default:
+            irq = UART0_IRQn;
+            break;
+    }
+
+    // Disable Interrupt for UART channel
+    NVIC_DisableIRQ(irq);
+
+    ringbuff_flush(serial->rx_buffer);
+    ringbuff_flush(serial->tx_buffer);
 
     // set priority
     NVIC_SetPriority(irq, serial->priority);

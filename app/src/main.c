@@ -369,8 +369,6 @@ static void cli_task(void *pvParameters)
 {
     UNUSED_PARAM(pvParameters);
 
-    //hardware_coreboard_power(COREBOARD_INIT);
-
 	hardware_eneble_serial_interupt(CLI_SERIAL);
 
     while (1)
@@ -381,6 +379,8 @@ static void cli_task(void *pvParameters)
         {
             //change own priority
             vTaskPrioritySet(NULL, 2);
+
+            hardware_change_serial_interupt_priority(CLI_SERIAL, 2);
         }
     }
 }

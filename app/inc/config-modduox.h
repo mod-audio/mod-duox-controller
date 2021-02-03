@@ -41,7 +41,7 @@
 // SERIAL2
 #define SERIAL2
 #define SERIAL2_BAUD_RATE       115200
-#define SERIAL2_PRIORITY        3
+#define SERIAL2_PRIORITY        1
 #define SERIAL2_RX_PORT         2
 #define SERIAL2_RX_PIN          9
 #define SERIAL2_RX_FUNC         2

@@ -428,12 +428,6 @@ void hardware_setup(void)
     //Pass the array into vPortDefineHeapRegions().
     vPortDefineHeapRegions( xHeapRegions );
 
-    // configure and set initial state of shutdown cpu button
-    // note: CLR_PIN will make the coreboard reboot unless SET_PIN is called in less than 5s
-    //       this is done in the beginning of cli_task()
-    //CONFIG_PIN_OUTPUT(SHUTDOWN_BUTTON_PORT, SHUTDOWN_BUTTON_PIN);
-    //CLR_PIN(SHUTDOWN_BUTTON_PORT, SHUTDOWN_BUTTON_PIN);
-
     EEPROM_Init();
 
     //check if this unit is being turned on for the first time (empty EEPROM)
@@ -710,6 +704,12 @@ void hardware_setup(void)
 void hardware_eneble_serial_interupt(uint8_t serial_port)
 {
     serial_enable_interupt(&g_serial[serial_port]);
+}
+
+void hardware_change_serial_interupt_priority(uint8_t serial_port, uint8_t priority)
+{
+    g_serial[serial_port].priority = priority;
+    serial_change_interupt_priority(&g_serial[serial_port]);
 }
 
 glcd_t *hardware_glcds(uint8_t glcd_id)
