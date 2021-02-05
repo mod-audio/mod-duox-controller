@@ -347,16 +347,15 @@ void widget_listbox3(glcd_t *display, listbox_t *listbox)
         glcd_text(display, listbox->x + listbox->text_left_margin, (listbox->y + 4),listbox->name , Terminal3x5, listbox->color);
     }
 
-    uint8_t list_width = 128 - (name_size + 10 + listbox->text_left_margin);
+    //indicator width
+    uint8_t indicator_width = 8;
+    uint8_t list_width = 128 - (name_size + indicator_width + listbox->text_left_margin);
 
     //draws the indicator
     glcd_rect_fill(display, (listbox->x + name_size + listbox->text_left_margin + 6 )  , (listbox->y + 2 ),  1, 1, listbox->color);
     glcd_rect_fill(display, (listbox->x + name_size + listbox->text_left_margin + 6 )  , (listbox->y + 10),  1, 1, listbox->color);
     glcd_rect_fill(display, (listbox->x + name_size + listbox->text_left_margin + 5 )  , (listbox->y + 2 ),  1, 9, listbox->color);
     glcd_rect_fill(display, (listbox->x + name_size + listbox->text_left_margin + 2 )  , (listbox->y + 6 ),  4, 1, listbox->color);
-
-    //indicator width
-    uint8_t indicator_width = 8;
 
     if (listbox->direction == 0)
     {
