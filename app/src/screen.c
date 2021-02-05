@@ -280,7 +280,15 @@ void screen_pot(uint8_t pot_id, control_t *control)
         {
             if (control->value > -99.9)
             {
-                float_to_str((control->value), value_str, sizeof(value_str), 1);
+                //not for ints
+                if (control->properties & FLAG_CONTROL_INTEGER)
+                {
+                    int_to_str(control->value, value_str, sizeof(value_str), 0);
+                }
+                else
+                {
+                    float_to_str((control->value), value_str, sizeof(value_str), 1);
+                }
             }
             else
             {
