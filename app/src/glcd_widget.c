@@ -349,42 +349,42 @@ void widget_listbox3(glcd_t *display, listbox_t *listbox)
 
     //indicator width
     uint8_t indicator_width = 8;
-    uint8_t list_width = 128 - (name_size + indicator_width + listbox->text_left_margin);
+    uint8_t list_width = 128 - (name_size + indicator_width + listbox->text_left_margin)+1;
 
     //draws the indicator
-    glcd_rect_fill(display, (listbox->x + name_size + listbox->text_left_margin + 6 )  , (listbox->y + 2 ),  1, 1, listbox->color);
-    glcd_rect_fill(display, (listbox->x + name_size + listbox->text_left_margin + 6 )  , (listbox->y + 10),  1, 1, listbox->color);
-    glcd_rect_fill(display, (listbox->x + name_size + listbox->text_left_margin + 5 )  , (listbox->y + 2 ),  1, 9, listbox->color);
-    glcd_rect_fill(display, (listbox->x + name_size + listbox->text_left_margin + 2 )  , (listbox->y + 6 ),  4, 1, listbox->color);
+    glcd_rect_fill(display, (listbox->x + name_size + listbox->text_left_margin + 5 ) , (listbox->y + 2 ),  1, 1, listbox->color);
+    glcd_rect_fill(display, (listbox->x + name_size + listbox->text_left_margin + 5 ) , (listbox->y + 10),  1, 1, listbox->color);
+    glcd_rect_fill(display, (listbox->x + name_size + listbox->text_left_margin + 4 ) , (listbox->y + 2 ),  1, 9, listbox->color);
+    glcd_rect_fill(display, (listbox->x + name_size + listbox->text_left_margin + 1 ) , (listbox->y + 6 ),  4, 1, listbox->color);
 
     if (listbox->direction == 0)
     {
         if (listbox->selected > 0)
         {
-            glcd_text(display, (listbox->x + name_size + listbox->text_left_margin + indicator_width), listbox->y, listbox->list[listbox->selected-1],Terminal3x5, listbox->color);
-            glcd_text(display, listbox->x + name_size + listbox->text_left_margin + 16, listbox->y + 7, listbox->list[listbox->selected], Terminal3x5, listbox->color);
-            glcd_rect_invert(display, listbox->x + name_size + listbox->text_left_margin + indicator_width,  listbox->y + 6, list_width, 7);
+            glcd_text(display, (listbox->x + name_size + listbox->text_left_margin + indicator_width-1), listbox->y, listbox->list[listbox->selected-1],Terminal3x5, listbox->color);
+            glcd_text(display, listbox->x + name_size + listbox->text_left_margin + 15, listbox->y + 7, listbox->list[listbox->selected], Terminal3x5, listbox->color);
+            glcd_rect_invert(display, listbox->x + name_size + listbox->text_left_margin + indicator_width-1,  listbox->y + 6, list_width, 7);
         }
         else
         {
-            glcd_text(display, listbox->x + name_size + listbox->text_left_margin + indicator_width, listbox->y + 7, listbox->list[listbox->selected+1], Terminal3x5, listbox->color);
-            glcd_text(display, listbox->x + name_size + listbox->text_left_margin + 16, listbox->y, listbox->list[listbox->selected], Terminal3x5, listbox->color);
-            glcd_rect_invert(display, listbox->x + name_size + listbox->text_left_margin + indicator_width,  listbox->y - 1, list_width, 7);
+            glcd_text(display, listbox->x + name_size + listbox->text_left_margin + indicator_width-1, listbox->y + 7, listbox->list[listbox->selected+1], Terminal3x5, listbox->color);
+            glcd_text(display, listbox->x + name_size + listbox->text_left_margin + 15, listbox->y, listbox->list[listbox->selected], Terminal3x5, listbox->color);
+            glcd_rect_invert(display, listbox->x + name_size + listbox->text_left_margin + indicator_width-1,  listbox->y - 1, list_width, 7);
         }
     }
     else if (listbox->direction ==  1)
     {
         if (listbox->selected < (listbox->count - 1))
         {
-            glcd_text(display, listbox->x + listbox->text_left_margin + name_size + indicator_width, listbox->y + 7, listbox->list[listbox->selected+1], Terminal3x5, listbox->color);
-            glcd_text(display, listbox->x + listbox->text_left_margin + name_size + 16, listbox->y, listbox->list[listbox->selected], Terminal3x5, listbox->color);
-            glcd_rect_invert(display, listbox->x + name_size + listbox->text_left_margin + indicator_width,  listbox->y - 1, list_width, 7);
+            glcd_text(display, listbox->x + listbox->text_left_margin + name_size + indicator_width-1, listbox->y + 7, listbox->list[listbox->selected+1], Terminal3x5, listbox->color);
+            glcd_text(display, listbox->x + listbox->text_left_margin + name_size + 15, listbox->y, listbox->list[listbox->selected], Terminal3x5, listbox->color);
+            glcd_rect_invert(display, listbox->x + name_size + listbox->text_left_margin + indicator_width-1,  listbox->y - 1, list_width, 7);
         }
         else
         {
-            glcd_text(display, listbox->x + listbox->text_left_margin + name_size + indicator_width, listbox->y, listbox->list[listbox->selected-1],Terminal3x5, listbox->color);
-            glcd_text(display, listbox->x + listbox->text_left_margin + name_size + 16, listbox->y + 7, listbox->list[listbox->selected], Terminal3x5, listbox->color);
-            glcd_rect_invert(display, listbox->x +  name_size + listbox->text_left_margin + indicator_width,  listbox->y + 6, list_width, 7);
+            glcd_text(display, listbox->x + listbox->text_left_margin + name_size + indicator_width-1, listbox->y, listbox->list[listbox->selected-1],Terminal3x5, listbox->color);
+            glcd_text(display, listbox->x + listbox->text_left_margin + name_size + 15, listbox->y + 7, listbox->list[listbox->selected], Terminal3x5, listbox->color);
+            glcd_rect_invert(display, listbox->x +  name_size + listbox->text_left_margin + indicator_width-1, listbox->y + 6, list_width, 7);
         }
     }
 }
