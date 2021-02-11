@@ -569,6 +569,7 @@ void cb_pedalboard_clear(proto_t *proto)
     //clear snapshots
     //we dont care yet about which snapshot, thats why hardcoded
     naveg_clear_snapshot(6);
+    naveg_clear_snapshot(5);
     naveg_clear_snapshot(4);
 
     //reset the page to page 1
