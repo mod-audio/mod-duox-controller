@@ -431,7 +431,7 @@ static void setup_task(void *pvParameters)
     }
 
     // workaround freeze during init
-    delay_ms(20);
+    delay_ms(350);
 
     // init the navigation
     naveg_init();
