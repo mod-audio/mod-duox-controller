@@ -374,14 +374,6 @@ static void cli_task(void *pvParameters)
     while (1)
     {
         cli_process();
-
-        if ((uxTaskPriorityGet(NULL) > 2) && (cli_restore(RESTORE_STATUS) == LOGGED_ON_SYSTEM))
-        {
-            //change own priority
-            vTaskPrioritySet(NULL, 2);
-
-            hardware_change_serial_interupt_priority(CLI_SERIAL, 2);
-        }
     }
 }
 
