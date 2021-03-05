@@ -66,6 +66,7 @@ typedef struct CMD_T {
 ************************************************************************************************************************
 */
 
+#define MAP(x, Omin, Omax, Nmin, Nmax)      ( x - Omin ) * (Nmax -  Nmin)  / (Omax - Omin) + Nmin;
 
 /*
 ************************************************************************************************************************
@@ -288,7 +289,7 @@ void protocol_init(void)
     protocol_add_command(CMD_SELFTEST_SKIP_CONTROL_ENABLE, cb_set_selftest_control_skip);
     protocol_add_command(CMD_SELFTEST_CHECK_CALIBRATION, cb_check_cal);
     protocol_add_command(CMD_DUOX_RESET_EEPROM, cb_clear_eeprom);
-    
+    protocol_add_command(CMD_DUOX_SET_CONTRAST, cb_set_disp_contrast);
 }
 
 /*
@@ -673,6 +674,22 @@ void cb_clear_eeprom(proto_t *proto)
     hardware_reset_eeprom();    
 
     //!! THIS NEEDS AN HMI RESET TO TAKE PROPER EFFECT
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+
+    g_protocol_busy = false;
+    system_lock_comm_serial(g_protocol_busy);
+}
+
+void cb_set_disp_contrast(proto_t *proto)
+{
+    //lock actuators and clear tx buffer
+    g_protocol_busy = true;
+    system_lock_comm_serial(g_protocol_busy);
+    comm_webgui_clear_tx_buffer();
+
+    int value_bfr = MAP(atoi(proto->list[2]), 0, 100, UC1701_PM_MIN, UC1701_PM_MAX);
+    uc1701_set_custom_value(hardware_glcds(atoi(proto->list[1])), value_bfr, UC1701_RR_DEFAULT);
 
     protocol_send_response(CMD_RESPONSE, 0, proto);
 

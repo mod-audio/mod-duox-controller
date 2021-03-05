@@ -24,6 +24,11 @@
 ************************************************************************************************************************
 */
 
+//display conf macro
+//#define INVERT_POTENTIOMENTERS
+//#define INVERT_HEADERS
+#define FOOT_INV_BORDERS
+
 #define FOOTER_NAME_WIDTH       ((DISPLAY_WIDTH * 50)/100)
 #define FOOTER_VALUE_WIDTH      (DISPLAY_WIDTH - FOOTER_NAME_WIDTH)
 
@@ -433,6 +438,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
         widget_textbox(display, &value);
     }
 
+#ifdef INVERT_POTENTIOMENTERS
     //invert the pot area
     switch(pot_id)
     {
@@ -453,6 +459,9 @@ void screen_pot(uint8_t pot_id, control_t *control)
             glcd_rect_invert(display, 65, knob.y -6, 63, 14);
             break;
     }
+#else
+    glcd_vline(display, 64, 25, 31, GLCD_BLACK);
+#endif
 }
 
 static void null_screen_encoded(glcd_t *display, uint8_t display_id)
@@ -810,6 +819,22 @@ void screen_footer(uint8_t id, const char *name, const char *value, int16_t prop
     	widget_textbox(display, &footer);
     	FREE(title_str_bfr);
 
+#ifndef FOOT_INV_BORDERS
+    uint8_t foor_inv_box_L_x = 0;
+    uint8_t foor_inv_box_R_x = 65;
+    uint8_t foor_inv_box_y = 56;
+    uint8_t foor_inv_box_L_width = 63;
+    uint8_t foor_inv_box_R_width = 64;
+    uint8_t foor_inv_box_height = 8;
+#else
+    uint8_t foor_inv_box_L_x = 0;
+    uint8_t foor_inv_box_R_x = 66;
+    uint8_t foor_inv_box_y = 57;
+    uint8_t foor_inv_box_L_width = 62;
+    uint8_t foor_inv_box_R_width = 63;
+    uint8_t foor_inv_box_height = 7;
+#endif
+
         if (property & FLAG_CONTROL_MOMENTARY)
         {
             //reverse
@@ -818,18 +843,18 @@ void screen_footer(uint8_t id, const char *name, const char *value, int16_t prop
                 if ((value[1] != 'N') && !(property & FLAG_CONTROL_BYPASS))
                 {
                     if (align)
-                        glcd_rect_invert(display, 66, 57, 62, 7);
+                        glcd_rect_invert(display, foor_inv_box_R_x, foor_inv_box_y, foor_inv_box_L_width, foor_inv_box_height);
                     else
-                        glcd_rect_invert(display, 0, 57, 63, 7);
+                        glcd_rect_invert(display, foor_inv_box_L_x, foor_inv_box_y, foor_inv_box_R_width, foor_inv_box_height);
                 }
                 else if (property & FLAG_CONTROL_BYPASS)
                 {
                     if (value[1] == 'N')
                     {
                         if (align)
-                            glcd_rect_invert(display, 66, 57, 62, 7);
+                            glcd_rect_invert(display, foor_inv_box_R_x, foor_inv_box_y, foor_inv_box_L_width, foor_inv_box_height);
                         else
-                            glcd_rect_invert(display, 0, 57, 63, 7);
+                            glcd_rect_invert(display, foor_inv_box_L_x, foor_inv_box_y, foor_inv_box_R_width, foor_inv_box_height);
                     }
                 }
             }
@@ -838,18 +863,18 @@ void screen_footer(uint8_t id, const char *name, const char *value, int16_t prop
                 if ((value[1] == 'N') && !(property & FLAG_CONTROL_BYPASS))
                 {
                     if (align)
-                        glcd_rect_invert(display, 66, 57, 62, 7);
+                        glcd_rect_invert(display, foor_inv_box_R_x, foor_inv_box_y, foor_inv_box_L_width, foor_inv_box_height);
                     else
-                        glcd_rect_invert(display, 0, 57, 63, 7);
+                        glcd_rect_invert(display, foor_inv_box_L_x, foor_inv_box_y, foor_inv_box_R_width, foor_inv_box_height);
                 }
                 else if (property & FLAG_CONTROL_BYPASS)
                 {
                     if (value[1] != 'N')
                     {
                         if (align)
-                            glcd_rect_invert(display, 66, 57, 62, 7);
+                            glcd_rect_invert(display, foor_inv_box_R_x, foor_inv_box_y, foor_inv_box_L_width, foor_inv_box_height);
                         else
-                            glcd_rect_invert(display, 0, 57, 63, 7);
+                            glcd_rect_invert(display, foor_inv_box_L_x, foor_inv_box_y, foor_inv_box_R_width, foor_inv_box_height);
                     }
                 } 
             }
@@ -857,9 +882,9 @@ void screen_footer(uint8_t id, const char *name, const char *value, int16_t prop
         else if (value[1] == 'N')
         {
             if (align)
-                glcd_rect_invert(display, 66, 57, 62, 7);
+                glcd_rect_invert(display, foor_inv_box_R_x, foor_inv_box_y, foor_inv_box_L_width, foor_inv_box_height);
             else
-                glcd_rect_invert(display, 0, 57, 63, 7);
+                glcd_rect_invert(display, foor_inv_box_L_x, foor_inv_box_y, foor_inv_box_R_width, foor_inv_box_height);
         }
 
         return;
@@ -981,6 +1006,10 @@ void screen_top_info(const void *data, uint8_t update)
 
     // horizontal footer line
     glcd_hline(display, 0, 7, DISPLAY_WIDTH, GLCD_BLACK);
+
+#ifdef INVERT_HEADERS
+    glcd_rect_invert(display, 0, 0, DISPLAY_WIDTH, 7);
+#endif
 }
 
 void screen_tool(uint8_t tool, uint8_t display_id)
@@ -1301,6 +1330,10 @@ void screen_master_vol(int8_t volume_val)
     glcd_hline(display, 0, 7, DISPLAY_WIDTH, GLCD_BLACK);
 
     if (naveg_is_master_vol()) glcd_rect_invert (display, 0, 0, DISPLAY_WIDTH, 7);
+
+#ifdef INVERT_HEADERS
+    glcd_rect_invert(display, 0, 0, DISPLAY_WIDTH, 7);
+#endif
 
 }
 

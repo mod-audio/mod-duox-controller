@@ -112,6 +112,7 @@ void cb_save_pot_cal_val(proto_t *proto);
 void cb_check_cal(proto_t *proto);
 void cb_set_selftest_control_skip(proto_t *proto);
 void cb_clear_eeprom(proto_t *proto);
+void cb_set_disp_contrast(proto_t *proto);
 
 /*
 ************************************************************************************************************************
