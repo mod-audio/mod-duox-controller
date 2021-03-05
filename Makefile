@@ -1,5 +1,4 @@
 # project name
-#PRJNAME = mod-controller
 PRJNAME = mod-duox-controller
 
 # toolchain configuration

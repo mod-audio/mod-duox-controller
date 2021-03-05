@@ -369,19 +369,11 @@ static void cli_task(void *pvParameters)
 {
     UNUSED_PARAM(pvParameters);
 
-	hardware_eneble_serial_interupt(CLI_SERIAL);
+    hardware_eneble_serial_interupt(CLI_SERIAL);
 
     while (1)
     {
         cli_process();
-
-        if ((uxTaskPriorityGet(NULL) > 2) && (cli_restore(RESTORE_STATUS) == LOGGED_ON_SYSTEM))
-        {
-            //change own priority
-            vTaskPrioritySet(NULL, 2);
-
-            hardware_change_serial_interupt_priority(CLI_SERIAL, 2);
-        }
     }
 }
 
@@ -401,13 +393,16 @@ static void setup_task(void *pvParameters)
     // initialize the communication resources
     comm_init();
 
+    // init the navigation
+    naveg_init();
+
     // create the queues
     g_actuators_queue = xQueueCreate(ACTUATORS_QUEUE_SIZE, sizeof(uint8_t *));
-    
+
     // create the tasks
     xTaskCreate(procotol_task, TASK_NAME("pro"), 512, NULL, 4, NULL);
     xTaskCreate(actuators_task, TASK_NAME("act"), 256, NULL, 3, NULL);
-    xTaskCreate(cli_task, TASK_NAME("cli"), 128, NULL, 4, NULL);
+    xTaskCreate(cli_task, TASK_NAME("cli"), 128, NULL, 2, NULL);
     xTaskCreate(displays_task, TASK_NAME("disp"), 128, NULL, 1, NULL);
 
     // actuators callbacks
@@ -427,9 +422,6 @@ static void setup_task(void *pvParameters)
         actuator_set_event(hardware_actuators(POT0 + i), actuators_cb);
         actuator_enable_event(hardware_actuators(POT0 + i), EV_POT_TURNED);
     }
-
-    // init the navigation
-    naveg_init();
 
     // deletes itself
     vTaskDelete(NULL);

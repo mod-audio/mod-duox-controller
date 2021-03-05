@@ -513,7 +513,6 @@ void system_bluetooth_cb(void *arg, int event)
                 update_status(item->data.list[2], items[0]);
                 update_status(item->data.list[3], items[1]);
                 update_status(item->data.list[4], items[2]);
-
                 FREE(items);
             } 
         }
@@ -543,6 +542,7 @@ void system_input_cb(void *arg, int event)
             g_gains_volumes[1] = atof(items[1]);
             g_cv_in_mode = atoi(items[2]);
             g_exp_mode = atoi(items[3]);
+            FREE(items);
         } 
         
     }
@@ -568,6 +568,7 @@ void system_output_cb(void *arg, int event)
             g_gains_volumes[3] = atof(items[1]);
             g_gains_volumes[4] = atof(items[2]);
             g_cv_out_mode = atoi(items[3]);
+            FREE(items);
         } 
     }
 }
