@@ -309,23 +309,26 @@ void write_o_settings_defaults()
 void check_eeprom_defaults(uint16_t current_version)
 {
     //if not force update, and not downgrading, check defaults
-	if ((!FORCE_WRITE_EEPROM) && (current_version < EEPROM_CURRENT_VERSION))
-	{
-    	switch (current_version)
-    	{
-    		//everything before 1.10
+    if ((!FORCE_WRITE_EEPROM) && (current_version < EEPROM_CURRENT_VERSION))
+    {
+        //IMPORTANT, all statements must fall through in order to non sequential updates
+        switch (current_version)
+        {
+            //everything before 1.10
             case 170:
             // fall through
-        	case 171:
-        		//leds where introduced here
-        	   	write_led_defaults();
+            case 171:
+                //leds where introduced here
+                write_led_defaults();
                 // fall through
-        	case 1100:
+            case 1100:
             // fall through
             case 1110:
-        	   //new led colors came here
+               //new led colors came here
                 write_led_defaults();
-        	break;
+            // fall through
+            case 1111:
+            // fall through
             case 1194:;
                 //induvidial display contrasts, if came through update, just copy the left one
                 uint8_t read_buffer = 0;
@@ -333,13 +336,13 @@ void check_eeprom_defaults(uint16_t current_version)
                 uint8_t write_buffer = read_buffer;
                 EEPROM_Write(0, DISPLAY_CONTRAST_RIGHT_ADRESS, &write_buffer, MODE_8_BIT, 1);
             break;
-    	    //nothing saved yet, new unit, write all settings
-    	    default:
-    			write_o_settings_defaults();
-    			calibration_write_default();
-    			write_led_defaults();
-    	    break;
-    	}
+            //nothing saved yet, new unit, write all settings
+            default:
+                write_o_settings_defaults();
+                calibration_write_default();
+                write_led_defaults();
+            break;
+        }
     }
     //detect downgrade, dont do anything
     else if ((current_version > EEPROM_CURRENT_VERSION) && (!FORCE_WRITE_EEPROM))
