@@ -2918,7 +2918,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 char buffer[10];
                 uint8_t i;
                 int8_t j;
-                i = copy_command(buffer, CMD_DUOX_NEXT_PAGE);
+                i = copy_command(buffer, CMD_NEXT_PAGE);
                 uint8_t pagefound = 0;
 
                 //up
@@ -3015,7 +3015,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
         case 5:;
             char buffer[10];
             uint8_t i, j;
-            i = copy_command(buffer, CMD_DUOX_NEXT_PAGE);
+            i = copy_command(buffer, CMD_NEXT_PAGE);
 
             if (!g_page_mode)
             {
