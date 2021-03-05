@@ -294,8 +294,9 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define POT_LOCK_ID         DEVICE_SETTINGS_ID + 4
 #define PAGE_MODE_ID        DEVICE_SETTINGS_ID + 5
 #define POT_CALL_ID         DEVICE_SETTINGS_ID + 6
-#define DISP_CONTRAST_ID    DEVICE_SETTINGS_ID + 7
-#define LED_BRIGHTNESS_ID   DEVICE_SETTINGS_ID + 8
+#define DISP_CONTRAST_L_ID  DEVICE_SETTINGS_ID + 7
+#define DISP_CONTRAST_R_ID  DEVICE_SETTINGS_ID + 8
+#define LED_BRIGHTNESS_ID   DEVICE_SETTINGS_ID + 9
 
 #define BLUETOOTH_DISCO_ID  BLUETOOTH_ID+2
 
@@ -353,7 +354,8 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"DEVICE SETTINGS",                 MENU_LIST,      DEVICE_SETTINGS_ID,   SYSTEM_ID,          NULL                       , 0},  \
     {"< BACK TO SYSTEM",                MENU_RETURN,    DEVICE_SETTINGS_ID+1, DEVICE_SETTINGS_ID, NULL                       , 0},  \
     {"DISPLAY BRIGHTNESS",              MENU_TOGGLE,    DISP_BL_ID,           DEVICE_SETTINGS_ID, system_display_cb          , 0},  \
-    {"DISPLAY CONTRAST",                MENU_SET,       DISP_CONTRAST_ID,     DEVICE_SETTINGS_ID, system_display_contrast_cb , 0},  \
+    {"DISPLAY CONTRAST LEFT",           MENU_SET,       DISP_CONTRAST_L_ID,   DEVICE_SETTINGS_ID, system_display_contrast_lcb, 0},  \
+    {"DISPLAY CONTRAST RIGHT",          MENU_SET,       DISP_CONTRAST_R_ID,   DEVICE_SETTINGS_ID, system_display_contrast_rcb, 0},  \
     {"UNASSIGNED ACTUATORS",            MENU_TOGGLE,    ACTU_HIDE_ID,         DEVICE_SETTINGS_ID, system_hide_actuator_cb    , 0},  \
     {"KNOB MODE ",                      MENU_TOGGLE,    POT_LOCK_ID,          DEVICE_SETTINGS_ID, system_lock_pots_cb        , 0},  \
     {"PAGES MODE ",                     MENU_TOGGLE,    PAGE_MODE_ID,         DEVICE_SETTINGS_ID, system_page_mode_cb        , 0},  \
@@ -527,8 +529,9 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define POT_8_MIN_CALIBRATION_ADRESS       32
 #define POT_8_MAX_CALIBRATION_ADRESS       34
 #define PAGE_MODE_ADRESS                   35
-#define DISPLAY_CONTRAST_ADRESS            36
+#define DISPLAY_CONTRAST_LEFT_ADRESS       36
 #define LED_BRIGHTNESS_ADRESS              37
+#define DISPLAY_CONTRAST_RIGHT_ADRESS      38
 
 //default settings
 #define DEFAULT_HIDE_ACTUATOR              0
@@ -545,7 +548,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define EEPROM_VERSION_ADRESS              62
 
 //for version control, when increasing they ALWAYS need to be bigger then the previous value
-#define EEPROM_CURRENT_VERSION             1111L
+#define EEPROM_CURRENT_VERSION             1211L
 
 //for testing purposes, overwrites the EEPROM regardless of the version
 #define FORCE_WRITE_EEPROM                0

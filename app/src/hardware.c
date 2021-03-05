@@ -294,7 +294,8 @@ void write_o_settings_defaults()
 {
     //set the eeprom default values
     uint8_t write_buffer = UC1701_PM_DEFAULT;
-    EEPROM_Write(0, DISPLAY_CONTRAST_ADRESS, &write_buffer, MODE_8_BIT, 1);
+    EEPROM_Write(0, DISPLAY_CONTRAST_LEFT_ADRESS, &write_buffer, MODE_8_BIT, 1);
+    EEPROM_Write(0, DISPLAY_CONTRAST_RIGHT_ADRESS, &write_buffer, MODE_8_BIT, 1);
     write_buffer = DEFAULT_HIDE_ACTUATOR;
     EEPROM_Write(0, HIDE_ACTUATOR_ADRESS, &write_buffer, MODE_8_BIT, 1);
     write_buffer = DEFAULT_LOCK_POTENTIOMTERS;
@@ -325,7 +326,13 @@ void check_eeprom_defaults(uint16_t current_version)
         	   //new led colors came here
                 write_led_defaults();
         	break;
-
+            case 1194:;
+                //induvidial display contrasts, if came through update, just copy the left one
+                uint8_t read_buffer = 0;
+                EEPROM_Read(0, DISPLAY_CONTRAST_LEFT_ADRESS, &read_buffer, MODE_8_BIT, 1);
+                uint8_t write_buffer = read_buffer;
+                EEPROM_Write(0, DISPLAY_CONTRAST_RIGHT_ADRESS, &write_buffer, MODE_8_BIT, 1);
+            break;
     	    //nothing saved yet, new unit, write all settings
     	    default:
     			write_o_settings_defaults();
@@ -498,8 +505,9 @@ void hardware_setup(void)
 
     //set the display contrast
     uint8_t display_contrast = 0;
-    EEPROM_Read(0, DISPLAY_CONTRAST_ADRESS, &display_contrast, MODE_8_BIT, 1);
+    EEPROM_Read(0, DISPLAY_CONTRAST_LEFT_ADRESS, &display_contrast, MODE_8_BIT, 1);
     uc1701_set_custom_value(hardware_glcds(0), display_contrast, UC1701_RR_DEFAULT);
+    EEPROM_Read(0, DISPLAY_CONTRAST_RIGHT_ADRESS, &display_contrast, MODE_8_BIT, 1);
     uc1701_set_custom_value(hardware_glcds(1), display_contrast, UC1701_RR_DEFAULT);
 
     //set led colors
