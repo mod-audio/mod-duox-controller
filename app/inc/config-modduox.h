@@ -24,7 +24,7 @@
 // If the UART ISR (or callbacks) uses freeRTOS API, the priorities values must be
 // equal or greater than configMAX_SYSCALL_INTERRUPT_PRIORITY
 
-// SERIAL1
+// SERIAL3 webgui callbacks
 #define SERIAL3
 #define SERIAL3_BAUD_RATE       1500000
 #define SERIAL3_PRIORITY        1
@@ -38,7 +38,7 @@
 #define SERIAL3_TX_BUFF_SIZE    32
 #define SERIAL3_HAS_OE          0
 
-// SERIAL2
+// SERIAL2 CLI
 #define SERIAL2
 #define SERIAL2_BAUD_RATE       115200
 #define SERIAL2_PRIORITY        1
@@ -52,23 +52,19 @@
 #define SERIAL2_TX_BUFF_SIZE    64
 #define SERIAL2_HAS_OE          0
 
-//TODO CONFIGURE ME
-//(placeholder copy from MDW)
-/*
-// SERIAL2 (system callbacks)
-#define SERIAL2
-#define SERIAL2_BAUD_RATE       1500000
-#define SERIAL2_PRIORITY        2
-#define SERIAL2_RX_PORT         2
-#define SERIAL2_RX_PIN          9
-#define SERIAL2_RX_FUNC         2
-#define SERIAL2_RX_BUFF_SIZE    32
-#define SERIAL2_TX_PORT         2
-#define SERIAL2_TX_PIN          8
-#define SERIAL2_TX_FUNC         2
-#define SERIAL2_TX_BUFF_SIZE    32
-#define SERIAL2_HAS_OE          0
-*/
+// SERIAL0 (system callbacks)
+#define SERIAL0
+#define SERIAL0_BAUD_RATE       1500000
+#define SERIAL0_PRIORITY        2
+#define SERIAL0_RX_PORT         0
+#define SERIAL0_RX_PIN          1
+#define SERIAL0_RX_FUNC         4
+#define SERIAL0_RX_BUFF_SIZE    32
+#define SERIAL0_TX_PORT         0
+#define SERIAL0_TX_PIN          0
+#define SERIAL0_TX_FUNC         4
+#define SERIAL0_TX_BUFF_SIZE    32
+#define SERIAL0_HAS_OE          0
 
 //// Hardware peripheral definitions
 // Clock power control
@@ -196,6 +192,14 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 // define how many bytes will be allocated to rx/tx buffers
 #define WEBGUI_COMM_RX_BUFF_SIZE    4096
 #define WEBGUI_COMM_TX_BUFF_SIZE    512
+
+//// system serial configuration
+// define the interface
+#define SYSTEM_SERIAL               0
+
+// define how many bytes will be allocated to rx/tx buffers
+#define SYSTEM_COMM_RX_BUFF_SIZE    1024
+#define SYSTEM_COMM_TX_BUFF_SIZE    512
 
 //// Tools configuration
 // navigation update time, this is only useful in tool mode
