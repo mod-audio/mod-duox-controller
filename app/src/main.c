@@ -375,6 +375,7 @@ static void cli_task(void *pvParameters)
     {
         cli_process();
 
+#if 0
         if ((uxTaskPriorityGet(NULL) > 2) && (cli_restore(RESTORE_STATUS) == LOGGED_ON_SYSTEM))
         {
             //change own priority
@@ -382,6 +383,7 @@ static void cli_task(void *pvParameters)
 
             hardware_change_serial_interupt_priority(CLI_SERIAL, 2);
         }
+#endif
     }
 }
 
@@ -400,9 +402,6 @@ static void setup_task(void *pvParameters)
 
     // initialize the communication resources
     comm_init();
-
-    // init the navigation
-    naveg_init();
 
     // create the queues
     g_actuators_queue = xQueueCreate(ACTUATORS_QUEUE_SIZE, sizeof(uint8_t *));
@@ -430,6 +429,12 @@ static void setup_task(void *pvParameters)
         actuator_set_event(hardware_actuators(POT0 + i), actuators_cb);
         actuator_enable_event(hardware_actuators(POT0 + i), EV_POT_TURNED);
     }
+
+    // workaround freeze during init
+    delay_ms(350);
+
+    // init the navigation
+    naveg_init();
 
     // deletes itself
     vTaskDelete(NULL);
