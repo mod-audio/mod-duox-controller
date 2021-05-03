@@ -290,6 +290,7 @@ void protocol_init(void)
     protocol_add_command(CMD_SELFTEST_CHECK_CALIBRATION, cb_check_cal);
     protocol_add_command(CMD_RESET_EEPROM, cb_clear_eeprom);
     protocol_add_command(CMD_DUOX_SET_CONTRAST, cb_set_disp_contrast);
+    protocol_add_command(CMD_DUOX_EXP_OVERCURRENT, cb_exp_overcurrent);
 }
 
 /*
@@ -344,7 +345,7 @@ void cb_glcd_text(proto_t *proto)
 
 void cb_glcd_dialog(proto_t *proto)
 {
-    uint8_t val = naveg_dialog(proto->list[1]);
+    uint8_t val = naveg_dialog(proto->list[1], NULL);
     protocol_send_response(CMD_RESPONSE, val, proto);
 }
 
@@ -695,4 +696,13 @@ void cb_set_disp_contrast(proto_t *proto)
 
     g_protocol_busy = false;
     system_lock_comm_serial(g_protocol_busy);
+}
+
+void cb_exp_overcurrent(proto_t *proto)
+{
+    (void) proto;
+
+    naveg_dialog("Exp port shorted\nTo avoid harm to your device\nthe unit switched back to CV\nmode\n\nPlease check your exp pedal\nand cables", "WARNING");
+
+    naveg_reload_display();
 }

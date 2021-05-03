@@ -3184,6 +3184,25 @@ void naveg_clear_snapshot(uint8_t foot)
     ledz_set_state(hardware_leds(foot), foot, MAX_COLOR_ID, 0, 0, 0, 0);
 }
 
+void naveg_reload_display(void)
+{
+    screen_clear(0);
+    screen_clear(1);
+
+    //disp 1
+    naveg_print_pb_name(0);
+    control_t *control = g_encoders[0];
+    screen_encoder(0, control);
+    draw_all_pots(0);
+    draw_all_foots(0);
+
+    //disp 2
+    control = g_encoders[1];
+    naveg_master_volume(0);
+    draw_all_pots(1);
+    screen_encoder(1, control);
+    draw_all_foots(1);
+}
 
 void naveg_toggle_tool(uint8_t tool, uint8_t display)
 {
@@ -3645,7 +3664,7 @@ void naveg_update(void)
     }
 }
 
-uint8_t naveg_dialog(const char *msg)
+uint8_t naveg_dialog(const char *msg, char *title)
 {
     static node_t *dummy_menu = NULL;
     static menu_desc_t desc = {NULL, MENU_CONFIRM2, DIALOG_ID, DIALOG_ID, NULL, 0};
@@ -3659,7 +3678,10 @@ uint8_t naveg_dialog(const char *msg)
         item->data.list_count = 2;
         item->data.list = NULL;
         item->data.popup_content = msg;
-        item->data.popup_header = "selftest";
+        if (title)
+            item->data.popup_header = title;
+        else
+            item->data.popup_header = "selftest";
         item->desc = &desc;
         item->name = NULL;
         dummy_menu = node_create(item);

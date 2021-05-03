@@ -1215,7 +1215,7 @@ void screen_system_menu(menu_item_t *item)
         case MENU_MESSAGE:
             if (item->desc->type == MENU_CANCEL)
                 popup.type = CANCEL_ONLY;
-            else if (item->desc->type == MENU_OK)
+            else if ((item->desc->type == MENU_OK) || !strcmp("WARNING", item->data.popup_header))
                 popup.type = OK_ONLY;
             else if (item->desc->type == MENU_MESSAGE)
                 popup.type = EMPTY_POPUP;

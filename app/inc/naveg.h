@@ -126,7 +126,7 @@ void naveg_reset_menu(void);
 // update the navigation screen if necessary
 void naveg_update(void);
 int naveg_need_update(void);
-uint8_t naveg_dialog(const char *msg);
+uint8_t naveg_dialog(const char *msg, char *title);
 uint8_t naveg_ui_status(void);
 void naveg_pages_available(uint8_t page_1, uint8_t page_2, uint8_t page_3, uint8_t page_4, uint8_t page_5, uint8_t page_6);
 //refreshes screen with current menu item
@@ -161,6 +161,8 @@ uint8_t naveg_dialog_status(void);
 void naveg_update_calibration(void);
 
 void naveg_turn_on_pagination_leds(void);
+
+void naveg_reload_display(void);
 
 /*
 ************************************************************************************************************************
