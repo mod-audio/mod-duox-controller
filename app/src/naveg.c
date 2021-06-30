@@ -1198,8 +1198,8 @@ static void control_set(uint8_t id, control_t *control)
         else
             control->value = 1 - control->scroll_dir;
 
-            // to update the footer and screen
-            foot_control_add(control);
+        // to update the footer and screen
+        foot_control_add(control);
     }
     else if (control->properties & (FLAG_CONTROL_TOGGLED | FLAG_CONTROL_BYPASS))
     {
