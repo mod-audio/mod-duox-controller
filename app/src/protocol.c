@@ -270,6 +270,7 @@ void protocol_init(void)
     protocol_add_command(CMD_GLCD_TEXT, cb_glcd_text);
     protocol_add_command(CMD_GLCD_DIALOG, cb_glcd_dialog);
     protocol_add_command(CMD_GLCD_DRAW, cb_glcd_draw);
+    protocol_add_command(CMD_DISP_BRIGHTNESS, cb_disp_brightness);
     protocol_add_command(CMD_GUI_CONNECTED, cb_gui_connection);
     protocol_add_command(CMD_GUI_DISCONNECTED, cb_gui_connection);
     protocol_add_command(CMD_CONTROL_ADD, cb_control_add);
@@ -386,6 +387,13 @@ void cb_gui_connection(proto_t *proto)
     //we are done supposedly closing the menu, we can unlock the actuators
     g_protocol_busy = false;
     system_lock_comm_serial(g_protocol_busy);
+}
+
+void cb_disp_brightness(proto_t *proto)
+{
+    hardware_glcd_brightness(atoi(proto->list[1]));
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
 }
 
 void cb_control_add(proto_t *proto)
