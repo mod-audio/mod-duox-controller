@@ -269,7 +269,7 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
                 cli_command(" xvol", CLI_CACHE_ONLY);
                 response = cli_command(NULL, CLI_RETRIEVE_RESPONSE);
                 strcpy(str, response);
-                item->data.value = atoi(str);
+                item->data.value = atof(str);
             }
             else
             {
@@ -293,20 +293,29 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
     //save gains globaly for stereo link functions
     g_gains_volumes[item->desc->id - VOLUME_ID] = item->data.value;
 
-    char str_bfr[8] = {};
-    float value_bfr;
-    value_bfr = MAP(item->data.value, min, max, 0, 100);
-    int_to_str(value_bfr, str_bfr, 8, 0);
+    char str_bfr[10] = {};
+
+    //input
+    if (!dir) {
+        float value_bfr;
+        value_bfr = MAP(item->data.value, min, max, -12, 25);
+        float_to_str(value_bfr, str_bfr, 8, 2);
+    }
+    //output, headphones
+    else {
+        float_to_str(item->data.value, str_bfr, 8, 2);
+    }
+
     strcpy(item->name, item->desc->name);
     uint8_t q;
     uint8_t value_size = strlen(str_bfr);
     uint8_t name_size = strlen(item->name);
-    for (q = 0; q < (31 - name_size - value_size - 1); q++)
+    for (q = 0; q < (31 - name_size - value_size - 3); q++)
     {
         strcat(item->name, " ");
     }
     strcat(item->name, str_bfr);
-    strcat(item->name, "%");
+    strcat(item->name, " dB");
 
     //if stereo link is on we need to update the other menu item as well
     if ((((event == MENU_EV_UP) || (event == MENU_EV_DOWN)) && (dir ? g_sl_out : g_sl_in))&& (item->desc->id != HP_VOLUME))
@@ -681,27 +690,27 @@ void system_volume_cb(void *arg, int event)
             case IN1_VOLUME:
                 source = "in 1";
                 min = 0;
-                max = 78.0;
-                step = 1.0;
+                max = 74.0;
+                step = 1;
                 break;
 
             case IN2_VOLUME:
                 source = "in 2";
-                min = 0.0;
-                max = 78.0;
-                step = 1.0;
+                min = 0;
+                max = 74.0;
+                step = 1;
                 break;
 
             case OUT1_VOLUME:
                 source = "out 1";
-                min = -60.0;
+                min = -127.5;
                 max = 0.0;
                 step = 2.0;
                 break;
 
             case OUT2_VOLUME:
                 source = "out 2";
-                min = -60.0;
+                min = -127.5;
                 max = 0.0;
                 step = 2.0;
                 break;

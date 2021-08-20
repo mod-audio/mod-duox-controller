@@ -529,10 +529,9 @@ void cb_boot(proto_t *proto)
     //set the master volume value
     float master_vol_value = atof(proto->list[6]);
     //-60 is our 0, we dont use lower values right now (doesnt make sense because of log scale)
-    if (master_vol_value < -60) master_vol_value = -60;
+    if (master_vol_value < -127.5) master_vol_value = -127.5;
     //convert value for screen
-    uint8_t screen_val =  ( ( master_vol_value - -60 ) / (0 - -60) ) * (100 - 0) + 0;
-    screen_master_vol(screen_val);
+    screen_master_vol(master_vol_value);
 
     naveg_turn_on_pagination_leds();
 
