@@ -1319,11 +1319,11 @@ void screen_master_vol(float volume_val)
     widget_textbox(display, &title);
 
     bar_t volume_bar;
-    volume_bar.x = (127-42);
+    volume_bar.x = (127-45);
     volume_bar.y = 1;
-    volume_bar.width = 42;
+    volume_bar.width = 45;
     volume_bar.height = 5;
-    volume_bar.step = MAP(volume_val, -127.5, 0, 0, 100);
+    volume_bar.step = MAP(volume_val, -99.5, 0, 0, 100);
     volume_bar.steps = 100;
     widget_bar_indicator(display, &volume_bar);
 

@@ -3402,7 +3402,7 @@ void naveg_set_master_volume(uint8_t set)
         else
             master_vol_value -= (2 * hardware_get_acceleration());
 
-        if (master_vol_value < -127.5) master_vol_value = -127.5;
+        if (master_vol_value < -99.5) master_vol_value = -99.5;
         system_master_volume_cb(master_vol_value, MENU_EV_DOWN);
     }
     else
