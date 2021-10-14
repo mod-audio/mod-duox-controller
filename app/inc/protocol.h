@@ -83,7 +83,6 @@ void protocol_parse(msg_t *msg);
 void protocol_add_command(const char *command, void (*callback)(proto_t *proto));
 void protocol_response(const char *response, proto_t *proto);
 void protocol_remove_commands(void);
-void protocol_just_changed_cv_port(void);
 
 //callbacks
 void cb_ping(proto_t *proto);

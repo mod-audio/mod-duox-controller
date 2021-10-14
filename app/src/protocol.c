@@ -77,7 +77,6 @@ typedef struct CMD_T {
 static unsigned int g_command_count = 0;
 static cmd_t g_commands[COMMAND_COUNT_DUOX];
 
-uint8_t g_just_changed_port = 0;
 
 /*
 ************************************************************************************************************************
@@ -295,11 +294,6 @@ void protocol_init(void)
     protocol_add_command(CMD_DUOX_EXP_OVERCURRENT, cb_exp_overcurrent);
 }
 
-//TODO KILLME
-void protocol_just_changed_cv_port(void)
-{
-    g_just_changed_port = 1;
-}
 
 /*
 ************************************************************************************************************************
@@ -715,13 +709,6 @@ void cb_set_disp_contrast(proto_t *proto)
 void cb_exp_overcurrent(proto_t *proto)
 {
     (void) proto;
-
-    //TODO FIXME
-    //very very ugly, but we will remove this once mod-system-control is here
-    if (g_just_changed_port) {
-        g_just_changed_port = 0;
-        return;
-    }
 
     naveg_dialog("Exp port shorted\nTo avoid harm to your device\nthe unit switched back to CV\nmode\n\nPlease check your exp pedal\nand cables", "WARNING");
 
