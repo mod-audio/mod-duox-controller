@@ -26,8 +26,6 @@
 #include "uc1701.h"
 #include "mod-protocol.h"
 
-//TODO remove me when mod-system-control is here (exp overcurrent workaround)
-#include "protocol.h"
 /*
 ************************************************************************************************************************
 *           LOCAL DEFINES
@@ -1528,10 +1526,6 @@ void system_cv_exp_cb (void *arg, int event)
     {
         if (g_cv_in_mode == 0) g_cv_in_mode = 1;
         else g_cv_in_mode = 0;
-
-        if (g_cv_in_mode == 0)
-            protocol_just_changed_cv_port();
-
         set_menu_item_value(MENU_ID_EXP_CV_INPUT, g_cv_in_mode);
     }
     char str_bfr[15] = {};
