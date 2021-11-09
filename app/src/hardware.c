@@ -25,10 +25,7 @@
 //0 is highest priority
 #define TIMER0_PRIORITY     4
 #define TIMER1_PRIORITY     2
-#define TIMER2_PRIORITY     3
-#define TIMER3_PRIORITY     0
-
-#define ADC_CONVERSION_RATE 200000
+#define TIMER2_PRIORITY     1
 
 /*
 ************************************************************************************************************************
@@ -389,7 +386,7 @@ void adc_initalisation(void)
   *((uint32_t *)(LPC_IOCON_BASE + ((0 * 32
                              + 13)*sizeof(uint32_t)))) = 1 << 8;
 
-
+  actuator_set_pins(hardware_actuators(POT0 + 0), POT_PINS[0]);
   actuator_set_pins(hardware_actuators(POT0 + 1), POT_PINS[1]);
   actuator_set_pins(hardware_actuators(POT0 + 2), POT_PINS[2]);
   actuator_set_pins(hardware_actuators(POT0 + 3), POT_PINS[3]);
@@ -399,31 +396,18 @@ void adc_initalisation(void)
   actuator_set_pins(hardware_actuators(POT0 + 7), POT_PINS[7]);
 
   /* Configuration for ADC :
-  *  ADC conversion rate = 200Khz
+  *  ADC conversion rate = 400Khz
   */
+  ADC_Init(LPC_ADC, 400000);
 
-  ADC_Init(LPC_ADC, ADC_CONVERSION_RATE);
-
-  uint8_t ADC_channels;
-  for (ADC_channels = 0; ADC_channels < POTS_COUNT; ADC_channels++) {
-        //set channel in actuator.c
-        actuator_set_pins(hardware_actuators(POT0 + ADC_channels), POT_PINS[ADC_channels]);
-
-        //dissable interupt, we dont use it
-        ADC_IntConfig(LPC_ADC, ADC_channels, RESET);
-
-        //enbable ADC channel
-        ADC_ChannelCmd(LPC_ADC, ADC_channels, ENABLE);
-  }
-/*
-  ADC_IntConfig(LPC_ADC, 0, RESET);
-  ADC_IntConfig(LPC_ADC, 1, RESET);
-  ADC_IntConfig(LPC_ADC, 2, RESET);
-  ADC_IntConfig(LPC_ADC, 3, RESET);
-  ADC_IntConfig(LPC_ADC, 4, RESET);
-  ADC_IntConfig(LPC_ADC, 5, RESET);
-  ADC_IntConfig(LPC_ADC, 6, RESET);
-  ADC_IntConfig(LPC_ADC, 7, RESET);
+  ADC_IntConfig(LPC_ADC, 0, DISABLE);
+  ADC_IntConfig(LPC_ADC, 1, DISABLE);
+  ADC_IntConfig(LPC_ADC, 2, DISABLE);
+  ADC_IntConfig(LPC_ADC, 3, DISABLE);
+  ADC_IntConfig(LPC_ADC, 4, DISABLE);
+  ADC_IntConfig(LPC_ADC, 5, DISABLE);
+  ADC_IntConfig(LPC_ADC, 6, DISABLE);
+  ADC_IntConfig(LPC_ADC, 7, DISABLE);
 
   // Start burst mode.
   ADC_ChannelCmd(LPC_ADC, ADC_CHANNEL_0, ENABLE);
@@ -433,12 +417,9 @@ void adc_initalisation(void)
   ADC_ChannelCmd(LPC_ADC, ADC_CHANNEL_4, ENABLE);
   ADC_ChannelCmd(LPC_ADC, ADC_CHANNEL_5, ENABLE);
   ADC_ChannelCmd(LPC_ADC, ADC_CHANNEL_6, ENABLE);
-  ADC_ChannelCmd(LPC_ADC, ADC_CHANNEL_7, ENABLE);*/
+  ADC_ChannelCmd(LPC_ADC, ADC_CHANNEL_7, ENABLE);
   ADC_StartCmd(LPC_ADC, ADC_START_CONTINUOUS);
   ADC_BurstCmd(LPC_ADC, ENABLE);
-
-  //initialize ADC filters
-
 }
 /*
 ************************************************************************************************************************
@@ -649,34 +630,6 @@ void hardware_setup(void)
     TIM_Cmd(LPC_TIM2, ENABLE);
 
     ////////////////////////////////////////////////////////////////
-    // Timer 3 configuration
-    // this timer is for the potentiometers ADC
-
-    // initialize timer 3, prescale count time of 100uS
-
-    TIM_ConfigStruct.PrescaleOption = TIM_PRESCALE_USVAL;
-    TIM_ConfigStruct.PrescaleValue = 100;
-    // use channel 3, MR2
-    TIM_MatchConfigStruct.MatchChannel = 3;
-    // enable interrupt when MR2 matches the value in TC register
-    TIM_MatchConfigStruct.IntOnMatch = TRUE;
-    // enable reset on MR2: TIMER will reset if MR2 matches it
-    TIM_MatchConfigStruct.ResetOnMatch = TRUE;
-    // stop on MR2 if MR2 matches it
-    TIM_MatchConfigStruct.StopOnMatch = FALSE;
-    // set Match value, count value of 1
-    TIM_MatchConfigStruct.MatchValue = 1;
-    // set configuration for Tim_config and Tim_MatchConfig
-    TIM_Init(LPC_TIM3, TIM_TIMER_MODE, &TIM_ConfigStruct);
-    TIM_ConfigMatch(LPC_TIM3, &TIM_MatchConfigStruct);
-    // set priority
-    NVIC_SetPriority(TIMER3_IRQn, TIMER3_PRIORITY);
-    // enable interrupt for timer 0
-    NVIC_EnableIRQ(TIMER3_IRQn);
-    // to start timer
-    TIM_Cmd(LPC_TIM3, ENABLE);
-
-    ////////////////////////////////////////////////////////////////
     // Serial initialization
     #ifdef SERIAL0
     g_serial[0].uart_id = 0;
@@ -823,7 +776,7 @@ uint8_t hardware_get_acceleration(void)
 
 uint16_t hardware_get_pot_value(uint8_t pot)
 {
-    return actuator_get_pot_value(pot);
+    return actuator_pot_value(pot);
 }
 
 void hardware_change_led_color(uint8_t item, uint8_t value[3])
@@ -933,19 +886,4 @@ void TIMER2_IRQHandler(void)
     }
 
     TIM_ClearIntPending(LPC_TIM2, TIM_MR2_INT);
-}
-
-void TIMER3_IRQHandler(void)
-{
-    if (TIM_GetIntStatus(LPC_TIM3, TIM_MR3_INT) == SET) {
-        uint8_t pot;
-        for (pot = 0; pot < POTS_COUNT; pot++) {
-            pot_t *hw_pot = (pot_t *) hardware_actuators(POT0 + pot);
-
-            if (ADC_ChannelGetStatus(LPC_ADC, hw_pot->channel, 0))
-                actuator_set_pot_value(pot, ADC_ChannelGetData(LPC_ADC, hw_pot->channel));
-        }
-    }
-
-    TIM_ClearIntPending(LPC_TIM3, TIM_MR3_INT);
 }

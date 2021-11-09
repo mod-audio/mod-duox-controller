@@ -184,11 +184,10 @@ void actuator_create(actuator_type_t type, uint8_t id, void *actuator)
             pot->type = type;
             pot->event = 0;
             pot->events_flags = 0;
-            pot->debounce = POT_HOLD_TICKS;
+            pot->debounce = 0;
             pot->control = 0;
             pot->status = 0;
             pot->value = 0;
-            pot->threshold = POT_INIT_THRESHOLD;
             break;
     }
 
@@ -339,14 +338,9 @@ uint8_t actuator_get_acceleration(void)
     return acceleration;
 }
 
-uint16_t actuator_get_pot_value(uint8_t pot_id)
+uint16_t actuator_pot_value(uint8_t pot_id)
 {
     return g_pot_value[pot_id];
-}
-
-void actuator_set_pot_value(uint8_t pot_id, float value)
-{
-    g_pot_value[pot_id] = value;
 }
 
 void actuators_clock(void)
@@ -356,17 +350,15 @@ void actuators_clock(void)
     pot_t *pot;
     uint8_t i, button_on = 0;
 
+    //this is our weighing factor for smoothing the pot value's
+    static float k = 0.01;
+    static uint16_t current_value[POTS_COUNT] = {};
+
     for (i = 0; i < g_actuators_count; i++)
     {
         button = (button_t *) g_actuators_pointers[i];
         encoder = (encoder_t *) g_actuators_pointers[i];
         pot = (pot_t *) g_actuators_pointers[i];
-
-        //this is our weighing factor for smoothing the pot value's
-        static float k = 0.1;
-
-        //some memory for calculations
-        static uint16_t current_value[POTS_COUNT] = {};
 
         switch (ACTUATOR_TYPE(g_actuators_pointers[i]))
         {
@@ -639,31 +631,28 @@ void actuators_clock(void)
                 //clear the pot event
                 CLR_FLAG(pot->status, EV_POT_TURNED);
 
-                //apply weighing factor
-                current_value[pot->id] = k * g_pot_value[pot->id] + (1.0 - k) * current_value[pot->id];
+                //if channel bussy we skip an actuator clock cycle, TODO make me not so dirty 
+                if (ADC_ChannelGetStatus(LPC_ADC, pot->channel, 1))
+                {
+                    //get value
+                    //uint16_t tmp = ADC_ChannelGetData(LPC_ADC, pot->channel);
 
-                //check if we need to change the threshold
-                if ((current_value[pot->id] > pot->value) ? ((current_value[pot->id] - pot->value) > POT_INIT_THRESHOLD) : ((pot->value - current_value[pot->id]) > POT_INIT_THRESHOLD)
-                    && (pot->threshold == POT_INIT_THRESHOLD) ) {
-                    pot->threshold = POT_MIN_THRESHOLD;
-                    pot->debounce = POT_HOLD_TICKS;
-                }
+                    uint16_t tmp = (((*(uint16_t *)((&LPC_ADC->DR[0]) + pot->channel)>>4)&0xFFF));
 
-                //if turned and difference is suficiant
-                if ((current_value[pot->id] > pot->value) ? ((current_value[pot->id] - pot->value) > pot->threshold) : ((pot->value - current_value[pot->id]) > pot->threshold)) {
-                        pot->value = current_value[pot->id];
-                        g_pot_value[pot->id] = current_value[pot->id];
-                        SET_FLAG(pot->status, EV_POT_TURNED);
-                        event(pot, EV_POT_TURNED);
-                }
+                    //apply weighing factor
+                    current_value[pot->id] = k * tmp + (1.0 - k) * current_value[pot->id];
 
-                if (pot->threshold != POT_INIT_THRESHOLD) {
-                    pot->debounce--;
+                    //set a tmp val
+                    uint16_t val = current_value[pot->id];
 
-                    if (pot->debounce == 0) {
-                        pot->threshold = POT_INIT_THRESHOLD;
+                    //if turned and difference is suficiant
+                    if ((val > pot->value) ? ((val - pot->value) > POT_THRESHOLD) : ((pot->value - val) > POT_THRESHOLD))
+                    {
+                            pot->value = val;
+                            g_pot_value[pot->id] = val;
+                            SET_FLAG(pot->status, EV_POT_TURNED);
+                            event(pot, EV_POT_TURNED);
                     }
-
                 }
 
             break;
