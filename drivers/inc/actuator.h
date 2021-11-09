@@ -109,7 +109,7 @@ typedef struct POT_T {
     actuators_common_fields
 
     uint8_t port, pin, function, channel;
-    uint16_t value, threshold;
+    uint16_t value;
 } pot_t;
 
 
@@ -152,8 +152,7 @@ void actuator_set_event(void *actuator, void (*event)(void *actuator));
 uint8_t actuator_get_status(void *actuator);
 void actuators_clock(void);
 uint8_t actuator_get_acceleration(void);
-uint16_t actuator_get_pot_value(uint8_t pot_id);
-void actuator_set_pot_value(uint8_t pot_id, float value);
+uint16_t actuator_pot_value(uint8_t pot_id);
 
 /*
 *********************************************************************************************************

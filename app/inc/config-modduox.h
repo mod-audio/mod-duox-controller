@@ -158,15 +158,12 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 //amount of potentiometers
 #define POTS_COUNT          8
 
-//the ADC difference that triggers a smaller threshold
-#define POT_INIT_THRESHOLD       50
-#define POT_MIN_THRESHOLD        POT_INIT_THRESHOLD/10
-#define POT_HOLD_TICKS           10
+//the resolution of a pot
+#define POT_THRESHOLD       4
 
-#define POT_LOWER_THRESHOLD (POT_MIN_THRESHOLD)
-#define POT_UPPER_THRESHOLD (4095- POT_MIN_THRESHOLD)
+#define POT_LOWER_THRESHOLD (POT_THRESHOLD)
+#define POT_UPPER_THRESHOLD (4095- POT_THRESHOLD)
 
-//only used for the actuator lock
 #define POT_DIFF_THRESHOLD 300
 
 // Potentiometers ports, pins and functions definitions

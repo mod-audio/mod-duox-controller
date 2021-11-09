@@ -297,7 +297,7 @@ void screen_pot(uint8_t pot_id, control_t *control)
                 }
                 else
                 {
-                     float_to_str((control->value), value_str, sizeof(value_str), 2);
+                    float_to_str((control->value), value_str, sizeof(value_str), 2);
                 }
             }
             else
