@@ -214,6 +214,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define DISPLAY_TOOL_NAVIG          2
 #define DISPLAY_TOOL_SYSTEM_SUBMENU 3
 #define DISPLAY_TOOL_MASTER_VOL     4
+#define DISPLAY_MAX_TOOL            5
 
 //induvidual display id's
 #define DISPLAY_LEFT                0

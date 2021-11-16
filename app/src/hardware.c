@@ -25,7 +25,7 @@
 //0 is highest priority
 #define TIMER0_PRIORITY     4
 #define TIMER1_PRIORITY     2
-#define TIMER2_PRIORITY     3
+#define TIMER2_PRIORITY     1
 
 /*
 ************************************************************************************************************************

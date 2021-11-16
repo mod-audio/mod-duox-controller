@@ -1151,9 +1151,13 @@ static void control_set(uint8_t id, control_t *control)
     }
     else if (control->properties & FLAG_CONTROL_MOMENTARY)
     {
-            control->value = !control->value;
-            // to update the footer and screen
-            foot_control_add(control);
+        if (control->properties & FLAG_CONTROL_REVERSE)
+            control->value = control->scroll_dir;
+        else
+            control->value = 1 - control->scroll_dir;
+
+        // to update the footer and screen
+        foot_control_add(control);
     }
     else if (control->properties & (FLAG_CONTROL_TOGGLED | FLAG_CONTROL_BYPASS))
     {
@@ -1857,16 +1861,20 @@ static void menu_up(uint8_t display_id)
 
     if ((item->desc->type == MENU_VOL) || (item->desc->type == MENU_SET))
     {
-        //substract one, if we reach the limit, value becomes the limit
-        if ((item->data.value -= (item->data.step)) < item->data.min)
-        {
-            item->data.value = item->data.min;
+        if ( ((item->desc->id == OUT1_VOLUME)||(item->desc->id == OUT2_VOLUME)) && (item->data.value == 0.0))
+            item->data.value -= 0.5;
+        else {
+            //substract one, if we reach the limit, value becomes the limit
+            if ((item->data.value -= (item->data.step)) < item->data.min) {
+                item->data.value = item->data.min;
+            }
         }
     }
     else
     {
-        if (item->data.hover > 0)
+        if (item->data.hover > 0) {
             item->data.hover--;
+        }
     }
 
     if (item->desc->action_cb)
@@ -3079,6 +3087,25 @@ void naveg_clear_snapshot(uint8_t foot)
     ledz_set_state(hardware_leds(foot), foot, MAX_COLOR_ID, 0, 0, 0, 0);
 }
 
+void naveg_reload_display(void)
+{
+    screen_clear(0);
+    screen_clear(1);
+
+    //disp 1
+    naveg_print_pb_name(0);
+    control_t *control = g_encoders[0];
+    screen_encoder(0, control);
+    draw_all_pots(0);
+    draw_all_foots(0);
+
+    //disp 2
+    control = g_encoders[1];
+    naveg_master_volume(0);
+    draw_all_pots(1);
+    screen_encoder(1, control);
+    draw_all_foots(1);
+}
 
 void naveg_toggle_tool(uint8_t tool, uint8_t display)
 {
@@ -3216,9 +3243,7 @@ void naveg_master_volume(uint8_t set)
         {
             tool_off (DISPLAY_TOOL_MASTER_VOL);
             system_save_gains_cb(NULL, MENU_EV_ENTER);
-            //convert value for screen
-            int8_t screen_val =  MAP(master_vol_value , -60 , -0, 0, 100);
-            screen_master_vol(screen_val);
+            screen_master_vol(master_vol_value);
             return;
         }
         else
@@ -3230,8 +3255,7 @@ void naveg_master_volume(uint8_t set)
     master_vol_value = system_master_volume_cb(0, MENU_EV_NONE);
 
     //convert value for screen
-    int8_t screen_val =  MAP(master_vol_value , -60, -0, 0, 100);
-    screen_master_vol(screen_val);
+    screen_master_vol(master_vol_value);
 
 }
 
@@ -3259,8 +3283,12 @@ void naveg_set_master_volume(uint8_t set)
 
     if (set)
     {
-        master_vol_value -= (2 * hardware_get_acceleration());
-        if (master_vol_value < -60) master_vol_value = -60;
+        if (master_vol_value == 0.0)
+            master_vol_value -= 0.5;
+        else
+            master_vol_value -= (2 * hardware_get_acceleration());
+
+        if (master_vol_value < -99.5) master_vol_value = -99.5;
         system_master_volume_cb(master_vol_value, MENU_EV_DOWN);
     }
     else
@@ -3270,10 +3298,7 @@ void naveg_set_master_volume(uint8_t set)
         system_master_volume_cb(master_vol_value, MENU_EV_UP);
     }
 
-    //convert value for screen
-    uint8_t screen_val =  ( ( master_vol_value - -60 ) / (0 - -60) ) * (100 - 0) + 0;
-
-    screen_master_vol(screen_val);
+    screen_master_vol(master_vol_value);
 }
 
 uint8_t naveg_is_master_vol(void)
@@ -3510,7 +3535,7 @@ void naveg_update(void)
     }
 }
 
-uint8_t naveg_dialog(const char *msg)
+uint8_t naveg_dialog(const char *msg, char *title)
 {
     static node_t *dummy_menu = NULL;
     static menu_desc_t desc = {NULL, MENU_CONFIRM2, DIALOG_ID, DIALOG_ID, NULL, 0};
@@ -3524,7 +3549,10 @@ uint8_t naveg_dialog(const char *msg)
         item->data.list_count = 2;
         item->data.list = NULL;
         item->data.popup_content = msg;
-        item->data.popup_header = "selftest";
+        if (title)
+            item->data.popup_header = title;
+        else
+            item->data.popup_header = "selftest";
         item->desc = &desc;
         item->name = NULL;
         dummy_menu = node_create(item);
@@ -3636,21 +3664,27 @@ void naveg_update_gain(uint8_t display_id, uint8_t update_id, float value, float
         if ((item->desc->id == update_id))
         {
             item->data.value = value;
+            char str_buf[10];
 
-            char str_buf[8];
-            float value_bfr;
-            value_bfr = MAP(item->data.value, min, max, 0, 100);
-            int_to_str(value_bfr, str_buf, sizeof(str_buf), 0);
+            if ((update_id == IN2_VOLUME) || (update_id == IN1_VOLUME)) {
+                float value_bfr;
+                value_bfr = MAP(item->data.value, min, max, -12, 25);
+                float_to_str(value_bfr, str_buf, sizeof(str_buf), 2);
+            }
+            else {
+                float_to_str(item->data.value, str_buf, sizeof(str_buf), 2);
+            }
+
             strcpy(item->name, item->desc->name);
             uint8_t q;
             uint8_t value_size = strlen(str_buf);
             uint8_t name_size = strlen(item->name);
-            for (q = 0; q < (31 - name_size - value_size - 1); q++)
+            for (q = 0; q < (31 - name_size - value_size - 3); q++)
             {
                 strcat(item->name, " ");
             }
             strcat(item->name, str_buf);
-            strcat(item->name, "%");
+            strcat(item->name, " dB");
         }
     }
 }

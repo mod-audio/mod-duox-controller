@@ -53,6 +53,7 @@ enum {BANKS_LIST, PEDALBOARD_LIST};
 ************************************************************************************************************************
 */
 
+#define MAP(x, Omin, Omax, Nmin, Nmax)      ( x - Omin ) * (Nmax -  Nmin)  / (Omax - Omin) + Nmin;
 
 /*
 ************************************************************************************************************************
@@ -290,9 +291,13 @@ void screen_pot(uint8_t pot_id, control_t *control)
                 {
                     int_to_str(control->value, value_str, sizeof(value_str), 0);
                 }
-                else
+                else if (control->value < -9.9)
                 {
                     float_to_str((control->value), value_str, sizeof(value_str), 1);
+                }
+                else
+                {
+                    float_to_str((control->value), value_str, sizeof(value_str), 2);
                 }
             }
             else
@@ -1215,7 +1220,7 @@ void screen_system_menu(menu_item_t *item)
         case MENU_MESSAGE:
             if (item->desc->type == MENU_CANCEL)
                 popup.type = CANCEL_ONLY;
-            else if (item->desc->type == MENU_OK)
+            else if ((item->desc->type == MENU_OK) || !strcmp("WARNING", item->data.popup_header))
                 popup.type = OK_ONLY;
             else if (item->desc->type == MENU_MESSAGE)
                 popup.type = EMPTY_POPUP;
@@ -1288,13 +1293,13 @@ void screen_image(uint8_t display, const uint8_t *image)
     glcd_draw_image(display_img, 0, 0, image, GLCD_BLACK);
 }
 
-void screen_master_vol(int8_t volume_val)
+void screen_master_vol(float volume_val)
 {
     char str_buf[8];
-    char name[40] = "MASTER VOLUME: ";
-    if (volume_val < 0) volume_val = 0;
+    char name[40] = "MASTER VOLUME:";
     int_to_str(((volume_val)), str_buf, sizeof(str_buf), 1);
     strcat(name, str_buf);
+    strcat(name, " dB");
 
     glcd_t *display = hardware_glcds(1);
 
@@ -1318,11 +1323,11 @@ void screen_master_vol(int8_t volume_val)
     widget_textbox(display, &title);
 
     bar_t volume_bar;
-    volume_bar.x = (127-52);
+    volume_bar.x = (127-45);
     volume_bar.y = 1;
-    volume_bar.width = 52;
+    volume_bar.width = 45;
     volume_bar.height = 5;
-    volume_bar.step = volume_val;
+    volume_bar.step = MAP(volume_val, -99.5, 0, 0, 100);
     volume_bar.steps = 100;
     widget_bar_indicator(display, &volume_bar);
 

@@ -350,6 +350,10 @@ void actuators_clock(void)
     pot_t *pot;
     uint8_t i, button_on = 0;
 
+    //this is our weighing factor for smoothing the pot value's
+    static float k = 0.01;
+    static uint16_t current_value[POTS_COUNT] = {};
+
     for (i = 0; i < g_actuators_count; i++)
     {
         button = (button_t *) g_actuators_pointers[i];
@@ -630,14 +634,10 @@ void actuators_clock(void)
                 //if channel bussy we skip an actuator clock cycle, TODO make me not so dirty 
                 if (ADC_ChannelGetStatus(LPC_ADC, pot->channel, 1))
                 {
-                    //this is our weighing factor for smoothing the pot value's
-                    static float k = 0.01;
-                    
-                    //some memory for calculations
-                    static uint16_t current_value[POTS_COUNT] = {};
-
                     //get value
-                    uint16_t tmp = ADC_ChannelGetData(LPC_ADC, pot->channel);
+                    //uint16_t tmp = ADC_ChannelGetData(LPC_ADC, pot->channel);
+
+                    uint16_t tmp = (((*(uint16_t *)((&LPC_ADC->DR[0]) + pot->channel)>>4)&0xFFF));
 
                     //apply weighing factor
                     current_value[pot->id] = k * tmp + (1.0 - k) * current_value[pot->id];

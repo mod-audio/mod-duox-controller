@@ -271,6 +271,7 @@ void protocol_init(void)
     protocol_add_command(CMD_GLCD_TEXT, cb_glcd_text);
     protocol_add_command(CMD_GLCD_DIALOG, cb_glcd_dialog);
     protocol_add_command(CMD_GLCD_DRAW, cb_glcd_draw);
+    protocol_add_command(CMD_DISP_BRIGHTNESS, cb_disp_brightness);
     protocol_add_command(CMD_GUI_CONNECTED, cb_gui_connection);
     protocol_add_command(CMD_GUI_DISCONNECTED, cb_gui_connection);
     protocol_add_command(CMD_CONTROL_ADD, cb_control_add);
@@ -291,7 +292,9 @@ void protocol_init(void)
     protocol_add_command(CMD_SELFTEST_CHECK_CALIBRATION, cb_check_cal);
     protocol_add_command(CMD_RESET_EEPROM, cb_clear_eeprom);
     protocol_add_command(CMD_DUOX_SET_CONTRAST, cb_set_disp_contrast);
+    protocol_add_command(CMD_DUOX_EXP_OVERCURRENT, cb_exp_overcurrent);
 }
+
 
 /*
 ************************************************************************************************************************
@@ -354,7 +357,7 @@ void cb_glcd_dialog(uint8_t serial_id, proto_t *proto)
 {
     UNUSED_PARAM(serial_id);
 
-    uint8_t val = naveg_dialog(proto->list[1]);
+    uint8_t val = naveg_dialog(proto->list[1], NULL);
     protocol_send_response(CMD_RESPONSE, val, proto);
 }
 
@@ -392,7 +395,15 @@ void cb_gui_connection(uint8_t serial_id, proto_t *proto)
     protocol_send_response(CMD_RESPONSE, 0, proto);
 }
 
+
 void cb_control_add(uint8_t serial_id, proto_t *proto)
+{
+    hardware_glcd_brightness(atoi(proto->list[1]));
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+}
+
+void cb_control_add(proto_t *proto)
 {
     UNUSED_PARAM(serial_id);
 
@@ -501,10 +512,9 @@ void cb_boot(uint8_t serial_id, proto_t *proto)
     //set the master volume value
     float master_vol_value = atof(proto->list[6]);
     //-60 is our 0, we dont use lower values right now (doesnt make sense because of log scale)
-    if (master_vol_value < -60) master_vol_value = -60;
+    if (master_vol_value < -127.5) master_vol_value = -127.5;
     //convert value for screen
-    uint8_t screen_val =  ( ( master_vol_value - -60 ) / (0 - -60) ) * (100 - 0) + 0;
-    screen_master_vol(screen_val);
+    screen_master_vol(master_vol_value);
 
     naveg_turn_on_pagination_leds();
 
@@ -557,7 +567,7 @@ void cb_pedalboard_name(uint8_t serial_id, proto_t *proto)
 {
     UNUSED_PARAM(serial_id);
 
-	screen_top_info(&proto->list[1] , 1);
+	  screen_top_info(&proto->list[1] , 1);
 
     protocol_send_response(CMD_RESPONSE, 0, proto);
 }
@@ -566,7 +576,7 @@ void cb_pages_available(uint8_t serial_id, proto_t *proto)
 {
     UNUSED_PARAM(serial_id);
 
-	naveg_pages_available(atoi(proto->list[1]), atoi(proto->list[2]), atoi(proto->list[3]), atoi(proto->list[4]), atoi(proto->list[5]), atoi(proto->list[6]));
+	  naveg_pages_available(atoi(proto->list[1]), atoi(proto->list[2]), atoi(proto->list[3]), atoi(proto->list[4]), atoi(proto->list[5]), atoi(proto->list[6]));
 
     naveg_turn_on_pagination_leds();
 
@@ -643,4 +653,13 @@ void cb_set_disp_contrast(uint8_t serial_id, proto_t *proto)
     uc1701_set_custom_value(hardware_glcds(atoi(proto->list[1])), value_bfr, UC1701_RR_DEFAULT);
 
     protocol_send_response(CMD_RESPONSE, 0, proto);
+}
+
+void cb_exp_overcurrent(proto_t *proto)
+{
+    (void) proto;
+
+    naveg_dialog("Exp port shorted\nTo avoid harm to your device\nthe unit switched back to CV\nmode\n\nPlease check your exp pedal\nand cables", "WARNING");
+
+    naveg_reload_display();
 }

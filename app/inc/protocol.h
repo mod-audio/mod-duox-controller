@@ -84,7 +84,6 @@ void protocol_add_command(const char *command, void (*callback)(uint8_t serial_i
 void protocol_response(const char *response, proto_t *proto);
 void protocol_remove_commands(void);
 
-
 //callbacks
 void cb_ping(uint8_t serial_id, proto_t *proto);
 void cb_say(uint8_t serial_id, proto_t *proto);
@@ -113,6 +112,8 @@ void cb_check_cal(uint8_t serial_id, proto_t *proto);
 void cb_set_selftest_control_skip(uint8_t serial_id, proto_t *proto);
 void cb_clear_eeprom(uint8_t serial_id, proto_t *proto);
 void cb_set_disp_contrast(uint8_t serial_id, proto_t *proto);
+void cb_exp_overcurrent(uint8_t serial_id, proto_t *proto);
+
 
 /*
 ************************************************************************************************************************
