@@ -6,20 +6,21 @@
 */
 
 #include <string.h>
-
-#include "comm.h"
 #include "config.h"
 #include "serial.h"
 
 #include "FreeRTOS.h"
 #include "semphr.h"
+
+#include "mod-protocol.h"
+
 /*
 ************************************************************************************************************************
 *           LOCAL DEFINES
 ************************************************************************************************************************
 */
 
-#define WEBGUI_MAX_SEM_COUNT   5
+#define SYSTEM_MAX_SEM_COUNT   5
 
 
 /*
@@ -49,11 +50,11 @@
 ************************************************************************************************************************
 */
 
-static  void (*g_webgui_response_cb)(void *data, menu_item_t *item) = NULL;
+static  void (*g_system_response_cb)(void *data, menu_item_t *item) = NULL;
 static  menu_item_t *g_current_item;
-static volatile uint8_t  g_webgui_blocked;
-static volatile xSemaphoreHandle g_webgui_sem = NULL;
-static  ringbuff_t *g_webgui_rx_rb;
+static volatile uint8_t  g_system_blocked;
+static volatile xSemaphoreHandle g_system_sem = NULL;
+static  ringbuff_t *g_system_rx_rb;
 
 
 /*
@@ -76,13 +77,13 @@ static  ringbuff_t *g_webgui_rx_rb;
 ************************************************************************************************************************
 */
 
-static void webgui_rx_cb(serial_t *serial)
+static void system_rx_cb(serial_t *serial)
 {
     uint8_t buffer[SERIAL_MAX_RX_BUFF_SIZE] = {};
     uint32_t size = serial_read(serial->uart_id, buffer, sizeof(buffer));
     if (size > 0)
     {
-        ringbuff_write(g_webgui_rx_rb, buffer, size);
+        ringbuff_write(g_system_rx_rb, buffer, size);
         // check end of message
         uint32_t i;
         for (i = 0; i < size; i++)
@@ -91,7 +92,7 @@ static void webgui_rx_cb(serial_t *serial)
             {
                 portBASE_TYPE xHigherPriorityTaskWoken;
                 xHigherPriorityTaskWoken = pdFALSE;
-                xSemaphoreGiveFromISR(g_webgui_sem, &xHigherPriorityTaskWoken);
+                xSemaphoreGiveFromISR(g_system_sem, &xHigherPriorityTaskWoken);
                 portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
                 break;
             }
@@ -106,60 +107,81 @@ static void webgui_rx_cb(serial_t *serial)
 ************************************************************************************************************************
 */
 
-void comm_init(void)
+void sys_comm_init(void)
 {
-    g_webgui_sem = xSemaphoreCreateCounting(WEBGUI_MAX_SEM_COUNT, 0);
-    g_webgui_rx_rb = ringbuff_create(WEBGUI_COMM_RX_BUFF_SIZE);
+    g_system_sem = xSemaphoreCreateCounting(SYSTEM_MAX_SEM_COUNT, 0);
+    g_system_rx_rb = ringbuff_create(SYSTEM_COMM_RX_BUFF_SIZE);
 
-    serial_set_callback(WEBGUI_SERIAL, webgui_rx_cb);
+    serial_set_callback(SYSTEM_SERIAL, system_rx_cb);
 }
 
-void comm_webgui_send(const char *data, uint32_t data_size)
+void sys_comm_send(const char *command, const char *arguments)
 {
-    serial_send(WEBGUI_SERIAL, (const uint8_t*)data, data_size+1);
-}
+    char buffer[20];
+    memset(buffer, 0, sizeof buffer);
 
-ringbuff_t* comm_webgui_read(void)
-{
-    if (xSemaphoreTake(g_webgui_sem, portMAX_DELAY) == pdTRUE)
+    //copy command
+    uint8_t i = copy_command(buffer, command); 
+
+    if (arguments)
     {
-        return g_webgui_rx_rb;
+
+        //add size as hex number
+        char str_bfr[9] = {};
+        i+=2;
+        i += int_to_hex_str(strlen(arguments), str_bfr);
+        strcat(buffer, str_bfr);
+
+        buffer[i++] = ' ';
+
+        //add arguments
+        strcat(buffer, arguments);
+    }
+    else
+    {
+        buffer[_CMD_SYS_LENGTH] = '\0';
+    }
+
+    //calc total size
+    uint32_t data_size = strlen(buffer);
+    serial_send(SYSTEM_SERIAL, (const uint8_t*)buffer, data_size+1);
+}
+
+ringbuff_t* sys_comm_read(void)
+{
+    if (xSemaphoreTake(g_system_sem, portMAX_DELAY) == pdTRUE)
+    {
+        return g_system_rx_rb;
     }
 
     return NULL;
 }
 
-void comm_webgui_set_response_cb(void (*resp_cb)(void *data, menu_item_t *item), menu_item_t *item)
+void sys_comm_set_response_cb(void (*resp_cb)(void *data, menu_item_t *item), menu_item_t *item)
 {
     g_current_item = item;
-    g_webgui_response_cb = resp_cb;
+    g_system_response_cb = resp_cb;
 }
 
-void comm_webgui_response_cb(void *data)
+void sys_comm_response_cb(void *data)
 {
-    if (g_webgui_response_cb)
+    if (g_system_response_cb)
     {
-        g_webgui_response_cb(data, g_current_item);
-        g_webgui_response_cb = NULL;
+        g_system_response_cb(data, g_current_item);
+        g_system_response_cb = NULL;
     }
 
-    g_webgui_blocked = 0;
+    g_system_blocked = 0;
 }
 
-void comm_webgui_wait_response(void)
+void sys_comm_wait_response(void)
 {
-    g_webgui_blocked = 1;
-    while (g_webgui_blocked);
-}
-
-//clear the ringbuffer
-void comm_webgui_clear_rx_buffer(void)
-{
-    ringbuff_flush(g_webgui_rx_rb);
+    g_system_blocked = 1;
+    while (g_system_blocked);
 }
 
 //clear the ringbuffer
-void comm_webgui_clear_tx_buffer(void)
+void sys_comm_clear(void)
 {
-    serial_flush_tx_buffer(WEBGUI_SERIAL);
+    ringbuff_flush(g_system_rx_rb);
 }

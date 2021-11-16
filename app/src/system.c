@@ -15,7 +15,8 @@
 #include "naveg.h"
 #include "hardware.h"
 #include "actuator.h"
-#include "comm.h"
+#include "ui_comm.h"
+#include "sys_comm.h"
 #include "cli.h"
 #include "screen.h"
 #include "glcd_widget.h"
@@ -82,7 +83,7 @@ char *option_disabled = "[ ]";
 *           LOCAL GLOBAL VARIABLES
 ************************************************************************************************************************
 */
-static uint8_t g_comm_protocol_bussy = 0;
+
 float g_gains_volumes[5] = {-1, -1, -1, -1, -1};
 uint8_t g_master_vol_port = 0;
 uint8_t g_q_bypass = 0;
@@ -109,6 +110,7 @@ int16_t g_display_contrast_left = -1;
 int16_t g_display_contrast_right = -1;
 int8_t g_page_mode = -1;
 int8_t g_led_brightness = -1;
+
 /*
 ************************************************************************************************************************
 *           LOCAL FUNCTION PROTOTYPES
@@ -165,8 +167,6 @@ void add_chars_to_menu_name(menu_item_t *item, char *chars_to_add)
 //TODO CHECK IF WE CAN USE DYNAMIC MEMORY HERE
 void set_item_value(char *command, uint16_t value)
 {
-    if (g_comm_protocol_bussy) return;
-
     uint8_t i;
     char buffer[50];
 
@@ -184,16 +184,14 @@ void set_item_value(char *command, uint16_t value)
     buffer[i] = 0;
 
     // sets the response callback
-    comm_webgui_set_response_cb(NULL, NULL);
+    ui_comm_webgui_set_response_cb(NULL, NULL);
 
     // sends the data to GUI
-    comm_webgui_send(buffer, i);
+    ui_comm_webgui_send(buffer, i);
 }
 
 static void set_menu_item_value(uint16_t menu_id, uint16_t value)
 {
-    if (g_comm_protocol_bussy) return;
-
     uint8_t i = 0;
     char buffer[50];
     memset(buffer, 0, sizeof buffer);
@@ -212,10 +210,10 @@ static void set_menu_item_value(uint16_t menu_id, uint16_t value)
     buffer[i++] = 0;
 
     // sets the response callback
-    comm_webgui_set_response_cb(NULL, NULL);
+    ui_comm_webgui_set_response_cb(NULL, NULL);
 
     // sends the data to GUI
-    comm_webgui_send(buffer, i);
+    ui_comm_webgui_send(buffer, i);
 }
 
 static void volume(menu_item_t *item, int event, const char *source, float min, float max, float step)
@@ -334,11 +332,6 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
 *           GLOBAL FUNCTIONS
 ************************************************************************************************************************
 */
-
-void system_lock_comm_serial(uint8_t bussy)
-{
-    g_comm_protocol_bussy = bussy;
-}
 
 uint8_t system_get_current_profile(void)
 {
@@ -493,11 +486,11 @@ void system_pedalboard_cb(void *arg, int event)
         switch (item->desc->id)
         {
             case PEDALBOARD_SAVE_ID:
-                comm_webgui_send(CMD_PEDALBOARD_SAVE, strlen(CMD_PEDALBOARD_SAVE));
+                ui_comm_webgui_send(CMD_PEDALBOARD_SAVE, strlen(CMD_PEDALBOARD_SAVE));
                 break;
 
             case PEDALBOARD_RESET_ID:
-                comm_webgui_send(CMD_PEDALBOARD_RESET, strlen(CMD_PEDALBOARD_RESET));
+                ui_comm_webgui_send(CMD_PEDALBOARD_RESET, strlen(CMD_PEDALBOARD_RESET));
                 break;
         }
     }
