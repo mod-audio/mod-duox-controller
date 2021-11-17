@@ -87,7 +87,8 @@ void naveg_dec_control(uint8_t display);
 // sets the control value
 void naveg_set_control(uint8_t hw_id, float value);
 // gets the control value
-float naveg_get_control(uint8_t hw_id);
+float naveg_get_control_value(uint8_t hw_id);
+control_t* naveg_get_control(uint8_t hw_id);
 // change the foot value
 void naveg_foot_change(uint8_t foot, uint8_t pressed);
 void naveg_pot_change(uint8_t pot);
@@ -156,6 +157,8 @@ char* naveg_get_current_pb_name(void);
 
 void naveg_reset_page(void);
 
+void naveg_draw_foot(control_t *control);
+
 uint8_t naveg_dialog_status(void);
 
 void naveg_update_calibration(void);
@@ -163,6 +166,8 @@ void naveg_update_calibration(void);
 void naveg_turn_on_pagination_leds(void);
 
 void naveg_reload_display(void);
+
+uint8_t naveg_get_actuator_type(uint8_t hw_id);
 
 /*
 ************************************************************************************************************************

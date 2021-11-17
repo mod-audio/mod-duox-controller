@@ -581,7 +581,7 @@ static void foot_control_add(control_t *control)
         // trigger specification: http://lv2plug.in/ns/ext/port-props/#trigger
         // updates the led
         //check if its assigned to a trigger and if the button is release
-        if (control->scroll_dir == 2) 
+        if (control->scroll_dir == 2)
             led->led_state.color = TRIGGER_COLOR;
         else
             led->led_state.color = TRIGGER_PRESSED_COLOR;
@@ -2072,6 +2072,16 @@ void naveg_init(void)
     xSemaphoreTake(g_dialog_sem, 0);
 }
 
+uint8_t naveg_get_actuator_type(uint8_t hw_id)
+{
+    if (hw_id < ENCODERS_COUNT)
+        return ACT_ENCODER;
+    else if (hw_id < ENCODERS_COUNT + FOOTSWITCHES_ACTUATOR_COUNT)
+        return ACT_FOOTSWITCH;
+    else
+        return ACT_POT;
+}
+
 void naveg_initial_state(uint16_t max_menu, uint16_t page_min, uint16_t page_max, char *bank_uid, char *pedalboard_uid, char **pedalboards_list)
 {
     if (!pedalboards_list)
@@ -2645,7 +2655,7 @@ void naveg_set_control(uint8_t hw_id, float value)
     }
 }
 
-float naveg_get_control(uint8_t hw_id)
+float naveg_get_control_value(uint8_t hw_id)
 {
     if (!g_initialized) return 0.0;
     control_t *control;
@@ -2654,6 +2664,22 @@ float naveg_get_control(uint8_t hw_id)
     if (control) return control->value;
 
     return 0.0;
+}
+
+control_t* naveg_get_control(uint8_t hw_id)
+{
+    if (!g_initialized) return NULL;
+    control_t *control;
+
+    if (hw_id < ENCODERS_COUNT) {
+        control = search_encoder(hw_id);
+    }
+    else
+        control = g_foots[hw_id - ENCODERS_COUNT];
+
+    if (control) return control;
+
+    return NULL;
 }
 
 void naveg_pot_change(uint8_t pot)
@@ -3075,6 +3101,11 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
             }      
         break;
     }
+}
+
+void naveg_draw_foot(control_t *control)
+{
+    foot_control_add(control);
 }
 
 void naveg_reset_page(void)

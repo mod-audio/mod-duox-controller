@@ -432,7 +432,7 @@ void cb_disp_brightness(uint8_t serial_id, proto_t *proto)
 
     protocol_send_response(CMD_RESPONSE, 0, proto);
 }
-/*
+
 void cb_change_assigned_led(uint8_t serial_id, proto_t *proto)
 {
     if (serial_id != SYSTEM_SERIAL)
@@ -443,7 +443,9 @@ void cb_change_assigned_led(uint8_t serial_id, proto_t *proto)
     uint16_t argument_1 = atoi(proto->list[4]);
     uint16_t argument_2 = atoi(proto->list[5]);
 
-    if ((hw_id < (ENCODERS_COUNT + FOOTSWITCHES_ACTUATOR_COUNT)) && (hw_id >= ENCODERS_COUNT)) {
+    ledz_t *led;
+
+    if (naveg_get_actuator_type(hw_id) == ACT_FOOTSWITCH) {
         led = hardware_leds(hw_id - ENCODERS_COUNT);
     }
     else {
@@ -451,7 +453,7 @@ void cb_change_assigned_led(uint8_t serial_id, proto_t *proto)
         return;
     }
 
-    control_t *control = CM_get_control(hw_id);
+    control_t *control = naveg_get_control(hw_id);
 
     //error no assignment
     if (!control)
@@ -467,28 +469,24 @@ void cb_change_assigned_led(uint8_t serial_id, proto_t *proto)
 
     control->lock_led_actions = 1;
 
-    uint8_t led_update = 0;
-    if (naveg_get_current_mode() == MODE_CONTROL)
-        led_update = LED_UPDATE;
-
     if ((argument_1 == 0) && (argument_2 == 0))
     {
         if (atoi(proto->list[3]) == 0)
-            ledz_set_state(led, LED_OFF, led_update);
+            ledz_set_state(led, LED_OFF, LED_UPDATE);
         else
-            ledz_set_state(led, LED_ON, led_update);
+            ledz_set_state(led, LED_ON, LED_UPDATE);
     }
     else if (argument_2 == 0)
     {
         led->led_state.brightness = (float)(argument_1 / 100.0f);
-        ledz_set_state(led, LED_DIMMED, led_update);
+        ledz_set_state(led, LED_DIMMED, LED_UPDATE);
     }
     else
     {
         led->led_state.amount_of_blinks = LED_BLINK_INFINIT;
         led->led_state.time_on = argument_1;
         led->led_state.time_off = argument_2;
-        ledz_set_state(led, LED_BLINK, led_update);
+        ledz_set_state(led, LED_BLINK, LED_UPDATE);
     }
 
     protocol_send_response(CMD_RESPONSE, 0, proto);
@@ -502,13 +500,13 @@ void cb_change_assigment_name(uint8_t serial_id, proto_t *proto)
     uint8_t hw_id = atoi(proto->list[2]);
 
     //error, no valid actuator
-    if (hw_id > ENCODERS_COUNT + MAX_FOOT_ASSIGNMENTS)
+    if (hw_id > ENCODERS_COUNT + FOOTSWITCHES_ACTUATOR_COUNT + POTS_COUNT)
     {
         protocol_send_response(CMD_RESPONSE, INVALID_ARGUMENT, proto);
         return;
     }
 
-    control_t *control = CM_get_control(hw_id);
+    control_t *control = naveg_get_control(hw_id);
 
     //error no assignment
     if (!control)
@@ -520,12 +518,18 @@ void cb_change_assigment_name(uint8_t serial_id, proto_t *proto)
     FREE(control->label);
     control->label = str_duplicate(proto->list[3]);
 
-    if ((naveg_get_current_mode() == MODE_CONTROL) && (hardware_get_overlay_counter() == 0))
+    //check if there is a tool on, if so dont display
+    if (naveg_is_tool_mode(0) || naveg_is_tool_mode(1)) {
+        return;
+    }
+    else
     {
-        if (hw_id < ENCODERS_COUNT)
-            screen_encoder(control, hw_id);
+        if (naveg_get_actuator_type(hw_id) == ACT_ENCODER)
+            screen_encoder(hw_id, control);
+        else if (naveg_get_actuator_type(hw_id) == ACT_POT)
+            screen_pot(hw_id - ENCODERS_COUNT - FOOTSWITCHES_ACTUATOR_COUNT, control);
         else
-            CM_draw_foot(hw_id - ENCODERS_COUNT);
+            naveg_draw_foot(control);
     }
 
     protocol_send_response(CMD_RESPONSE, 0, proto);
@@ -539,13 +543,13 @@ void cb_change_assigment_value(uint8_t serial_id, proto_t *proto)
     uint8_t hw_id = atoi(proto->list[2]);
 
     //error, we dont change value of foots
-    if (hw_id > ENCODERS_COUNT)
+    if (naveg_get_actuator_type(hw_id) == ACT_FOOTSWITCH)
     {
         protocol_send_response(CMD_RESPONSE, INVALID_ARGUMENT, proto);
         return;
     }
 
-    control_t *control = CM_get_control(hw_id);
+    control_t *control = naveg_get_control(hw_id);
 
     //error no assignment
     if (!control)
@@ -559,9 +563,12 @@ void cb_change_assigment_value(uint8_t serial_id, proto_t *proto)
 
     control->value_string = str_duplicate(proto->list[3]);
 
-    if ((naveg_get_current_mode() == MODE_CONTROL) && (hardware_get_overlay_counter() == 0))
+    if (naveg_is_tool_mode(0) || naveg_is_tool_mode(1))
     {
-        screen_encoder(control, hw_id);
+        if (naveg_get_actuator_type(hw_id) == ACT_ENCODER)
+            screen_encoder(hw_id, control);
+        else if (naveg_get_actuator_type(hw_id) == ACT_POT)
+            screen_pot(hw_id - ENCODERS_COUNT - FOOTSWITCHES_ACTUATOR_COUNT, control);
     }
 
     protocol_send_response(CMD_RESPONSE, 0, proto);
@@ -575,13 +582,13 @@ void cb_change_widget_indicator(uint8_t serial_id, proto_t *proto)
     uint8_t hw_id = atoi(proto->list[2]);
 
     //error, we dont have an indicator on foots
-    if (hw_id > ENCODERS_COUNT)
+    if (naveg_get_actuator_type(hw_id) == ACT_FOOTSWITCH)
     {
         protocol_send_response(CMD_RESPONSE, INVALID_ARGUMENT, proto);
         return;
     }
 
-    control_t *control = CM_get_control(hw_id);
+    control_t *control = naveg_get_control(hw_id);
 
     //error no assignment
     if (!control)
@@ -592,9 +599,12 @@ void cb_change_widget_indicator(uint8_t serial_id, proto_t *proto)
 
     control->screen_indicator_widget_val = atof(proto->list[3]);
 
-    if ((naveg_get_current_mode() == MODE_CONTROL) && (hardware_get_overlay_counter() == 0))
+    if (naveg_is_tool_mode(0) || naveg_is_tool_mode(1))
     {
-        screen_encoder(control, hw_id);
+        if (naveg_get_actuator_type(hw_id) == ACT_ENCODER)
+            screen_encoder(hw_id, control);
+        else if (naveg_get_actuator_type(hw_id) == ACT_POT)
+            screen_pot(hw_id - ENCODERS_COUNT - FOOTSWITCHES_ACTUATOR_COUNT, control);
     }
 
     protocol_send_response(CMD_RESPONSE, 0, proto);
@@ -608,13 +618,13 @@ void cb_change_assigment_unit(uint8_t serial_id, proto_t *proto)
     uint8_t hw_id = atoi(proto->list[2]);
 
     //error, we dont change units of foots
-    if (hw_id > ENCODERS_COUNT)
+    if (naveg_get_actuator_type(hw_id) == ACT_FOOTSWITCH)
     {
         protocol_send_response(CMD_RESPONSE, INVALID_ARGUMENT, proto);
         return;
     }
 
-    control_t *control = CM_get_control(hw_id);
+    control_t *control = naveg_get_control(hw_id);
 
     //error no assignment
     if (!control)
@@ -626,14 +636,17 @@ void cb_change_assigment_unit(uint8_t serial_id, proto_t *proto)
     FREE(control->unit);
     control->unit = str_duplicate(proto->list[3]);
 
-    if ((naveg_get_current_mode() == MODE_CONTROL) && (hardware_get_overlay_counter() == 0))
+    if (naveg_is_tool_mode(0) || naveg_is_tool_mode(1))
     {
-        screen_encoder(control, hw_id);
+        if (naveg_get_actuator_type(hw_id) == ACT_ENCODER)
+            screen_encoder(hw_id, control);
+        else if (naveg_get_actuator_type(hw_id) == ACT_POT)
+            screen_pot(hw_id - ENCODERS_COUNT - FOOTSWITCHES_ACTUATOR_COUNT, control);
     }
 
     protocol_send_response(CMD_RESPONSE, 0, proto);
 }
-*/
+
 void cb_control_add(uint8_t serial_id, proto_t *proto)
 {
     UNUSED_PARAM(serial_id);
@@ -678,7 +691,7 @@ void cb_control_get(uint8_t serial_id, proto_t *proto)
     UNUSED_PARAM(serial_id);
 
     float value;
-    value = naveg_get_control(atoi(proto->list[1]));
+    value = naveg_get_control_value(atoi(proto->list[1]));
 
     protocol_send_response(CMD_RESPONSE, value, proto);
 }
