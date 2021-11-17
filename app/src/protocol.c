@@ -395,15 +395,16 @@ void cb_gui_connection(uint8_t serial_id, proto_t *proto)
     protocol_send_response(CMD_RESPONSE, 0, proto);
 }
 
-
-void cb_control_add(uint8_t serial_id, proto_t *proto)
+void cb_disp_brightness(uint8_t serial_id, proto_t *proto)
 {
+    UNUSED_PARAM(serial_id);
+
     hardware_glcd_brightness(atoi(proto->list[1]));
 
     protocol_send_response(CMD_RESPONSE, 0, proto);
 }
 
-void cb_control_add(proto_t *proto)
+void cb_control_add(uint8_t serial_id, proto_t *proto)
 {
     UNUSED_PARAM(serial_id);
 
@@ -655,9 +656,10 @@ void cb_set_disp_contrast(uint8_t serial_id, proto_t *proto)
     protocol_send_response(CMD_RESPONSE, 0, proto);
 }
 
-void cb_exp_overcurrent(proto_t *proto)
+void cb_exp_overcurrent(uint8_t serial_id, proto_t *proto)
 {
-    (void) proto;
+    UNUSED_PARAM(proto);
+    UNUSED_PARAM(serial_id);
 
     naveg_dialog("Exp port shorted\nTo avoid harm to your device\nthe unit switched back to CV\nmode\n\nPlease check your exp pedal\nand cables", "WARNING");
 
