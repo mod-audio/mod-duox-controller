@@ -498,40 +498,44 @@ static void set_alternated_led_list_colour(control_t *control)
 {
     uint8_t color_id = control->scale_point_index % LED_LIST_AMOUNT_OF_COLORS;
 
+    ledz_t *led = hardware_leds(control->hw_id - ENCODERS_COUNT);
+
     switch (color_id)
     {
         case 0:
-            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_1, 1, 0, 0, 0);
+            led->led_state.color = LED_LIST_COLOR_1;
         break;
 
         case 1:
-            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_2, 1, 0, 0, 0);
+            led->led_state.color = LED_LIST_COLOR_2;
         break;
 
         case 2:
-            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_3, 1, 0, 0, 0);
+            led->led_state.color = LED_LIST_COLOR_3;
         break;
 
         case 3:
-            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_4, 1, 0, 0, 0);
+            led->led_state.color = LED_LIST_COLOR_4;
         break;
 
         case 4:
-            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_5, 1, 0, 0, 0);
+            led->led_state.color = LED_LIST_COLOR_5;
         break;
 
         case 5:
-            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_6, 1, 0, 0, 0);
+            led->led_state.color = LED_LIST_COLOR_6;
         break;
 
         case 6:
-            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_7, 1, 0, 0, 0);
+            led->led_state.color = LED_LIST_COLOR_7;
         break;
 
         default:
-            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), LED_LIST_COLOR_1, 1, 0, 0, 0);
+            led->led_state.color = LED_LIST_COLOR_1;
         break;
     }
+
+    ledz_set_state(led, LED_ON, LED_UPDATE);
 }
 
 // control assigned to foot
@@ -553,13 +557,17 @@ static void foot_control_add(control_t *control)
     // stores the foot
     g_foots[control->hw_id - ENCODERS_COUNT] = control;
 
+    ledz_t *led = hardware_leds(control->hw_id - ENCODERS_COUNT);
+
     if (control->properties & FLAG_CONTROL_MOMENTARY)
     {
         if ((control->scroll_dir == 0)||(control->scroll_dir == 2))
-            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR, 1, 0, 0, 0);
+            led->led_state.color = TRIGGER_COLOR;
         else
-            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TRIGGER_PRESSED_COLOR, 1, 0, 0, 0);
+            led->led_state.color = TRIGGER_PRESSED_COLOR;
         
+        ledz_set_state(led, LED_ON, LED_UPDATE);
+
         // if is in tool mode break
         if (!display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT)))
         {
@@ -572,14 +580,14 @@ static void foot_control_add(control_t *control)
     {
         // trigger specification: http://lv2plug.in/ns/ext/port-props/#trigger
         // updates the led
-        //check if its assigned to a trigger and if the button is released
-        if (control->scroll_dir == 2) ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR, 1, 0, 0, 0);
+        //check if its assigned to a trigger and if the button is release
+        if (control->scroll_dir == 2) 
+            led->led_state.color = TRIGGER_COLOR;
         else
-        {
-            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TRIGGER_PRESSED_COLOR, 1, 0, 0, 0);
-        }
+            led->led_state.color = TRIGGER_PRESSED_COLOR;
 
         // updates the led
+        ledz_set_state(led, LED_ON, LED_UPDATE);
 
         // if is in tool mode break
         if (!display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT)))
@@ -592,10 +600,12 @@ static void foot_control_add(control_t *control)
     {
         // toggled specification: http://lv2plug.in/ns/lv2core/#toggled
         // updates the led
+        led->led_state.color = TOGGLED_COLOR;
+
         if (control->value <= 0)
-            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TOGGLED_COLOR, 0, 0, 0, 0);
+            ledz_set_state(led, LED_OFF, LED_UPDATE);
         else
-            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TOGGLED_COLOR, 1, 0, 0, 0);
+            ledz_set_state(led, LED_ON, LED_UPDATE);
 
         // if is in tool mode break
         if (!display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT)))
@@ -610,25 +620,21 @@ static void foot_control_add(control_t *control)
         // convert the time unit
         uint16_t time_ms = (uint16_t)(convert_to_ms(control->unit, control->value) + 0.5);
 
+        led->led_state.color = TAP_TEMPO_COLOR;
+        led->led_state.state = LED_BLINK;
+        led->led_state.amount_of_blinks = LED_BLINK_INFINIT;
+
         // setup the led blink
-        if (time_ms > TAP_TEMPO_TIME_ON)
-        {
-            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT),
-                       TAP_TEMPO_COLOR,
-                       2,
-                       TAP_TEMPO_TIME_ON,
-                       time_ms - TAP_TEMPO_TIME_ON,
-                       LED_BLINK_INFINIT);
+        if (time_ms > TAP_TEMPO_TIME_ON) {
+            led->led_state.time_on = TAP_TEMPO_TIME_ON;
+            led->led_state.time_off = time_ms - TAP_TEMPO_TIME_ON;
         }
-        else
-        {
-            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT),
-                       TAP_TEMPO_COLOR,
-                       2,
-                       time_ms / 2,
-                       time_ms / 2,
-                       LED_BLINK_INFINIT);
+        else {
+            led->led_state.time_on = time_ms / 2;
+            led->led_state.time_off = time_ms / 2;
         }
+
+        ledz_set_state(led, LED_BLINK, LED_UPDATE);
 
         // calculates the maximum tap tempo value
         if (g_tap_tempo[control->hw_id - ENCODERS_COUNT].state == TT_INIT)
@@ -685,10 +691,12 @@ static void foot_control_add(control_t *control)
     else if (control->properties & FLAG_CONTROL_BYPASS)
     {
         // updates the led
+        led->led_state.color = BYPASS_COLOR;
+
         if (control->value <= 0)
-            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), BYPASS_COLOR, 1, 0, 0, 0);
+            ledz_set_state(led, LED_ON, LED_UPDATE);
         else
-            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), BYPASS_COLOR, 0, 0, 0, 0);
+            ledz_set_state(led, LED_OFF, LED_UPDATE);
 
         // if is in tool mode break
         if (!display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT)))
@@ -702,20 +710,18 @@ static void foot_control_add(control_t *control)
     {
         // updates the led
         //check if its assigned to a trigger and if the button is released
-        if ((control->scroll_dir == 2) || (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR))
-        {
-            if (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR)
-            {
+        if ((control->scroll_dir == 2) || (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR)) {
+            if (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR) {
                 set_alternated_led_list_colour(control);
             }
-            else
-            {
-                ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_COLOR, 1, 0, 0, 0);
+            else {
+                led->led_state.color = ENUMERATED_COLOR;
+                ledz_set_state(led, LED_ON, LED_UPDATE);
             }
         }
-        else
-        {
-            ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_PRESSED_COLOR, 1, 0, 0, 0);
+        else {
+            led->led_state.color = ENUMERATED_PRESSED_COLOR;
+            ledz_set_state(led, LED_ON, LED_UPDATE);
         }
 
         // locates the current value
@@ -764,7 +770,9 @@ static void foot_control_rm(uint8_t hw_id)
             g_foots[i] = NULL;
 
             // turn off the led
-            ledz_set_state(hardware_leds(i), i, MAX_COLOR_ID, 0, 0, 0, 0);
+            ledz_t *led = hardware_leds(i);
+            led->led_state.color = MAX_COLOR_ID;
+            ledz_set_state(led, LED_OFF, LED_UPDATE);
 
             // check if foot isn't being used to bank function
             // update the footer
@@ -1054,23 +1062,23 @@ static void control_set(uint8_t id, control_t *control)
         }
         else if ((ENCODERS_COUNT <= control->hw_id) && ( control->hw_id < FOOTSWITCHES_ACTUATOR_COUNT + ENCODERS_COUNT))
         {
+            ledz_t *led = hardware_leds(control->hw_id - ENCODERS_COUNT);
+
             uint8_t trigger_led_change = 0;
             // updates the led
             //check if its assigned to a trigger and if the button is released
-            if ((control->scroll_dir == 2) || (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR))
-            {
-                if (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR)
-                {
+            if ((control->scroll_dir == 2) || (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR)) {
+                if (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR) {
                     trigger_led_change = 1;
                 }
-                else
-                {
-                    ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_COLOR, 1, 0, 0, 0);
+                else {
+                    led->led_state.color = ENUMERATED_COLOR;
+                    ledz_set_state(led, LED_ON, LED_UPDATE);
                 }
             }
-            else
-            {
-                ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_PRESSED_COLOR, 1, 0, 0, 0);
+            else {
+                led->led_state.color = ENUMERATED_PRESSED_COLOR;
+                ledz_set_state(led, LED_ON, LED_UPDATE);
             }
 
             if (!(control->properties & FLAG_CONTROL_REVERSE))
@@ -2416,19 +2424,21 @@ void naveg_set_control(uint8_t hw_id, float value)
             else if (control->properties & FLAG_CONTROL_TRIGGER)
             {
                 // updates the led
+                ledz_t *led = hardware_leds(control->hw_id - ENCODERS_COUNT);
+
                 //check if its assigned to a trigger and if the button is released
-                if (!control->scroll_dir)
-                {
-                    ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR, 1, 0, 0, 0);
+                if (!control->scroll_dir) {
+                    led->led_state.color = TRIGGER_COLOR;
+                    ledz_set_state(led, LED_ON, LED_UPDATE);
                     return;
                 }
-                else if (control->scroll_dir == 2)
-                {
-                    ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TRIGGER_COLOR, 1, 0, 0, 0);;
+                else if (control->scroll_dir == 2) {
+                    led->led_state.color = TRIGGER_COLOR;
+                    ledz_set_state(led, LED_ON, LED_UPDATE);
                 }
-                else
-                {
-                    ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TRIGGER_PRESSED_COLOR, 1, 0, 0, 0);
+                else {
+                    led->led_state.color = TRIGGER_PRESSED_COLOR;
+                    ledz_set_state(led, LED_ON, LED_UPDATE);
                 }
 
                 // if is in tool mode break
@@ -2442,10 +2452,13 @@ void naveg_set_control(uint8_t hw_id, float value)
             else if (control->properties & FLAG_CONTROL_TOGGLED)
             {
                 // updates the led
+                ledz_t *led = hardware_leds(control->hw_id - ENCODERS_COUNT);
+                led->led_state.color = TOGGLED_COLOR;
+
                 if (control->value <= 0)
-                    ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TOGGLED_COLOR, 0, 0, 0, 0);
+                    ledz_set_state(led, LED_OFF, LED_UPDATE);
                 else
-                    ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TOGGLED_COLOR, 1, 0, 0, 0);
+                    ledz_set_state(led, LED_ON, LED_UPDATE);
 
                 // if is in tool mode break
                 if (!display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT)))
@@ -2461,10 +2474,22 @@ void naveg_set_control(uint8_t hw_id, float value)
                 uint16_t time_ms = (uint16_t)(convert_to_ms(control->unit, control->value) + 0.5);
 
                 // setup the led blink
-                if (time_ms > TAP_TEMPO_TIME_ON)
-                    ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TAP_TEMPO_COLOR, 2, TAP_TEMPO_TIME_ON, time_ms - TAP_TEMPO_TIME_ON, LED_BLINK_INFINIT);
-                else
-                    ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), TAP_TEMPO_COLOR, 2, time_ms / 2, time_ms / 2, LED_BLINK_INFINIT);
+                ledz_t *led = hardware_leds(control->hw_id - ENCODERS_COUNT);
+                led->led_state.color = TAP_TEMPO_COLOR;
+                led->led_state.state = LED_BLINK;
+                led->led_state.amount_of_blinks = LED_BLINK_INFINIT;
+
+                // setup the led blink
+                if (time_ms > TAP_TEMPO_TIME_ON) {
+                    led->led_state.time_on = TAP_TEMPO_TIME_ON;
+                    led->led_state.time_off = time_ms - TAP_TEMPO_TIME_ON;
+                }
+                else {
+                    led->led_state.time_on = time_ms / 2;
+                    led->led_state.time_off = time_ms / 2;
+                }
+
+                ledz_set_state(led, LED_BLINK, LED_UPDATE);
 
                 // calculates the maximum tap tempo value
                 if (g_tap_tempo[control->hw_id - ENCODERS_COUNT].state == TT_INIT)
@@ -2520,10 +2545,13 @@ void naveg_set_control(uint8_t hw_id, float value)
             else if (control->properties & FLAG_CONTROL_BYPASS)
             {
                 // updates the led
+                ledz_t *led = hardware_leds(control->hw_id - ENCODERS_COUNT);
+                led->led_state.color = BYPASS_COLOR;
+
                 if (control->value <= 0)
-                    ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), BYPASS_COLOR, 1, 0, 0, 0);
+                    ledz_set_state(led, LED_ON, LED_UPDATE);
                 else
-                    ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), BYPASS_COLOR, 0, 0, 0, 0);
+                    ledz_set_state(led, LED_OFF, LED_UPDATE);
 
                 // if is in tool mode break
                 if (!display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT)))
@@ -2536,13 +2564,13 @@ void naveg_set_control(uint8_t hw_id, float value)
             else if (control->properties & (FLAG_CONTROL_REVERSE | FLAG_CONTROL_ENUMERATION | FLAG_CONTROL_SCALE_POINTS))
             {
                 // updates the led
-                if (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR)
-                {
+                if (control->scale_points_flag & FLAG_SCALEPOINT_ALT_LED_COLOR) {
                     set_alternated_led_list_colour(control);
                 }
-                else
-                {
-                    ledz_set_state(hardware_leds(control->hw_id - ENCODERS_COUNT), (control->hw_id - ENCODERS_COUNT), ENUMERATED_COLOR, 1, 0, 0, 0);
+                else {
+                    ledz_t *led = hardware_leds(control->hw_id - ENCODERS_COUNT);
+                    led->led_state.color = ENUMERATED_COLOR;
+                    ledz_set_state(led, LED_ON, LED_UPDATE);
                 }
 
                 // locates the current value
@@ -2778,7 +2806,9 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 //check if we use the release action for this actuator
                 if (g_foots[foot]->properties & (FLAG_CONTROL_MOMENTARY | FLAG_CONTROL_TRIGGER))
                 {
-                    ledz_set_state(hardware_leds(foot), foot, TRIGGER_COLOR, 1, 0, 0, 0); //TRIGGER_COLOR
+                    ledz_t *led = hardware_leds(g_foots[foot]->hw_id - ENCODERS_COUNT);
+                    led->led_state.color = TRIGGER_COLOR;
+                    ledz_set_state(led, LED_ON, LED_UPDATE);
                 }
                 else if (g_foots[foot]->properties & (FLAG_CONTROL_SCALE_POINTS | FLAG_CONTROL_REVERSE | FLAG_CONTROL_ENUMERATION))  
                 {
@@ -2788,7 +2818,9 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                         }
                         else
                         {
-                            ledz_set_state(hardware_leds(foot), foot, ENUMERATED_COLOR, 1, 0, 0, 0); //ENUMERATED_COLOR
+                            ledz_t *led = hardware_leds(g_foots[foot]->hw_id - ENCODERS_COUNT);
+                            led->led_state.color = ENUMERATED_COLOR;
+                            ledz_set_state(led, LED_ON, LED_UPDATE);
                         }
                     break;
                 }
@@ -2816,13 +2848,17 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 {
                 	if (pressed == 1)
                 	{
-                    	ledz_set_state(hardware_leds(foot), foot, SNAPSHOT_LOAD_COLOR, 1, 0, 0, 0);
+                        ledz_t *led = hardware_leds(foot);
+                        led->led_state.color = SNAPSHOT_LOAD_COLOR;
+                        ledz_set_state(led, LED_ON, LED_UPDATE);
                     }
                     else
                    	{
                         if ( snapshot_loaded[foot - FOOTSWITCHES_ACTUATOR_COUNT] == 1)
                     	{
-                    	   ledz_set_state(hardware_leds(foot), foot, SNAPSHOT_COLOR, 1, 0, 0, 0);
+                            ledz_t *led = hardware_leds(foot);
+                            led->led_state.color = SNAPSHOT_COLOR;
+                            ledz_set_state(led, LED_ON, LED_UPDATE);
 
                             char buffer[10];
                             uint8_t i;
@@ -3003,13 +3039,17 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 {
                     if (pressed == 1)
                     {
-                        ledz_set_state(hardware_leds(foot), foot, SNAPSHOT_LOAD_COLOR, 1, 0, 0, 0);
+                        ledz_t *led = hardware_leds(foot);
+                        led->led_state.color = SNAPSHOT_LOAD_COLOR;
+                        ledz_set_state(led, LED_ON, LED_UPDATE);
                     }
                     else
                     {
                         if ( snapshot_loaded[foot - FOOTSWITCHES_ACTUATOR_COUNT] == 1)
                         {
-                           ledz_set_state(hardware_leds(foot), foot, SNAPSHOT_COLOR, 1, 0, 0, 0);
+                            ledz_t *led = hardware_leds(foot);
+                            led->led_state.color = SNAPSHOT_COLOR;
+                            ledz_set_state(led, LED_ON, LED_UPDATE);
 
                             char buffer[10];
                             uint8_t i;
@@ -3071,7 +3111,9 @@ void naveg_save_snapshot(uint8_t foot)
 
     i = copy_command(buffer, CMD_DUOX_SNAPSHOT_SAVE);
 
-    ledz_set_state(hardware_leds(foot), foot, SNAPSHOT_COLOR, 1, 0, 0, 0);
+    ledz_t *led = hardware_leds(foot);
+    led->led_state.color = SNAPSHOT_COLOR;
+    ledz_set_state(led, LED_ON, LED_UPDATE);
     ledz_blink(hardware_leds(foot), RED, 85, 85, 3);
 
     i += int_to_str(foot - FOOTSWITCHES_ACTUATOR_COUNT, &buffer[i], sizeof(buffer) - i, 0);
@@ -3084,7 +3126,9 @@ void naveg_save_snapshot(uint8_t foot)
 void naveg_clear_snapshot(uint8_t foot)
 {
     snapshot_loaded[foot - FOOTSWITCHES_ACTUATOR_COUNT] = 0;
-    ledz_set_state(hardware_leds(foot), foot, MAX_COLOR_ID, 0, 0, 0, 0);
+    ledz_t *led = hardware_leds(foot);
+    led->led_state.color = MAX_COLOR_ID;
+    ledz_set_state(led, LED_OFF, LED_UPDATE);
 }
 
 void naveg_reload_display(void)
@@ -3742,7 +3786,7 @@ void naveg_update_calibration(void)
     //update the led states
     for (i=0; i < LEDS_COUNT; i++)
     {
-        ledz_restore_state(hardware_leds(i), i);
+        //ledz_restore_state(hardware_leds(i), i);
     }
 }
 
@@ -3750,98 +3794,119 @@ void naveg_turn_on_pagination_leds(void)
 {
     if (!g_page_mode)
     {
+        ledz_t *led = hardware_leds(5);
         switch (page)
         {
             case 0:
                 //just trigger LED 5 red
-                ledz_set_state(hardware_leds(5), 5, PAGES1_COLOR, 1, 0, 0, 0);
+                led->led_state.color = PAGES1_COLOR;
             break;
 
             case 1:
                 //just trigger LED 5 yellow
-                ledz_set_state(hardware_leds(5), 5, PAGES2_COLOR, 1, 0, 0, 0);
+                led->led_state.color = PAGES2_COLOR;
             break;
 
             case 2:
                 //just trigger LED 5 cyan
-                ledz_set_state(hardware_leds(5), 5, PAGES3_COLOR, 1, 0, 0, 0);
+                led->led_state.color = PAGES3_COLOR;
             break;
 
             case 3:
                 //just trigger LED 5 cyan
-                ledz_set_state(hardware_leds(5), 5, PAGES4_COLOR, 1, 0, 0, 0);
+                led->led_state.color = PAGES4_COLOR;
             break;
 
             case 4:
                 //just trigger LED 5 cyan
-                ledz_set_state(hardware_leds(5), 5, PAGES5_COLOR, 1, 0, 0, 0);
+                led->led_state.color = PAGES5_COLOR;
             break;
 
             case 5:
                 //just trigger LED 5 cyan
-                ledz_set_state(hardware_leds(5), 5, PAGES6_COLOR, 1, 0, 0, 0);
+                led->led_state.color = PAGES6_COLOR;
             break;
 
             default:
                 //just trigger LED 5 red
-                ledz_set_state(hardware_leds(5), 5, PAGES1_COLOR, 1, 0, 0, 0);
+                led->led_state.color = PAGES1_COLOR;
             break;
         }
 
-        if (snapshot_loaded[0]) ledz_set_state(hardware_leds(4), 4, SNAPSHOT_COLOR, 1, 0, 0, 0);
-        else ledz_set_state(hardware_leds(4), 4, SNAPSHOT_COLOR, 0, 0, 0, 0);
+        ledz_set_state(led, LED_ON, LED_UPDATE);
 
-        if (snapshot_loaded[2]) ledz_set_state(hardware_leds(6), 6, SNAPSHOT_COLOR, 1, 0, 0, 0);
-        else ledz_set_state(hardware_leds(6), 6, SNAPSHOT_COLOR, 0, 0, 0, 0);
+        led = hardware_leds(4);
+        led->led_state.color = SNAPSHOT_COLOR;
+        if (snapshot_loaded[0])
+            ledz_set_state(led, LED_ON, LED_UPDATE);
+        else
+            ledz_set_state(led, LED_OFF, LED_UPDATE);
+
+        led = hardware_leds(6);
+        led->led_state.color = SNAPSHOT_COLOR;
+        if (snapshot_loaded[2])
+            ledz_set_state(led, LED_ON, LED_UPDATE);
+        else
+            ledz_set_state(led, LED_OFF, LED_UPDATE);
     }
     else 
     {
+        ledz_t *led_page_1 = hardware_leds(4);
+        ledz_t *led_page_2 = hardware_leds(6);
+
         switch (page)
         {
             case 0:
-                //just trigger LED 4 & LED 6 red
-                ledz_set_state(hardware_leds(4), 4, PAGES1_COLOR, 1, 0, 0, 0);
-                ledz_set_state(hardware_leds(6), 6, PAGES1_COLOR, 1, 0, 0, 0);
+                //just trigger LED 5 red
+                led_page_1->led_state.color = PAGES1_COLOR;
+                led_page_2->led_state.color = PAGES1_COLOR;
             break;
 
             case 1:
-                //just trigger LED 4 & LED 6 red
-                ledz_set_state(hardware_leds(4), 4, PAGES2_COLOR, 1, 0, 0, 0);
-                ledz_set_state(hardware_leds(6), 6, PAGES2_COLOR, 1, 0, 0, 0);
+                //just trigger LED 5 yellow
+                led_page_1->led_state.color = PAGES2_COLOR;
+                led_page_2->led_state.color = PAGES1_COLOR;
             break;
 
             case 2:
-                //just trigger LED 4 & LED 6 red
-                ledz_set_state(hardware_leds(4), 4, PAGES3_COLOR, 1, 0, 0, 0);
-                ledz_set_state(hardware_leds(6), 6, PAGES3_COLOR, 1, 0, 0, 0);
+                //just trigger LED 5 cyan
+                led_page_1->led_state.color = PAGES3_COLOR;
+                led_page_2->led_state.color = PAGES1_COLOR;
             break;
 
             case 3:
-                //just trigger LED 4 & LED 6 red
-                ledz_set_state(hardware_leds(4), 4, PAGES4_COLOR, 1, 0, 0, 0);
-                ledz_set_state(hardware_leds(6), 6, PAGES4_COLOR, 1, 0, 0, 0);
+                //just trigger LED 5 cyan
+                led_page_1->led_state.color = PAGES4_COLOR;
+                led_page_2->led_state.color = PAGES1_COLOR;
             break;
 
             case 4:
-                //just trigger LED 4 & LED 6 red
-                ledz_set_state(hardware_leds(4), 4, PAGES5_COLOR, 1, 0, 0, 0);
-                ledz_set_state(hardware_leds(6), 6, PAGES5_COLOR, 1, 0, 0, 0);
+                //just trigger LED 5 cyan
+                led_page_1->led_state.color = PAGES5_COLOR;
+                led_page_2->led_state.color = PAGES1_COLOR;
             break;
 
             case 5:
-                //just trigger LED 4 & LED 6 red
-                ledz_set_state(hardware_leds(4), 4, PAGES6_COLOR, 1, 0, 0, 0);
-                ledz_set_state(hardware_leds(6), 6, PAGES6_COLOR, 1, 0, 0, 0);
+                //just trigger LED 5 cyan
+                led_page_1->led_state.color = PAGES6_COLOR;
+                led_page_2->led_state.color = PAGES1_COLOR;
             break;
 
             default:
-                //just trigger LED 4 & LED 6 red
-                ledz_set_state(hardware_leds(4), 4, PAGES1_COLOR, 1, 0, 0, 0);
-                ledz_set_state(hardware_leds(6), 6, PAGES1_COLOR, 1, 0, 0, 0);
+                //just trigger LED 5 red
+                led_page_1->led_state.color = PAGES1_COLOR;
+                led_page_2->led_state.color = PAGES1_COLOR;
             break;
         }
 
-        if (snapshot_loaded[1]) ledz_set_state(hardware_leds(5), 5, SNAPSHOT_COLOR, 1, 0, 0, 0);
-        else ledz_set_state(hardware_leds(5), 5, SNAPSHOT_COLOR, 0, 0, 0, 0);
+        ledz_set_state(led_page_1, LED_ON, LED_UPDATE);
+        ledz_set_state(led_page_2, LED_ON, LED_UPDATE);
+
+        ledz_t *led = hardware_leds(5);
+        led->led_state.color = SNAPSHOT_COLOR;
+        if (snapshot_loaded[1])
+            ledz_set_state(led, LED_ON, LED_UPDATE);
+        else
+            ledz_set_state(led, LED_OFF, LED_UPDATE);
     }
 }

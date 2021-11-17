@@ -1638,7 +1638,7 @@ void system_led_brightness_cb(void *arg, int event)
         g_led_brightness = read_buffer;
 
         //write to driver
-        ledz_set_brightness(g_led_brightness);
+        ledz_set_global_brightness(g_led_brightness);
     }
 
     if (event == MENU_EV_ENTER)
@@ -1651,13 +1651,13 @@ void system_led_brightness_cb(void *arg, int event)
         EEPROM_Write(0, LED_BRIGHTNESS_ADRESS, &write_buffer, MODE_8_BIT, 1);
 
         //write to naveg.c
-        ledz_set_brightness(g_led_brightness);
+        ledz_set_global_brightness(g_led_brightness);
 
         //update the leds 
         uint8_t j = 0;
         for (j = 0; j < LEDS_COUNT; j++)
         {
-            ledz_restore_state(hardware_leds(j), j);
+            ledz_restore_state(hardware_leds(j));
         }        
     }
 

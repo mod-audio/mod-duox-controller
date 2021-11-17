@@ -78,6 +78,32 @@ typedef struct CMD_T {
 static unsigned int g_command_count = 0;
 static cmd_t g_commands[COMMAND_COUNT_DUOX];
 
+static int8_t *WIDGET_LED_COLORS[]  = {
+#ifdef WIDGET_LED0_COLOR
+    (int8_t []) WIDGET_LED0_COLOR,
+#endif
+#ifdef WIDGET_LED1_COLOR
+    (int8_t []) WIDGET_LED1_COLOR,
+#endif
+#ifdef WIDGET_LED2_COLOR
+    (int8_t []) WIDGET_LED2_COLOR,
+#endif
+#ifdef WIDGET_LED3_COLOR
+    (int8_t []) WIDGET_LED3_COLOR,
+#endif
+#ifdef WIDGET_LED4_COLOR
+    (int8_t []) WIDGET_LED4_COLOR,
+#endif
+#ifdef WIDGET_LED5_COLOR
+    (int8_t []) WIDGET_LED5_COLOR,
+#endif
+#ifdef WIDGET_LED6_COLOR
+    (int8_t []) WIDGET_LED6_COLOR,
+#endif
+#ifdef WIDGET_LED7_COLOR
+    (int8_t []) WIDGET_LED7_COLOR,
+#endif
+};
 
 /*
 ************************************************************************************************************************
@@ -323,16 +349,19 @@ void cb_led(uint8_t serial_id, proto_t *proto)
 
     ledz_t *led = hardware_leds(atoi(proto->list[1]));
 
-    uint8_t value[3] = {atoi(proto->list[2]), atoi(proto->list[3]), atoi(proto->list[4])}; 
-    ledz_set_color(CMD_COLOR_ID,value);
+    int8_t value[3] = {atoi(proto->list[2]), atoi(proto->list[3]), atoi(proto->list[4])};
+    ledz_set_color(CMD_COLOR_ID, value);
 
-    if (proto->list_count == 7)
-    {
-        ledz_set_state(led, atoi(proto->list[1]), CMD_COLOR_ID, 1, 0, 0, 0);
-    }
+    led->led_state.color = MAX_COLOR_ID;
+
+    if (proto->list_count < 6)
+        ledz_set_state(led, LED_ON, LED_UPDATE);
     else
     {
-        ledz_set_state(led, atoi(proto->list[1]), CMD_COLOR_ID, 2, atoi(proto->list[5]), atoi(proto->list[6]), LED_BLINK_INFINIT);
+        led->led_state.time_on = atoi(proto->list[5]);
+        led->led_state.time_off = atoi(proto->list[6]);
+        led->led_state.amount_of_blinks = LED_BLINK_INFINIT;
+        ledz_set_state(led, LED_BLINK, LED_UPDATE);
     }
 
     protocol_send_response(CMD_RESPONSE, 0, proto);
@@ -403,7 +432,208 @@ void cb_disp_brightness(uint8_t serial_id, proto_t *proto)
 
     protocol_send_response(CMD_RESPONSE, 0, proto);
 }
+/*
+void cb_change_assigned_led(uint8_t serial_id, proto_t *proto)
+{
+    if (serial_id != SYSTEM_SERIAL)
+        return;
 
+    uint8_t hw_id = atoi(proto->list[2]);
+
+    uint16_t argument_1 = atoi(proto->list[4]);
+    uint16_t argument_2 = atoi(proto->list[5]);
+
+    if ((hw_id < (ENCODERS_COUNT + FOOTSWITCHES_ACTUATOR_COUNT)) && (hw_id >= ENCODERS_COUNT)) {
+        led = hardware_leds(hw_id - ENCODERS_COUNT);
+    }
+    else {
+        protocol_send_response(CMD_RESPONSE, INVALID_ARGUMENT, proto);
+        return;
+    }
+
+    control_t *control = CM_get_control(hw_id);
+
+    //error no assignment
+    if (!control)
+    {
+        protocol_send_response(CMD_RESPONSE, INVALID_ARGUMENT, proto);
+        return;
+    }
+
+    //set color
+    ledz_set_color(MAX_COLOR_ID + hw_id-ENCODERS_COUNT +1, WIDGET_LED_COLORS[atoi(proto->list[3])]);
+
+    led->led_state.color =  MAX_COLOR_ID + hw_id-ENCODERS_COUNT+1;
+
+    control->lock_led_actions = 1;
+
+    uint8_t led_update = 0;
+    if (naveg_get_current_mode() == MODE_CONTROL)
+        led_update = LED_UPDATE;
+
+    if ((argument_1 == 0) && (argument_2 == 0))
+    {
+        if (atoi(proto->list[3]) == 0)
+            ledz_set_state(led, LED_OFF, led_update);
+        else
+            ledz_set_state(led, LED_ON, led_update);
+    }
+    else if (argument_2 == 0)
+    {
+        led->led_state.brightness = (float)(argument_1 / 100.0f);
+        ledz_set_state(led, LED_DIMMED, led_update);
+    }
+    else
+    {
+        led->led_state.amount_of_blinks = LED_BLINK_INFINIT;
+        led->led_state.time_on = argument_1;
+        led->led_state.time_off = argument_2;
+        ledz_set_state(led, LED_BLINK, led_update);
+    }
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+}
+
+void cb_change_assigment_name(uint8_t serial_id, proto_t *proto)
+{
+    if (serial_id != SYSTEM_SERIAL)
+        return;
+
+    uint8_t hw_id = atoi(proto->list[2]);
+
+    //error, no valid actuator
+    if (hw_id > ENCODERS_COUNT + MAX_FOOT_ASSIGNMENTS)
+    {
+        protocol_send_response(CMD_RESPONSE, INVALID_ARGUMENT, proto);
+        return;
+    }
+
+    control_t *control = CM_get_control(hw_id);
+
+    //error no assignment
+    if (!control)
+    {
+        protocol_send_response(CMD_RESPONSE, INVALID_ARGUMENT, proto);
+        return;
+    }
+
+    FREE(control->label);
+    control->label = str_duplicate(proto->list[3]);
+
+    if ((naveg_get_current_mode() == MODE_CONTROL) && (hardware_get_overlay_counter() == 0))
+    {
+        if (hw_id < ENCODERS_COUNT)
+            screen_encoder(control, hw_id);
+        else
+            CM_draw_foot(hw_id - ENCODERS_COUNT);
+    }
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+}
+
+void cb_change_assigment_value(uint8_t serial_id, proto_t *proto)
+{
+    if (serial_id != SYSTEM_SERIAL)
+        return;
+
+    uint8_t hw_id = atoi(proto->list[2]);
+
+    //error, we dont change value of foots
+    if (hw_id > ENCODERS_COUNT)
+    {
+        protocol_send_response(CMD_RESPONSE, INVALID_ARGUMENT, proto);
+        return;
+    }
+
+    control_t *control = CM_get_control(hw_id);
+
+    //error no assignment
+    if (!control)
+    {
+        protocol_send_response(CMD_RESPONSE, INVALID_ARGUMENT, proto);
+        return;
+    }
+
+    if (control->value_string)
+        FREE(control->value_string);
+
+    control->value_string = str_duplicate(proto->list[3]);
+
+    if ((naveg_get_current_mode() == MODE_CONTROL) && (hardware_get_overlay_counter() == 0))
+    {
+        screen_encoder(control, hw_id);
+    }
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+}
+
+void cb_change_widget_indicator(uint8_t serial_id, proto_t *proto)
+{
+    if (serial_id != SYSTEM_SERIAL)
+        return;
+
+    uint8_t hw_id = atoi(proto->list[2]);
+
+    //error, we dont have an indicator on foots
+    if (hw_id > ENCODERS_COUNT)
+    {
+        protocol_send_response(CMD_RESPONSE, INVALID_ARGUMENT, proto);
+        return;
+    }
+
+    control_t *control = CM_get_control(hw_id);
+
+    //error no assignment
+    if (!control)
+    {
+        protocol_send_response(CMD_RESPONSE, INVALID_ARGUMENT, proto);
+        return;
+    }
+
+    control->screen_indicator_widget_val = atof(proto->list[3]);
+
+    if ((naveg_get_current_mode() == MODE_CONTROL) && (hardware_get_overlay_counter() == 0))
+    {
+        screen_encoder(control, hw_id);
+    }
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+}
+
+void cb_change_assigment_unit(uint8_t serial_id, proto_t *proto)
+{
+    if (serial_id != SYSTEM_SERIAL)
+        return;
+
+    uint8_t hw_id = atoi(proto->list[2]);
+
+    //error, we dont change units of foots
+    if (hw_id > ENCODERS_COUNT)
+    {
+        protocol_send_response(CMD_RESPONSE, INVALID_ARGUMENT, proto);
+        return;
+    }
+
+    control_t *control = CM_get_control(hw_id);
+
+    //error no assignment
+    if (!control)
+    {
+        protocol_send_response(CMD_RESPONSE, INVALID_ARGUMENT, proto);
+        return;
+    }
+
+    FREE(control->unit);
+    control->unit = str_duplicate(proto->list[3]);
+
+    if ((naveg_get_current_mode() == MODE_CONTROL) && (hardware_get_overlay_counter() == 0))
+    {
+        screen_encoder(control, hw_id);
+    }
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+}
+*/
 void cb_control_add(uint8_t serial_id, proto_t *proto)
 {
     UNUSED_PARAM(serial_id);

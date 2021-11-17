@@ -514,7 +514,7 @@ void hardware_setup(void)
     uc1701_set_custom_value(hardware_glcds(1), display_contrast, UC1701_RR_DEFAULT);
 
     //set led colors
-    uint8_t led_color_value[3] = {};
+    int8_t led_color_value[3] = {};
     uint8_t eeprom_index, eeprom_page;
     eeprom_page = LED_COLOR_EEMPROM_PAGE;
     eeprom_index = 0;
