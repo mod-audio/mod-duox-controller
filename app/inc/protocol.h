@@ -93,11 +93,6 @@ void cb_glcd_dialog(uint8_t serial_id, proto_t *proto);
 void cb_glcd_draw(uint8_t serial_id, proto_t *proto);
 void cb_gui_connection(uint8_t serial_id, proto_t *proto);
 void cb_disp_brightness(uint8_t serial_id, proto_t *proto);
-void cb_change_assigned_led(uint8_t serial_id, proto_t *proto);
-void cb_change_assigment_name(uint8_t serial_id, proto_t *proto);
-void cb_change_assigment_value(uint8_t serial_id, proto_t *proto);
-void cb_change_widget_indicator(uint8_t serial_id, proto_t *proto);
-void cb_change_assigment_unit(uint8_t serial_id, proto_t *proto);
 void cb_control_add(uint8_t serial_id, proto_t *proto);
 void cb_control_rm(uint8_t serial_id, proto_t *proto);
 void cb_control_set(uint8_t serial_id, proto_t *proto);
@@ -119,6 +114,13 @@ void cb_set_selftest_control_skip(uint8_t serial_id, proto_t *proto);
 void cb_clear_eeprom(uint8_t serial_id, proto_t *proto);
 void cb_set_disp_contrast(uint8_t serial_id, proto_t *proto);
 void cb_exp_overcurrent(uint8_t serial_id, proto_t *proto);
+
+void cb_change_assigned_led_blink(uint8_t serial_id, proto_t *proto);
+void cb_change_assigned_led_brightness(uint8_t serial_id, proto_t *proto);
+void cb_change_assigment_name(uint8_t serial_id, proto_t *proto);
+void cb_change_assigment_value(uint8_t serial_id, proto_t *proto);
+void cb_change_assigment_unit(uint8_t serial_id, proto_t *proto);
+void cb_change_widget_indicator(uint8_t serial_id, proto_t *proto);
 
 /*
 ************************************************************************************************************************
