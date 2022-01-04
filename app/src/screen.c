@@ -729,8 +729,14 @@ void screen_encoder(uint8_t display_id, control_t *control)
         volume_bar.y = 17;
         volume_bar.width = 124;
         volume_bar.height = 5;
-        volume_bar.step = control->step;
-        volume_bar.steps = control->steps - 1;
+        if (control->screen_indicator_widget_val == -1) {
+            volume_bar.step = control->step;
+            volume_bar.steps = control->steps - 1;
+        }
+        else {
+            volume_bar.step = control->screen_indicator_widget_val * 100;
+            volume_bar.steps = 100;
+        }
         widget_bar_indicator(display, &volume_bar);
     }
 
