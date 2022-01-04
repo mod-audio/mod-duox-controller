@@ -798,10 +798,7 @@ void cb_change_assigned_led_brightness(uint8_t serial_id, proto_t *proto)
 
     control->lock_led_actions = 1;
 
-    uint8_t led_update = 0;
-    //check if we are in the menu
-    if (!naveg_is_tool_mode(0) || !naveg_is_tool_mode(1))
-        led_update = LED_UPDATE;
+    uint8_t led_update = 1;
 
     if (argument <= 0)
     {
@@ -843,20 +840,19 @@ void cb_change_assigned_led_brightness(uint8_t serial_id, proto_t *proto)
 
 void cb_change_assigment_name(uint8_t serial_id, proto_t *proto)
 {
-    /*
     if (serial_id != SYSTEM_SERIAL)
         return;
 
     uint8_t hw_id = atoi(proto->list[2]);
 
     //error, no valid actuator
-    if (hw_id > ENCODERS_COUNT + MAX_FOOT_ASSIGNMENTS)
+    if (hw_id > ENCODERS_COUNT + FOOTSWITCHES_ACTUATOR_COUNT + POTS_COUNT)
     {
         protocol_send_response(CMD_RESPONSE, INVALID_ARGUMENT, proto);
         return;
     }
 
-    control_t *control = CM_get_control(hw_id);
+    control_t *control = naveg_get_control(hw_id);
 
     //error no assignment
     if (!control)
@@ -868,19 +864,17 @@ void cb_change_assigment_name(uint8_t serial_id, proto_t *proto)
     FREE(control->label);
     control->label = str_duplicate(proto->list[3]);
 
-    if (naveg_get_current_mode() == MODE_CONTROL)
+    if (!naveg_is_tool_mode(0) || !naveg_is_tool_mode(1))
     {
-        if (hardware_get_overlay_counter() != 0)
-            hardware_force_overlay_off(0);
-
-        if (hw_id < ENCODERS_COUNT)
-            screen_encoder(control, hw_id);
+        if (naveg_get_actuator_type(hw_id) == ACT_ENCODER)
+            screen_encoder(hw_id, control);
+        else if (naveg_get_actuator_type(hw_id) == ACT_POT)
+            screen_pot(hw_id - ENCODERS_COUNT - FOOTSWITCHES_ACTUATOR_COUNT, control);
         else
-            CM_draw_foot(hw_id - ENCODERS_COUNT);
+            naveg_draw_foot(control);
     }
 
     protocol_send_response(CMD_RESPONSE, 0, proto);
-    */
 }
 
 void cb_change_assigment_value(uint8_t serial_id, proto_t *proto)

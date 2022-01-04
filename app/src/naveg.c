@@ -2692,13 +2692,14 @@ float naveg_get_control_value(uint8_t hw_id)
 control_t* naveg_get_control(uint8_t hw_id)
 {
     if (!g_initialized) return NULL;
-    control_t *control;
+    control_t *control = NULL;
 
-    if (hw_id < ENCODERS_COUNT) {
+    if (hw_id < ENCODERS_COUNT)
         control = search_encoder(hw_id);
-    }
-    else
+    else if (hw_id < ENCODERS_COUNT + FOOTSWITCHES_ACTUATOR_COUNT)
         control = g_foots[hw_id - ENCODERS_COUNT];
+    else if (hw_id < ENCODERS_COUNT + FOOTSWITCHES_ACTUATOR_COUNT + POTS_COUNT)
+        control = g_pots[hw_id - ENCODERS_COUNT - FOOTSWITCHES_ACTUATOR_COUNT];
 
     if (control) return control;
 
