@@ -242,93 +242,87 @@ void screen_pot(uint8_t pot_id, control_t *control)
         char value_str[10] = {0};
         char value_str_bfr[7] = {0};
 
-        //if the value becomes bigger then 9999 (4 characters), then switch to another view 10999 becomes 10.9K
-        if (control->value > 9999)
-        {
-            float_to_str((control->value/1000), value_str, sizeof(value_str), 1);
-            strcat(value_str, "K");
-        }
-        //else if we have a value bigger then 100, we dont display decimals anymore
-        else if (control->value > 99.9)
-        {
-        	if (control->value > 999.9)
-        	{
-				int_to_str(control->value, value_str, sizeof(value_str), 0);
-        	}
-        	else
-        	{
-                //not for ints or percantages
-                if ((control->properties & FLAG_CONTROL_INTEGER) || (!strcmp(control->unit, "%")))
-                {
-                    int_to_str(control->value, value_str, sizeof(value_str), 0);
-                }
-                else 
-                {    
-                	float_to_str((control->value), value_str, sizeof(value_str), 1);
-                }
-        	}
-        }
-        //else if we have a value bigger then 10 we display just one decimal
-        else if (control->value > 9.9)
-        {
-            //not for ints
-            if (control->properties & FLAG_CONTROL_INTEGER)
-            {
-                int_to_str(control->value, value_str, sizeof(value_str), 0);
+        if (!control->value_string) {
+            //if the value becomes bigger then 9999 (4 characters), then switch to another view 10999 becomes 10.9K
+            if (control->value > 9999) {
+                float_to_str((control->value/1000), value_str, sizeof(value_str), 1);
+                strcat(value_str, "K");
             }
-            else
-            {
-                float_to_str((control->value), value_str, sizeof(value_str), 6);
+            //else if we have a value bigger then 100, we dont display decimals anymore
+            else if (control->value > 99.9) {
+            	if (control->value > 999.9) {
+		  		int_to_str(control->value, value_str, sizeof(value_str), 0);
+            	}
+            	else {
+                    //not for ints or percantages
+                    if ((control->properties & FLAG_CONTROL_INTEGER) || (!strcmp(control->unit, "%"))) {
+                        int_to_str(control->value, value_str, sizeof(value_str), 0);
+                    }
+                    else {    
+                    	float_to_str((control->value), value_str, sizeof(value_str), 1);
+                    }
+            	}
             }
-        }
-        //if the value becomes less then 0 we change to 1 or 0 decimals
-        else if (control->value < 0)
-        {
-            if (control->value > -99.9)
-            {
+            //else if we have a value bigger then 10 we display just one decimal
+            else if (control->value > 9.9) {
                 //not for ints
-                if (control->properties & FLAG_CONTROL_INTEGER)
-                {
+                if (control->properties & FLAG_CONTROL_INTEGER) {
                     int_to_str(control->value, value_str, sizeof(value_str), 0);
                 }
-                else if (control->value < -9.9)
-                {
-                    float_to_str((control->value), value_str, sizeof(value_str), 1);
-                }
-                else
-                {
-                    float_to_str((control->value), value_str, sizeof(value_str), 2);
+                else {
+                    float_to_str((control->value), value_str, sizeof(value_str), 6);
                 }
             }
-            else
-            {
-                if (control->value < -9999.9)
-                {
-                    int_to_str(control->value/1000, value_str, sizeof(value_str), 0);
-                    strcat(value_str, "K");
+            //if the value becomes less then 0 we change to 1 or 0 decimals
+            else if (control->value < 0) {
+                if (control->value > -99.9) {
+                    //not for ints
+                    if (control->properties & FLAG_CONTROL_INTEGER) {
+                        int_to_str(control->value, value_str, sizeof(value_str), 0);
+                    }
+                    else if (control->value < -9.9) {
+                        float_to_str((control->value), value_str, sizeof(value_str), 1);
+                    }
+                    else {
+                        float_to_str((control->value), value_str, sizeof(value_str), 2);
+                    }
                 }
-            	int_to_str(control->value, value_str, sizeof(value_str), 0);
+                else {
+                    if (control->value < -9999.9) {
+                        int_to_str(control->value/1000, value_str, sizeof(value_str), 0);
+                        strcat(value_str, "K");
+                    }
+                	int_to_str(control->value, value_str, sizeof(value_str), 0);
+                }
+            }
+            //for values between 0 and 10 display 2 decimals
+            else {
+                //not for ints
+                if (control->properties & FLAG_CONTROL_INTEGER) {
+                    int_to_str(control->value, value_str, sizeof(value_str), 0);
+                }
+                else {
+                    float_to_str((control->value), value_str, sizeof(value_str), 6);
+                }
+            }
 
-            }
+            //copy to value_str_bfr, the first 5 char
+            strncpy(value_str_bfr, value_str, 5);
+            //terminate the text with line ending, since no unit is added to it
+            value_str_bfr[5] = '\0';
         }
-        //for values between 0 and 10 display 2 decimals
         else
         {
-            //not for ints
-            if (control->properties & FLAG_CONTROL_INTEGER)
-            {
-                int_to_str(control->value, value_str, sizeof(value_str), 0);
-            }
-            else
-            {
-                float_to_str((control->value), value_str, sizeof(value_str), 6);
-            }
-        }
+            //draw the value string
+            uint8_t char_cnt_value = strlen(control->value_string);
 
-        //copy to value_str_bfr, the first 5 char
-        strncpy(value_str_bfr, value_str, 5);
-        //terminate the text with line ending, since no unit is added to it
-        value_str_bfr[5] = '\0';
+            if (char_cnt_value > 5)
+                char_cnt_value = 5;
+
+            control->value_string[char_cnt_value] = '\0';
+            strcpy(value_str_bfr, control->value_string);
+            value_str_bfr[char_cnt_value] = '\0';
+        }
 
         //convert unit
         char *unit_str = 0;
@@ -613,7 +607,7 @@ void screen_encoder(uint8_t display_id, control_t *control)
         int_box.y = 13;
         widget_textbox(display, &int_box);
     }
-        //liniar/logaritmic control type, Bar graphic
+    //liniar/logaritmic control type, Bar graphic
     else
     {
         textbox_t value, title;
@@ -623,57 +617,77 @@ void screen_encoder(uint8_t display_id, control_t *control)
         strncpy(title_str_bfr, control->label, 24);
         title_str_bfr[24] = '\0';
 
-        //convert value
-        //value_str is our temporary value which we use for what kind of value representation we need
-        //value_str_bfr is the value that gets printed
-        char value_str[10] = {0};
-        char value_str_bfr[6] = {0};
+        char value_str_bfr[11] = {0};
         char *unit_str_bfr = NULL;
 
-        //if the value becomes bigger then 9999 (4 characters), then switch to another view 10999 becomes 10.9K
-        if (control->value > 9999)
-        {
-            int_to_str(control->value/1000, value_str, sizeof(value_str) - 1, 0);
-            strcat(value_str, "K");
-        }
-        //else if we have a value bigger then 100, we dont display decimals anymore
-        else if (control->value > 99.9)
-        {
-            int_to_str(control->value, value_str, sizeof(value_str), 0);
-        }
-        //else if we have a value bigger then 10 we display just one decimal
-        else if (control->value > 9.9)
-        {
-            float_to_str((control->value), value_str, sizeof(value_str), 1);
-        }
-        //if the value becomes less then 0 we change to 1 or 0 decimals
-        else if (control->value < 0)
-        {
-            if (control->value > -99.9)
-            {
-                float_to_str(control->value, value_str, sizeof(value_str), 1);
-            }
-            else if (control->value < -9999.9)
-            {
-                int_to_str((control->value/1000), value_str, sizeof(value_str) - 1, 0);
+        if (!control->value_string) {
+            //convert value
+            //value_str is our temporary value which we use for what kind of value representation we need
+            //value_str_bfr is the value that gets printed
+            char value_str[10] = {0};
+
+            //if the value becomes bigger then 9999 (4 characters), then switch to another view 10999 becomes 10.9K
+            if (control->value > 9999) {
+                int_to_str(control->value/1000, value_str, sizeof(value_str) - 1, 0);
                 strcat(value_str, "K");
             }
-            else int_to_str(control->value, value_str, sizeof(value_str), 0);
-        }
-        //for values between 0 and 10 display 2 decimals
-        else
-        {
-            float_to_str(control->value, value_str, sizeof(value_str), 2);
-        }
+            //else if we have a value bigger then 100, we dont display decimals anymore
+            else if (control->value > 99.9) {
+                int_to_str(control->value, value_str, sizeof(value_str), 0);
+            }
+            //else if we have a value bigger then 10 we display just one decimal
+            else if (control->value > 9.9) {
+                float_to_str((control->value), value_str, sizeof(value_str), 1);
+            }
+            //if the value becomes less then 0 we change to 1 or 0 decimals
+            else if (control->value < 0) {
+                if (control->value > -99.9) {
+                    float_to_str(control->value, value_str, sizeof(value_str), 1);
+                }
+                else if (control->value < -9999.9) {
+                    int_to_str((control->value/1000), value_str, sizeof(value_str) - 1, 0);
+                    strcat(value_str, "K");
+                }
+                else int_to_str(control->value, value_str, sizeof(value_str), 0);
+            }
+            //for values between 0 and 10 display 2 decimals
+            else {
+                float_to_str(control->value, value_str, sizeof(value_str), 2);
+            }
 
-        //copy to value_str_bfr, the first 5 char
-        strncpy(value_str_bfr, value_str, 5);
-        //terminate the text with line ending
-        value_str_bfr[5] ='\0';
+            //copy to value_str_bfr, the first 5 char
+            strncpy(value_str_bfr, value_str, 5);
+            //terminate the text with line ending
+            value_str_bfr[5] ='\0';
 
-        //convert unit
-        const char *unit_str;
-        unit_str = (strcmp(control->unit, "") == 0 ? NULL : control->unit);
+            //convert unit
+            const char *unit_str;
+            unit_str = (strcmp(control->unit, "") == 0 ? NULL : control->unit);
+
+            //adds the unit to the value
+            if (unit_str != NULL) {
+                unit_str_bfr = MALLOC(strlen(value_str_bfr)+strlen(unit_str)+3);
+                strcpy(unit_str_bfr, value_str_bfr);
+                strcat(unit_str_bfr, " ");
+                strcat(unit_str_bfr, unit_str);
+                value.text = unit_str_bfr;
+            }
+            else {
+                value.text = value_str_bfr;
+            }
+        }
+        else {
+            //draw the value string
+            uint8_t char_cnt_value = strlen(control->value_string);
+
+            if (char_cnt_value > 10)
+                char_cnt_value = 10;
+
+            control->value_string[char_cnt_value] = '\0';
+            strcpy(value_str_bfr, control->value_string);
+            value_str_bfr[char_cnt_value] = '\0';
+            value.text = value_str_bfr;
+        }
 
         //title:
         title.color = GLCD_BLACK;
@@ -692,20 +706,6 @@ void screen_encoder(uint8_t display_id, control_t *control)
         widget_textbox(display, &title);
 
         FREE(title_str_bfr);
-
-        //adds the unit to the value
-        if (unit_str != NULL)
-        {
-            unit_str_bfr = MALLOC(strlen(value_str_bfr)+strlen(unit_str)+3);
-            strcpy(unit_str_bfr, value_str_bfr);
-            strcat(unit_str_bfr, " ");
-            strcat(unit_str_bfr, unit_str);
-            value.text = unit_str_bfr;
-        }
-        else
-        {
-            value.text = value_str_bfr;
-        }
 
         //value
         value.color = GLCD_BLACK;
