@@ -85,7 +85,6 @@ char *option_disabled = "[ ]";
 */
 
 float g_gains_volumes[5] = {-1, -1, -1, -1, -1};
-uint8_t g_master_vol_port = 0;
 uint8_t g_q_bypass = 0;
 uint8_t g_bypass[4] = {};
 uint8_t g_current_profile = 1;
@@ -341,7 +340,7 @@ uint8_t system_get_current_profile(void)
 //I'm not a system callback
 float system_master_volume_cb(float value, int event)
 {
-    //what is the master volume currently connected to? and convert it to a char
+   /* //what is the master volume currently connected to? and convert it to a char
     char channel_char[8];
     int_to_str(g_master_vol_port, channel_char, 4, 0);
 
@@ -369,7 +368,7 @@ float system_master_volume_cb(float value, int event)
         cli_command(value_char, CLI_DISCARD_RESPONSE);
         
         return value;
-    }
+    }*/
     //ERROR
     return 0;
 }
@@ -420,10 +419,6 @@ void system_update_menu_value(uint8_t item_ID, uint16_t value)
         //sl input
         case MENU_ID_SL_IN: 
             g_sl_in = value;
-        break;
-        //master volume target 
-        case MENU_ID_MASTER_VOL_PORT: 
-            g_master_vol_port = value;
         break;
         //stereo link output
         case MENU_ID_SL_OUT: 
@@ -722,64 +717,6 @@ void system_volume_cb(void *arg, int event)
         volume(item, event, source, min, max, step);
 }
 
-void system_master_vol_link_cb(void *arg, int event)
-{
-    menu_item_t *item = arg;
-
-    if (event == MENU_EV_ENTER)
-    {
-        if (g_master_vol_port < 2)
-        {
-            g_master_vol_port++;
-
-            //if stereo link is enabled, disable it
-            if (g_sl_out == 1)
-            {
-                g_sl_out = 0;
-                set_menu_item_value(MENU_ID_SL_IN, g_sl_in);
-            }
-        }
-        else
-        {
-            g_master_vol_port = 0;
-            //if value is 0 (link to 1&2) we must also turn on stereo link fo the output
-            g_sl_out = 1;
-            set_menu_item_value(MENU_ID_SL_OUT, g_sl_out);
-
-            //also set the gains to the same value
-            char value_bfr[8] = {};
-            float_to_str(g_gains_volumes[OUT1_VOLUME - VOLUME_ID], value_bfr, 8, 1);
-            cli_command("mod-amixer out 0 xvol ", CLI_CACHE_ONLY);
-            cli_command(value_bfr, CLI_DISCARD_RESPONSE);
-            //keep everything in sync
-            g_gains_volumes[OUT2_VOLUME - VOLUME_ID] = g_gains_volumes[OUT1_VOLUME - VOLUME_ID];
-
-            naveg_update_gain(DISPLAY_RIGHT, OUT2_VOLUME, g_gains_volumes[OUT1_VOLUME - VOLUME_ID], 0, 78);
-
-            system_save_gains_cb(NULL, MENU_EV_ENTER);
-        }
-        set_menu_item_value(MENU_ID_MASTER_VOL_PORT, g_master_vol_port);
-    }
-
-    char str_bfr[4];
-    switch (g_master_vol_port)
-    {
-        case 0:
-            strcpy(str_bfr,"1&2");
-        break;
-        case 1:
-            strcpy(str_bfr,"1");
-        break;
-        case 2:
-            strcpy(str_bfr,"2");
-        break;
-    }
-    add_chars_to_menu_name(item, str_bfr);
-
-    //the whole menu can be changed, lets update everything
-    if (event == MENU_EV_ENTER) naveg_menu_refresh(DISPLAY_RIGHT);
-}
-
 void system_banks_cb(void *arg, int event)
 {
     UNUSED_PARAM(arg);
@@ -1045,22 +982,14 @@ void system_sl_out_cb (void *arg, int event)
             cli_command(value_bfr, CLI_DISCARD_RESPONSE);
             //keep everything in sync
             g_gains_volumes[OUT2_VOLUME - VOLUME_ID] = g_gains_volumes[OUT1_VOLUME - VOLUME_ID];
-            
-            //we also need to change the master volume link to 0 (1&2)
-            g_master_vol_port = 0;
 
             naveg_update_gain(DISPLAY_RIGHT, OUT2_VOLUME, g_gains_volumes[OUT1_VOLUME - VOLUME_ID], 0, 78);
 
             system_save_gains_cb(NULL, MENU_EV_ENTER);
         }
-        else 
-        {
+        else {
             g_sl_out = 0;
-
-            //we must change the master volume link as wel to channel 1 =1 
-            g_master_vol_port = 1;
         }
-        set_menu_item_value(MENU_ID_MASTER_VOL_PORT, g_master_vol_port);
         set_menu_item_value(MENU_ID_SL_OUT, g_sl_out);
     }
 
