@@ -306,6 +306,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define DISP_CONTRAST_L_ID  DEVICE_SETTINGS_ID + 7
 #define DISP_CONTRAST_R_ID  DEVICE_SETTINGS_ID + 8
 #define LED_BRIGHTNESS_ID   DEVICE_SETTINGS_ID + 9
+#define USB_B_MODE_ID       DEVICE_SETTINGS_ID + 10
 
 #define BLUETOOTH_DISCO_ID  BLUETOOTH_ID+2
 
@@ -361,6 +362,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"ADDRESS:",                        MENU_NONE,      BLUETOOTH_ID+5,       BLUETOOTH_ID,       NULL                       , 0},  \
     {"DEVICE SETTINGS",                 MENU_LIST,      DEVICE_SETTINGS_ID,   SYSTEM_ID,          NULL                       , 0},  \
     {"< BACK TO SYSTEM",                MENU_RETURN,    DEVICE_SETTINGS_ID+1, DEVICE_SETTINGS_ID, NULL                       , 0},  \
+    {"USB-B MODE",                      MENU_SET,       USB_B_MODE_ID,        DEVICE_SETTINGS_ID, system_usb_b_cb            , 0},  \
     {"DISPLAY BRIGHTNESS",              MENU_TOGGLE,    DISP_BL_ID,           DEVICE_SETTINGS_ID, system_display_cb          , 0},  \
     {"DISPLAY CONTRAST LEFT",           MENU_SET,       DISP_CONTRAST_L_ID,   DEVICE_SETTINGS_ID, system_display_contrast_lcb, 0},  \
     {"DISPLAY CONTRAST RIGHT",          MENU_SET,       DISP_CONTRAST_R_ID,   DEVICE_SETTINGS_ID, system_display_contrast_rcb, 0},  \
@@ -417,6 +419,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {HP_CV_OUTP, "Set output to HP", HP_CV_POPUP_TXT}, \
     {HP_CV_OUTP+1, "Set output to CV", HP_CV_POPUP_TXT}, \
     {POT_CALL_ID, "knob calibration mode", "enter knob calibration mode?\nthis mode is used to\ncalibrate the range of the\nanalog potentiometers.\nThis mode locks the menu\nfrom other actions temporarily"}, \
+    {USB_B_MODE_ID, "Change USB mode", "\n\nChanging USB modes requires a device reboot\n\nreboot now?"},  \
 
 #define MENU_LINE_CHARS     31
 

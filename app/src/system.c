@@ -108,6 +108,7 @@ int16_t g_display_contrast_left = -1;
 int16_t g_display_contrast_right = -1;
 int8_t g_page_mode = -1;
 int8_t g_led_brightness = -1;
+int g_usb_mode = -1;
 
 /*
 ************************************************************************************************************************
@@ -1808,4 +1809,79 @@ void system_led_brightness_cb(void *arg, int event)
     
     //this setting changes just 1 item
     if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);   
+}
+
+void system_usb_b_cb(void *arg, int event)
+{
+    menu_item_t *item = arg;
+
+    //first time, fetch value
+    if (g_usb_mode == -1)
+    {
+        sys_comm_set_response_cb(recieve_sys_value, item);
+
+        sys_comm_send(CMD_SYS_USB_MODE, NULL);
+        sys_comm_wait_response();
+
+        g_usb_mode = item->data.value;
+        item->data.selected = g_usb_mode;
+        item->data.min = 0;
+        item->data.max = 2;
+        item->data.list_count = 2;
+        item->data.hover = 1;
+
+        naveg_set_reboot_value(g_usb_mode);
+    }
+
+    //if clicked and YES was selected from the pop-up
+    if ((event == MENU_EV_ENTER) && (item->data.hover == 0))
+    {
+        g_usb_mode = item->data.value;
+        item->data.selected = g_usb_mode;
+
+        //set the value
+        char str_buf[8];
+        int_to_str(item->data.value, str_buf, 4, 0);
+        str_buf[1] = 0;
+
+        //send value
+        sys_comm_send(CMD_SYS_USB_MODE, str_buf);
+        sys_comm_wait_response();
+
+        //tell the system to reboot
+        sys_comm_send(CMD_SYS_REBOOT, NULL);
+    }
+    //cancel, reset widget
+    else if ((event == MENU_EV_ENTER) && (item->data.hover == 1)) {
+        item->data.selected = g_usb_mode;
+        item->data.value = g_usb_mode;
+    }
+
+    if (event == MENU_EV_NONE)
+        item->data.value = g_usb_mode;
+
+    if (event == MENU_EV_DOWN)
+        item->data.value++;
+    else if (event == MENU_EV_UP)
+        item->data.value--;
+
+    if (item->data.value > item->data.max)
+        item->data.value = item->data.max;
+    if (item->data.value < item->data.min)
+        item->data.value = item->data.min;
+
+    char bfr[20];
+    switch ((int)item->data.value)
+    {
+        case 0:
+            strcpy(bfr, "NETWORK (DEFAULT)");
+        break;
+        case 1:
+            strcpy(bfr, "NET+MIDI");
+        break;
+        case 2:
+            strcpy(bfr, "NET+MIDI (WINDOWS)");
+        break;
+    }
+    add_chars_to_menu_name(item, bfr);
 }

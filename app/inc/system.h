@@ -128,6 +128,9 @@ void system_pot_callibration(void *arg, int event);
 void system_page_mode_cb(void *arg, int event);
 void system_led_brightness_cb(void *arg, int event);
 
+//set the USB B mode of the device, NEEDS A REBOOT
+void system_usb_b_cb(void *arg, int event);
+
 /*
 ************************************************************************************************************************
 *           CONFIGURATION ERRORS

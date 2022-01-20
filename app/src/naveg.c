@@ -113,6 +113,7 @@ static uint8_t g_lock_potentiometers = 1;
 //default scrolling direction, will only change and set back once needed
 static uint8_t g_scroll_dir = 1;
 static uint8_t g_page_mode = 0;
+static uint8_t g_reboot_value = 0;
 
 // only disabled after "boot" command received
 bool g_self_test_mode = true;
@@ -1836,7 +1837,56 @@ static void menu_enter(uint8_t display_id)
     }
     else if ((item->desc->type == MENU_VOL) || (item->desc->type == MENU_SET))
     {
-        if (display_id)
+        if (item->desc->id == USB_B_MODE_ID) {
+            static uint8_t value_toggle = 0, popup_toggle = 0;
+            if (value_toggle == 0) {
+                g_reboot_value = (int)item->data.value;
+                value_toggle = 1;
+            }
+            else {
+                if (g_reboot_value != (int)item->data.value) {
+                    //now do popup
+                    item->desc->type = MENU_CONFIRM;
+
+                    item->data.popup_content = NULL;
+
+                    // highlights the default button
+                    item->data.hover = 1;
+
+                    // defines the buttons count
+                    item->data.list_count = 2;
+
+                    // locates the popup menu
+                    i = 0;
+                    while (g_menu_popups[i].popup_content)
+                    {
+                        if (item->desc->id == g_menu_popups[i].menu_id)
+                        {
+                            item->data.popup_content = g_menu_popups[i].popup_content;
+                            item->data.popup_header = g_menu_popups[i].popup_header;
+                        }
+
+                        i++;
+                    }
+
+                    if (popup_toggle) {
+                        item->desc->action_cb(item, MENU_EV_ENTER);
+                    }
+                    else {
+                        popup_toggle = 1;
+                    }
+                }
+                else {
+                    //resets the menu node
+                    item = g_current_menu->data;
+                    g_current_item = item;
+
+                    value_toggle = 0;
+                }
+            }
+        }
+
+        else if (display_id)
         {
             static uint8_t toggle = 0;
             if (toggle == 0)
@@ -4014,4 +4064,9 @@ void naveg_turn_on_pagination_leds(void)
 menu_item_t *naveg_get_menu_item_by_ID(uint16_t menu_id)
 {
     return get_menu_node_by_ID(menu_id)->data;
+}
+
+void naveg_set_reboot_value(uint8_t boot_value)
+{
+    g_reboot_value = boot_value;
 }
