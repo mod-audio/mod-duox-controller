@@ -60,13 +60,35 @@
 */
 
 // system menu callbacks
-void system_update_menu_value(uint8_t item_ID, uint16_t value);
+//used when opening profiles menu
 uint8_t system_get_current_profile(void);
-uint8_t master_volume(int event, int step);
+//used when changing the master volume from control mode
+float system_master_volume_cb(float value, int event);
+//used when a gain item is closed
+void system_save_gains_cb(void *arg, int event);
+//called from various places in the system to change a menu item value
+void system_update_menu_value(uint8_t item_ID, uint16_t value);
+
+//used to save or reset the current loaded PB
 void system_pedalboard_cb(void *arg, int event);
+//used for all bluetooth actions
 void system_bluetooth_cb(void *arg, int event);
-void system_input_cb(void *arg, int event);
-void system_output_cb(void *arg, int event);
+
+//control for input 1 + 2
+void system_inp_0_volume_cb(void *arg, int event);
+//control for input 1
+void system_inp_1_volume_cb(void *arg, int event);
+//control for input 2
+void system_inp_2_volume_cb(void *arg, int event);
+//control for output 1 + 2
+void system_outp_0_volume_cb(void *arg, int event);
+//control for output 1
+void system_outp_1_volume_cb(void *arg, int event);
+//control for output 2
+void system_outp_2_volume_cb(void *arg, int event);
+//control headphone volume
+void system_hp_volume_cb(void *arg, int event);
+
 void system_services_cb(void *arg, int event);
 void system_versions_cb(void *arg, int event);
 void system_release_cb(void *arg, int event);
@@ -74,7 +96,7 @@ void system_device_cb(void *arg, int event);
 void system_tag_cb(void *arg, int event);
 void system_upgrade_cb(void *arg, int event);
 void system_volume_cb(void *arg, int event);
-void system_save_gains_cb(void *arg, int event);
+
 void system_banks_cb(void *arg, int event);
 void system_display_cb(void *arg, int event);
 void system_display_contrast_lcb(void *arg, int event);
@@ -97,7 +119,7 @@ void system_load_pro_cb(void *arg, int event);
 void system_save_pro_cb(void *arg, int event);
 void system_master_vol_link_cb(void *arg, int event);
 void system_exp_mode_cb(void *arg, int event);
-float system_master_volume_cb(float value, int event);
+
 void system_master_volume_link(uint8_t link_value);
 void system_qbp_channel_cb (void *arg, int event);
 void system_hide_actuator_cb(void *arg, int event);

@@ -84,7 +84,6 @@ char *option_disabled = "[ ]";
 ************************************************************************************************************************
 */
 
-float g_gains_volumes[5] = {-1, -1, -1, -1, -1};
 uint8_t g_q_bypass = 0;
 uint8_t g_bypass[4] = {};
 uint8_t g_current_profile = 1;
@@ -163,7 +162,6 @@ void add_chars_to_menu_name(menu_item_t *item, char *chars_to_add)
         strcat(item->name, chars_to_add);
 }
 
-//TODO CHECK IF WE CAN USE DYNAMIC MEMORY HERE
 void set_item_value(char *command, uint16_t value)
 {
     uint8_t i;
@@ -215,115 +213,33 @@ static void set_menu_item_value(uint16_t menu_id, uint16_t value)
     ui_comm_webgui_send(buffer, i);
 }
 
-static void volume(menu_item_t *item, int event, const char *source, float min, float max, float step)
+static void recieve_sys_value(void *data, menu_item_t *item)
 {
-    static uint32_t last_message_time = 0; 
-    char value[8] = {};
-    static const char *response = NULL;
-    cli_command(NULL, CLI_DISCARD_RESPONSE);
-    uint8_t dir = (source[0] == 'i') ? 0 : 1;
+    char **values = data;
 
-    uint32_t message_time = hardware_timestamp();
+    //protocol ok
+    if (atoi(values[1]) == 0)
+        item->data.value = atof(values[2]);
+}
 
-    if (((event == MENU_EV_UP) || (event == MENU_EV_DOWN)) && (dir ? g_sl_out : g_sl_in) && (item->desc->id != HP_VOLUME))
-    {
-        //change volume for both
-        //PGA (input)
-        if (!dir)
-        {
-            if (message_time - last_message_time > VOL_MESSAGE_TIMEOUT)
-            {
-                int_to_str(item->data.value, value, 8, 0);
-                cli_command("mod-amixer in 0 xvol ", CLI_CACHE_ONLY);
-                cli_command(value, CLI_DISCARD_RESPONSE);
+static void update_gain_item_value(uint8_t menu_id, float value)
+{
+    menu_item_t *item = naveg_get_menu_item_by_ID(menu_id);
+    item->data.value = value;
 
-                last_message_time = message_time;
-            }
-        }
-        //DAC (output)
-        else
-        {
-            if (message_time - last_message_time > VOL_MESSAGE_TIMEOUT)
-            {
-                int_to_str(item->data.value, value, 8, 0);
-                cli_command("mod-amixer out 0 xvol ", CLI_CACHE_ONLY);
-                cli_command(value, CLI_DISCARD_RESPONSE);
+    static char str_bfr[8] = {};
+    float value_bfr = 0;
 
-                last_message_time = message_time;
-            }
-        }
+    if ((menu_id == IN1_VOLUME) || (menu_id == IN2_VOLUME)) {
+        value_bfr = MAP(item->data.value, item->data.min, item->data.max, -12, 25);
     }
-    else
-    {
-    	if ((event == MENU_EV_ENTER) || (event == MENU_EV_NONE))
-    	{
-    		char str[LINE_BUFFER_SIZE+1];
-
-            if (event == MENU_EV_ENTER)
-            {
-                cli_command("mod-amixer ", CLI_CACHE_ONLY);
-                cli_command(source, CLI_CACHE_ONLY);
-                cli_command(" xvol", CLI_CACHE_ONLY);
-                response = cli_command(NULL, CLI_RETRIEVE_RESPONSE);
-                strcpy(str, response);
-                item->data.value = atof(str);
-            }
-            else
-            {
-                item->data.value = g_gains_volumes[item->desc->id - VOLUME_ID];
-            }
-
-            item->data.min = min;
-            item->data.max = max;
-            item->data.step = step;
-        }
-        else if ((event == MENU_EV_UP) ||(event == MENU_EV_DOWN))
-        {
-            float_to_str(item->data.value, value, 8, 1);
-            cli_command("mod-amixer ", CLI_CACHE_ONLY);
-            cli_command(source, CLI_CACHE_ONLY);
-            cli_command(" xvol ", CLI_CACHE_ONLY);
-            cli_command(value, CLI_DISCARD_RESPONSE);
-        }
-    }
-
-    //save gains globaly for stereo link functions
-    g_gains_volumes[item->desc->id - VOLUME_ID] = item->data.value;
-
-    char str_bfr[10] = {};
-
-    //input
-    if (!dir) {
-        float value_bfr;
-        value_bfr = MAP(item->data.value, min, max, -12, 25);
-        float_to_str(value_bfr, str_bfr, 8, 2);
-    }
-    //output, headphones
     else {
-        float_to_str(item->data.value, str_bfr, 8, 2);
+        value_bfr = item->data.value;
     }
 
-    strcpy(item->name, item->desc->name);
-    uint8_t q;
-    uint8_t value_size = strlen(str_bfr);
-    uint8_t name_size = strlen(item->name);
-    for (q = 0; q < (31 - name_size - value_size - 3); q++)
-    {
-        strcat(item->name, " ");
-    }
-    strcat(item->name, str_bfr);
-    strcat(item->name, " dB");
-
-    //if stereo link is on we need to update the other menu item as well
-    if ((((event == MENU_EV_UP) || (event == MENU_EV_DOWN)) && (dir ? g_sl_out : g_sl_in))&& (item->desc->id != HP_VOLUME))
-    {
-        if (strchr(source, '1'))
-            naveg_update_gain(DISPLAY_RIGHT, item->desc->id + 1, item->data.value, min, max);
-        else
-            naveg_update_gain(DISPLAY_RIGHT, item->desc->id - 1, item->data.value, min, max);
-    }
-    
-    naveg_settings_refresh(DISPLAY_RIGHT);
+    float_to_str(value_bfr, str_bfr, 8, 2);
+    strcat(str_bfr, " dB");
+    add_chars_to_menu_name(item, str_bfr);
 }
 
 /*
@@ -335,9 +251,11 @@ static void volume(menu_item_t *item, int event, const char *source, float min, 
 uint8_t system_get_current_profile(void)
 {
     return g_current_profile;
+
+
+
 }
 
-//I'm not a system callback
 float system_master_volume_cb(float value, int event)
 {
    /* //what is the master volume currently connected to? and convert it to a char
@@ -373,7 +291,6 @@ float system_master_volume_cb(float value, int event)
     return 0;
 }
 
-//I SHOULD NOT BE HERE
 void system_save_gains_cb(void *arg, int event)
 {
     UNUSED_PARAM(arg);
@@ -415,14 +332,6 @@ void system_update_menu_value(uint8_t item_ID, uint16_t value)
         //quick bypass channel
         case MENU_ID_QUICK_BYPASS: 
             g_q_bypass = value;
-        break;
-        //sl input
-        case MENU_ID_SL_IN: 
-            g_sl_in = value;
-        break;
-        //stereo link output
-        case MENU_ID_SL_OUT: 
-            g_sl_out = value;
         break;
         //MIDI clock source
         case MENU_ID_MIDI_CLK_SOURCE: 
@@ -521,54 +430,381 @@ void system_bluetooth_cb(void *arg, int event)
     }
 }
 
-void system_input_cb(void *arg, int event)
+void system_inp_0_volume_cb(void *arg, int event)
 {
-    (void) arg;
+    menu_item_t *item = arg;
 
-    if (event == MENU_EV_ENTER)
+    char val_buffer[20];
+    uint8_t q;
+
+    if (event == MENU_EV_NONE)
     {
-        const char *response;
-        char resp[LINE_BUFFER_SIZE];
+        sys_comm_set_response_cb(recieve_sys_value, item);
 
-        response = cli_command("mod-amixer in xall", CLI_RETRIEVE_RESPONSE);
-        strncpy(resp, response, sizeof(resp)-1);
-        char **items = strarr_split(resp, '|');;
-
-        if (items)
-        {
-            g_gains_volumes[0] = atof(items[0]);
-            g_gains_volumes[1] = atof(items[1]);
-            g_cv_in_mode = atoi(items[2]);
-            g_exp_mode = atoi(items[3]);
-            FREE(items);
-        } 
+        q = copy_command(val_buffer, "0 1");
+        val_buffer[q] = 0;
         
+        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_wait_response();
+
+        item->data.min = 0.0f;
+        item->data.max = 74.0f;
     }
+    else if ((event == MENU_EV_UP) ||(event == MENU_EV_DOWN))
+    {
+        if (event == MENU_EV_UP)
+            item->data.value -= item->data.step;
+        else
+            item->data.value += item->data.step;
+
+        if (item->data.value > item->data.max)
+            item->data.value = item->data.max;
+        if (item->data.value < item->data.min)
+            item->data.value = item->data.min;
+
+        q = copy_command(val_buffer, "0 0 ");
+        update_gain_item_value(IN1_VOLUME, item->data.value);
+        update_gain_item_value(IN2_VOLUME, item->data.value);
+
+        // insert the value on buffer
+        q += float_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 1);
+        val_buffer[q] = 0;
+
+        sys_comm_set_response_cb(NULL, NULL);
+        ui_comm_webgui_set_response_cb(NULL, NULL);
+        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_wait_response();
+
+        item->data.step = 1.0f;
+    }
+
+    static char str_bfr[10] = {};
+    float scaled_val = MAP(item->data.value, item->data.min, item->data.max, -12, 25);
+    float_to_str(scaled_val, str_bfr, sizeof(str_bfr), 2);
+    strcat(str_bfr, " dB");
+    add_chars_to_menu_name(item, str_bfr);
+
+    item->data.step = 1.0f;
 }
 
-void system_output_cb(void *arg, int event)
+void system_inp_1_volume_cb(void *arg, int event)
 {
-    (void) arg;
-    
-    if (event == MENU_EV_ENTER)
+    menu_item_t *item = arg;
+
+    char val_buffer[20];
+    uint8_t q;
+
+    if (event == MENU_EV_NONE)
     {
-        const char *response;
-        char resp[LINE_BUFFER_SIZE];
+        sys_comm_set_response_cb(recieve_sys_value, item);
 
-        response = cli_command("mod-amixer out xall", CLI_RETRIEVE_RESPONSE);
-           
-        strncpy(resp, response, sizeof(resp)-1);
-        char **items = strarr_split(resp, '|');;
+        q = copy_command(val_buffer, "0 1");
+        val_buffer[q] = 0;
+        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_wait_response();
 
-        if (items)
-        {
-            g_gains_volumes[2] = atof(items[0]);
-            g_gains_volumes[3] = atof(items[1]);
-            g_gains_volumes[4] = atof(items[2]);
-            g_cv_out_mode = atoi(items[3]);
-            FREE(items);
-        } 
+        item->data.min = 0.0f;
+        item->data.max = 74.0f;
     }
+    else if ((event == MENU_EV_UP) ||(event == MENU_EV_DOWN))
+    {
+        if (event == MENU_EV_UP)
+            item->data.value -= item->data.step;
+        else
+            item->data.value += item->data.step;
+
+        if (item->data.value > item->data.max)
+            item->data.value = item->data.max;
+        if (item->data.value < item->data.min)
+            item->data.value = item->data.min;
+
+        q = copy_command(val_buffer, "0 1 ");
+
+        // insert the value on buffer
+        q += float_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 1);
+        val_buffer[q] = 0;
+
+        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_wait_response();
+
+        item->data.step = 1.0f;
+    }
+
+    static char str_bfr[10] = {};
+    float scaled_val = MAP(item->data.value, item->data.min, item->data.max, -12, 25);
+    float_to_str(scaled_val, str_bfr, sizeof(str_bfr), 2);
+    strcat(str_bfr, " dB");
+    add_chars_to_menu_name(item, str_bfr);
+
+    item->data.step = 1.0f;
+}
+
+void system_inp_2_volume_cb(void *arg, int event)
+{
+    menu_item_t *item = arg;
+
+    char val_buffer[20];
+    uint8_t q;
+
+    if (event == MENU_EV_NONE)
+    {
+        sys_comm_set_response_cb(recieve_sys_value, item);
+
+        q = copy_command(val_buffer, "0 2");
+        val_buffer[q] = 0;
+
+        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_wait_response();
+
+        item->data.min = 0.0f;
+        item->data.max = 74.0f;
+    }
+    else if ((event == MENU_EV_UP) ||(event == MENU_EV_DOWN))
+    {
+        if (event == MENU_EV_UP)
+            item->data.value -= item->data.step;
+        else
+            item->data.value += item->data.step;
+
+        if (item->data.value > item->data.max)
+            item->data.value = item->data.max;
+        if (item->data.value < item->data.min)
+            item->data.value = item->data.min;
+
+        q = copy_command(val_buffer, "0 2 ");
+
+        // insert the value on buffer
+        q += float_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 1);
+        val_buffer[q] = 0;
+
+        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_wait_response();
+
+        item->data.step = 1.0f;
+    }
+
+    static char str_bfr[10] = {};
+    float scaled_val = MAP(item->data.value, item->data.min, item->data.max, -12, 25);
+    float_to_str(scaled_val, str_bfr, sizeof(str_bfr), 2);
+    strcat(str_bfr, " dB");
+    add_chars_to_menu_name(item, str_bfr);
+
+    item->data.step = 1.0f;
+}
+
+void system_outp_0_volume_cb(void *arg, int event)
+{
+    menu_item_t *item = arg;
+
+    char val_buffer[20];
+    uint8_t q;
+
+    if (event == MENU_EV_NONE)
+    {
+        sys_comm_set_response_cb(recieve_sys_value, item);
+
+        q = copy_command(val_buffer, "1 1");
+        val_buffer[q] = 0;
+
+        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_wait_response();
+
+        item->data.min = -99.5f;
+        item->data.max = 0.0f;
+    }
+    else if ((event == MENU_EV_UP) ||(event == MENU_EV_DOWN))
+    {
+        if (item->data.value == 0.0)
+            item->data.step = 0.5;
+
+        if (event == MENU_EV_UP)
+            item->data.value -= item->data.step;
+        else
+            item->data.value += item->data.step;
+
+        if (item->data.value > item->data.max)
+            item->data.value = item->data.max;
+        if (item->data.value < item->data.min)
+            item->data.value = item->data.min;
+
+        q = copy_command(val_buffer, "1 0 ");
+        update_gain_item_value(OUT1_VOLUME, item->data.value);
+        update_gain_item_value(OUT2_VOLUME, item->data.value);
+
+        // insert the value on buffer
+        q += float_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 1);
+        val_buffer[q] = 0;
+
+        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_wait_response();
+
+        item->data.step = 1.0f;
+    }
+
+    static char str_bfr[10] = {};
+    float_to_str(item->data.value, str_bfr, sizeof(str_bfr), 2);
+    strcat(str_bfr, " dB");
+    add_chars_to_menu_name(item, str_bfr);
+
+    item->data.step = 1.0f;
+}
+
+void system_outp_1_volume_cb(void *arg, int event)
+{
+    menu_item_t *item = arg;
+
+    char val_buffer[20];
+    uint8_t q;
+
+    if (event == MENU_EV_NONE)
+    {
+        sys_comm_set_response_cb(recieve_sys_value, item);
+
+        q = copy_command(val_buffer, "1 1");
+        val_buffer[q] = 0;
+
+        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_wait_response();
+
+        item->data.min = -99.5f;
+        item->data.max = 0.0f;
+    }
+    else if ((event == MENU_EV_UP) ||(event == MENU_EV_DOWN))
+    {
+        if (item->data.value == 0.0)
+            item->data.step = 0.5;
+
+        if (event == MENU_EV_UP)
+            item->data.value -= item->data.step;
+        else
+            item->data.value += item->data.step;
+
+        if (item->data.value > item->data.max)
+            item->data.value = item->data.max;
+        if (item->data.value < item->data.min)
+            item->data.value = item->data.min;
+
+        q = copy_command(val_buffer, "1 1 ");
+
+        // insert the value on buffer
+
+        q += float_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 1);
+        val_buffer[q] = 0;
+
+        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_wait_response();
+
+        item->data.step = 1.0f;
+    }
+
+    static char str_bfr[10] = {};
+    float_to_str(item->data.value, str_bfr, sizeof(str_bfr), 2);
+    strcat(str_bfr, " dB");
+    add_chars_to_menu_name(item, str_bfr);
+    item->data.step = 1.0f;
+}
+
+void system_outp_2_volume_cb(void *arg, int event)
+{
+    menu_item_t *item = arg;
+
+    char val_buffer[20];
+    uint8_t q;
+
+    if (event == MENU_EV_NONE)
+    {
+        sys_comm_set_response_cb(recieve_sys_value, item);
+
+        q = copy_command(val_buffer, "1 2");
+        val_buffer[q] = 0;
+
+        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_wait_response();
+
+        item->data.min = -99.5f;
+        item->data.max = 0.0f;
+    }
+    else if ((event == MENU_EV_UP) ||(event == MENU_EV_DOWN))
+    {
+        if (item->data.value == 0.0)
+            item->data.step = 0.5;
+
+        if (event == MENU_EV_UP)
+            item->data.value -= item->data.step;
+        else
+            item->data.value += item->data.step;
+
+        if (item->data.value > item->data.max)
+            item->data.value = item->data.max;
+        if (item->data.value < item->data.min)
+            item->data.value = item->data.min;
+
+        q = copy_command(val_buffer, "1 2 ");
+
+        // insert the value on buffer
+        q += float_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 1);
+        val_buffer[q] = 0;
+
+        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_wait_response();
+
+        item->data.step = 1.0f;
+    }
+
+    static char str_bfr[10] = {};
+    float_to_str(item->data.value, str_bfr, sizeof(str_bfr), 2);
+    strcat(str_bfr, " dB");
+    add_chars_to_menu_name(item, str_bfr);
+
+    item->data.step = 1.0f;
+}
+
+void system_hp_volume_cb(void *arg, int event)
+{
+    menu_item_t *item = arg;
+
+    char val_buffer[20];
+    uint8_t q=0;
+
+    if (event == MENU_EV_NONE)
+    {
+        sys_comm_set_response_cb(recieve_sys_value, item);
+
+        sys_comm_send(CMD_SYS_HP_GAIN, NULL);
+        sys_comm_wait_response();
+
+        item->data.min = -33.0f;
+        item->data.max = 12.0f;
+    }
+    else if ((event == MENU_EV_UP) ||(event == MENU_EV_DOWN))
+    {
+        if (event == MENU_EV_UP)
+            item->data.value -= item->data.step;
+        else
+            item->data.value += item->data.step;
+
+        if (item->data.value > item->data.max)
+            item->data.value = item->data.max;
+        if (item->data.value < item->data.min)
+            item->data.value = item->data.min;
+
+        // insert the value on buffer
+        q += float_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 1);
+        val_buffer[q] = 0;
+
+        sys_comm_send(CMD_SYS_HP_GAIN, val_buffer);
+        sys_comm_wait_response();
+
+        item->data.step = 3.0f;
+    }
+
+    static char str_bfr[10] = {};
+    float scaled_val = item->data.value;
+    float_to_str(scaled_val, str_bfr, sizeof(str_bfr), 2);
+    strcat(str_bfr, " dB");
+    add_chars_to_menu_name(item, str_bfr);
+
+    item->data.step = 3.0f;
 }
 
 void system_services_cb(void *arg, int event)
@@ -665,56 +901,6 @@ void system_upgrade_cb(void *arg, int event)
             }
         }
     }
-}
-
-void system_volume_cb(void *arg, int event)
-{
-    menu_item_t *item = arg;
-    float min, max, step;
-    const char *source;
-
-        switch (item->desc->id)
-        {
-            case IN1_VOLUME:
-                source = "in 1";
-                min = 0;
-                max = 74.0;
-                step = 1;
-                break;
-
-            case IN2_VOLUME:
-                source = "in 2";
-                min = 0;
-                max = 74.0;
-                step = 1;
-                break;
-
-            case OUT1_VOLUME:
-                source = "out 1";
-                min = -99.5;
-                max = 0.0;
-                step = 2.0;
-                break;
-
-            case OUT2_VOLUME:
-                source = "out 2";
-                min = -99.5;
-                max = 0.0;
-                step = 2.0;
-                break;
-
-            case HP_VOLUME:
-                source = "hp";
-                min = -33.0;
-                max = 12.0;
-                step = 3.0;
-                break;
-            default:
-                return;
-                break;
-        }
-
-        volume(item, event, source, min, max, step);
 }
 
 void system_banks_cb(void *arg, int event)
@@ -927,79 +1113,6 @@ void system_lock_pots_cb(void *arg, int event)
     
     //this setting changes just 1 item
     if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);    
-}
-
-void system_sl_in_cb (void *arg, int event)
-{
-    menu_item_t *item = arg;
-
-    if (event == MENU_EV_ENTER)
-    {
-        if (g_sl_in == 0) g_sl_in = 1;
-        else g_sl_in = 0;
-
-        set_menu_item_value(MENU_ID_SL_IN, g_sl_in);
-
-        //if we toggled to 1, we need to change gain 2 to  gain 1
-        char value_bfr[8] = {};
-        if (g_sl_in == 1)
-        {
-            float_to_str(g_gains_volumes[IN1_VOLUME - VOLUME_ID], value_bfr, 8, 1);
-            cli_command("mod-amixer in 0 xvol ", CLI_CACHE_ONLY);
-            cli_command(value_bfr, CLI_DISCARD_RESPONSE);
-            //keep everything in sync
-            g_gains_volumes[IN2_VOLUME - VOLUME_ID] = g_gains_volumes[IN1_VOLUME - VOLUME_ID];
-
-            naveg_update_gain(DISPLAY_RIGHT, IN2_VOLUME, g_gains_volumes[IN1_VOLUME - VOLUME_ID], 0, 78);
-
-            system_save_gains_cb(NULL, MENU_EV_ENTER);
-        }
-    }
-
-    char str_bfr[4] = {};
-    if (g_sl_in == 1) strcpy(str_bfr,option_enabled);
-    else strcpy(str_bfr,option_disabled);   
-    add_chars_to_menu_name(item, str_bfr);
-
-    //gains can change because of this, update the menu
-    if (event == MENU_EV_ENTER) naveg_settings_refresh(DISPLAY_RIGHT);
-}
-
-void system_sl_out_cb (void *arg, int event)
-{
-    menu_item_t *item = arg;
-
-    if (event == MENU_EV_ENTER)
-    {
-        if (g_sl_out == 0)
-        {   
-            g_sl_out = 1;
-            
-            //also set the gains to the same value
-            char value_bfr[8] = {};
-            float_to_str(g_gains_volumes[OUT1_VOLUME - VOLUME_ID], value_bfr, 8, 1);
-            cli_command("mod-amixer out 0 xvol ", CLI_CACHE_ONLY);
-            cli_command(value_bfr, CLI_DISCARD_RESPONSE);
-            //keep everything in sync
-            g_gains_volumes[OUT2_VOLUME - VOLUME_ID] = g_gains_volumes[OUT1_VOLUME - VOLUME_ID];
-
-            naveg_update_gain(DISPLAY_RIGHT, OUT2_VOLUME, g_gains_volumes[OUT1_VOLUME - VOLUME_ID], 0, 78);
-
-            system_save_gains_cb(NULL, MENU_EV_ENTER);
-        }
-        else {
-            g_sl_out = 0;
-        }
-        set_menu_item_value(MENU_ID_SL_OUT, g_sl_out);
-    }
-
-    char str_bfr[4] = {};
-    if (g_sl_out == 1) strcpy(str_bfr,option_enabled);
-    else strcpy(str_bfr,option_disabled);   
-    add_chars_to_menu_name(item, str_bfr);
-
-    //gains can change because of this, update the whole menu
-    if (event == MENU_EV_ENTER) naveg_menu_refresh(DISPLAY_RIGHT);
 }
 
 void system_tuner_cb (void *arg, int event)
@@ -1439,11 +1552,6 @@ void system_cv_exp_cb (void *arg, int event)
 {
     menu_item_t *item = arg;
 
-    if (g_cv_in_mode == -1)
-    {
-        system_input_cb(NULL, MENU_EV_ENTER);
-    }
-
     if (event == MENU_EV_ENTER && item->data.hover == 0)
     {
         if (g_cv_in_mode == 0) g_cv_in_mode = 1;
@@ -1462,11 +1570,6 @@ void system_exp_mode_cb (void *arg, int event)
 {
     menu_item_t *item = arg;
 
-    if (g_cv_in_mode == -1)
-    {
-        system_input_cb(NULL, MENU_EV_ENTER);
-    }
-
     if (event == MENU_EV_ENTER && item->data.hover == 0)
     {
         if (g_exp_mode == 0) g_exp_mode = 1;
@@ -1484,11 +1587,6 @@ void system_exp_mode_cb (void *arg, int event)
 void system_cv_hp_cb (void *arg, int event)
 {
     menu_item_t *item = arg;
-
-    if (g_cv_in_mode == -1)
-    {
-        system_output_cb(NULL, MENU_EV_ENTER);
-    }
 
     if (event == MENU_EV_ENTER && item->data.hover == 0)
     {

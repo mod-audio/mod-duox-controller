@@ -169,6 +169,8 @@ void naveg_reload_display(void);
 
 uint8_t naveg_get_actuator_type(uint8_t hw_id);
 
+menu_item_t *naveg_get_menu_item_by_ID(uint16_t menu_id);
+
 /*
 ************************************************************************************************************************
 *           CONFIGURATION ERRORS

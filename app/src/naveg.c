@@ -1890,18 +1890,14 @@ static void menu_up(uint8_t display_id)
 {
     menu_item_t *item = (display_id) ? g_current_item : g_current_main_item;
 
-    if ((item->desc->type == MENU_VOL) || (item->desc->type == MENU_SET))
+    if (item->desc->type == MENU_SET)
     {
-        if ( ((item->desc->id == OUT1_VOLUME)||(item->desc->id == OUT2_VOLUME)) && (item->data.value == 0.0))
-            item->data.value -= 0.5;
-        else {
-            //substract one, if we reach the limit, value becomes the limit
-            if ((item->data.value -= (item->data.step)) < item->data.min) {
-                item->data.value = item->data.min;
-            }
+        //substract one, if we reach the limit, value becomes the limit
+        if ((item->data.value -= (item->data.step)) < item->data.min) {
+            item->data.value = item->data.min;
         }
     }
-    else
+    else if (item->desc->type != MENU_VOL)
     {
         if (item->data.hover > 0) {
             item->data.hover--;
@@ -1919,15 +1915,14 @@ static void menu_down(uint8_t display_id)
 {
     menu_item_t *item = (display_id) ? g_current_item : g_current_main_item;
 
-    if ((item->desc->type == MENU_VOL) || (item->desc->type == MENU_SET))
+    if (item->desc->type == MENU_SET)
     {
         //up one, if we reach the limit, value becomes the limit
-        if ((item->data.value += (item->data.step)) > item->data.max)
-        {
+        if ((item->data.value += (item->data.step)) > item->data.max) {
             item->data.value = item->data.max;
         }
     }
-    else
+    else if (item->desc->type != MENU_VOL)
     {
         if (item->data.hover < (item->data.list_count - 1))
             item->data.hover++;
@@ -1997,6 +1992,58 @@ static void reset_menu_hover(node_t *menu_node)
             item->data.hover = 0;
         reset_menu_hover(node);
     }
+}
+
+node_t *get_menu_node_by_ID(uint8_t menu_id)
+{
+    node_t *node = g_menu->first_child->first_child;
+
+    //make sure we have all menu value's updated
+    node_t *child_nodes, *grandchild_nodes;
+    menu_item_t *item_child, *item_grandchild;
+
+    while(node)
+    {
+        item_child = node->data;
+        if (item_child->desc->id == menu_id)
+        {
+            return node;
+        }
+
+        if (node->first_child)
+        {
+            child_nodes = node->first_child;
+            while(child_nodes)
+            {
+                item_child = child_nodes->data;
+                if (item_child->desc->id == menu_id)
+                {
+                    return child_nodes;
+                }
+
+                if (child_nodes->first_child)
+                {
+                    grandchild_nodes = child_nodes->first_child;
+                    while(grandchild_nodes)
+                    {
+                        item_grandchild = grandchild_nodes->data;
+                        if (item_grandchild->desc->id == menu_id)
+                        {
+                            return grandchild_nodes;
+                        }
+
+                        grandchild_nodes = grandchild_nodes->next;
+                    }
+                }
+
+                child_nodes = child_nodes->next;
+            }
+        }
+
+        node = node->next;
+    }
+
+    return NULL;
 }
 
 /*
@@ -3962,4 +4009,9 @@ void naveg_turn_on_pagination_leds(void)
         else
             ledz_set_state(led, LED_OFF, LED_UPDATE);
     }
+}
+
+menu_item_t *naveg_get_menu_item_by_ID(uint16_t menu_id)
+{
+    return get_menu_node_by_ID(menu_id)->data;
 }
