@@ -145,21 +145,21 @@ static void update_status(char *item_to_update, const char *response)
 
 void add_chars_to_menu_name(menu_item_t *item, char *chars_to_add)
 {
-        //if no good data
-        if ((!chars_to_add)||(!item)) return; 
+    //if no good data
+    if ((!chars_to_add)||(!item)) return;
 
-        //always copy the clean name
-        strcpy(item->name, item->desc->name);
-        uint8_t value_size = strlen(chars_to_add);
-        uint8_t name_size = strlen(item->name);
-        uint8_t q;
-        //add spaces until so we allign the chars_to_add to the left
-        for (q = 0; q < (MENU_LINE_CHARS - name_size - value_size); q++)
-        {
-            strcat(item->name, " ");
-        }
+    //always copy the clean name
+    strcpy(item->name, item->desc->name);
+    uint8_t value_size = strlen(chars_to_add);
+    uint8_t name_size = strlen(item->name);
+    uint8_t q;
+    //add spaces until so we allign the chars_to_add to the left
+    for (q = 0; q < (MENU_LINE_CHARS - name_size - value_size); q++)
+    {
+        strcat(item->name, " ");
+    }
 
-        strcat(item->name, chars_to_add);
+    strcat(item->name, chars_to_add);
 }
 
 void set_item_value(char *command, uint16_t value)
@@ -222,6 +222,37 @@ static void recieve_sys_value(void *data, menu_item_t *item)
         item->data.value = atof(values[2]);
 }
 
+static void recieve_sys_cv_value(void *data, menu_item_t *item)
+{
+    char **values = data;
+
+    //protocol ok
+    if (atoi(values[1]) == 0) {
+        switch (item->desc->id) {
+            case EXP_CV_INP:
+                if (strcmp(values[2], "cv"))
+                    item->data.value = 1;
+                else
+                    item->data.value = 0;
+            break;
+
+            case EXP_MODE:
+                if (strcmp(values[2], "ring"))
+                    item->data.value = 0;
+                else
+                    item->data.value = 1;
+            break;
+
+            case HP_CV_OUTP:
+                if (strcmp(values[2], "cv"))
+                    item->data.value = 0;
+                else
+                    item->data.value = 1;
+            break;
+        }
+    }
+}
+
 static void update_gain_item_value(uint8_t menu_id, float value)
 {
     menu_item_t *item = naveg_get_menu_item_by_ID(menu_id);
@@ -251,9 +282,6 @@ static void update_gain_item_value(uint8_t menu_id, float value)
 uint8_t system_get_current_profile(void)
 {
     return g_current_profile;
-
-
-
 }
 
 float system_master_volume_cb(float value, int event)
@@ -1548,18 +1576,41 @@ void system_save_pro_cb(void *arg, int event)
 }
 
 //CV stuff
-void system_cv_exp_cb (void *arg, int event)
+void system_cv_exp_cb(void *arg, int event)
 {
     menu_item_t *item = arg;
+    char val_buffer[20];
 
-    if (event == MENU_EV_ENTER && item->data.hover == 0)
+    if (event == MENU_EV_NONE)
     {
-        if (g_cv_in_mode == 0) g_cv_in_mode = 1;
-        else g_cv_in_mode = 0;
-        set_menu_item_value(MENU_ID_EXP_CV_INPUT, g_cv_in_mode);
+        sys_comm_set_response_cb(recieve_sys_cv_value, item);
+
+        sys_comm_send(CMD_SYS_CVI_MODE, NULL);
+        sys_comm_wait_response();
+
+        item->data.min = 0;
+        item->data.max = 1;
     }
+    else if (event == MENU_EV_ENTER && item->data.hover == 0)
+    {
+        item->data.value = 1 - item->data.value;
+
+        if (item->data.value > item->data.max)
+            item->data.value = item->data.max;
+        if (item->data.value < item->data.min)
+            item->data.value = item->data.min;
+
+        // insert the value on buffer
+        uint8_t q = 0;
+        q = int_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 0);
+        val_buffer[q] = 0;
+
+        sys_comm_send(CMD_SYS_CVI_MODE, val_buffer);
+        sys_comm_wait_response();
+    }
+
     char str_bfr[15] = {};
-    strcat(str_bfr,(g_cv_in_mode ? "EXP" : "CV"));
+    strcat(str_bfr,(item->data.value ? "EXP" : "CV"));
     add_chars_to_menu_name(item, str_bfr);
 
     //this setting changes just 1 item
@@ -1569,15 +1620,38 @@ void system_cv_exp_cb (void *arg, int event)
 void system_exp_mode_cb (void *arg, int event)
 {
     menu_item_t *item = arg;
+    char val_buffer[20];
 
-    if (event == MENU_EV_ENTER && item->data.hover == 0)
+    if (event == MENU_EV_NONE)
     {
-        if (g_exp_mode == 0) g_exp_mode = 1;
-        else g_exp_mode = 0;
-        set_menu_item_value(MENU_ID_EXP_MODE, g_exp_mode);
+        sys_comm_set_response_cb(recieve_sys_cv_value, item);
+
+        sys_comm_send(CMD_SYS_EXP_MODE, NULL);
+        sys_comm_wait_response();
+
+        item->data.min = 0;
+        item->data.max = 1;
     }
+    else if (event == MENU_EV_ENTER && item->data.hover == 0)
+    {
+        item->data.value = 1 - item->data.value;
+
+        if (item->data.value > item->data.max)
+            item->data.value = item->data.max;
+        if (item->data.value < item->data.min)
+            item->data.value = item->data.min;
+
+        // insert the value on buffer
+        uint8_t q = 0;
+        q = int_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 0);
+        val_buffer[q] = 0;
+
+        sys_comm_send(CMD_SYS_EXP_MODE, val_buffer);
+        sys_comm_wait_response();
+    }
+
     char str_bfr[15] = {};
-    strcat(str_bfr,(g_exp_mode ? "Signal on Ring" : "Signal on Tip"));
+    strcat(str_bfr,(item->data.value  ? "Signal on Ring" : "Signal on Tip"));
     add_chars_to_menu_name(item, str_bfr);
 
     //this setting changes just 1 item
@@ -1587,15 +1661,38 @@ void system_exp_mode_cb (void *arg, int event)
 void system_cv_hp_cb (void *arg, int event)
 {
     menu_item_t *item = arg;
+    char val_buffer[20];
 
-    if (event == MENU_EV_ENTER && item->data.hover == 0)
+    if (event == MENU_EV_NONE)
     {
-        if (g_cv_out_mode == 0) g_cv_out_mode = 1;
-        else g_cv_out_mode = 0;
-        set_menu_item_value(MENU_ID_HP_CV_OUTPUT, g_cv_out_mode);
+        sys_comm_set_response_cb(recieve_sys_cv_value, item);
+
+        sys_comm_send(CMD_SYS_CVO_MODE, NULL);
+        sys_comm_wait_response();
+
+        item->data.min = 0;
+        item->data.max = 1;
     }
+    else if (event == MENU_EV_ENTER && item->data.hover == 0)
+    {
+        item->data.value = 1 - item->data.value;
+
+        if (item->data.value > item->data.max)
+            item->data.value = item->data.max;
+        if (item->data.value < item->data.min)
+            item->data.value = item->data.min;
+
+        // insert the value on buffer
+        uint8_t q = 0;
+        q = int_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 0);
+        val_buffer[q] = 0;
+
+        sys_comm_send(CMD_SYS_CVO_MODE, val_buffer);
+        sys_comm_wait_response();
+    }
+
     char str_bfr[15] = {};
-    strcat(str_bfr,(g_cv_out_mode ? "CV" : "Headphone"));
+    strcat(str_bfr,(item->data.value ? "CV" : "Headphone"));
     add_chars_to_menu_name(item, str_bfr);
 
     //this setting changes just 1 item
