@@ -89,6 +89,20 @@ void system_outp_2_volume_cb(void *arg, int event);
 //control headphone volume
 void system_hp_volume_cb(void *arg, int event);
 
+//IO processing parts
+//sets noisegate channel
+void system_ng_channel(void *arg, int event);
+//sets noisegate threshold
+void system_ng_threshold(void *arg, int event);
+//sets noisegate decay
+void system_ng_decay(void *arg, int event);
+//sets compressor mode
+void system_compressor_mode(void *arg, int event);
+//sets compressor release
+void system_compressor_release(void *arg, int event);
+//sets pedalboard gain
+void system_pb_gain(void *arg, int event);
+
 void system_services_cb(void *arg, int event);
 void system_versions_cb(void *arg, int event);
 void system_release_cb(void *arg, int event);

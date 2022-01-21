@@ -262,6 +262,7 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define TEMPO_ID            (18 * 10)
 #define PROFILES_ID         (19 * 10)
 #define MIDI_ID             (20 * 10)
+#define IO_PROCESSING_ID    (21 * 10)
 
 //pedalboard sub menu
 #define PEDALBOARD_SAVE_ID   PEDALBOARD_ID+2
@@ -290,6 +291,14 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define HP_VOLUME           VOLUME_ID+4
 #define STEREO_LINK_OUTP    OUTP_ID+3
 #define HP_CV_OUTP          OUTP_ID+2
+
+//IO processing menu
+#define NOISEGATE_CHNL      IO_PROCESSING_ID + 2
+#define NOISEGATE_THRHLD    IO_PROCESSING_ID + 3
+#define NOISEGATE_DCY       IO_PROCESSING_ID + 4
+#define COMP_MODE           IO_PROCESSING_ID + 5
+#define COMP_RELEASE        IO_PROCESSING_ID + 6
+#define PB_GAIN_OUTP        IO_PROCESSING_ID + 7
 
 //sync & midi sub menu
 #define MIDI_CLK_SOURCE     MIDI_ID+2
@@ -348,6 +357,14 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"OUTPUT 2 GAIN",                   MENU_VOL,       OUT2_VOLUME,          OUTP_ID,            system_outp_2_volume_cb    , 0},  \
     {"HEADPHONE VOLUME",                MENU_VOL,       HP_VOLUME,            OUTP_ID,            system_hp_volume_cb        , 0},  \
     {"CV / HP OUTPUT",                  MENU_TOGGLE,    HP_CV_OUTP,           OUTP_ID,            system_cv_hp_cb            , 0},  \
+    {"I/O processing",                  MENU_LIST,      IO_PROCESSING_ID,     SYSTEM_ID,          NULL                       , 0},  \
+    {"< BACK TO SYSTEM",                MENU_RETURN,    IO_PROCESSING_ID+1,   IO_PROCESSING_ID,   NULL                       , 0},  \
+    {"NOISEGATE CHANNEL",               MENU_SET,       NOISEGATE_CHNL,       IO_PROCESSING_ID,   NULL    , 0},  \
+    {"NOISEGATE THRESHOLD",             MENU_VOL,       NOISEGATE_THRHLD,     IO_PROCESSING_ID,   NULL    , 0},  \
+    {"NOISEGATE DECAY",                 MENU_VOL,       NOISEGATE_DCY,        IO_PROCESSING_ID,   NULL    , 0},  \
+    {"COMPRESSOR MODE",                 MENU_SET,       COMP_MODE,            IO_PROCESSING_ID,   NULL        , 0},  \
+    {"COMPRESSOR RELEASE",              MENU_VOL,       COMP_RELEASE,         IO_PROCESSING_ID,   NULL            , 0},  \
+    {"PEDALBOARD GAIN",                 MENU_VOL,       PB_GAIN_OUTP,         IO_PROCESSING_ID,   NULL            , 0},  \
     {"SYNC & MIDI",                     MENU_LIST,      MIDI_ID,              SYSTEM_ID,          NULL                       , 0},  \
     {"< BACK TO SYSTEM",                MENU_RETURN,    MIDI_ID+1,            MIDI_ID,            NULL                       , 0},  \
     {"CLOCK SOURCE",                    MENU_TOGGLE,    MIDI_CLK_SOURCE,      MIDI_ID,            system_midi_src_cb         , 0},  \
