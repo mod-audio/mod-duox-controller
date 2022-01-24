@@ -239,6 +239,11 @@ static void displays_task(void *pvParameters)
     uint8_t i = 0;
     uint32_t count = 0;
 
+    //we need to do this before printing screen first time
+    //system_master_volume_cb(MENU_EV_NONE);
+    //menu_item_t *item = naveg_get_menu_item_by_ID(PB_GAIN_OUTP);
+    //screen_master_vol(item->data.value);
+
     while (1)
     {
         // update GLCD

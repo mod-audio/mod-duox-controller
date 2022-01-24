@@ -1301,11 +1301,21 @@ void screen_image(uint8_t display, const uint8_t *image)
 
 void screen_master_vol(float volume_val)
 {
-    char str_buf[8];
     char name[40] = "MASTER VOLUME:";
-    int_to_str(((volume_val)), str_buf, sizeof(str_buf), 1);
-    strcat(name, str_buf);
-    strcat(name, " dB");
+
+    static char str_buf[10] = {};
+    if (volume_val < -29) {
+        strncpy(str_buf, "-INF", 5);
+        str_buf[5] = '\0';
+        strcat(name, str_buf);
+    }
+    else {
+        int_to_str(volume_val, str_buf, sizeof(str_buf), 0);
+        if (volume_val > 0)
+            strcat(name, "+");
+        strcat(name, str_buf);
+        strcat(name, " dB");
+    }
 
     glcd_t *display = hardware_glcds(1);
 
@@ -1333,8 +1343,8 @@ void screen_master_vol(float volume_val)
     volume_bar.y = 1;
     volume_bar.width = 45;
     volume_bar.height = 5;
-    volume_bar.step = MAP(volume_val, -99.5, 0, 0, 100);
-    volume_bar.steps = 100;
+    volume_bar.step = MAP(volume_val, -30, 20, 0, 50);
+    volume_bar.steps = 50;
     widget_bar_indicator(display, &volume_bar);
 
     // horizontal line

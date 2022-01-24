@@ -544,13 +544,6 @@ void cb_boot(uint8_t serial_id, proto_t *proto)
 
     //set the master volume link
     system_update_menu_value(MENU_ID_MASTER_VOL_PORT, atoi(proto->list[5]));
-    
-    //set the master volume value
-    float master_vol_value = atof(proto->list[6]);
-    //-60 is our 0, we dont use lower values right now (doesnt make sense because of log scale)
-    if (master_vol_value < -127.5) master_vol_value = -127.5;
-    //convert value for screen
-    screen_master_vol(master_vol_value);
 
     naveg_turn_on_pagination_leds();
 

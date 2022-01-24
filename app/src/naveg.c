@@ -104,7 +104,6 @@ static void (*g_update_cb)(void *data, int event);
 static void *g_update_data;
 static xSemaphoreHandle g_dialog_sem;
 static uint8_t dialog_active = 0;
-static float master_vol_value;
 static uint8_t snapshot_loaded[3] = {};
 static uint8_t page = 0;
 static int16_t g_current_bank;
@@ -2185,6 +2184,11 @@ void naveg_init(void)
     //check the page mode
     system_page_mode_cb(NULL, MENU_EV_NONE);
 
+    //set the master volume widget
+    //system_master_volume_cb(MENU_EV_NONE);
+    //menu_item_t *item = naveg_get_menu_item_by_ID(PB_GAIN_OUTP);
+    //screen_master_vol(item->data.value);
+
     vSemaphoreCreateBinary(g_dialog_sem);
     // vSemaphoreCreateBinary is created as available which makes
     // first xSemaphoreTake pass even if semaphore has not been given
@@ -3431,13 +3435,15 @@ void naveg_master_volume(uint8_t set)
         return;
     }
 
+    menu_item_t *item = naveg_get_menu_item_by_ID(PB_GAIN_OUTP);
+
     if (set == 1)
     {
         if (tool_is_on(DISPLAY_TOOL_MASTER_VOL))
         {
             tool_off (DISPLAY_TOOL_MASTER_VOL);
             system_save_gains_cb(NULL, MENU_EV_ENTER);
-            screen_master_vol(master_vol_value);
+            screen_master_vol(item->data.value);
             return;
         }
         else
@@ -3446,10 +3452,8 @@ void naveg_master_volume(uint8_t set)
         }
     }
 
-    master_vol_value = system_master_volume_cb(0, MENU_EV_NONE);
-
     //convert value for screen
-    screen_master_vol(master_vol_value);
+    screen_master_vol(item->data.value);
 
 }
 
@@ -3476,23 +3480,13 @@ void naveg_set_master_volume(uint8_t set)
     if (!tool_is_on(DISPLAY_TOOL_MASTER_VOL)) return;
 
     if (set)
-    {
-        if (master_vol_value == 0.0)
-            master_vol_value -= 0.5;
-        else
-            master_vol_value -= (2 * hardware_get_acceleration());
-
-        if (master_vol_value < -99.5) master_vol_value = -99.5;
-        system_master_volume_cb(master_vol_value, MENU_EV_DOWN);
-    }
+        system_master_volume_cb(MENU_EV_DOWN);
     else
-    {
-        master_vol_value += (2 * hardware_get_acceleration());
-        if (master_vol_value > 0) master_vol_value = 0;
-        system_master_volume_cb(master_vol_value, MENU_EV_UP);
-    }
+        system_master_volume_cb(MENU_EV_UP);
 
-    screen_master_vol(master_vol_value);
+    menu_item_t *item = naveg_get_menu_item_by_ID(PB_GAIN_OUTP);
+
+    screen_master_vol(item->data.value);
 }
 
 uint8_t naveg_is_master_vol(void)

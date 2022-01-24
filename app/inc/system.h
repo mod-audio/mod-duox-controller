@@ -63,7 +63,7 @@
 //used when opening profiles menu
 uint8_t system_get_current_profile(void);
 //used when changing the master volume from control mode
-float system_master_volume_cb(float value, int event);
+void system_master_volume_cb(int event);
 //used when a gain item is closed
 void system_save_gains_cb(void *arg, int event);
 //called from various places in the system to change a menu item value

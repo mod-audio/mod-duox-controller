@@ -285,39 +285,43 @@ uint8_t system_get_current_profile(void)
     return g_current_profile;
 }
 
-float system_master_volume_cb(float value, int event)
+void system_master_volume_cb(int event)
 {
-   /* //what is the master volume currently connected to? and convert it to a char
-    char channel_char[8];
-    int_to_str(g_master_vol_port, channel_char, 4, 0);
+    char val_buffer[20];
+    uint8_t q = 0;
+    
+    menu_item_t *item = naveg_get_menu_item_by_ID(PB_GAIN_OUTP);
 
-    if ((event == MENU_EV_ENTER) || (event == MENU_EV_NONE))
+    if ((event == MENU_EV_ENTER) ||(event == MENU_EV_NONE))
     {
-        //get the value
-        cli_command("mod-amixer out ", CLI_CACHE_ONLY);
-        cli_command(channel_char, CLI_CACHE_ONLY);
-        cli_command(" xvol ", CLI_CACHE_ONLY);
+        sys_comm_set_response_cb(recieve_sys_value, item);
+        
+        sys_comm_send(CMD_SYS_COMP_PEDALBOARD_GAIN, NULL);
+        sys_comm_wait_response();
 
-        //convert and return
-        const char *response = cli_command(NULL, CLI_RETRIEVE_RESPONSE);
-        return atof(response);
+        item->data.step = 1.0f;
+        item->data.min = -30.0f;
+        item->data.max = 20.0f;
     }
-    //chaning the master volume
     else if ((event == MENU_EV_UP) ||(event == MENU_EV_DOWN))
     {
-        char value_char[8];
+        if (event == MENU_EV_UP)
+            item->data.value += (item->data.step * hardware_get_acceleration());
+        else
+            item->data.value -= (item->data.step * hardware_get_acceleration());
 
-        //set the value
-        int_to_str(value, value_char, 8, 0);
-        cli_command("mod-amixer out ", CLI_CACHE_ONLY);
-        cli_command(channel_char, CLI_CACHE_ONLY);
-        cli_command(" xvol ", CLI_CACHE_ONLY);
-        cli_command(value_char, CLI_DISCARD_RESPONSE);
-        
-        return value;
-    }*/
-    //ERROR
-    return 0;
+        if (item->data.value > item->data.max)
+            item->data.value = item->data.max;
+        if (item->data.value < item->data.min)
+            item->data.value = item->data.min;
+
+        // insert the value on buffer
+        q += float_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 2);
+        val_buffer[q] = 0;
+
+        sys_comm_send(CMD_SYS_COMP_PEDALBOARD_GAIN, val_buffer);
+        sys_comm_wait_response();
+    }
 }
 
 void system_save_gains_cb(void *arg, int event)
@@ -2187,7 +2191,7 @@ void system_pb_gain(void *arg, int event)
 
     static char str_bfr[10] = {};
     if (item->data.value < -29) {
-        strncpy(str_bfr, " -INF", 5);
+        strncpy(str_bfr, " -INF dB", 5);
         str_bfr[5] = '\0';
         add_chars_to_menu_name(item, str_bfr); 
     }
