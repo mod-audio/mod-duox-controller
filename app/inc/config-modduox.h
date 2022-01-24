@@ -359,12 +359,12 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
     {"CV / HP OUTPUT",                  MENU_TOGGLE,    HP_CV_OUTP,           OUTP_ID,            system_cv_hp_cb            , 0},  \
     {"I/O processing",                  MENU_LIST,      IO_PROCESSING_ID,     SYSTEM_ID,          NULL                       , 0},  \
     {"< BACK TO SYSTEM",                MENU_RETURN,    IO_PROCESSING_ID+1,   IO_PROCESSING_ID,   NULL                       , 0},  \
-    {"NOISEGATE CHANNEL",               MENU_SET,       NOISEGATE_CHNL,       IO_PROCESSING_ID,   NULL    , 0},  \
-    {"NOISEGATE THRESHOLD",             MENU_VOL,       NOISEGATE_THRHLD,     IO_PROCESSING_ID,   NULL    , 0},  \
-    {"NOISEGATE DECAY",                 MENU_VOL,       NOISEGATE_DCY,        IO_PROCESSING_ID,   NULL    , 0},  \
-    {"COMPRESSOR MODE",                 MENU_SET,       COMP_MODE,            IO_PROCESSING_ID,   NULL        , 0},  \
-    {"COMPRESSOR RELEASE",              MENU_VOL,       COMP_RELEASE,         IO_PROCESSING_ID,   NULL            , 0},  \
-    {"PEDALBOARD GAIN",                 MENU_VOL,       PB_GAIN_OUTP,         IO_PROCESSING_ID,   NULL            , 0},  \
+    {"NOISEGATE CHANNEL",               MENU_TOGGLE,    NOISEGATE_CHNL,       IO_PROCESSING_ID,   system_ng_channel          , 0},  \
+    {"NOISEGATE THRESHOLD",             MENU_VOL,       NOISEGATE_THRHLD,     IO_PROCESSING_ID,   system_ng_threshold        , 0},  \
+    {"NOISEGATE DECAY",                 MENU_VOL,       NOISEGATE_DCY,        IO_PROCESSING_ID,   system_ng_decay            , 0},  \
+    {"COMPRESSOR MODE",                 MENU_TOGGLE,    COMP_MODE,            IO_PROCESSING_ID,   system_compressor_mode     , 0},  \
+    {"COMPRESSOR RELEASE",              MENU_VOL,       COMP_RELEASE,         IO_PROCESSING_ID,   system_compressor_release  , 0},  \
+    {"PEDALBOARD GAIN",                 MENU_VOL,       PB_GAIN_OUTP,         IO_PROCESSING_ID,   system_pb_gain             , 0},  \
     {"SYNC & MIDI",                     MENU_LIST,      MIDI_ID,              SYSTEM_ID,          NULL                       , 0},  \
     {"< BACK TO SYSTEM",                MENU_RETURN,    MIDI_ID+1,            MIDI_ID,            NULL                       , 0},  \
     {"CLOCK SOURCE",                    MENU_TOGGLE,    MIDI_CLK_SOURCE,      MIDI_ID,            system_midi_src_cb         , 0},  \

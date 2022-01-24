@@ -1892,50 +1892,31 @@ void system_ng_channel(void *arg, int event)
     menu_item_t *item = arg;
 
     char val_buffer[20];
-    uint8_t q;
+    uint8_t q = 0;
 
     if (event == MENU_EV_NONE)
     {
-        /*
         sys_comm_set_response_cb(recieve_sys_value, item);
-
-        q = copy_command(val_buffer, "0 1");
-        val_buffer[q] = 0;
         
-        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_send(CMD_SYS_NG_CHANNEL, NULL);
         sys_comm_wait_response();
-        */
-        item->data.min = 0;
-        item->data.max = 3;
-    }
-    else if ((event == MENU_EV_UP) ||(event == MENU_EV_DOWN))
-    {
-        if (event == MENU_EV_UP)
-            item->data.value -= item->data.step;
-        else
-            item->data.value += item->data.step;
 
-        if (item->data.value > item->data.max)
-            item->data.value = item->data.max;
-        if (item->data.value < item->data.min)
+        item->data.min = 0.0f;
+        item->data.max = 3.0f;
+    }
+    else if (event == MENU_EV_ENTER)
+    {
+        if (item->data.value < item->data.max)
+            item->data.value++;
+        else
             item->data.value = item->data.min;
 
-        /*
-        q = copy_command(val_buffer, "0 0 ");
-        update_gain_item_value(IN1_VOLUME, item->data.value);
-        update_gain_item_value(IN2_VOLUME, item->data.value);
-
         // insert the value on buffer
-        q += float_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 1);
+        q += int_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 0);
         val_buffer[q] = 0;
 
-        sys_comm_set_response_cb(NULL, NULL);
-        ui_comm_webgui_set_response_cb(NULL, NULL);
-        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_send(CMD_SYS_NG_CHANNEL, val_buffer);
         sys_comm_wait_response();
-        */
-
-        item->data.step = 1.0f;
     }
 
     char bfr[20];
@@ -1968,19 +1949,16 @@ void system_ng_threshold(void *arg, int event)
     menu_item_t *item = arg;
 
     char val_buffer[20];
-    uint8_t q;
+    uint8_t q = 0;
 
     if (event == MENU_EV_NONE)
     {
-        /*
         sys_comm_set_response_cb(recieve_sys_value, item);
-
-        q = copy_command(val_buffer, "0 1");
-        val_buffer[q] = 0;
         
-        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_send(CMD_SYS_NG_THRESHOLD, NULL);
         sys_comm_wait_response();
-        */
+
+        item->data.step = 1.0f;
         item->data.min = -70;
         item->data.max = -10;
     }
@@ -1996,20 +1974,12 @@ void system_ng_threshold(void *arg, int event)
         if (item->data.value < item->data.min)
             item->data.value = item->data.min;
 
-        /*
-        q = copy_command(val_buffer, "0 0 ");
-        update_gain_item_value(IN1_VOLUME, item->data.value);
-        update_gain_item_value(IN2_VOLUME, item->data.value);
-
         // insert the value on buffer
-        q += float_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 1);
+        q += float_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 2);
         val_buffer[q] = 0;
 
-        sys_comm_set_response_cb(NULL, NULL);
-        ui_comm_webgui_set_response_cb(NULL, NULL);
-        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_send(CMD_SYS_NG_THRESHOLD, val_buffer);
         sys_comm_wait_response();
-        */
 
         item->data.step = 1.0f;
     }
@@ -2028,19 +1998,16 @@ void system_ng_decay(void *arg, int event)
     menu_item_t *item = arg;
 
     char val_buffer[20];
-    uint8_t q;
+    uint8_t q = 0;
 
     if (event == MENU_EV_NONE)
     {
-        /*
         sys_comm_set_response_cb(recieve_sys_value, item);
-
-        q = copy_command(val_buffer, "0 1");
-        val_buffer[q] = 0;
         
-        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_send(CMD_SYS_NG_DECAY, NULL);
         sys_comm_wait_response();
-        */
+
+        item->data.step = 5.0f;
         item->data.min = 1;
         item->data.max = 500;
     }
@@ -2059,24 +2026,16 @@ void system_ng_decay(void *arg, int event)
         if (item->data.value < item->data.min)
             item->data.value = item->data.min;
 
-        /*
-        q = copy_command(val_buffer, "0 0 ");
-        update_gain_item_value(IN1_VOLUME, item->data.value);
-        update_gain_item_value(IN2_VOLUME, item->data.value);
-
         // insert the value on buffer
-        q += float_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 1);
+        q += int_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 0);
         val_buffer[q] = 0;
 
-        sys_comm_set_response_cb(NULL, NULL);
-        ui_comm_webgui_set_response_cb(NULL, NULL);
-        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_send(CMD_SYS_NG_DECAY, val_buffer);
         sys_comm_wait_response();
-        */
     }
 
     static char str_bfr[10] = {};
-    float_to_str(item->data.value, str_bfr, sizeof(str_bfr), 2);
+    int_to_str((int)item->data.value, str_bfr, sizeof(str_bfr), 0);
     strcat(str_bfr, " MS");
     add_chars_to_menu_name(item, str_bfr);
 
@@ -2089,50 +2048,32 @@ void system_compressor_mode(void *arg, int event)
     menu_item_t *item = arg;
 
     char val_buffer[20];
-    uint8_t q;
+    uint8_t q = 0;
 
     if (event == MENU_EV_NONE)
     {
-        /*
         sys_comm_set_response_cb(recieve_sys_value, item);
-
-        q = copy_command(val_buffer, "0 1");
-        val_buffer[q] = 0;
         
-        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_send(CMD_SYS_COMP_MODE, NULL);
         sys_comm_wait_response();
-        */
+
+        item->data.step = 1;
         item->data.min = 0;
         item->data.max = 3;
     }
-    else if ((event == MENU_EV_UP) ||(event == MENU_EV_DOWN))
+    else if (event == MENU_EV_ENTER)
     {
-        if (event == MENU_EV_UP)
-            item->data.value -= item->data.step;
+        if (item->data.value < item->data.max)
+            item->data.value++;
         else
-            item->data.value += item->data.step;
-
-        if (item->data.value > item->data.max)
-            item->data.value = item->data.max;
-        if (item->data.value < item->data.min)
             item->data.value = item->data.min;
 
-        /*
-        q = copy_command(val_buffer, "0 0 ");
-        update_gain_item_value(IN1_VOLUME, item->data.value);
-        update_gain_item_value(IN2_VOLUME, item->data.value);
-
         // insert the value on buffer
-        q += float_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 1);
+        q += int_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 0);
         val_buffer[q] = 0;
 
-        sys_comm_set_response_cb(NULL, NULL);
-        ui_comm_webgui_set_response_cb(NULL, NULL);
-        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_send(CMD_SYS_COMP_MODE, val_buffer);
         sys_comm_wait_response();
-        */
-
-        item->data.step = 1.0f;
     }
 
     char bfr[20];
@@ -2156,7 +2097,7 @@ void system_compressor_mode(void *arg, int event)
     }
     add_chars_to_menu_name(item, bfr);
 
-    item->data.step = 1.0f;
+    item->data.step = 1;
 }
 //sets compressor release
 void system_compressor_release(void *arg, int event)
@@ -2164,19 +2105,16 @@ void system_compressor_release(void *arg, int event)
     menu_item_t *item = arg;
 
     char val_buffer[20];
-    uint8_t q;
+    uint8_t q = 0;
 
     if (event == MENU_EV_NONE)
     {
-        /*
         sys_comm_set_response_cb(recieve_sys_value, item);
-
-        q = copy_command(val_buffer, "0 1");
-        val_buffer[q] = 0;
         
-        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_send(CMD_SYS_COMP_RELEASE, NULL);
         sys_comm_wait_response();
-        */
+
+        item->data.step = 5.0f;
         item->data.min = 50;
         item->data.max = 500;
     }
@@ -2192,24 +2130,16 @@ void system_compressor_release(void *arg, int event)
         if (item->data.value < item->data.min)
             item->data.value = item->data.min;
 
-        /*
-        q = copy_command(val_buffer, "0 0 ");
-        update_gain_item_value(IN1_VOLUME, item->data.value);
-        update_gain_item_value(IN2_VOLUME, item->data.value);
-
         // insert the value on buffer
-        q += float_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 1);
+        q += int_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 0);
         val_buffer[q] = 0;
 
-        sys_comm_set_response_cb(NULL, NULL);
-        ui_comm_webgui_set_response_cb(NULL, NULL);
-        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_send(CMD_SYS_COMP_RELEASE, val_buffer);
         sys_comm_wait_response();
-        */
     }
 
     static char str_bfr[10] = {};
-    float_to_str(item->data.value, str_bfr, sizeof(str_bfr), 2);
+    int_to_str((int)item->data.value, str_bfr, sizeof(str_bfr), 0);
     strcat(str_bfr, " MS");
     add_chars_to_menu_name(item, str_bfr);
 
@@ -2222,19 +2152,16 @@ void system_pb_gain(void *arg, int event)
     menu_item_t *item = arg;
 
     char val_buffer[20];
-    uint8_t q;
+    uint8_t q = 0;
 
     if (event == MENU_EV_NONE)
     {
-        /*
         sys_comm_set_response_cb(recieve_sys_value, item);
-
-        q = copy_command(val_buffer, "0 1");
-        val_buffer[q] = 0;
         
-        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_send(CMD_SYS_COMP_PEDALBOARD_GAIN, NULL);
         sys_comm_wait_response();
-        */
+
+        item->data.step = 1.0f;
         item->data.min = -30;
         item->data.max = -20;
     }
@@ -2250,26 +2177,16 @@ void system_pb_gain(void *arg, int event)
         if (item->data.value < item->data.min)
             item->data.value = item->data.min;
 
-        /*
-        q = copy_command(val_buffer, "0 0 ");
-        update_gain_item_value(IN1_VOLUME, item->data.value);
-        update_gain_item_value(IN2_VOLUME, item->data.value);
-
         // insert the value on buffer
-        q += float_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 1);
+        q += float_to_str(item->data.value, &val_buffer[q], sizeof(val_buffer) - q, 2);
         val_buffer[q] = 0;
 
-        sys_comm_set_response_cb(NULL, NULL);
-        ui_comm_webgui_set_response_cb(NULL, NULL);
-        sys_comm_send(CMD_SYS_GAIN, val_buffer);
+        sys_comm_send(CMD_SYS_COMP_PEDALBOARD_GAIN, val_buffer);
         sys_comm_wait_response();
-        */
-
-        item->data.step = 1.0f;
     }
 
     static char str_bfr[10] = {};
-    if (item->data.value < 29) {
+    if (item->data.value < -29) {
         strcat(str_bfr, " -INF");
         add_chars_to_menu_name(item, str_bfr); 
     }
