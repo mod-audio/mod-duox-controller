@@ -2162,8 +2162,8 @@ void system_pb_gain(void *arg, int event)
         sys_comm_wait_response();
 
         item->data.step = 1.0f;
-        item->data.min = -30;
-        item->data.max = -20;
+        item->data.min = -30.0f;
+        item->data.max = 20.0f;
     }
     else if ((event == MENU_EV_UP) ||(event == MENU_EV_DOWN))
     {
@@ -2187,7 +2187,8 @@ void system_pb_gain(void *arg, int event)
 
     static char str_bfr[10] = {};
     if (item->data.value < -29) {
-        strcat(str_bfr, " -INF");
+        strncpy(str_bfr, " -INF", 5);
+        str_bfr[5] = '\0';
         add_chars_to_menu_name(item, str_bfr); 
     }
     else {
