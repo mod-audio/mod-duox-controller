@@ -87,6 +87,7 @@ static void system_procotol_task(void *pvParameters);
 static void displays_task(void *pvParameters);
 static void actuators_task(void *pvParameters);
 static void cli_task(void *pvParameters);
+static void post_boot_task(void *pvParameters);
 static void setup_task(void *pvParameters);
 
 /*
@@ -239,11 +240,6 @@ static void displays_task(void *pvParameters)
     uint8_t i = 0;
     uint32_t count = 0;
 
-    //we need to do this before printing screen first time
-    //system_master_volume_cb(MENU_EV_NONE);
-    //menu_item_t *item = naveg_get_menu_item_by_ID(PB_GAIN_OUTP);
-    //screen_master_vol(item->data.value);
-
     while (1)
     {
         // update GLCD
@@ -287,7 +283,7 @@ static void actuators_task(void *pvParameters)
             cli_restore(RESTORE_CHECK_BOOT);
 
         // checks if actuator has successfully taken
-        if (xStatus == pdPASS && cli_restore(RESTORE_STATUS) == LOGGED_ON_SYSTEM)
+        if (xStatus == pdPASS && cli_restore(RESTORE_STATUS) == LOGGED_ON_SYSTEM && g_device_booted)
         {
             type = actuator_info[0];
             id = actuator_info[1];
@@ -397,6 +393,31 @@ static void cli_task(void *pvParameters)
     }
 }
 
+static void post_boot_task(void *pvParameters)
+{
+    UNUSED_PARAM(pvParameters);
+
+    while (1)
+    {
+        if (g_device_booted)
+        {
+            //set the master volume widget
+            system_master_volume_cb(MENU_EV_NONE);
+            menu_item_t *item = naveg_get_menu_item_by_ID(PB_GAIN_OUTP);
+            screen_master_vol(item->data.value);
+
+            // deletes itself
+            vTaskDelete(NULL);
+        }
+
+        // check if must enter in the restore mode before we are booted
+        if (cli_restore(RESTORE_STATUS) == NOT_LOGGED)
+            cli_restore(RESTORE_CHECK_BOOT);
+
+        taskYIELD();
+    }
+}
+
 static void setup_task(void *pvParameters)
 {
     UNUSED_PARAM(pvParameters);
@@ -426,6 +447,9 @@ static void setup_task(void *pvParameters)
     xTaskCreate(actuators_task, TASK_NAME("act"), 256, NULL, 3, NULL);
     xTaskCreate(cli_task, TASK_NAME("cli"), 128, NULL, 2, NULL);
     xTaskCreate(displays_task, TASK_NAME("disp"), 128, NULL, 1, NULL);
+
+    //post boot operations, will be deleted after being ran once after boot_cb is ran
+    xTaskCreate(post_boot_task, TASK_NAME("post_boot"), 128, NULL, 1, NULL);
 
     // actuators callbacks
     uint8_t i;

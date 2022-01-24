@@ -547,6 +547,8 @@ void cb_boot(uint8_t serial_id, proto_t *proto)
 
     naveg_turn_on_pagination_leds();
 
+    g_device_booted = true;
+
     protocol_send_response(CMD_RESPONSE, 0, proto);
 }
 

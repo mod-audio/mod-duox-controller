@@ -118,6 +118,7 @@ static uint8_t g_reboot_value = 0;
 bool g_self_test_mode = true;
 bool g_self_test_cancel_button = false;
 float g_pot_calibrations[2][POTS_COUNT] = {{0}};
+bool g_device_booted = false;
 
 /*
 ************************************************************************************************************************
@@ -2183,11 +2184,6 @@ void naveg_init(void)
 
     //check the page mode
     system_page_mode_cb(NULL, MENU_EV_NONE);
-
-    //set the master volume widget
-    //system_master_volume_cb(MENU_EV_NONE);
-    //menu_item_t *item = naveg_get_menu_item_by_ID(PB_GAIN_OUTP);
-    //screen_master_vol(item->data.value);
 
     vSemaphoreCreateBinary(g_dialog_sem);
     // vSemaphoreCreateBinary is created as available which makes
