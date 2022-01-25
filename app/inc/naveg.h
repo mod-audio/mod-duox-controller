@@ -56,6 +56,7 @@ bool g_self_test_mode;
 bool g_self_test_cancel_button;
 bool g_ui_communication_started;
 bool g_device_booted;
+bool g_dialog_active;
 float g_pot_calibrations[2][POTS_COUNT];
 
 /*

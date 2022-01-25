@@ -358,7 +358,9 @@ void cb_led(uint8_t serial_id, proto_t *proto)
     int8_t value[3] = {atoi(proto->list[2]), atoi(proto->list[3]), atoi(proto->list[4])};
     ledz_set_color(CMD_COLOR_ID, value);
 
-    led->led_state.color = MAX_COLOR_ID;
+    led->led_state.color = CMD_COLOR_ID;
+
+    ledz_off(led, WHITE);
 
     if (proto->list_count < 6)
         ledz_set_state(led, LED_ON, LED_UPDATE);
@@ -392,7 +394,7 @@ void cb_glcd_dialog(uint8_t serial_id, proto_t *proto)
 {
     UNUSED_PARAM(serial_id);
 
-    uint8_t val = naveg_dialog(proto->list[1], NULL);
+    uint8_t val = naveg_dialog(proto->list[1], "selftest");
     protocol_send_response(CMD_RESPONSE, val, proto);
 }
 
@@ -607,7 +609,7 @@ void cb_pages_available(uint8_t serial_id, proto_t *proto)
 {
     UNUSED_PARAM(serial_id);
 
-	  naveg_pages_available(atoi(proto->list[1]), atoi(proto->list[2]), atoi(proto->list[3]), atoi(proto->list[4]), atoi(proto->list[5]), atoi(proto->list[6]));
+	naveg_pages_available(atoi(proto->list[1]), atoi(proto->list[2]), atoi(proto->list[3]), atoi(proto->list[4]), atoi(proto->list[5]), atoi(proto->list[6]));
 
     naveg_turn_on_pagination_leds();
 

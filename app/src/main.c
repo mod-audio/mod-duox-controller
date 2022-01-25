@@ -390,6 +390,12 @@ static void cli_task(void *pvParameters)
     while (1)
     {
         cli_process();
+
+        if ((uxTaskPriorityGet(NULL) > 2) && (cli_restore(RESTORE_STATUS) == LOGGED_ON_SYSTEM))
+        {
+            //change own priority
+            vTaskPrioritySet(NULL, 2);
+        }
     }
 }
 
@@ -404,7 +410,9 @@ static void post_boot_task(void *pvParameters)
             //set the master volume widget
             system_master_volume_cb(MENU_EV_NONE);
             menu_item_t *item = naveg_get_menu_item_by_ID(PB_GAIN_OUTP);
-            screen_master_vol(item->data.value);
+
+            if (!g_dialog_active)
+                screen_master_vol(item->data.value);
 
             // deletes itself
             vTaskDelete(NULL);
@@ -442,10 +450,10 @@ static void setup_task(void *pvParameters)
     g_actuators_queue = xQueueCreate(ACTUATORS_QUEUE_SIZE, sizeof(uint8_t *));
 
     // create the tasks
-    xTaskCreate(system_procotol_task, TASK_NAME("ui_proto"), 256, NULL, 5, NULL);
-    xTaskCreate(webgui_procotol_task, TASK_NAME("sys_proto"), 512, NULL, 4, NULL);
+    xTaskCreate(webgui_procotol_task, TASK_NAME("ui_proto"), 512, NULL, 4, NULL);
+    xTaskCreate(system_procotol_task, TASK_NAME("sys_proto"), 128, NULL, 5, NULL);
     xTaskCreate(actuators_task, TASK_NAME("act"), 256, NULL, 3, NULL);
-    xTaskCreate(cli_task, TASK_NAME("cli"), 128, NULL, 2, NULL);
+    xTaskCreate(cli_task, TASK_NAME("cli"), 128, NULL, 4, NULL);
     xTaskCreate(displays_task, TASK_NAME("disp"), 128, NULL, 1, NULL);
 
     //post boot operations, will be deleted after being ran once after boot_cb is ran

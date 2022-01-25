@@ -103,7 +103,6 @@ static uint8_t g_initialized, g_ui_connected;
 static void (*g_update_cb)(void *data, int event);
 static void *g_update_data;
 static xSemaphoreHandle g_dialog_sem;
-static uint8_t dialog_active = 0;
 static uint8_t snapshot_loaded[3] = {};
 static uint8_t page = 0;
 static int16_t g_current_bank;
@@ -119,6 +118,7 @@ bool g_self_test_mode = true;
 bool g_self_test_cancel_button = false;
 float g_pot_calibrations[2][POTS_COUNT] = {{0}};
 bool g_device_booted = false;
+bool g_dialog_active = false;
 
 /*
 ************************************************************************************************************************
@@ -1555,8 +1555,8 @@ static void menu_enter(uint8_t display_id)
 {
 
     uint8_t i;
-    node_t *node = (display_id || dialog_active) ? g_current_menu : g_current_main_menu;
-    menu_item_t *item = (display_id || dialog_active) ? g_current_item : g_current_main_item;
+    node_t *node = (display_id || g_dialog_active) ? g_current_menu : g_current_main_menu;
+    menu_item_t *item = (display_id || g_dialog_active) ? g_current_item : g_current_main_item;
 
     if (item->desc->type == MENU_LIST || item->desc->type == MENU_SELECT)
     {
@@ -1930,7 +1930,6 @@ static void menu_enter(uint8_t display_id)
 
     if (item->desc->type == MENU_CONFIRM2)
     {
-        dialog_active = 0;
         portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
         xSemaphoreGiveFromISR(g_dialog_sem, &xHigherPriorityTaskWoken);
     }
@@ -2029,18 +2028,6 @@ static void create_menu_tree(node_t *parent, const menu_desc_t *desc)
             if (item->desc->type == MENU_LIST || item->desc->type == MENU_SELECT)
                 create_menu_tree(node, &g_menu_desc[i]);
         }
-    }
-}
-
-static void reset_menu_hover(node_t *menu_node)
-{
-    node_t *node;
-    for (node = menu_node->first_child; node; node = node->next)
-    {
-        menu_item_t *item = node->data;
-        if (item->desc->type == MENU_LIST || item->desc->type == MENU_SELECT)
-            item->data.hover = 0;
-        reset_menu_hover(node);
     }
 }
 
@@ -2906,7 +2893,7 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
     if (!g_initialized) return;
 
     //if in selftest mode, we just send if we are working or not
-    if ((g_self_test_mode) && !dialog_active)
+    if ((g_self_test_mode) && !g_dialog_active)
     {
         char buffer[30];
         uint8_t i;
@@ -3520,7 +3507,7 @@ bp_list_t *naveg_get_pedalboards(void)
 void naveg_enter(uint8_t display)
 {
     //if in selftest mode, we just send if we are working or not
-    if ((g_self_test_mode) && !dialog_active)
+    if ((g_self_test_mode) && !g_dialog_active)
     {
         char buffer[30];
         uint8_t i;
@@ -3545,9 +3532,9 @@ void naveg_enter(uint8_t display)
         if (display == 0)
         {
             //we dont use this knob in dialog mode
-            if (dialog_active) return;
+            if (g_dialog_active) return;
 
-            if (tool_is_on(DISPLAY_TOOL_TUNER) || dialog_active)
+            if (tool_is_on(DISPLAY_TOOL_TUNER) || g_dialog_active)
             {
                 menu_enter(display);
             }
@@ -3574,7 +3561,7 @@ void naveg_up(uint8_t display)
     if (!g_initialized) return;
 
     //if in selftest mode, we just send if we are working or not
-    if ((g_self_test_mode) && !dialog_active)
+    if ((g_self_test_mode) && !g_dialog_active)
     {
         char buffer[30];
         uint8_t i;
@@ -3597,7 +3584,7 @@ void naveg_up(uint8_t display)
         if (display == 0)
         {
             //we dont use this knob in dialog mode
-            if (dialog_active) return;
+            if (g_dialog_active) return;
 
         	if ( (tool_is_on(DISPLAY_TOOL_TUNER)) || (tool_is_on(DISPLAY_TOOL_NAVIG)) )
             {
@@ -3611,13 +3598,13 @@ void naveg_up(uint8_t display)
             else if (tool_is_on(DISPLAY_TOOL_SYSTEM))
            	{
 
-           		if (((g_current_menu == g_menu) || (g_current_item->desc->id == ROOT_ID)) && (dialog_active != 1))
+           		if (((g_current_menu == g_menu) || (g_current_item->desc->id == ROOT_ID)) && (g_dialog_active != 1))
            		{
            			g_current_main_menu = g_current_menu;
            			g_current_main_item = g_current_item;
            		}
            		menu_up(display);
-           		if (dialog_active != 1) menu_enter(display);
+           		if (g_dialog_active != 1) menu_enter(display);
            	}
         }
         else if (display == 1)
@@ -3637,7 +3624,7 @@ void naveg_down(uint8_t display)
     if (!g_initialized) return;
 
     //if in selftest mode, we just send if we are working or not
-    if ((g_self_test_mode) && !dialog_active)
+    if ((g_self_test_mode) && !g_dialog_active)
     {
         char buffer[30];
         uint8_t i;
@@ -3660,7 +3647,7 @@ void naveg_down(uint8_t display)
         if (display == 0)
         {
             //we dont use this knob in dialog mode
-            if (dialog_active) return;
+            if (g_dialog_active) return;
 
         	if ( (tool_is_on(DISPLAY_TOOL_TUNER)) || (tool_is_on(DISPLAY_TOOL_NAVIG)) )
             {
@@ -3673,13 +3660,13 @@ void naveg_down(uint8_t display)
            	}
             else if (tool_is_on(DISPLAY_TOOL_SYSTEM))
            	{
-           		if (((g_current_menu == g_menu) || (g_current_item->desc->id == ROOT_ID)) && (dialog_active != 1))
+           		if (((g_current_menu == g_menu) || (g_current_item->desc->id == ROOT_ID)) && (g_dialog_active != 1))
            		{
            			g_current_main_menu = g_current_menu;
            			g_current_main_item = g_current_item;
            		}
            		menu_down(display);
-           		if (dialog_active != 1) menu_enter(display);
+           		if (g_dialog_active != 1) menu_enter(display);
            	}
         }
         else if (display == 1)
@@ -3702,7 +3689,6 @@ void naveg_reset_menu(void)
     g_current_item = g_menu->first_child->data;
     g_current_main_menu = g_menu;
     g_current_main_item = g_menu->first_child->data;
-    reset_menu_hover(g_menu);
 }
 
 int naveg_need_update(void)
@@ -3723,7 +3709,7 @@ uint8_t naveg_dialog(const char *msg, char *title)
 {
     static node_t *dummy_menu = NULL;
     static menu_desc_t desc = {NULL, MENU_CONFIRM2, DIALOG_ID, DIALOG_ID, NULL, 0};
-    
+
     if (!dummy_menu)
     {
         menu_item_t *item;
@@ -3736,7 +3722,7 @@ uint8_t naveg_dialog(const char *msg, char *title)
         if (title)
             item->data.popup_header = title;
         else
-            item->data.popup_header = "selftest";
+            item->data.popup_header = "WARNING";
         item->desc = &desc;
         item->name = NULL;
         dummy_menu = node_create(item);
@@ -3745,26 +3731,31 @@ uint8_t naveg_dialog(const char *msg, char *title)
     display_disable_all_tools(DISPLAY_LEFT);
     tool_on(DISPLAY_TOOL_SYSTEM, DISPLAY_LEFT);
     tool_on(DISPLAY_TOOL_SYSTEM_SUBMENU, DISPLAY_RIGHT);
+
     g_current_menu = dummy_menu;
     g_current_item = dummy_menu->data;
+
+    screen_clear(DISPLAY_LEFT);
+    screen_clear(DISPLAY_RIGHT);
+
     screen_system_menu(g_current_item);
 
-    dialog_active = 1;
+    g_dialog_active = 1;
+    //force device being booted, as mod-ui wont notify in selftest mode
+    g_device_booted = true;
+
     if (xSemaphoreTake(g_dialog_sem, portMAX_DELAY) == pdTRUE)
     {
-        dialog_active = 0;
+        g_dialog_active = 0;
         display_disable_all_tools(DISPLAY_LEFT);
         display_disable_all_tools(DISPLAY_RIGHT);
-
+        
         g_update_cb = NULL;
         g_update_data = NULL;
-
-        g_current_main_menu = g_menu;
-        g_current_main_item = g_menu->first_child->data;
-        reset_menu_hover(g_menu);
+        
+        naveg_reset_menu();
 
         screen_clear(DISPLAY_RIGHT);
-
         return g_current_item->data.hover;
     }
     //we can never get here, portMAX_DELAY means wait indefinatly I'm adding this to remove a compiler warning
@@ -3792,7 +3783,7 @@ void naveg_set_page_mode(uint8_t mode)
 
 uint8_t naveg_dialog_status(void)
 {
-    return dialog_active;
+    return g_dialog_active;
 }
 
 uint8_t naveg_banks_mode_pb(void)
