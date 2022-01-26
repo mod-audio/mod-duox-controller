@@ -3103,6 +3103,14 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
                 if (!g_self_test_mode) {
                     ui_comm_webgui_wait_response();
                 }
+
+                //now notify host
+                char val_buffer[20] = {0};
+                sys_comm_set_response_cb(NULL, NULL);
+
+                int_to_str(page, val_buffer, sizeof(val_buffer), 0);
+
+                sys_comm_send(CMD_SYS_PAGE_CHANGE, val_buffer);
             }
         break;
 
@@ -3162,7 +3170,15 @@ void naveg_foot_change(uint8_t foot, uint8_t pressed)
 
                 if (!g_self_test_mode) {
                     ui_comm_webgui_wait_response();
-                }   
+                }
+
+                //now notify host
+                char val_buffer[20] = {0};
+                sys_comm_set_response_cb(NULL, NULL);
+
+                int_to_str(page, val_buffer, sizeof(val_buffer), 0);
+
+                sys_comm_send(CMD_SYS_PAGE_CHANGE, val_buffer);
             }
             //other navigation mode, we are a snapshot button now
             else 
