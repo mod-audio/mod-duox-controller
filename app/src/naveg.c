@@ -1558,6 +1558,9 @@ static void menu_enter(uint8_t display_id)
     node_t *node = (display_id || g_dialog_active) ? g_current_menu : g_current_main_menu;
     menu_item_t *item = (display_id || g_dialog_active) ? g_current_item : g_current_main_item;
 
+    //TODO Handle better, when menu is going to be redesigned
+    static uint8_t value_toggle = 0;
+
     if (item->desc->type == MENU_LIST || item->desc->type == MENU_SELECT)
     {
         // locates the clicked item
@@ -1674,7 +1677,13 @@ static void menu_enter(uint8_t display_id)
     }
     else if (item->desc->type == MENU_CONFIRM ||item->desc->type == MENU_OK || item->desc->parent_id == PROFILES_ID || item->desc->id == EXP_MODE || item->desc->id == EXP_CV_INP || item->desc->id == HP_CV_OUTP || item->desc->type == MENU_MESSAGE)
     {
-        if (item->desc->type == MENU_OK)
+        if (item->desc->id == USB_B_MODE_ID)
+        {
+            item->desc->action_cb(item, MENU_EV_ENTER);
+            item->desc->type = MENU_SET;
+            value_toggle = 0;
+        }
+        else if (item->desc->type == MENU_OK)
         {
             //if bleutooth activate right away
             if (item->desc->id == BLUETOOTH_DISCO_ID)
@@ -1838,9 +1847,7 @@ static void menu_enter(uint8_t display_id)
     else if ((item->desc->type == MENU_VOL) || (item->desc->type == MENU_SET))
     {
         if (item->desc->id == USB_B_MODE_ID) {
-            static uint8_t value_toggle = 0, popup_toggle = 0;
             if (value_toggle == 0) {
-                g_reboot_value = (int)item->data.value;
                 value_toggle = 1;
             }
             else {
@@ -1868,19 +1875,12 @@ static void menu_enter(uint8_t display_id)
 
                         i++;
                     }
-
-                    if (popup_toggle) {
-                        item->desc->action_cb(item, MENU_EV_ENTER);
-                    }
-                    else {
-                        popup_toggle = 1;
-                    }
                 }
                 else {
                     //resets the menu node
+                    item->desc->type = MENU_SET;
                     item = g_current_menu->data;
                     g_current_item = item;
-
                     value_toggle = 0;
                 }
             }

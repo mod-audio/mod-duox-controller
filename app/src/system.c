@@ -1831,6 +1831,7 @@ void system_usb_b_cb(void *arg, int event)
         item->data.selected = g_usb_mode;
         item->data.min = 0;
         item->data.max = 2;
+        item->data.step = 1;
         item->data.list_count = 2;
         item->data.hover = 1;
 
@@ -1855,19 +1856,11 @@ void system_usb_b_cb(void *arg, int event)
         //tell the system to reboot
         sys_comm_send(CMD_SYS_REBOOT, NULL);
     }
-    //cancel, reset widget
-    else if ((event == MENU_EV_ENTER) && (item->data.hover == 1)) {
+    else if ((event != MENU_EV_UP) && (event != MENU_EV_DOWN)) {
+        item->data.value = g_usb_mode;
         item->data.selected = g_usb_mode;
-        item->data.value = g_usb_mode;
+        naveg_set_reboot_value(g_usb_mode);
     }
-
-    if (event == MENU_EV_NONE)
-        item->data.value = g_usb_mode;
-
-    if (event == MENU_EV_DOWN)
-        item->data.value++;
-    else if (event == MENU_EV_UP)
-        item->data.value--;
 
     if (item->data.value > item->data.max)
         item->data.value = item->data.max;
