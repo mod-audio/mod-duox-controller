@@ -1930,6 +1930,7 @@ static void menu_enter(uint8_t display_id)
 
     if (item->desc->type == MENU_CONFIRM2)
     {
+        g_dialog_active = false;
         portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
         xSemaphoreGiveFromISR(g_dialog_sem, &xHigherPriorityTaskWoken);
     }
@@ -2081,6 +2082,18 @@ node_t *get_menu_node_by_ID(uint8_t menu_id)
     }
 
     return NULL;
+}
+
+static void reset_menu_hover(node_t *menu_node)
+{
+    node_t *node;
+    for (node = menu_node->first_child; node; node = node->next)
+    {
+        menu_item_t *item = node->data;
+        if (item->desc->type == MENU_LIST || item->desc->type == MENU_SELECT)
+            item->data.hover = 0;
+        reset_menu_hover(node);
+    }
 }
 
 /*
@@ -3614,13 +3627,13 @@ void naveg_up(uint8_t display)
             else if (tool_is_on(DISPLAY_TOOL_SYSTEM))
            	{
 
-           		if (((g_current_menu == g_menu) || (g_current_item->desc->id == ROOT_ID)) && (g_dialog_active != 1))
+           		if (((g_current_menu == g_menu) || (g_current_item->desc->id == ROOT_ID)) && (g_dialog_active == false))
            		{
            			g_current_main_menu = g_current_menu;
            			g_current_main_item = g_current_item;
            		}
            		menu_up(display);
-           		if (g_dialog_active != 1) menu_enter(display);
+           		if (g_dialog_active == false)menu_enter(display);
            	}
         }
         else if (display == 1)
@@ -3676,13 +3689,13 @@ void naveg_down(uint8_t display)
            	}
             else if (tool_is_on(DISPLAY_TOOL_SYSTEM))
            	{
-           		if (((g_current_menu == g_menu) || (g_current_item->desc->id == ROOT_ID)) && (g_dialog_active != 1))
+           		if (((g_current_menu == g_menu) || (g_current_item->desc->id == ROOT_ID)) && (g_dialog_active == false))
            		{
            			g_current_main_menu = g_current_menu;
            			g_current_main_item = g_current_item;
            		}
            		menu_down(display);
-           		if (g_dialog_active != 1) menu_enter(display);
+           		if (g_dialog_active == false) menu_enter(display);
            	}
         }
         else if (display == 1)
@@ -3705,6 +3718,7 @@ void naveg_reset_menu(void)
     g_current_item = g_menu->first_child->data;
     g_current_main_menu = g_menu;
     g_current_main_item = g_menu->first_child->data;
+    reset_menu_hover(g_menu);
 }
 
 int naveg_need_update(void)
