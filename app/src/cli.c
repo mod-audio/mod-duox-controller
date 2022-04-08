@@ -349,6 +349,9 @@ void cli_process(void)
         char *msg = &g_cli.received[4];
         if (strncmp(g_cli.received, "hmi:", 4) == 0)
         {
+            if (strncmp(g_cli.received, "hmi:installing user data", 25) == 0)
+                hardware_reset_eeprom();
+
             write_msg(msg);
         }
     }
