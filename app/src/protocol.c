@@ -325,6 +325,7 @@ void protocol_init(void)
     protocol_add_command(CMD_SYS_CHANGE_UNIT, cb_change_assigment_unit);
     protocol_add_command(CMD_SYS_CHANGE_VALUE, cb_change_assigment_value);
     protocol_add_command(CMD_SYS_CHANGE_WIDGET_INDICATOR, cb_change_widget_indicator);
+    protocol_add_command(CMD_PEDALBOARD_CHANGE, cb_pedalboard_change);
 }
 
 
@@ -600,9 +601,20 @@ void cb_pedalboard_name(uint8_t serial_id, proto_t *proto)
 {
     UNUSED_PARAM(serial_id);
 
-	  screen_top_info(&proto->list[1] , 1);
+	screen_top_info(&proto->list[1] , 1);
 
     protocol_send_response(CMD_RESPONSE, 0, proto);
+}
+
+void cb_pedalboard_change(uint8_t serial_id, proto_t *proto)
+{
+    UNUSED_PARAM(serial_id);
+
+    naveg_set_active_pedalboard(atoi(proto->list[1]));
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+
+    naveg_set_pb_list_update();
 }
 
 void cb_pages_available(uint8_t serial_id, proto_t *proto)
