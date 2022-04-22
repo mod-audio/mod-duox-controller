@@ -3992,46 +3992,38 @@ void naveg_update_calibration(void)
 
 void naveg_turn_on_pagination_leds(void)
 {
+    uint8_t page_color;
+
+    switch (page)
+    {
+        case 0:
+            page_color = PAGES1_COLOR;
+        break;
+        case 1:
+            page_color = PAGES2_COLOR;
+        break;
+        case 2:
+            page_color = PAGES3_COLOR;
+        break;
+        case 3:
+            page_color = PAGES4_COLOR;
+        break;
+        case 4:
+            page_color = PAGES5_COLOR;
+        break;
+        case 5:
+            page_color = PAGES6_COLOR;
+        break;
+        default:
+            page_color = PAGES1_COLOR;
+        break;
+    }
+
     if (!g_page_mode)
     {
         ledz_t *led = hardware_leds(5);
-        switch (page)
-        {
-            case 0:
-                //just trigger LED 5 red
-                led->led_state.color = PAGES1_COLOR;
-            break;
 
-            case 1:
-                //just trigger LED 5 yellow
-                led->led_state.color = PAGES2_COLOR;
-            break;
-
-            case 2:
-                //just trigger LED 5 cyan
-                led->led_state.color = PAGES3_COLOR;
-            break;
-
-            case 3:
-                //just trigger LED 5 cyan
-                led->led_state.color = PAGES4_COLOR;
-            break;
-
-            case 4:
-                //just trigger LED 5 cyan
-                led->led_state.color = PAGES5_COLOR;
-            break;
-
-            case 5:
-                //just trigger LED 5 cyan
-                led->led_state.color = PAGES6_COLOR;
-            break;
-
-            default:
-                //just trigger LED 5 red
-                led->led_state.color = PAGES1_COLOR;
-            break;
-        }
+        led->led_state.color = page_color;
 
         ledz_set_state(led, LED_ON, LED_UPDATE);
 
@@ -4054,50 +4046,8 @@ void naveg_turn_on_pagination_leds(void)
         ledz_t *led_page_1 = hardware_leds(4);
         ledz_t *led_page_2 = hardware_leds(6);
 
-        switch (page)
-        {
-            case 0:
-                //just trigger LED 5 red
-                led_page_1->led_state.color = PAGES1_COLOR;
-                led_page_2->led_state.color = PAGES1_COLOR;
-            break;
-
-            case 1:
-                //just trigger LED 5 yellow
-                led_page_1->led_state.color = PAGES2_COLOR;
-                led_page_2->led_state.color = PAGES1_COLOR;
-            break;
-
-            case 2:
-                //just trigger LED 5 cyan
-                led_page_1->led_state.color = PAGES3_COLOR;
-                led_page_2->led_state.color = PAGES1_COLOR;
-            break;
-
-            case 3:
-                //just trigger LED 5 cyan
-                led_page_1->led_state.color = PAGES4_COLOR;
-                led_page_2->led_state.color = PAGES1_COLOR;
-            break;
-
-            case 4:
-                //just trigger LED 5 cyan
-                led_page_1->led_state.color = PAGES5_COLOR;
-                led_page_2->led_state.color = PAGES1_COLOR;
-            break;
-
-            case 5:
-                //just trigger LED 5 cyan
-                led_page_1->led_state.color = PAGES6_COLOR;
-                led_page_2->led_state.color = PAGES1_COLOR;
-            break;
-
-            default:
-                //just trigger LED 5 red
-                led_page_1->led_state.color = PAGES1_COLOR;
-                led_page_2->led_state.color = PAGES1_COLOR;
-            break;
-        }
+        led_page_1->led_state.color = page_color;
+        led_page_2->led_state.color = page_color;
 
         ledz_set_state(led_page_1, LED_ON, LED_UPDATE);
         ledz_set_state(led_page_2, LED_ON, LED_UPDATE);
