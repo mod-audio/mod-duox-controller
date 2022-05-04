@@ -997,8 +997,8 @@ void cb_change_assigment_unit(uint8_t serial_id, proto_t *proto)
 
 void cb_launch_popup(uint8_t serial_id, proto_t *proto)
 {
-    //if (serial_id != SYSTEM_SERIAL)
-    //    return;
+    if (serial_id != SYSTEM_SERIAL)
+        return;
 
     uint8_t hw_id = atoi(proto->list[2]);
 
