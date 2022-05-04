@@ -3713,7 +3713,7 @@ void naveg_down(uint8_t display)
 
 void naveg_reset_menu(void)
 {
-    if (!g_initialized) return;
+    if ((!g_initialized) || (g_self_test_mode)) return;
 
     g_current_menu = g_menu;
     g_current_item = g_menu->first_child->data;
