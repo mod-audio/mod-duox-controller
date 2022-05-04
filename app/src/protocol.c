@@ -325,9 +325,9 @@ void protocol_init(void)
     protocol_add_command(CMD_SYS_CHANGE_UNIT, cb_change_assigment_unit);
     protocol_add_command(CMD_SYS_CHANGE_VALUE, cb_change_assigment_value);
     protocol_add_command(CMD_SYS_CHANGE_WIDGET_INDICATOR, cb_change_widget_indicator);
+    protocol_add_command(CMD_SYS_LAUNCH_POPUP, cb_launch_popup);
     protocol_add_command(CMD_PEDALBOARD_CHANGE, cb_pedalboard_change);
 }
-
 
 /*
 ************************************************************************************************************************
@@ -995,3 +995,37 @@ void cb_change_assigment_unit(uint8_t serial_id, proto_t *proto)
     protocol_send_response(CMD_RESPONSE, 0, proto);
 }
 
+void cb_launch_popup(uint8_t serial_id, proto_t *proto)
+{
+    //if (serial_id != SYSTEM_SERIAL)
+    //    return;
+
+    uint8_t hw_id = atoi(proto->list[2]);
+
+    control_t *control = naveg_get_control(hw_id);
+
+    //error no assignment
+    if (!control)
+    {
+        protocol_send_response(CMD_RESPONSE, INVALID_ARGUMENT, proto);
+        return;
+    }
+
+    uint8_t display;
+    if ((hw_id == 0) || (hw_id == 2) || (hw_id == 3) || ((hw_id >= 6) && (hw_id <= 9)))
+        display = DISPLAY_LEFT;
+    else
+        display = DISPLAY_RIGHT;
+
+    if (!naveg_is_tool_mode(0) && !naveg_is_tool_mode(1))
+    {
+        if (hardware_get_overlay_counter() != 0)
+            hardware_force_overlay_off(0);
+
+        screen_widget_overlay(display, atoi(proto->list[3]), proto->list[4], proto->list[5]);
+
+        hardware_set_overlay_timeout(TIME_WIDGET_OVERLAY, naveg_reload_display, 0);
+    }
+
+    protocol_send_response(CMD_RESPONSE, 0, proto);
+}

@@ -75,6 +75,7 @@ void screen_image(uint8_t display, const uint8_t *image);
 void screen_top_info(const void *data, uint8_t update);
 void screen_master_vol(float volume_val);
 void screen_text_box(uint8_t display, uint8_t x, uint8_t y, const char *text);
+void screen_widget_overlay(uint8_t display, int8_t style, char *header, char *text);
 
 /*
 ************************************************************************************************************************

@@ -1378,3 +1378,68 @@ void screen_text_box(uint8_t display, uint8_t x, uint8_t y, const char *text)
     text_box.x = x;
     widget_textbox(hardware_display, &text_box);
 }
+
+void screen_widget_overlay(uint8_t display, int8_t style, char *header, char *text)
+{
+    glcd_t *hardware_display = hardware_glcds(display);
+
+    //clear encoder and pot  area
+    glcd_rect_fill(hardware_display, 0, 9, 128, 46, GLCD_WHITE);
+
+    //draw the popup box
+    glcd_rect(hardware_display, 1, 10, 127, 43, GLCD_BLACK);
+
+    //draw title
+    char *title_str_bfr = (char *) MALLOC(16 * sizeof(char));
+    textbox_t title;
+    title.color = GLCD_BLACK;
+    title.mode = TEXT_SINGLE_LINE;
+    title.font = Terminal7x8;
+    title.height = 0;
+    title.top_margin = 0;
+    title.bottom_margin = 1;
+    title.left_margin = 0;
+    title.width = 0;
+    title.right_margin = 0;
+    strncpy(title_str_bfr, header, 15);
+    title_str_bfr[15] = '\0';
+    title.text = title_str_bfr;
+    title.y = 15;
+    title.align = ALIGN_CENTER_NONE;
+    widget_textbox(hardware_display, &title);
+    FREE(title_str_bfr);
+
+    //draw line between title and text
+    glcd_rect(hardware_display, 1, 27, 126, 1, GLCD_BLACK);
+
+    //invert title
+    glcd_rect_invert(hardware_display, 3, 12, 123, 14);
+
+    //draw popup text
+    char *text_str_bfr = (char *) MALLOC(16 * sizeof(char));
+    textbox_t popup_text;
+    popup_text.color = GLCD_BLACK;
+    popup_text.mode = TEXT_SINGLE_LINE;
+    popup_text.font = Terminal7x8;
+    popup_text.height = 0;
+    popup_text.top_margin = 0;
+    popup_text.bottom_margin = 1;
+    popup_text.left_margin = 0;
+    popup_text.width = 0;
+    popup_text.right_margin = 0;
+    strncpy(text_str_bfr, text, 15);
+    text_str_bfr[15] = '\0';
+    popup_text.text = text_str_bfr;
+    popup_text.y = 36;
+    popup_text.align = ALIGN_CENTER_NONE;
+    widget_textbox(hardware_display, &popup_text);
+    FREE(text_str_bfr);
+
+    //check if inversion is needed
+    if (style) {
+        glcd_rect_invert(hardware_display, 3, 29, 123, 22);
+    }
+
+    //update display
+    glcd_update(hardware_glcds(display));
+}

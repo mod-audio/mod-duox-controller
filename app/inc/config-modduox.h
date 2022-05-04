@@ -526,9 +526,10 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define TAP_TEMPO_MAXVAL_OVERFLOW 50
 
 //time in us for the display brightness + led tick interupt
-//needs to be this high so that the generated PWM does not leak into the audio path (EMC and stuff)
 #define LED_INTERUPT_TIME     10
-#define DISPL_INTERUPT_TIME   20
+
+//times used for overlays and popups
+#define TIME_WIDGET_OVERLAY     70
 
 //// Toggled
 // defines the toggled footer text
@@ -547,9 +548,6 @@ enum {ENCODER0, ENCODER1, FOOTSWITCH0, FOOTSWITCH1, FOOTSWITCH2, FOOTSWITCH3, FO
 #define PEDALBOARD_NEXT_FOOTER_TEXT "+"
 // defines the previous pedalboard footer text
 #define PEDALBOARD_PREV_FOOTER_TEXT "-"
-
-//timeout in between CLI volume messages
-#define VOL_MESSAGE_TIMEOUT         200
 
 //// Command line interface configurations
 // defines the cli serial

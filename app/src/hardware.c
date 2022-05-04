@@ -23,9 +23,15 @@
 
 // check in hardware_setup() what is the function of each timer
 //0 is highest priority
+
+//Timer 0 LEDS + Display backlight
 #define TIMER0_PRIORITY     4
-#define TIMER1_PRIORITY     2
-#define TIMER2_PRIORITY     1
+//Timer 1 Actuators polling
+#define TIMER1_PRIORITY     6
+//Timer 2 overlay counter
+#define TIMER2_PRIORITY     2
+//Timer 3 pols overlay and print if needed
+#define TIMER3_PRIORITY     5
 
 /*
 ************************************************************************************************************************
@@ -236,7 +242,9 @@ static button_t g_footswitches[FOOTSWITCHES_COUNT];
 static pot_t g_potentiometer[POTS_COUNT];
 static uint32_t g_counter;
 static int g_brightness;
-
+static uint32_t g_overlay_counter = 0;
+static uint8_t g_overlay_type = 0, g_trigger_overlay_callback = 0;
+static void (*g_overlay_callback)(void);
 
 /*
 ************************************************************************************************************************
@@ -601,23 +609,22 @@ void hardware_setup(void)
     // to start timer
     TIM_Cmd(LPC_TIM1, ENABLE);
 
-
     ////////////////////////////////////////////////////////////////
     // Timer 2 configuration
-    // this timer is for the display brightness
+    // this timer is all device screen overlays
 
-    // initialize timer 2, prescale count time of 10us
+    // initialize timer 2, prescale count time of 10ms
     TIM_ConfigStruct.PrescaleOption = TIM_PRESCALE_USVAL;
-    TIM_ConfigStruct.PrescaleValue = DISPL_INTERUPT_TIME;
+    TIM_ConfigStruct.PrescaleValue = 10000;
     // use channel 2, MR2
     TIM_MatchConfigStruct.MatchChannel = 2;
     // enable interrupt when MR2 matches the value in TC register
     TIM_MatchConfigStruct.IntOnMatch = TRUE;
     // enable reset on MR2: TIMER will reset if MR2 matches it
     TIM_MatchConfigStruct.ResetOnMatch = TRUE;
-    // stop on MR2 if MR2 matches it
+    // stop on MR1 if MR2 matches it
     TIM_MatchConfigStruct.StopOnMatch = FALSE;
-    // set Match value, count value of 1 
+    // set Match value, count value of 1
     TIM_MatchConfigStruct.MatchValue = 1;
     // set configuration for Tim_config and Tim_MatchConfig
     TIM_Init(LPC_TIM2, TIM_TIMER_MODE, &TIM_ConfigStruct);
@@ -628,6 +635,33 @@ void hardware_setup(void)
     NVIC_EnableIRQ(TIMER2_IRQn);
     // to start timer
     TIM_Cmd(LPC_TIM2, ENABLE);
+
+    ////////////////////////////////////////////////////////////////
+    // Timer 3 configuration
+    // this timer is all device screen popup screens
+
+    // initialize timer 3, prescale count time of 20ms
+    TIM_ConfigStruct.PrescaleOption = TIM_PRESCALE_USVAL;
+    TIM_ConfigStruct.PrescaleValue = 20000;
+    // use channel 3, MR3
+    TIM_MatchConfigStruct.MatchChannel = 3;
+    // enable interrupt when MR3 matches the value in TC register
+    TIM_MatchConfigStruct.IntOnMatch = TRUE;
+    // enable reset on MR3: TIMER will reset if MR3 matches it
+    TIM_MatchConfigStruct.ResetOnMatch = TRUE;
+    // stop on MR3 if MR3 matches it
+    TIM_MatchConfigStruct.StopOnMatch = FALSE;
+    // set Match value, count value of 1
+    TIM_MatchConfigStruct.MatchValue = 1;
+    // set configuration for Tim_config and Tim_MatchConfig
+    TIM_Init(LPC_TIM3, TIM_TIMER_MODE, &TIM_ConfigStruct);
+    TIM_ConfigMatch(LPC_TIM3, &TIM_MatchConfigStruct);
+    // set priority
+    NVIC_SetPriority(TIMER3_IRQn, TIMER3_PRIORITY);
+    // enable interrupt for timer 3
+    NVIC_EnableIRQ(TIMER3_IRQn);
+    // to start timer
+    TIM_Cmd(LPC_TIM3, ENABLE);
 
     ////////////////////////////////////////////////////////////////
     // Serial initialization
@@ -826,34 +860,38 @@ void hardware_coreboard_power(uint8_t state)
     }
 }
 
+void hardware_set_overlay_timeout(uint32_t overlay_time_in_ms, void (*timeout_cb), uint8_t type)
+{
+    g_overlay_callback = timeout_cb;
+    g_overlay_type = type;
+
+    //overlay counter is per 10ms, not in ms, so devided by 10
+    g_overlay_counter = overlay_time_in_ms;
+}
+
+void hardware_force_overlay_off(uint8_t avoid_callback)
+{
+    g_overlay_counter = 0;
+
+    if (g_overlay_callback && !avoid_callback)
+        g_overlay_callback();
+
+    g_overlay_callback = NULL;
+}
+
+uint32_t hardware_get_overlay_counter(void)
+{
+    return g_overlay_counter;
+}
+
 void TIMER0_IRQHandler(void)
 {
+    static int count = 1, state;
+
     if (TIM_GetIntStatus(LPC_TIM0, TIM_MR0_INT) == SET)
     {
         // LEDs PWM
         ledz_tick();
-    }
-
-    TIM_ClearIntPending(LPC_TIM0, TIM_MR0_INT);
-}
-
-void TIMER1_IRQHandler(void)
-{
-    if (TIM_GetIntStatus(LPC_TIM1, TIM_MR1_INT) == SET)
-    {
-        actuators_clock();
-        g_counter++;
-    }
-
-    TIM_ClearIntPending(LPC_TIM1, TIM_MR1_INT);
-}
-
-void TIMER2_IRQHandler(void)
-{
-    static int count = 1, state;
-
-    if (TIM_GetIntStatus(LPC_TIM2, TIM_MR2_INT) == SET)
-    {
 
         if (g_brightness == 0)
         {
@@ -885,5 +923,48 @@ void TIMER2_IRQHandler(void)
         }
     }
 
+    TIM_ClearIntPending(LPC_TIM0, TIM_MR0_INT);
+}
+
+void TIMER1_IRQHandler(void)
+{
+    if (TIM_GetIntStatus(LPC_TIM1, TIM_MR1_INT) == SET)
+    {
+        actuators_clock();
+        g_counter++;
+    }
+
+    TIM_ClearIntPending(LPC_TIM1, TIM_MR1_INT);
+}
+
+void TIMER2_IRQHandler(void)
+{
+    if (TIM_GetIntStatus(LPC_TIM2, TIM_MR2_INT) == SET)
+    {
+        if (g_overlay_counter != 0)
+        {
+            g_overlay_counter--;
+
+            if ((g_overlay_counter == 0) && (g_overlay_callback))
+            {
+                g_trigger_overlay_callback = 1;
+            }
+        }
+    }
+
     TIM_ClearIntPending(LPC_TIM2, TIM_MR2_INT);
+}
+
+void TIMER3_IRQHandler(void)
+{
+    if (TIM_GetIntStatus(LPC_TIM3, TIM_MR3_INT) == SET)
+    {
+        if (g_trigger_overlay_callback)
+        {
+            g_overlay_callback();
+            g_trigger_overlay_callback = 0;
+        }
+    }
+
+    TIM_ClearIntPending(LPC_TIM3, TIM_MR3_INT);
 }
