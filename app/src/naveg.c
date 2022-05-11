@@ -2864,7 +2864,12 @@ void naveg_pot_change(uint8_t pot)
         }
     }
 
-    if (g_pots[pot]->properties & FLAG_CONTROL_LOGARITHMIC)
+    if (g_pots[pot]->properties & FLAG_CONTROL_INTEGER)
+    {
+        float value = MAP(tmp_value, (float)g_pot_calibrations[0][pot], (float)g_pot_calibrations[1][pot],  g_pots[pot]->minimum,  g_pots[pot]->maximum);
+        g_pots[pot]->value = round(value);
+    }
+    else if (g_pots[pot]->properties & FLAG_CONTROL_LOGARITHMIC)
     {
         //n = current ADC value (linear range value)
         //x = ADC min = g_pot_calibrations[0][pot]
@@ -2889,7 +2894,7 @@ void naveg_pot_change(uint8_t pot)
         }
     }
     //default, liniar
-    else 
+    else
     {
     	g_pots[pot]->value = MAP(tmp_value, (float)g_pot_calibrations[0][pot], (float)g_pot_calibrations[1][pot],  g_pots[pot]->minimum,  g_pots[pot]->maximum);
     }
