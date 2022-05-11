@@ -294,9 +294,11 @@ static void actuators_task(void *pvParameters)
             id = actuator_info[1];
             status = actuator_info[2];
 
-            //turn off plugin overlay actions
-            if (hardware_get_overlay_counter() != 0)
-                hardware_force_overlay_off(0);
+            //turn off plugin overlay actions, but not on foot release
+            if (hardware_get_overlay_counter() != 0) {
+                if ((type != BUTTON) && (!BUTTON_RELEASED(status)))
+                    hardware_force_overlay_off(0);
+            }
 
             // encoders
             if (type == ROTARY_ENCODER)

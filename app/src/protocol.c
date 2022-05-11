@@ -150,7 +150,11 @@ void protocol_parse(msg_t *msg)
 
     // TODO: check invalid argumets (wildcards)
 
-    if (proto.list_count == 0) return;
+    if (proto.list_count == 0)
+    {
+        FREE(proto.list);
+        return;
+    }
 
     unsigned int match, variable_arguments = 0;
 
@@ -262,7 +266,7 @@ void protocol_response(const char *response, proto_t *proto)
     response_buffer[proto->response_size] = 0;
 }
 
-void protocol_send_response (const char *response, const uint8_t value ,proto_t *proto)
+void protocol_send_response(const char *response, const uint8_t value ,proto_t *proto)
 {
     char buffer[20];
     uint8_t i = 0;
@@ -319,13 +323,13 @@ void protocol_init(void)
     protocol_add_command(CMD_RESET_EEPROM, cb_clear_eeprom);
     protocol_add_command(CMD_DUOX_SET_CONTRAST, cb_set_disp_contrast);
     protocol_add_command(CMD_DUOX_EXP_OVERCURRENT, cb_exp_overcurrent);
+    protocol_add_command(CMD_SYS_LAUNCH_POPUP, cb_launch_popup);
     protocol_add_command(CMD_SYS_CHANGE_LED_BLINK, cb_change_assigned_led_blink);
     protocol_add_command(CMD_SYS_CHANGE_LED_BRIGHTNESS, cb_change_assigned_led_brightness);
     protocol_add_command(CMD_SYS_CHANGE_NAME, cb_change_assigment_name);
     protocol_add_command(CMD_SYS_CHANGE_UNIT, cb_change_assigment_unit);
     protocol_add_command(CMD_SYS_CHANGE_VALUE, cb_change_assigment_value);
     protocol_add_command(CMD_SYS_CHANGE_WIDGET_INDICATOR, cb_change_widget_indicator);
-    protocol_add_command(CMD_SYS_LAUNCH_POPUP, cb_launch_popup);
     protocol_add_command(CMD_PEDALBOARD_CHANGE, cb_pedalboard_change);
 }
 

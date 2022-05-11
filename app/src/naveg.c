@@ -572,7 +572,7 @@ static void foot_control_add(control_t *control)
             ledz_set_state(led, LED_ON, LED_UPDATE);
 
         // if is in tool mode break
-        if (!display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT)))
+        if ((!display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT))) && !hardware_get_overlay_counter())
         {
             // updates the footer
             screen_footer(control->hw_id - ENCODERS_COUNT, control->label,
@@ -595,7 +595,7 @@ static void foot_control_add(control_t *control)
         }
 
         // if is in tool mode break
-        if (!display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT)))
+        if ((!display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT))) && !hardware_get_overlay_counter())
         {
             // updates the footer (a getto fix here, the screen.c file did not regognize the NULL pointer so it did not allign the text properly, TODO fix this)
             screen_footer(control->hw_id - ENCODERS_COUNT, control->label, BYPASS_ON_FOOTER_TEXT, control->properties);
@@ -616,7 +616,7 @@ static void foot_control_add(control_t *control)
         }
 
         // if is in tool mode break
-        if (!display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT)))
+        if ((!display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT))) && !hardware_get_overlay_counter())
         {
             // updates the footer
             screen_footer(control->hw_id - ENCODERS_COUNT, control->label,
@@ -678,7 +678,7 @@ static void foot_control_add(control_t *control)
         }
 
         // if is in tool mode break
-        if (!display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT)))
+        if ((!display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT))) && !hardware_get_overlay_counter())
         {
             // footer text composition
             char value_txt[32];
@@ -711,7 +711,7 @@ static void foot_control_add(control_t *control)
         }
 
         // if is in tool mode break
-        if (!display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT)))
+        if ((!display_has_tool_enabled(get_display_by_id(control->hw_id - ENCODERS_COUNT, FOOT))) && !hardware_get_overlay_counter())
         {
             // updates the footer
             screen_footer(control->hw_id - ENCODERS_COUNT, control->label,
@@ -751,7 +751,7 @@ static void foot_control_add(control_t *control)
         control->steps = control->scale_points_count;
 
         // if is in tool mode break
-        if (!display_has_tool_enabled(get_display_by_id(i, FOOT)))
+        if ((!display_has_tool_enabled(get_display_by_id(i, FOOT))) && !hardware_get_overlay_counter())
         {
             // updates the footer
             screen_footer(control->hw_id - ENCODERS_COUNT, control->label, control->scale_points[i]->label, control->properties);
