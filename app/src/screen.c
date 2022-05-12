@@ -1387,7 +1387,7 @@ void screen_widget_overlay(uint8_t display, int8_t style, char *header, char *te
     glcd_rect_fill(hardware_display, 0, 9, 128, 46, GLCD_WHITE);
 
     //draw the popup box
-    glcd_rect(hardware_display, 1, 10, 127, 43, GLCD_BLACK);
+    glcd_rect(hardware_display, 0, 10, 128, 43, GLCD_BLACK);
 
     //draw title
     char *title_str_bfr = (char *) MALLOC(16 * sizeof(char));
@@ -1410,10 +1410,10 @@ void screen_widget_overlay(uint8_t display, int8_t style, char *header, char *te
     FREE(title_str_bfr);
 
     //draw line between title and text
-    glcd_rect(hardware_display, 1, 27, 126, 1, GLCD_BLACK);
+    glcd_rect(hardware_display, 0, 27, 128, 1, GLCD_BLACK);
 
     //invert title
-    glcd_rect_invert(hardware_display, 3, 12, 123, 14);
+    glcd_rect_invert(hardware_display, 2, 12, 124, 14);
 
     //draw popup text
     char *text_str_bfr = (char *) MALLOC(16 * sizeof(char));
@@ -1437,7 +1437,7 @@ void screen_widget_overlay(uint8_t display, int8_t style, char *header, char *te
 
     //check if inversion is needed
     if (style) {
-        glcd_rect_invert(hardware_display, 3, 29, 123, 22);
+        glcd_rect_invert(hardware_display, 2, 29, 124, 22);
     }
 
     //update display
