@@ -60,7 +60,7 @@
 #define ACTUATOR_TYPE(act)  (((button_t *)(act))->type)
 
 #define ACTUATORS_QUEUE_SIZE    40
-#define RESERVED_QUEUE_SPACES	15
+#define RESERVED_QUEUE_SPACES   15
 
 /*
 ************************************************************************************************************************
@@ -154,30 +154,47 @@ static void actuators_cb(void *actuator)
     actuator_info[2] = actuator_get_status(actuator);
 
     //we always reserve empty spaces in the queue, these are for non analog actuators
-    //when these are triggered they are moved to the front of the queue for imidiate excecution. 
+    //when these are triggered they are moved to the front of the queue for imidiate excecution.
     //the analog actuators can not overflow the whole queue
-   	//when an overflow happens, samples of the analog actuator are not send, basicly lowering the resolution for us already
+    //when an overflow happens, samples of the analog actuator are not send, basicly lowering the resolution for us already
     portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 
-   	if (ACTUATOR_TYPE(actuator) == BUTTON)
-   	{
-   		xQueueSendToFrontFromISR(g_actuators_queue, &actuator_info, &xHigherPriorityTaskWoken);
-   	}
-   	else 
-   	{
-   		if (uxQueueSpacesAvailable(g_actuators_queue) > RESERVED_QUEUE_SPACES)
-   		{
-    		// queue actuator info
-			xQueueSendToBackFromISR(g_actuators_queue, &actuator_info, &xHigherPriorityTaskWoken);
-   		}
-   		else 
-   			return;
+    xQueueOverwriteFromISR(g_actuators_queue, &actuator_info, &xHigherPriorityTaskWoken);
 
-   	}
-   	
-   	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+    portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }
 
+// this callback is called from a ISR
+static void pots_cb(void *actuator)
+{
+    static uint8_t i, info[ACTUATORS_QUEUE_SIZE - RESERVED_QUEUE_SPACES][3];
+
+    // does a copy of actuator id and status
+    uint8_t *actuator_info;
+    actuator_info = info[i];
+    if (++i == ACTUATORS_QUEUE_SIZE - RESERVED_QUEUE_SPACES) i = 0;
+
+    // fills the actuator info vector
+    actuator_info[0] = ((button_t *)(actuator))->type;
+    actuator_info[1] = ((button_t *)(actuator))->id;
+    actuator_info[2] = actuator_get_status(actuator);
+
+    //we always reserve empty spaces in the queue, these are for non analog actuators
+    //when these are triggered they are moved to the front of the queue for imidiate excecution.
+    //the analog actuators can not overflow the whole queue
+    //when an overflow happens, samples of the analog actuator are not send, basicly lowering the resolution for us already
+    portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+
+    if (uxQueueSpacesAvailable(g_actuators_queue) > RESERVED_QUEUE_SPACES)
+    {
+        // queue actuator info
+        xQueueSendToBackFromISR(g_actuators_queue, &actuator_info, &xHigherPriorityTaskWoken);
+    }
+    else
+        return;
+
+    portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+}
 
 /*
 ************************************************************************************************************************
@@ -379,7 +396,7 @@ static void actuators_task(void *pvParameters)
 
                 if (BUTTON_HOLD(status))
                 {
-                   	//we dont use these button events in callibration mode
+                    //we dont use these button events in callibration mode
                     if (!g_calibration_mode)
                     {
                         if (id > 3) naveg_save_snapshot(id);
@@ -484,7 +501,7 @@ static void setup_task(void *pvParameters)
     }
     for (i = 0; i < POTS_COUNT; i++)
     {
-        actuator_set_event(hardware_actuators(POT0 + i), actuators_cb);
+        actuator_set_event(hardware_actuators(POT0 + i), pots_cb);
         actuator_enable_event(hardware_actuators(POT0 + i), EV_POT_TURNED);
     }
 

@@ -356,13 +356,11 @@ void actuators_clock(void)
 
     for (i = 0; i < g_actuators_count; i++)
     {
-        button = (button_t *) g_actuators_pointers[i];
-        encoder = (encoder_t *) g_actuators_pointers[i];
-        pot = (pot_t *) g_actuators_pointers[i];
-
         switch (ACTUATOR_TYPE(g_actuators_pointers[i]))
         {
             case BUTTON:
+                button = (button_t *) g_actuators_pointers[i];
+
                 if (READ_PIN(button->port, button->pin) == BUTTON_ACTIVATED)
                     button_on = BUTTON_ON_FLAG;
                 else
@@ -447,6 +445,8 @@ void actuators_clock(void)
                 break;
 
             case ROTARY_ENCODER:
+                encoder = (encoder_t *) g_actuators_pointers[i];
+
                 // --- button processing ---
 
                 // read button pin
@@ -475,7 +475,7 @@ void actuators_clock(void)
                                 SET_FLAG(encoder->status, EV_BUTTON_HELD);
                                 SET_FLAG(encoder->control, CLICK_CANCEL_FLAG);
 
-                                event(button, EV_BUTTON_HELD);
+                                event(encoder, EV_BUTTON_HELD);
                             }
                         }
                     }
@@ -506,7 +506,7 @@ void actuators_clock(void)
                             CLR_FLAG(encoder->status, EV_BUTTON_RELEASED);
                             SET_FLAG(encoder->status, EV_BUTTON_PRESSED);
 
-                            event(button, EV_BUTTON_PRESSED);
+                            event(encoder, EV_BUTTON_PRESSED);
 
                             // reload debounce counter
                             encoder->debounce = ENCODER_RELEASE_DEBOUNCE / CLOCK_PERIOD;
@@ -526,7 +526,7 @@ void actuators_clock(void)
 
                             CLR_FLAG(encoder->control, CLICK_CANCEL_FLAG);
 
-                            event(button, EV_BUTTON_RELEASED | EV_BUTTON_CLICKED);
+                            event(encoder, EV_BUTTON_RELEASED | EV_BUTTON_CLICKED);
 
                             // reload debounce counter
                             encoder->debounce = ENCODER_PRESS_DEBOUNCE / CLOCK_PERIOD;
@@ -628,15 +628,14 @@ void actuators_clock(void)
                 break;
 
             case POT:
+                pot = (pot_t *) g_actuators_pointers[i];
+
                 //clear the pot event
                 CLR_FLAG(pot->status, EV_POT_TURNED);
 
                 //if channel bussy we skip an actuator clock cycle, TODO make me not so dirty 
                 if (ADC_ChannelGetStatus(LPC_ADC, pot->channel, 1))
                 {
-                    //get value
-                    //uint16_t tmp = ADC_ChannelGetData(LPC_ADC, pot->channel);
-
                     uint16_t tmp = (((*(uint16_t *)((&LPC_ADC->DR[0]) + pot->channel)>>4)&0xFFF));
 
                     //apply weighing factor
@@ -648,10 +647,10 @@ void actuators_clock(void)
                     //if turned and difference is suficiant
                     if ((val > pot->value) ? ((val - pot->value) > POT_THRESHOLD) : ((pot->value - val) > POT_THRESHOLD))
                     {
-                            pot->value = val;
-                            g_pot_value[pot->id] = val;
-                            SET_FLAG(pot->status, EV_POT_TURNED);
-                            event(pot, EV_POT_TURNED);
+                        pot->value = val;
+                        g_pot_value[pot->id] = val;
+                        SET_FLAG(pot->status, EV_POT_TURNED);
+                        event(pot, EV_POT_TURNED);
                     }
                 }
 
