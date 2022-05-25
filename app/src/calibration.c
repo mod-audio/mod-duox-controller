@@ -408,6 +408,9 @@ void calibration_button_pressed(uint8_t button)
             //all is safe, we can exit
             g_calibration_mode = false;
 
+            //make sure to turn off all leds
+            naveg_turn_off_leds();
+
             //exit the menu show normal operation
             naveg_toggle_tool(DISPLAY_TOOL_SYSTEM, DISPLAY_LEFT);
 

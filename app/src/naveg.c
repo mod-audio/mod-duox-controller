@@ -4075,3 +4075,17 @@ void naveg_set_reboot_value(uint8_t boot_value)
 {
     g_reboot_value = boot_value;
 }
+
+void naveg_turn_off_leds(void)
+{
+    uint8_t i;
+    ledz_t *led; 
+    for (i = 0; i < LEDS_COUNT; i++)
+    {
+        led = hardware_leds(i);
+        led_state_t led_state = {
+            .color = WHITE,
+        };
+        set_ledz_trigger_by_color_id(led, LED_OFF, led_state);
+    }
+}
