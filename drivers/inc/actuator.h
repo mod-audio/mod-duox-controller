@@ -55,13 +55,6 @@ typedef enum {
 #define BUTTON_ACTIVATED            0
 #define ENCODER_ACTIVATED           0
 
-// Setup your external I/O's functions
-// These configurations have been moved to config.h
-#if 0
-#define READ_PIN(port, pin)
-#define CONFIG_PIN_INPUT(port, pin)
-#endif
-
 // Clock peririod definition (in miliseconds)
 #define CLOCK_PERIOD                1
 
@@ -72,7 +65,7 @@ typedef enum {
 #define ENCODER_RELEASE_DEBOUNCE    100
 
 // Encoders configuration
-#define ENCODER_RESOLUTION          24
+#define ENCODER_RESOLUTION          25
 
 
 /*

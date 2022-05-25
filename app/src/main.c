@@ -59,8 +59,8 @@
 #define TASK_NAME(name)     ((const char * const) (name))
 #define ACTUATOR_TYPE(act)  (((button_t *)(act))->type)
 
-#define ACTUATORS_QUEUE_SIZE    40
-#define RESERVED_QUEUE_SPACES   15
+#define ACTUATORS_QUEUE_SIZE    120
+#define RESERVED_QUEUE_SPACES   20
 
 /*
 ************************************************************************************************************************
@@ -153,13 +153,10 @@ static void actuators_cb(void *actuator)
     actuator_info[1] = ((button_t *)(actuator))->id;
     actuator_info[2] = actuator_get_status(actuator);
 
-    //we always reserve empty spaces in the queue, these are for non analog actuators
-    //when these are triggered they are moved to the front of the queue for imidiate excecution.
-    //the analog actuators can not overflow the whole queue
-    //when an overflow happens, samples of the analog actuator are not send, basicly lowering the resolution for us already
     portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 
-    xQueueOverwriteFromISR(g_actuators_queue, &actuator_info, &xHigherPriorityTaskWoken);
+    //we use an overwrite here, to never miss events from digital actuators
+    xQueueSendToFrontFromISR(g_actuators_queue, &actuator_info, &xHigherPriorityTaskWoken);
 
     portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }
