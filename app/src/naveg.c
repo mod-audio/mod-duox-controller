@@ -1330,7 +1330,7 @@ static void bp_enter(void)
         g_bp_state = PEDALBOARD_LIST;
         //index is relevent in our array so - page_min
         title = g_banks->names[g_banks->hover - g_banks->page_min];
-        g_bp_first = 1;   
+        g_bp_first = 1;
     }
     else if (g_bp_state == PEDALBOARD_LIST)
     {
