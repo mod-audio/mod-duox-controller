@@ -1,6 +1,6 @@
 # MOD Duo X Controller
 
-This is the source code for the MOD Duo controller (sometimes referred to as "HMI").
+This is the source code for the MOD Duo X controller (sometimes referred to as "HMI").
 
 If you don't know what this refers to, see [wiki.mod.audio/wiki/Device_Settings](https://wiki.mod.audio/wiki/Device_Settings).
 
