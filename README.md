@@ -1,25 +1,49 @@
-# mod-duox-controller
+# MOD Duo X Controller
 
-Files for the Duo X controller firmware
+This is the source code for the MOD Duo controller (sometimes referred to as "HMI").
 
-This repo will only work with the latest revision of the MOD DuoX controller board (Rev 5, March 2019).
-The board features a 12Mhz crystal (main CLK of 120Mhz) on the LPC1777.
+If you don't know what this refers to, see [wiki.mod.audio/wiki/Device_Settings](https://wiki.mod.audio/wiki/Device_Settings).
 
-In order to flash the HMI the LPC2ISP tool is used: https://github.com/moddevices/lpc21isp.git
+## Building
 
-In order to flash the LPC1777 the update script hmi-update in /bin/ needs the correct value's 
-the baudrate at which the data is send needs to be 57600bps instead of 115200bps for the MOD Duo
-this is because the LPC1777 doesnt accept an ISP baud rate of 115200bps
-The clock frequency also needs to be adjusted to 12Mhz instead of 10Mhz. 
+There are no external dependencies besides `arm-none-eabi-` GCC and [mod-controller-proto](https://github.com/mod-audio/mod-controller-proto) (used as git submodule).
 
-## Build dependencies
+So building can be done with:
 
-A ARM compiler. E.g. on Arch Linux install:
 ```
-pacman -S arm-none-eabi-gcc
+# adjust if not using debian-based distribution
+sudo apt install gcc-arm-none-eabi
+
+# clone recursively (note the --recursive, important!)
+git clone --recursive https://github.com/mod-audio/mod-duox-controller.git
+
+# change dir to where code is
+cd mod-duox-controller
+
+# build firmware
+make modduox
 ```
-Or on Debian Linux install:
+
+The generated firmware file will be placed inside the `out/` subdirectory.
+
+## Deploying
+
+You can deploy HMI firmware with the `hmi-update` command included inside the MOD OS.
+Just copy the firmware binary into the MOD unit over SSH and run this script with the binary filename as argument.
+
+For example:
+
 ```
-add-apt-repository ppa:team-gcc-arm-embedded/ppa
-apt-get install gcc-arm-embedded
+# Copy firmware file to MOD unit
+scp -O out/mod-duox-controller.bin root@192.168.51.1:/tmp/
+
+# Update HMI firmware
+ssh root@192.168.51.1 "hmi-update /tmp/mod-duox-controller.bin"
+
+# Restart mod-ui service
+ssh root@192.168.51.1 "systemctl stop mod-ui"
 ```
+
+## License
+
+MOD Duo X Controller is licensed under AGPLv3+, see [LICENSE](LICENSE) for more details.
